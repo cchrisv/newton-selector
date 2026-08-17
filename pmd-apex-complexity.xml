@@ -7,7 +7,7 @@
 >
 
   <description>
-    Complexity thresholds for the newtonSelectorFlowScreen package. Enforces the cyclomatic and
+    Complexity thresholds for the newton-selector package. Enforces the cyclomatic and
     cognitive limits defined in code-complexity-standards.md: CC fail >15 on Apex,
     cognitive-complexity fail >15.
   </description>

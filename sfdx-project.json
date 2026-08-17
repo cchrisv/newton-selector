@@ -3,13 +3,13 @@
     {
       "path": "force-app",
       "default": true,
-      "package": "newtonSelector",
+      "package": "newton-selector",
       "versionName": "Newton Selector v1.0",
       "versionNumber": "1.0.0.NEXT",
       "versionDescription": "Newton Selector for Flow Screens with CPE. Supports picklist, collection, SObject+SOQL, and custom data sources."
     }
   ],
-  "name": "newtonSelector",
+  "name": "newton-selector",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "66.0",
