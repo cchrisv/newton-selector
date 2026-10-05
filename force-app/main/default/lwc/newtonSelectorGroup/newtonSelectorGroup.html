@@ -4,7 +4,7 @@
       <div class="newton-search-bar">
         <c-newton-selector-icon
           name="search"
-          size="sm"
+          size="x-small"
           box="input"
         ></c-newton-selector-icon>
         <input
@@ -41,64 +41,22 @@
       <div
         class={groupClass}
         style={groupStyle}
-        role={groupRole}
         oncardselect={handleCardSelect}
       >
-        <template for:each={decoratedItems} for:item="item">
+        <template for:each={cards} for:item="item">
           <c-newton-selector-choice-tile
             key={item.id}
             item={item}
-            variant={choiceTileVariant}
             selected={item._selected}
             disabled={item._disabled}
-            selection-mode={selectionMode}
-            group-name={_groupName}
-            size={size}
-            aspect-ratio={aspectRatio}
-            badge-position={badgePosition}
-            badge-variant={badgeVariant}
-            badge-shape={badgeShape}
-            selection-indicator={selectionIndicator}
-            elevation={elevation}
-            pattern={pattern}
-            pattern-tone={patternTone}
-            pattern-hover-tone={patternHoverTone}
-            pattern-selected-tone={patternSelectedTone}
-            pattern-disabled-tone={patternDisabledTone}
-            corner-style={cornerStyle}
-            corner-tone={cornerTone}
-            surface-style={surfaceStyle}
-            surface-tone={surfaceTone}
-            surface-hover-tone={surfaceHoverTone}
-            surface-selected-tone={surfaceSelectedTone}
-            surface-disabled-tone={surfaceDisabledTone}
-            icon-decor={iconDecor}
-            icon-style={iconStyle}
-            icon-shading={iconShading}
-            icon-tone={iconTone}
-            icon-tone-hex={iconToneHex}
-            icon-glyph-tone={iconGlyphTone}
-            icon-glyph-tone-hex={iconGlyphToneHex}
-            icon-size={iconSize}
-            pattern-tone-hex={patternToneHex}
-            pattern-hover-tone-hex={patternHoverToneHex}
-            pattern-selected-tone-hex={patternSelectedToneHex}
-            pattern-disabled-tone-hex={patternDisabledToneHex}
-            corner-tone-hex={cornerToneHex}
-            surface-tone-hex={surfaceToneHex}
-            surface-hover-tone-hex={surfaceHoverToneHex}
-            surface-selected-tone-hex={surfaceSelectedToneHex}
-            surface-disabled-tone-hex={surfaceDisabledToneHex}
-            badge-variant-hex={badgeVariantHex}
-            show-icons={showIcons}
-            show-badges={showBadges}
+            lwc:spread={tileProps}
           ></c-newton-selector-choice-tile>
         </template>
         <template lwc:if={isEmpty}>
           <div class="newton-empty">
             <c-newton-selector-icon
               name="search"
-              size="sm"
+              size="x-small"
               box="tile"
             ></c-newton-selector-icon>
             <p>No items to display.</p>
@@ -108,118 +66,125 @@
     </template>
 
     <template lwc:if={isPicklist}>
-      <div class={picklistClass} style={groupStyle}>
-        <c-newton-selector-combobox
-          class="newton-picklist__combobox"
-          open={_picklistOpen}
-          dropdown-id={picklistListboxId}
-          dropdown-label="Picklist options"
-          dropdown-class="newton-picklist__menu"
-          aria-multiselectable={picklistAriaMultiselectable}
-        >
-          <div slot="trigger" class={picklistInputContainerClass} role="none">
-            <template lwc:if={selectedPicklistIcon}>
+      <div
+        class={picklistClass}
+        style={groupStyle}
+        onfocusout={handlePicklistFocusOut}
+      >
+        <div class="slds-combobox_container newton-picklist__combobox">
+          <div class={picklistComboboxClass}>
+            <div class={picklistInputContainerClass} role="none">
+              <template lwc:if={selectedPicklistIcon}>
+                <span
+                  class="slds-icon_container slds-combobox__input-entity-icon newton-picklist__selected-icon"
+                  aria-hidden="true"
+                >
+                  <c-newton-selector-icon
+                    name={selectedPicklistIcon}
+                    size="x-small"
+                    box="input"
+                  ></c-newton-selector-icon>
+                </span>
+              </template>
+
+              <button
+                class={picklistInputClass}
+                type="button"
+                role="combobox"
+                aria-haspopup="listbox"
+                aria-controls={picklistControls}
+                aria-expanded={picklistExpanded}
+                aria-activedescendant={picklistActiveDescendant}
+                aria-label={picklistAriaLabel}
+                title={picklistInputTitle}
+                onkeydown={handlePicklistKeydown}
+                onclick={handlePicklistToggle}
+              >
+                <span class="slds-truncate">{picklistButtonLabel}</span>
+              </button>
+
               <span
-                class="slds-icon_container slds-combobox__input-entity-icon newton-picklist__selected-icon"
+                class="slds-icon_container slds-input__icon slds-input__icon_right newton-picklist__chevron"
                 aria-hidden="true"
               >
                 <c-newton-selector-icon
-                  name={selectedPicklistIcon}
+                  name={picklistChevron}
                   size="x-small"
                   box="input"
                 ></c-newton-selector-icon>
               </span>
-            </template>
+            </div>
 
-            <button
-              id={picklistInputId}
-              class={picklistInputClass}
-              type="button"
-              role="combobox"
-              aria-haspopup="listbox"
-              aria-controls={picklistListboxId}
-              aria-expanded={picklistExpanded}
-              aria-label={picklistAriaLabel}
-              title={picklistInputTitle}
-              onkeydown={handlePicklistKeydown}
-              onclick={handlePicklistToggle}
-            >
-              <span class="slds-truncate">{picklistButtonLabel}</span>
-            </button>
-
-            <span
-              class="slds-icon_container slds-input__icon slds-input__icon_right newton-picklist__chevron"
-              aria-hidden="true"
-            >
-              <c-newton-selector-icon
-                name={picklistChevron}
-                size="x-small"
-                box="input"
-              ></c-newton-selector-icon>
-            </span>
-          </div>
-
-          <div
-            slot="dropdown"
-            class="newton-picklist__menu"
-            oncardselect={handlePicklistCardSelect}
-          >
-            <template lwc:if={enableSearch}>
-              <div class="slds-form-element newton-picklist__search">
-                <div
-                  class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left"
-                >
-                  <span
-                    class="slds-icon_container slds-input__icon slds-input__icon_left"
-                    aria-hidden="true"
+            <template lwc:if={_picklistOpen}>
+              <div
+                class="slds-dropdown slds-dropdown_fluid newton-picklist__menu"
+              >
+                <template lwc:if={enableSearch}>
+                  <div class="slds-form-element newton-picklist__search">
+                    <div
+                      class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left"
+                    >
+                      <span
+                        class="slds-icon_container slds-input__icon slds-input__icon_left"
+                        aria-hidden="true"
+                      >
+                        <c-newton-selector-icon
+                          name="search"
+                          size="x-small"
+                          box="input"
+                        ></c-newton-selector-icon>
+                      </span>
+                      <input
+                        type="search"
+                        class="slds-input newton-picklist__search-input"
+                        placeholder="Search options"
+                        value={_searchTerm}
+                        oninput={handleSearch}
+                        onkeydown={handlePicklistKeydown}
+                        aria-label="Filter picklist options"
+                        aria-controls={picklistListboxId}
+                        aria-activedescendant={picklistActiveDescendant}
+                      />
+                    </div>
+                  </div>
+                </template>
+                <template lwc:if={hasFilteredItems}>
+                  <ul
+                    id={picklistListboxId}
+                    class="slds-listbox slds-listbox_vertical newton-picklist__listbox"
+                    role="listbox"
+                    aria-label="Picklist options"
+                    aria-multiselectable={picklistAriaMultiselectable}
+                    onmousedown={handlePicklistOptionMouseDown}
                   >
-                    <c-newton-selector-icon
-                      name="search"
-                      size="x-small"
-                      box="input"
-                    ></c-newton-selector-icon>
-                  </span>
-                  <input
-                    type="search"
-                    class="slds-input newton-picklist__search-input"
-                    placeholder="Search options"
-                    value={_searchTerm}
-                    oninput={handleSearch}
-                    aria-label="Filter picklist options"
-                  />
-                </div>
+                    <template for:each={picklistItems} for:item="item">
+                      <li key={item.id} class={item._class} role="presentation">
+                        <div
+                          id={item._optionId}
+                          class={item._optionClass}
+                          role="option"
+                          aria-selected={item._ariaSelected}
+                          aria-disabled={item._ariaDisabled}
+                          data-value={item.value}
+                          onclick={handlePicklistOptionSelect}
+                        >
+                          <c-newton-selector-flow-cpe-lookup-choice-option
+                            row={item}
+                            search-term={_searchTerm}
+                            selected={item._selected}
+                          ></c-newton-selector-flow-cpe-lookup-choice-option>
+                        </div>
+                      </li>
+                    </template>
+                  </ul>
+                </template>
+                <template lwc:else>
+                  <p class="newton-picklist__empty">No options to display.</p>
+                </template>
               </div>
             </template>
-            <template lwc:if={hasPicklistItems}>
-              <ul
-                class="slds-listbox slds-listbox_vertical newton-picklist__listbox"
-                role="presentation"
-              >
-                <template for:each={picklistItems} for:item="item">
-                  <li key={item.id} class={item._class} role="presentation">
-                    <div
-                      class="slds-listbox__option newton-picklist__option"
-                      role="option"
-                      aria-selected={item._ariaSelected}
-                      aria-disabled={item._ariaDisabled}
-                      data-value={item.value}
-                      onclick={handlePicklistOptionSelect}
-                    >
-                      <c-newton-selector-flow-cpe-lookup-choice-option
-                        row={item}
-                        search-term={_searchTerm}
-                        selected={item._selected}
-                      ></c-newton-selector-flow-cpe-lookup-choice-option>
-                    </div>
-                  </li>
-                </template>
-              </ul>
-            </template>
-            <template lwc:else>
-              <p class="newton-picklist__empty">No options to display.</p>
-            </template>
           </div>
-        </c-newton-selector-combobox>
+        </div>
       </div>
     </template>
 
@@ -227,7 +192,6 @@
       <div
         class={groupClass}
         style={groupStyle}
-        role={groupRole}
         oncardselect={handleCardSelect}
       >
         <template for:each={radioItems} for:item="item">
@@ -235,58 +199,17 @@
             <span class="newton-radio-card__marker" aria-hidden="true"></span>
             <c-newton-selector-choice-tile
               item={item}
-              variant={choiceTileVariant}
               selected={item._selected}
               disabled={item._disabled}
-              selection-mode={selectionMode}
-              group-name={_groupName}
-              size={size}
-              aspect-ratio={aspectRatio}
-              badge-position={badgePosition}
-              badge-variant={badgeVariant}
-              badge-shape={badgeShape}
-              selection-indicator={selectionIndicator}
-              elevation={elevation}
-              pattern={pattern}
-              pattern-tone={patternTone}
-              pattern-hover-tone={patternHoverTone}
-              pattern-selected-tone={patternSelectedTone}
-              pattern-disabled-tone={patternDisabledTone}
-              corner-style={cornerStyle}
-              corner-tone={cornerTone}
-              surface-style={surfaceStyle}
-              surface-tone={surfaceTone}
-              surface-hover-tone={surfaceHoverTone}
-              surface-selected-tone={surfaceSelectedTone}
-              surface-disabled-tone={surfaceDisabledTone}
-              icon-decor={iconDecor}
-              icon-style={iconStyle}
-              icon-shading={iconShading}
-              icon-tone={iconTone}
-              icon-tone-hex={iconToneHex}
-              icon-glyph-tone={iconGlyphTone}
-              icon-glyph-tone-hex={iconGlyphToneHex}
-              icon-size={iconSize}
-              pattern-tone-hex={patternToneHex}
-              pattern-hover-tone-hex={patternHoverToneHex}
-              pattern-selected-tone-hex={patternSelectedToneHex}
-              pattern-disabled-tone-hex={patternDisabledToneHex}
-              corner-tone-hex={cornerToneHex}
-              surface-tone-hex={surfaceToneHex}
-              surface-hover-tone-hex={surfaceHoverToneHex}
-              surface-selected-tone-hex={surfaceSelectedToneHex}
-              surface-disabled-tone-hex={surfaceDisabledToneHex}
-              badge-variant-hex={badgeVariantHex}
-              show-icons={showIcons}
-              show-badges={showBadges}
+              lwc:spread={tileProps}
             ></c-newton-selector-choice-tile>
           </div>
         </template>
-        <template lwc:if={isRadioEmpty}>
+        <template lwc:if={isEmpty}>
           <div class="newton-empty">
             <c-newton-selector-icon
               name="search"
-              size="sm"
+              size="x-small"
               box="tile"
             ></c-newton-selector-icon>
             <p>No items to display.</p>
@@ -296,7 +219,7 @@
     </template>
 
     <template lwc:if={isTransferLayout}>
-      <div class={transferClass} style={groupStyle} role="group">
+      <div class={transferClass} style={groupStyle}>
         <section
           class={availablePanelClass}
           data-zone="available"
@@ -306,14 +229,16 @@
           ondrop={handleDrop}
         >
           <header class="newton-transfer__head">
-            <span class="newton-transfer__label">{availablePanelLabel}</span>
+            <span id={availableLabelId} class="newton-transfer__label"
+              >{availablePanelLabel}</span
+            >
             <span class="newton-transfer__count">{availableCountLabel}</span>
           </header>
           <template lwc:if={enableSearch}>
             <div class="newton-transfer__search">
               <c-newton-selector-icon
                 name="search"
-                size="sm"
+                size="x-small"
                 box="input"
               ></c-newton-selector-icon>
               <input
@@ -328,8 +253,8 @@
           </template>
           <div
             class="newton-transfer__list"
-            role="listbox"
-            aria-label="Available options"
+            role="group"
+            aria-labelledby={availableLabelId}
             oncardselect={handleAvailableCardSelect}
           >
             <template lwc:if={hasAvailableItems}>
@@ -343,50 +268,9 @@
                 >
                   <c-newton-selector-choice-tile
                     item={item}
-                    variant={choiceTileVariant}
                     selected={item._selected}
                     disabled={item._disabled}
-                    selection-mode={selectionMode}
-                    group-name={_groupName}
-                    size={size}
-                    aspect-ratio={aspectRatio}
-                    badge-position={badgePosition}
-                    badge-variant={badgeVariant}
-                    badge-shape={badgeShape}
-                    selection-indicator={selectionIndicator}
-                    elevation={elevation}
-                    pattern={pattern}
-                    pattern-tone={patternTone}
-                    pattern-hover-tone={patternHoverTone}
-                    pattern-selected-tone={patternSelectedTone}
-                    pattern-disabled-tone={patternDisabledTone}
-                    corner-style={cornerStyle}
-                    corner-tone={cornerTone}
-                    surface-style={surfaceStyle}
-                    surface-tone={surfaceTone}
-                    surface-hover-tone={surfaceHoverTone}
-                    surface-selected-tone={surfaceSelectedTone}
-                    surface-disabled-tone={surfaceDisabledTone}
-                    icon-decor={iconDecor}
-                    icon-style={iconStyle}
-                    icon-shading={iconShading}
-                    icon-tone={iconTone}
-                    icon-tone-hex={iconToneHex}
-                    icon-glyph-tone={iconGlyphTone}
-                    icon-glyph-tone-hex={iconGlyphToneHex}
-                    icon-size={iconSize}
-                    pattern-tone-hex={patternToneHex}
-                    pattern-hover-tone-hex={patternHoverToneHex}
-                    pattern-selected-tone-hex={patternSelectedToneHex}
-                    pattern-disabled-tone-hex={patternDisabledToneHex}
-                    corner-tone-hex={cornerToneHex}
-                    surface-tone-hex={surfaceToneHex}
-                    surface-hover-tone-hex={surfaceHoverToneHex}
-                    surface-selected-tone-hex={surfaceSelectedToneHex}
-                    surface-disabled-tone-hex={surfaceDisabledToneHex}
-                    badge-variant-hex={badgeVariantHex}
-                    show-icons={showIcons}
-                    show-badges={showBadges}
+                    lwc:spread={tileProps}
                   ></c-newton-selector-choice-tile>
                 </div>
               </template>
@@ -398,7 +282,11 @@
         </section>
 
         <template lwc:if={isDualListbox}>
-          <div class="newton-transfer__controls" aria-label="Move options">
+          <div
+            class="newton-transfer__controls"
+            role="group"
+            aria-label="Move options"
+          >
             <button
               type="button"
               class="slds-button slds-button_icon slds-button_icon-border newton-transfer__control"
@@ -467,13 +355,15 @@
           ondrop={handleDrop}
         >
           <header class="newton-transfer__head">
-            <span class="newton-transfer__label">{selectedPanelLabel}</span>
+            <span id={selectedLabelId} class="newton-transfer__label"
+              >{selectedPanelLabel}</span
+            >
             <span class="newton-transfer__count">{selectedCountLabel}</span>
           </header>
           <div
             class="newton-transfer__list"
-            role="listbox"
-            aria-label="Selected options"
+            role="group"
+            aria-labelledby={selectedLabelId}
             oncardselect={handleSelectedCardSelect}
           >
             <template lwc:if={hasSelectedItems}>
@@ -487,50 +377,9 @@
                 >
                   <c-newton-selector-choice-tile
                     item={item}
-                    variant={choiceTileVariant}
                     selected={item._selected}
                     disabled={item._disabled}
-                    selection-mode={selectionMode}
-                    group-name={_groupName}
-                    size={size}
-                    aspect-ratio={aspectRatio}
-                    badge-position={badgePosition}
-                    badge-variant={badgeVariant}
-                    badge-shape={badgeShape}
-                    selection-indicator={selectionIndicator}
-                    elevation={elevation}
-                    pattern={pattern}
-                    pattern-tone={patternTone}
-                    pattern-hover-tone={patternHoverTone}
-                    pattern-selected-tone={patternSelectedTone}
-                    pattern-disabled-tone={patternDisabledTone}
-                    corner-style={cornerStyle}
-                    corner-tone={cornerTone}
-                    surface-style={surfaceStyle}
-                    surface-tone={surfaceTone}
-                    surface-hover-tone={surfaceHoverTone}
-                    surface-selected-tone={surfaceSelectedTone}
-                    surface-disabled-tone={surfaceDisabledTone}
-                    icon-decor={iconDecor}
-                    icon-style={iconStyle}
-                    icon-shading={iconShading}
-                    icon-tone={iconTone}
-                    icon-tone-hex={iconToneHex}
-                    icon-glyph-tone={iconGlyphTone}
-                    icon-glyph-tone-hex={iconGlyphToneHex}
-                    icon-size={iconSize}
-                    pattern-tone-hex={patternToneHex}
-                    pattern-hover-tone-hex={patternHoverToneHex}
-                    pattern-selected-tone-hex={patternSelectedToneHex}
-                    pattern-disabled-tone-hex={patternDisabledToneHex}
-                    corner-tone-hex={cornerToneHex}
-                    surface-tone-hex={surfaceToneHex}
-                    surface-hover-tone-hex={surfaceHoverToneHex}
-                    surface-selected-tone-hex={surfaceSelectedToneHex}
-                    surface-disabled-tone-hex={surfaceDisabledToneHex}
-                    badge-variant-hex={badgeVariantHex}
-                    show-icons={showIcons}
-                    show-badges={showBadges}
+                    lwc:spread={tileProps}
                   ></c-newton-selector-choice-tile>
                 </div>
               </template>
@@ -546,7 +395,7 @@
     <template lwc:if={showManualInput}>
       <div class="slds-form-element newton-manual-input">
         <label class="slds-form-element__label" for="manual-input">
-          {resolvedManualInputLabel}
+          {manualInputLabel}
         </label>
         <div class="slds-form-element__control">
           <input
@@ -559,7 +408,7 @@
             oninput={handleManualInput}
           />
         </div>
-        <template lwc:if={hasManualInputHelpText}>
+        <template lwc:if={manualInputHelpText}>
           <div class="slds-form-element__help">{manualInputHelpText}</div>
         </template>
       </div>

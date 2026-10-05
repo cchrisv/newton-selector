@@ -1,7 +1,9 @@
-/** @description Builds validated SOQL text and bind values for Newton Selector runtime queries. */
+/** @description Builds validated SOQL text and bind values for Newton Selector runtime queries. Owns the query defaults. */
 public with sharing class NewtonSelectorQueryBuilder {
   private static final Integer DEFAULT_LIMIT = 50;
   private static final Integer MAX_LIMIT = 2000;
+  private static final String DEFAULT_DIRECTION = 'ASC';
+  private static final String DEFAULT_LABEL_FIELD = 'Name';
   private static final Set<String> ALLOWED_DIRECTIONS = new Set<String>{
     'ASC',
     'DESC'
@@ -17,99 +19,94 @@ public with sharing class NewtonSelectorQueryBuilder {
 
   /**
    * @description Builds validated SOQL and named bind values from a selector config.
+   * Fills a blank labelField with the default in place so record mapping reads the same field.
    * @param config Selector query configuration.
    * @return Validated SOQL and bind values.
    */
   public static QueryParts build(NewtonSelectorQueryDTO config) {
-    validateConfig(config);
-    NewtonSelectorQueryFieldAccess.validateObject(config.sObjectApiName);
-    List<String> fields = NewtonSelectorQueryFieldAccess.collectFields(config);
-    NewtonSelectorQueryFieldAccess.validateFields(
-      config.sObjectApiName,
-      fields
-    );
-    return buildSoql(config, fields);
-  }
-
-  private static void validateConfig(NewtonSelectorQueryDTO config) {
-    if (config == null) {
-      throw new NewtonSelectorException('Query configuration is required.');
+    if (String.isBlank(config.labelField)) {
+      config.labelField = DEFAULT_LABEL_FIELD;
     }
-  }
+    NewtonSelectorQueryFieldAccess access = new NewtonSelectorQueryFieldAccess(
+      config.sObjectApiName
+    );
 
-  private static QueryParts buildSoql(
-    NewtonSelectorQueryDTO config,
-    List<String> fields
-  ) {
     QueryParts queryParts = new QueryParts();
-    String sObjectName = Schema.getGlobalDescribe()
-      .get(config.sObjectApiName)
-      .getDescribe(SObjectDescribeOptions.DEFERRED)
-      .getName();
-
     queryParts.soql =
       'SELECT ' +
-      String.join(fields, ', ') +
+      String.join(selectFields(config, access), ', ') +
       ' FROM ' +
-      sObjectName +
-      buildWhere(config, queryParts.binds) +
-      buildOrderBy(config) +
-      buildLimit(config);
+      access.objectName +
+      buildWhere(config, access, queryParts.binds) +
+      buildOrderBy(config, access) +
+      ' LIMIT ' +
+      effectiveLimit(config.queryLimit);
     return queryParts;
+  }
+
+  private static List<String> selectFields(
+    NewtonSelectorQueryDTO config,
+    NewtonSelectorQueryFieldAccess access
+  ) {
+    Set<String> fields = new Set<String>{ 'Id' };
+    for (
+      String fieldApiName : new List<String>{
+        config.labelField,
+        config.valueField,
+        config.sublabelField,
+        config.iconField,
+        config.badgeField,
+        config.helpField,
+        config.orderByField
+      }
+    ) {
+      if (String.isNotBlank(fieldApiName)) {
+        fields.add(access.readableField(fieldApiName).getName());
+      }
+    }
+    return new List<String>(fields);
   }
 
   private static String buildWhere(
     NewtonSelectorQueryDTO config,
+    NewtonSelectorQueryFieldAccess access,
     Map<String, Object> binds
   ) {
-    List<String> clauses = new List<String>();
-    String structuredWhere = NewtonSelectorQueryPredicateBuilder.buildStructuredWhere(
-      config,
-      binds
-    );
-    if (String.isNotBlank(structuredWhere)) {
-      clauses.add(structuredWhere);
+    if (String.isBlank(config.whereClause)) {
+      return '';
     }
-    if (String.isNotBlank(config.whereClause)) {
-      clauses.add(
-        new NewtonSelectorWhereParser(
-            config.sObjectApiName,
-            config.whereClause,
-            binds
-          )
-          .parse()
-      );
-    }
-    return clauses.isEmpty()
-      ? ''
-      : ' WHERE (' + String.join(clauses, ') AND (') + ')';
+    return ' WHERE ' +
+      new NewtonSelectorWhereParser(access, config.whereClause, binds).parse();
   }
 
-  private static String buildOrderBy(NewtonSelectorQueryDTO config) {
+  private static String buildOrderBy(
+    NewtonSelectorQueryDTO config,
+    NewtonSelectorQueryFieldAccess access
+  ) {
     if (String.isBlank(config.orderByField)) {
       return '';
     }
 
     String direction = String.isBlank(config.orderByDirection)
-      ? 'ASC'
+      ? DEFAULT_DIRECTION
       : config.orderByDirection.toUpperCase();
     if (!ALLOWED_DIRECTIONS.contains(direction)) {
-      direction = 'ASC';
+      throw new NewtonSelectorException(
+        'Invalid sort direction: ' +
+          config.orderByDirection +
+          '. Use ASC or DESC.'
+      );
     }
     return ' ORDER BY ' +
-      String.escapeSingleQuotes(config.orderByField) +
+      access.sortableField(config.orderByField).getName() +
       ' ' +
       direction;
   }
 
-  private static String buildLimit(NewtonSelectorQueryDTO config) {
-    Integer effective = (config.queryLimit == null ||
-      config.queryLimit <= 0)
-      ? DEFAULT_LIMIT
-      : config.queryLimit;
-    if (effective > MAX_LIMIT) {
-      effective = MAX_LIMIT;
+  private static Integer effectiveLimit(Integer requested) {
+    if (requested == null || requested <= 0) {
+      return DEFAULT_LIMIT;
     }
-    return ' LIMIT ' + effective;
+    return Math.min(requested, MAX_LIMIT);
   }
 }

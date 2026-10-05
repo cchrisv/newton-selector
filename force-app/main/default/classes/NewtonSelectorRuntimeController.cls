@@ -2,27 +2,25 @@
 public with sharing class NewtonSelectorRuntimeController {
   /**
    * @description Queries runtime selector items from a serialized NewtonSelectorQueryDTO.
+   * Failures surface as AuraHandledException carrying the validation or database message.
    * @param configJson Serialized NewtonSelectorQueryDTO.
    * @return Runtime selector item DTOs.
    */
   @AuraEnabled(cacheable=true)
   public static List<NewtonSelectorItemDTO> queryItems(String configJson) {
     try {
-      NewtonSelectorQueryDTO config = parseConfig(configJson);
-      return NewtonSelectorService.fetchItems(config);
+      return NewtonSelectorService.fetchItems(parseConfig(configJson));
     } catch (NewtonSelectorException e) {
-      throw new AuraHandledException(e.getMessage());
-    } catch (System.JSONException e) {
-      throw new AuraHandledException('Invalid selector configuration.');
-    } catch (Exception e) {
-      throw new AuraHandledException('Unable to load selector options.');
+      throw auraException(e.getMessage());
+    } catch (QueryException e) {
+      throw auraException(e.getMessage());
     }
   }
 
   /**
-   * @description Validates a serialized query configuration and returns preview SOQL.
+   * @description Validates a serialized query configuration by running it with LIMIT 1.
    * @param configJson Serialized NewtonSelectorQueryDTO.
-   * @return Validation result with status, message, and optional preview SOQL.
+   * @return Validation status and the validation or database message.
    */
   @AuraEnabled(cacheable=false)
   public static NewtonSelectorQueryValidationResultDTO validateQuery(
@@ -31,22 +29,15 @@ public with sharing class NewtonSelectorRuntimeController {
     try {
       NewtonSelectorQueryDTO config = parseConfig(configJson);
       config.queryLimit = 1;
-      String soql = NewtonSelectorRecordQuery.previewSoql(config);
-      NewtonSelectorService.fetchItems(config);
-      return NewtonSelectorQueryValidationResultDTO.success(
-        'Query validated successfully.',
-        soql
+      NewtonSelectorRecordQuery.query(config);
+      return new NewtonSelectorQueryValidationResultDTO(
+        true,
+        'Query validated successfully.'
       );
     } catch (NewtonSelectorException e) {
-      return NewtonSelectorQueryValidationResultDTO.failure(e.getMessage());
-    } catch (System.JSONException e) {
-      return NewtonSelectorQueryValidationResultDTO.failure(
-        'Invalid selector configuration.'
-      );
-    } catch (Exception e) {
-      return NewtonSelectorQueryValidationResultDTO.failure(
-        'Unable to validate this query.'
-      );
+      return new NewtonSelectorQueryValidationResultDTO(false, e.getMessage());
+    } catch (QueryException e) {
+      return new NewtonSelectorQueryValidationResultDTO(false, e.getMessage());
     }
   }
 
@@ -55,13 +46,24 @@ public with sharing class NewtonSelectorRuntimeController {
       throw new NewtonSelectorException('Selector configuration is required.');
     }
 
-    NewtonSelectorQueryDTO config = (NewtonSelectorQueryDTO) JSON.deserialize(
-      configJson,
-      NewtonSelectorQueryDTO.class
-    );
+    NewtonSelectorQueryDTO config;
+    try {
+      config = (NewtonSelectorQueryDTO) JSON.deserialize(
+        configJson,
+        NewtonSelectorQueryDTO.class
+      );
+    } catch (JSONException e) {
+      throw new NewtonSelectorException('Invalid selector configuration.');
+    }
     if (config == null) {
       throw new NewtonSelectorException('Selector configuration is required.');
     }
     return config;
+  }
+
+  private static AuraHandledException auraException(String message) {
+    AuraHandledException e = new AuraHandledException(message);
+    e.setMessage(message);
+    return e;
   }
 }

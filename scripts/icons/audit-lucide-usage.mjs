@@ -59,7 +59,8 @@ for (const file of walk(lwcRoot)) {
     );
   }
 
-  const iconRegex = /<c-newton-selector-icon\b[\s\S]*?<\/c-newton-selector-icon>/g;
+  const iconRegex =
+    /<c-newton-selector-icon\b[\s\S]*?<\/c-newton-selector-icon>/g;
   for (const match of source.matchAll(iconRegex)) {
     const tag = match[0].replace(/\s+/g, " ");
     const nameMatch = tag.match(/\bname="([^"]+)"/);
@@ -121,16 +122,61 @@ for (const file of walk(lwcRoot)) {
     const iconPropertyRegex = /\b(?:icon|optionIcon)\s*:\s*["']([^"']+)["']/g;
     for (const match of source.matchAll(iconPropertyRegex)) {
       const iconName = match[1];
-      if (
-        iconName &&
-        !lucideNames.has(iconName.toLowerCase().replace(/_/g, "-"))
-      ) {
+      if (!lucideNames.has(iconName)) {
         report(
           file,
           lineNumber(source, match.index),
           `JS icon option name is not in Lucide: ${iconName}`
         );
       }
+    }
+  }
+}
+
+// Field-type icon maps: every value must be a Lucide icon name.
+const typeIconMaps = [
+  {
+    file: path.join(
+      lwcRoot,
+      "newtonSelectorFlowCpeUtilityHelpers",
+      "newtonSelectorFlowCpeUtilityHelpers.js"
+    ),
+    label: "TYPE_ICON_MAP",
+    body: /export\s+const\s+TYPE_ICON_MAP\s*=\s*(?:Object\.freeze\(\s*)?\{([\s\S]*?)\}/,
+    entry: /\b\w+\s*:\s*["']([^"']*)["']/g
+  },
+  {
+    file: path.join(
+      root,
+      "force-app",
+      "main",
+      "default",
+      "classes",
+      "NewtonSelectorFlowCpeDescribeService.cls"
+    ),
+    label: "field-type icon map",
+    body: /Map<String,\s*String>\s+\w*ICON\w*\s*=\s*new\s+Map<String,\s*String>\s*\{([\s\S]*?)\}\s*;/i,
+    entry: /'[^']*'\s*=>\s*'([^']*)'/g
+  }
+];
+
+for (const map of typeIconMaps) {
+  const source = fs.existsSync(map.file)
+    ? fs.readFileSync(map.file, "utf8")
+    : "";
+  const bodyMatch = source.match(map.body);
+  if (!bodyMatch) {
+    report(map.file, 1, `${map.label} not found; cannot audit its icon names`);
+    continue;
+  }
+  const bodyStart = bodyMatch.index + bodyMatch[0].indexOf(bodyMatch[1]);
+  for (const match of bodyMatch[1].matchAll(map.entry)) {
+    if (!lucideNames.has(match[1])) {
+      report(
+        map.file,
+        lineNumber(source, bodyStart + match.index),
+        `${map.label} value is not in Lucide: ${match[1]}`
+      );
     }
   }
 }

@@ -1,3 +1,6 @@
 engines:
   eslint:
     eslint_config_file: eslint.config.js
+  pmd:
+    custom_rulesets:
+      - pmd-apex-complexity.xml

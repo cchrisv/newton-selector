@@ -1,233 +1,208 @@
 <template>
-  <div style={inputStyle} onmouseleave={handleInputFocus}>
-    <div>
-      <div class={formElementClass}>
-        <div class="slds-form-element__control">
-          <c-newton-selector-combobox
-            class="newton-selector-flow-cpe-resource-selector__combobox"
-            open={isMenuOpen}
-            dropdown-id="listbox-id-1"
-            dropdown-label={label}
-            dropdown-class="newton-selector-flow-cpe-resource-selector__dropdown"
+  <div style={inputStyle}>
+    <div class={formElementClass}>
+      <div class="slds-form-element__control">
+        <c-newton-selector-combobox
+          class="newton-selector-flow-cpe-resource-selector__combobox"
+          open={isMenuOpen}
+          dropdown-id="listbox-id-1"
+          dropdown-label={label}
+          dropdown-class="newton-selector-flow-cpe-resource-selector__dropdown"
+        >
+          <div
+            slot="trigger"
+            data-id="resultBox"
+            aria-expanded={dropdownExpanded}
           >
             <div
-              slot="trigger"
-              data-id="resultBox"
-              aria-expanded={dropdownExpanded}
+              class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right"
+              role="none"
             >
-              <div
-                class="slds-form-element__control slds-input-has-icon slds-input-has-icon slds-input-has-icon_right"
-                role="none"
-              >
-                <template if:false={displayPill}>
-                  <div
-                    class="newton-selector-flow-cpe-resource-selector__input-anchor"
-                    onkeyup={handleSearchKeyUp}
-                  >
-                    <label class={labelClass} onclick={toggleMenu}
-                      >{label}</label
-                    >
-                    <template if:true={fieldLevelHelp}>
-                      <div
-                        class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_xx-small"
-                      >
-                        {fieldLevelHelp}
-                      </div>
-                    </template>
-                    <lightning-input
-                      class="value-input newton-selector-flow-cpe-resource-selector__value-input"
-                      name="searchText"
-                      type="search"
-                      required={required}
-                      data-input-name={name}
-                      data-id="userinput"
-                      variant="label-hidden"
-                      value={_value}
-                      disabled={disabled}
-                      onchange={handleSearchField}
-                      onkeydown={handleKeyDown}
-                      onclick={handleOpenOptions}
-                      autocomplete={autocomplete}
-                      placeholder={placeholderText}
-                    ></lightning-input>
-                  </div>
-                </template>
-                <template if:true={displayPill}>
-                  <label class={labelClassForPill} onclick={toggleMenu}
-                    >{label}</label
-                  >
-                  <template if:true={fieldLevelHelp}>
-                    <div
-                      class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_xx-small"
-                    >
-                      {fieldLevelHelp}
-                    </div>
-                  </template>
-                  <button
-                    type="button"
+              <template if:false={displayPill}>
+                <div
+                  class="newton-selector-flow-cpe-resource-selector__input-anchor"
+                  onkeyup={handleSearchKeyUp}
+                >
+                  <label class={labelClass} onclick={toggleMenu}>{label}</label>
+                  <lightning-input
+                    class="value-input newton-selector-flow-cpe-resource-selector__value-input"
+                    name="searchText"
+                    type="search"
+                    label={label}
+                    required={required}
                     data-input-name={name}
-                    class="slds-input_faux slds-combobox__input slds-combobox__input-value newton-selector-flow-cpe-resource-selector__selected-trigger"
-                    title={selectedDisplayLabel}
-                    disabled={disabled}
+                    data-id="userinput"
+                    variant="label-hidden"
+                    value={_value}
+                    onchange={handleSearchField}
+                    onkeydown={handleKeyDown}
                     onclick={handleOpenOptions}
+                    onblur={handleInputBlur}
+                    autocomplete="off"
+                    placeholder={placeholderText}
+                  ></lightning-input>
+                </div>
+              </template>
+              <template if:true={displayPill}>
+                <label class={labelClassForPill} onclick={toggleMenu}
+                  >{label}</label
+                >
+                <button
+                  type="button"
+                  data-input-name={name}
+                  class="slds-input_faux slds-combobox__input slds-combobox__input-value newton-selector-flow-cpe-resource-selector__selected-trigger"
+                  title={selectedDisplayLabel}
+                  onclick={handleOpenOptions}
+                >
+                  <span
+                    class="newton-selector-flow-cpe-resource-selector__selected-icon"
+                    aria-hidden="true"
                   >
-                    <span
-                      class="newton-selector-flow-cpe-resource-selector__selected-icon"
-                      aria-hidden="true"
-                    >
-                      <c-newton-selector-icon
-                        name={selectedResourceIconName}
-                        size="small"
-                        box="tile"
-                        alternative-text=""
-                      ></c-newton-selector-icon>
-                    </span>
-                    <span
-                      class="newton-selector-flow-cpe-resource-selector__selected-label"
-                      >{selectedDisplayLabel}</span
-                    >
                     <c-newton-selector-icon
-                      name="chevron-down"
-                      size="x-small"
-                      box="button"
+                      name={selectedResourceIconName}
+                      size="small"
+                      box="tile"
                       alternative-text=""
                     ></c-newton-selector-icon>
-                  </button>
-                </template>
-              </div>
+                  </span>
+                  <span
+                    class="newton-selector-flow-cpe-resource-selector__selected-label"
+                    >{selectedDisplayLabel}</span
+                  >
+                  <c-newton-selector-icon
+                    name="chevron-down"
+                    size="x-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                </button>
+              </template>
             </div>
+          </div>
 
-            <template lwc:if={isMenuOpen}>
-              <ul
-                slot="dropdown"
-                class="slds-listbox slds-listbox_vertical newton-selector-flow-cpe-resource-selector__listbox"
-                role="presentation"
-              >
-                <template if:false={_options.length}>
-                  <div class="slds-p-around_small">
-                    {labels.noDataAvailable}
+          <template lwc:if={isMenuOpen}>
+            <ul
+              slot="dropdown"
+              class="slds-listbox slds-listbox_vertical newton-selector-flow-cpe-resource-selector__listbox"
+              role="presentation"
+              onmousedown={handleMenuMouseDown}
+            >
+              <template if:false={_options.length}>
+                <div class="slds-p-around_small">{emptyMessage}</div>
+              </template>
+              <template for:each={_options} for:item="curOption">
+                <li
+                  role="presentation"
+                  class="slds-listbox__item newton-selector-flow-cpe-resource-selector__group"
+                  key={curOption.type}
+                >
+                  <div
+                    class="slds-p-around_xx-small custom-text-transform_uppercase newton-selector-flow-cpe-resource-selector__group-heading"
+                  >
+                    <button
+                      type="button"
+                      class="slds-button slds-button_icon newton-selector-flow-cpe-resource-selector__icon-button"
+                      title="Back"
+                      aria-label="Back"
+                      onclick={resetData}
+                    >
+                      <c-newton-selector-icon
+                        name="chevron-left"
+                        size="x-small"
+                        box="button"
+                        alternative-text=""
+                      ></c-newton-selector-icon>
+                    </button>
+                    {curOption.type}
                   </div>
-                </template>
-                <template for:each={_options} for:item="curOption">
-                  <li
-                    role="presentation"
-                    class="slds-listbox__item newton-selector-flow-cpe-resource-selector__group"
-                    key={curOption.type}
+                  <template
+                    for:each={curOption.options}
+                    for:item="curOptionElement"
                   >
                     <div
-                      class="slds-p-around_xx-small custom-text-transform_uppercase newton-selector-flow-cpe-resource-selector__group-heading"
+                      key={curOptionElement.key}
+                      class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta newton-selector-flow-cpe-resource-selector__option"
+                      role="option"
+                      data-value={curOptionElement.value}
+                      data-flow-type={curOptionElement.flowType}
+                      data-label={curOptionElement.label}
+                      data-icon={curOptionElement.optionIcon}
+                      data-object-type={curOptionElement.objectType}
+                      data-is-collection={curOptionElement.isCollection}
+                      onclick={handleSetSelectedRecord}
                     >
+                      <span
+                        class="slds-media__body newton-selector-flow-cpe-resource-selector__option-body"
+                      >
+                        <c-newton-selector-flow-cpe-lookup-choice-option
+                          row={curOptionElement}
+                        ></c-newton-selector-flow-cpe-lookup-choice-option>
+                      </span>
                       <button
+                        if:true={curOptionElement.isObject}
+                        data-option-value={curOptionElement.value}
+                        data-object-type={curOptionElement.objectType}
                         type="button"
-                        class="slds-button slds-button_icon newton-selector-flow-cpe-resource-selector__icon-button"
-                        title="Back"
-                        aria-label="Back"
-                        onclick={resetData}
+                        class="slds-button slds-button_icon newton-selector-flow-cpe-resource-selector__chevron"
+                        title="Open object fields"
+                        aria-label="Open object fields"
+                        onclick={handleOpenObject}
                       >
                         <c-newton-selector-icon
-                          name="chevron-left"
+                          name="chevron-right"
                           size="x-small"
                           box="button"
                           alternative-text=""
                         ></c-newton-selector-icon>
                       </button>
-                      {curOption.type}
-                    </div>
-                    <template
-                      for:each={curOption.options}
-                      for:item="curOptionElement"
-                    >
-                      <div
-                        key={curOptionElement.key}
-                        class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta newton-selector-flow-cpe-resource-selector__option"
-                        role="option"
-                        data-value={curOptionElement.value}
-                        data-flow-type={curOptionElement.flowType}
-                        data-label={curOptionElement.label}
-                        data-icon={curOptionElement.optionIcon}
+
+                      <button
+                        if:true={curOptionElement.storeOutputAutomatically}
+                        data-option-value={curOptionElement.value}
                         data-object-type={curOptionElement.objectType}
-                        data-is-collection={curOptionElement.isCollection}
-                        onclick={handleSetSelectedRecord}
+                        type="button"
+                        class="slds-button slds-button_icon newton-selector-flow-cpe-resource-selector__chevron"
+                        title="Open screen component outputs"
+                        aria-label="Open screen component outputs"
+                        onclick={handleOpenScreenComponent}
                       >
-                        <span
-                          data-value={curOptionElement.value}
-                          data-flow-type={curOptionElement.flowType}
-                          data-object-type={curOptionElement.objectType}
-                          data-is-collection={curOptionElement.isCollection}
-                          onclick={handleSetSelectedRecord}
-                          class="slds-media__body newton-selector-flow-cpe-resource-selector__option-body"
-                        >
-                          <c-newton-selector-flow-cpe-lookup-choice-option
-                            row={curOptionElement}
-                          ></c-newton-selector-flow-cpe-lookup-choice-option>
-                        </span>
-                        <button
-                          if:true={curOptionElement.isObject}
-                          data-option-value={curOptionElement.value}
-                          data-object-type={curOptionElement.objectType}
-                          type="button"
-                          class="slds-button slds-button_icon newton-selector-flow-cpe-resource-selector__chevron"
-                          title="Open object fields"
-                          aria-label="Open object fields"
-                          onclick={handleOpenObject}
-                        >
-                          <c-newton-selector-icon
-                            name="chevron-right"
-                            size="x-small"
-                            box="button"
-                            alternative-text=""
-                          ></c-newton-selector-icon>
-                        </button>
+                        <c-newton-selector-icon
+                          name="chevron-right"
+                          size="x-small"
+                          box="button"
+                          alternative-text=""
+                        ></c-newton-selector-icon>
+                      </button>
 
-                        <button
-                          if:true={curOptionElement.storeOutputAutomatically}
-                          data-option-value={curOptionElement.value}
-                          data-object-type={curOptionElement.objectType}
-                          type="button"
-                          class="slds-button slds-button_icon newton-selector-flow-cpe-resource-selector__chevron"
-                          title="Open screen component outputs"
-                          aria-label="Open screen component outputs"
-                          onclick={handleOpenScreenComponent}
-                        >
-                          <c-newton-selector-icon
-                            name="chevron-right"
-                            size="x-small"
-                            box="button"
-                            alternative-text=""
-                          ></c-newton-selector-icon>
-                        </button>
-
-                        <button
-                          if:true={curOptionElement.globalVariable}
-                          data-option-value={curOptionElement.value}
-                          data-object-type={curOptionElement.objectType}
-                          type="button"
-                          class="slds-button slds-button_icon newton-selector-flow-cpe-resource-selector__chevron"
-                          title="Open global variable"
-                          aria-label="Open global variable"
-                          onclick={handleOpenGlobalVariable}
-                        >
-                          <c-newton-selector-icon
-                            name="chevron-right"
-                            size="x-small"
-                            box="button"
-                            alternative-text=""
-                          ></c-newton-selector-icon>
-                        </button>
-                      </div>
-                    </template>
-                  </li>
-                </template>
-              </ul>
-            </template>
-          </c-newton-selector-combobox>
-        </div>
-        <template if:true={hasError}>
-          <div class="slds-form-element__help slds-m-top_large">
-            {labels.invalidReferenceError}
-          </div>
-        </template>
+                      <button
+                        if:true={curOptionElement.globalVariable}
+                        data-option-value={curOptionElement.value}
+                        type="button"
+                        class="slds-button slds-button_icon newton-selector-flow-cpe-resource-selector__chevron"
+                        title="Open global variable"
+                        aria-label="Open global variable"
+                        onclick={handleOpenGlobalVariable}
+                      >
+                        <c-newton-selector-icon
+                          name="chevron-right"
+                          size="x-small"
+                          box="button"
+                          alternative-text=""
+                        ></c-newton-selector-icon>
+                      </button>
+                    </div>
+                  </template>
+                </li>
+              </template>
+            </ul>
+          </template>
+        </c-newton-selector-combobox>
       </div>
+      <template if:true={hasError}>
+        <div class="slds-form-element__help slds-m-top_large">
+          {labels.invalidReferenceError}
+        </div>
+      </template>
     </div>
   </div>
 </template>

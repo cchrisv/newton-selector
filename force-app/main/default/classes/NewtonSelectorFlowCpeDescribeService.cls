@@ -2,17 +2,39 @@
 public with sharing class NewtonSelectorFlowCpeDescribeService {
   private static final Integer MAX_OBJECT_LOOKUP_ROWS = 80;
   private static final Integer MAX_FIELD_LOOKUP_ROWS = 2000;
+  private static final String OBJECT_ICON = 'box';
+  /** @description Lucide icon for text-like and unmapped field types. */
+  private static final String DEFAULT_FIELD_ICON = 'type';
+  /** @description Lucide icon name per Schema.DisplayType name. */
+  private static final Map<String, String> FIELD_TYPE_ICONS = new Map<String, String>{
+    'TEXTAREA' => 'file-text',
+    'INTEGER' => 'hash',
+    'LONG' => 'hash',
+    'DOUBLE' => 'hash',
+    'CURRENCY' => 'dollar-sign',
+    'PERCENT' => 'percent',
+    'BOOLEAN' => 'square-check',
+    'DATE' => 'calendar',
+    'DATETIME' => 'calendar-clock',
+    'TIME' => 'clock',
+    'PICKLIST' => 'list',
+    'COMBOBOX' => 'list',
+    'MULTIPICKLIST' => 'list-checks',
+    'REFERENCE' => 'search',
+    'EMAIL' => 'mail',
+    'PHONE' => 'phone',
+    'URL' => 'link',
+    'ID' => 'key',
+    'ENCRYPTEDSTRING' => 'lock',
+    'COMPLEXVALUE' => 'braces',
+    'DATACATEGORYGROUPREFERENCE' => 'braces',
+    'SOBJECT' => 'box'
+  };
   private static final Set<Schema.DisplayType> LOOKUP_FIELD_SKIP_TYPES = new Set<Schema.DisplayType>{
     Schema.DisplayType.BASE64,
     Schema.DisplayType.ADDRESS,
     Schema.DisplayType.LOCATION
   };
-  private class FieldChoiceRequest {
-    List<NewtonSelectorFlowCpeController.ChoiceOption> rows;
-    Schema.SObjectField fieldToken;
-    String normalizedSearchKey;
-    String canonicalObject;
-  }
 
   /**
    * @description Finds accessible, queryable sObject types for Flow Builder search.
@@ -24,21 +46,30 @@ public with sharing class NewtonSelectorFlowCpeDescribeService {
   ) {
     List<NewtonSelectorFlowCpeController.ChoiceOption> rows = new List<NewtonSelectorFlowCpeController.ChoiceOption>();
     String normalizedSearchKey = normalizeSearchKey(searchKey);
-
     for (Schema.SObjectType sObjectType : Schema.getGlobalDescribe().values()) {
-      addSObjectChoice(rows, sObjectType, normalizedSearchKey);
+      Schema.DescribeSObjectResult describe = sObjectType.getDescribe(
+        SObjectDescribeOptions.DEFERRED
+      );
+      if (
+        describe.isAccessible() &&
+        describe.isQueryable() &&
+        matchesSearch(
+          describe.getName(),
+          describe.getLabel(),
+          normalizedSearchKey
+        )
+      ) {
+        rows.add(objectChoice(describe));
+      }
     }
 
     rows.sort();
-    return NewtonSelectorFlowCpeChoiceFactory.capChoiceList(
-      rows,
-      MAX_OBJECT_LOOKUP_ROWS
-    );
+    return firstRows(rows, MAX_OBJECT_LOOKUP_ROWS);
   }
 
   /**
    * @description Finds accessible fields for the selected lookup dataset object.
-   * @param objectApiName Source object API name.
+   * @param objectApiName Source object API name (case-insensitive).
    * @param searchKey Optional field API name or label search text.
    * @return Matching field choices capped for the CPE lookup.
    */
@@ -47,38 +78,34 @@ public with sharing class NewtonSelectorFlowCpeDescribeService {
     String searchKey
   ) {
     List<NewtonSelectorFlowCpeController.ChoiceOption> rows = new List<NewtonSelectorFlowCpeController.ChoiceOption>();
-    Schema.SObjectType sObjectType = NewtonSelectorFlowCpeObjectResolver.resolveSObjectType(
-      objectApiName
-    );
+    Schema.SObjectType sObjectType = Schema.getGlobalDescribe()
+      .get(objectApiName);
     if (sObjectType == null) {
       return rows;
     }
 
     String normalizedSearchKey = normalizeSearchKey(searchKey);
-    Schema.DescribeSObjectResult describe = NewtonSelectorFlowCpeObjectResolver.describeSObject(
-      sObjectType
+    Schema.DescribeSObjectResult describe = sObjectType.getDescribe(
+      SObjectDescribeOptions.DEFERRED
     );
-    String canonicalObject = describe.getName();
     for (Schema.SObjectField fieldToken : describe.fields.getMap().values()) {
-      FieldChoiceRequest request = new FieldChoiceRequest();
-      request.rows = rows;
-      request.fieldToken = fieldToken;
-      request.normalizedSearchKey = normalizedSearchKey;
-      request.canonicalObject = canonicalObject;
-      addFieldChoice(request);
+      Schema.DescribeFieldResult field = fieldToken.getDescribe();
+      if (
+        isLookupSelectableField(field) &&
+        matchesSearch(field.getName(), field.getLabel(), normalizedSearchKey)
+      ) {
+        rows.add(fieldChoice(field, describe.getName()));
+      }
     }
 
     rows.sort();
-    return NewtonSelectorFlowCpeChoiceFactory.capChoiceList(
-      rows,
-      MAX_FIELD_LOOKUP_ROWS
-    );
+    return firstRows(rows, MAX_FIELD_LOOKUP_ROWS);
   }
 
   /**
    * @description Describes accessible fields for a selected object.
-   * @param objectName Source object API name.
-   * @return Accessible field rows, including lookup relationship metadata when available.
+   * @param objectName Source object API name (case-insensitive).
+   * @return Accessible field rows; single-target lookups include their relationship name.
    */
   public static List<NewtonSelectorFlowCpeController.Field> getObjectFields(
     String objectName
@@ -89,103 +116,73 @@ public with sharing class NewtonSelectorFlowCpeDescribeService {
       return fields;
     }
 
-    Schema.DescribeSObjectResult describe = NewtonSelectorFlowCpeObjectResolver.describeSObject(
-      sObjectType
+    Schema.DescribeSObjectResult describe = sObjectType.getDescribe(
+      SObjectDescribeOptions.DEFERRED
     );
     if (!describe.isAccessible()) {
       return fields;
     }
 
-    Map<String, Schema.SObjectField> tokenMap = describe.fields.getMap();
-    for (String fieldName : tokenMap.keySet()) {
-      addObjectField(fields, tokenMap.get(fieldName));
+    for (Schema.SObjectField fieldToken : describe.fields.getMap().values()) {
+      Schema.DescribeFieldResult fieldDescribe = fieldToken.getDescribe();
+      if (fieldDescribe.isAccessible()) {
+        fields.add(objectField(fieldDescribe));
+      }
     }
     return fields;
   }
 
-  private static void addSObjectChoice(
-    List<NewtonSelectorFlowCpeController.ChoiceOption> rows,
-    Schema.SObjectType sObjectType,
-    String normalizedSearchKey
+  private static NewtonSelectorFlowCpeController.ChoiceOption objectChoice(
+    Schema.DescribeSObjectResult describe
   ) {
-    Schema.DescribeSObjectResult describe = NewtonSelectorFlowCpeObjectResolver.describeSObject(
-      sObjectType
-    );
-    if (!describe.isAccessible() || !describe.isQueryable()) {
-      return;
-    }
-
-    String apiName = describe.getName();
-    String label = describe.getLabel() == null ? apiName : describe.getLabel();
-    if (!matchesSearch(apiName, label, normalizedSearchKey)) {
-      return;
-    }
-    NewtonSelectorFlowCpeChoiceFactory.ChoiceRequest request = new NewtonSelectorFlowCpeChoiceFactory.ChoiceRequest();
-    request.value = apiName;
-    request.label = label;
-    request.subtitle = apiName;
-    request.icon = 'utility:sobject';
-    request.sObjectType = apiName;
-    rows.add(NewtonSelectorFlowCpeChoiceFactory.choice(request));
+    NewtonSelectorFlowCpeController.ChoiceOption row = new NewtonSelectorFlowCpeController.ChoiceOption();
+    row.value = describe.getName();
+    row.label = describe.getLabel();
+    row.subtitle = row.value;
+    row.icon = OBJECT_ICON;
+    row.sObjectType = row.value;
+    return row;
   }
 
-  private static void addFieldChoice(FieldChoiceRequest request) {
-    Schema.DescribeFieldResult fieldDescribe = request.fieldToken.getDescribe();
-    if (!isLookupSelectableField(fieldDescribe)) {
-      return;
-    }
-
-    String fieldName = fieldDescribe.getName();
-    String label = fieldDescribe.getLabel();
-    if (!matchesSearch(fieldName, label, request.normalizedSearchKey)) {
-      return;
-    }
-
-    String fieldType = String.valueOf(fieldDescribe.getType());
-    NewtonSelectorFlowCpeChoiceFactory.ChoiceRequest choiceRequest = new NewtonSelectorFlowCpeChoiceFactory.ChoiceRequest();
-    choiceRequest.value = fieldName;
-    choiceRequest.label = label;
-    choiceRequest.subtitle = fieldName + ' - ' + fieldType;
-    choiceRequest.icon = NewtonSelectorFlowCpeChoiceFactory.iconForFieldType(
-      fieldType
-    );
-    choiceRequest.sObjectType = request.canonicalObject;
-    request.rows.add(NewtonSelectorFlowCpeChoiceFactory.choice(choiceRequest));
+  private static NewtonSelectorFlowCpeController.ChoiceOption fieldChoice(
+    Schema.DescribeFieldResult field,
+    String objectName
+  ) {
+    NewtonSelectorFlowCpeController.ChoiceOption row = new NewtonSelectorFlowCpeController.ChoiceOption();
+    row.value = field.getName();
+    row.label = field.getLabel();
+    row.type = field.getType().name();
+    row.subtitle = row.value + ' - ' + row.type;
+    row.icon = FIELD_TYPE_ICONS.containsKey(row.type)
+      ? FIELD_TYPE_ICONS.get(row.type)
+      : DEFAULT_FIELD_ICON;
+    row.sObjectType = objectName;
+    return row;
   }
 
-  private static void addObjectField(
-    List<NewtonSelectorFlowCpeController.Field> fields,
-    Schema.SObjectField fieldToken
+  private static NewtonSelectorFlowCpeController.Field objectField(
+    Schema.DescribeFieldResult fieldDescribe
   ) {
-    Schema.DescribeFieldResult fieldDescribe = fieldToken.getDescribe();
-    if (!fieldDescribe.isAccessible()) {
-      return;
-    }
-
     NewtonSelectorFlowCpeController.Field field = new NewtonSelectorFlowCpeController.Field(
       fieldDescribe.getName(),
       fieldDescribe.getLabel(),
       fieldDescribe.getType().name()
     );
-    addReferenceMetadata(field, fieldDescribe);
-    fields.add(field);
+    if (fieldDescribe.getReferenceTo().size() == 1) {
+      field.relationshipName = fieldDescribe.getRelationshipName();
+    }
+    return field;
   }
 
-  private static void addReferenceMetadata(
-    NewtonSelectorFlowCpeController.Field field,
-    Schema.DescribeFieldResult fieldDescribe
+  private static List<NewtonSelectorFlowCpeController.ChoiceOption> firstRows(
+    List<NewtonSelectorFlowCpeController.ChoiceOption> rows,
+    Integer maxRows
   ) {
-    if (
-      fieldDescribe.getReferenceTo() == null ||
-      fieldDescribe.getReferenceTo().size() != 1
-    ) {
-      return;
+    List<NewtonSelectorFlowCpeController.ChoiceOption> limited = new List<NewtonSelectorFlowCpeController.ChoiceOption>();
+    for (Integer i = 0; i < Math.min(rows.size(), maxRows); i++) {
+      limited.add(rows[i]);
     }
-    field.parentObjectName = NewtonSelectorFlowCpeObjectResolver.describeSObject(
-        fieldDescribe.getReferenceTo()[0]
-      )
-      .getName();
-    field.relationshipName = fieldDescribe.getRelationshipName();
+    return limited;
   }
 
   private static Boolean isLookupSelectableField(
@@ -200,11 +197,8 @@ public with sharing class NewtonSelectorFlowCpeDescribeService {
     String label,
     String normalizedSearchKey
   ) {
-    if (String.isBlank(normalizedSearchKey)) {
-      return true;
-    }
     return apiName.toLowerCase().contains(normalizedSearchKey) ||
-      (label != null && label.toLowerCase().contains(normalizedSearchKey));
+      label.toLowerCase().contains(normalizedSearchKey);
   }
 
   private static String normalizeSearchKey(String searchKey) {

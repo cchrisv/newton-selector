@@ -15,6 +15,9 @@ public with sharing class NewtonSelectorFlowCpeController {
     public String icon;
     @AuraEnabled
     public String sObjectType;
+    /** @description Field rows only: Schema.DisplayType name, e.g. STRING, CURRENCY, REFERENCE. */
+    @AuraEnabled
+    public String type;
 
     /**
      * @description Sorts choice rows by label.
@@ -22,10 +25,7 @@ public with sharing class NewtonSelectorFlowCpeController {
      * @return Integer comparison result.
      */
     public Integer compareTo(Object other) {
-      ChoiceOption o = (ChoiceOption) other;
-      String a = this.label == null ? '' : this.label;
-      String b = o.label == null ? '' : o.label;
-      return a.compareTo(b);
+      return label.compareTo(((ChoiceOption) other).label);
     }
   }
 
@@ -37,8 +37,6 @@ public with sharing class NewtonSelectorFlowCpeController {
     public String label;
     @AuraEnabled
     public String type;
-    @AuraEnabled
-    public String parentObjectName;
     @AuraEnabled
     public String relationshipName;
 
@@ -85,7 +83,7 @@ public with sharing class NewtonSelectorFlowCpeController {
   /**
    * @description Describes accessible fields for a selected object.
    * @param objectName Source object API name.
-   * @return Accessible field rows, including lookup relationship metadata when available.
+   * @return Accessible field rows; single-target lookups include their relationship name.
    */
   @AuraEnabled(cacheable=true)
   public static List<Field> getObjectFields(String objectName) {

@@ -22,7 +22,7 @@ describe("c-newton-selector-flow-cpe-toggle", () => {
   });
 
   it("renders a two-state selector with the provided label", () => {
-    const el = mount({ label: "Show Border", name: "showBorder" });
+    const el = mount({ label: "Show Border" });
     const group = el.shadowRoot.querySelector('[role="radiogroup"]');
 
     expect(group).not.toBeNull();
@@ -31,103 +31,36 @@ describe("c-newton-selector-flow-cpe-toggle", () => {
     expect(choice(el, "true").textContent).toContain("On");
   });
 
-  describe("isChecked value coercion", () => {
-    it("treats boolean true as checked", () => {
-      expect(mount({ checked: true }).isChecked).toBe(true);
-    });
+  it("marks the option matching the checked value", () => {
+    const on = mount({ checked: true });
+    expect(choice(on, "true").getAttribute("aria-checked")).toBe("true");
+    expect(choice(on, "false").getAttribute("aria-checked")).toBe("false");
 
-    it("treats string 'true' as checked", () => {
-      expect(mount({ checked: "true" }).isChecked).toBe(true);
-    });
-
-    it("treats the CB_TRUE sentinel as checked", () => {
-      expect(mount({ checked: "CB_TRUE" }).isChecked).toBe(true);
-    });
-
-    it("treats false / undefined / empty / CB_FALSE as unchecked", () => {
-      expect(mount({ checked: false }).isChecked).toBe(false);
-      expect(mount({}).isChecked).toBe(false);
-      expect(mount({ checked: "" }).isChecked).toBe(false);
-      expect(mount({ checked: "CB_FALSE" }).isChecked).toBe(false);
-    });
+    const off = mount({ checked: false });
+    expect(choice(off, "true").getAttribute("aria-checked")).toBe("false");
+    expect(choice(off, "false").getAttribute("aria-checked")).toBe("true");
   });
 
-  describe('wireFormat = "boolean" (default)', () => {
-    it("fires toggle with {name, checked:true} when the input turns on", () => {
-      const el = mount({ name: "enableThing" });
+  describe("toggle event", () => {
+    it("fires toggle with {checked:true} when the on option is chosen", () => {
+      const el = mount();
       const handler = jest.fn();
       el.addEventListener("toggle", handler);
 
       choice(el, "true").click();
 
       expect(handler).toHaveBeenCalledTimes(1);
-      expect(handler.mock.calls[0][0].detail).toEqual({
-        name: "enableThing",
-        checked: true
-      });
+      expect(handler.mock.calls[0][0].detail).toEqual({ checked: true });
     });
 
-    it("fires toggle with {name, checked:false} when the input turns off", () => {
-      const el = mount({ name: "enableThing", checked: true });
+    it("fires toggle with {checked:false} when the off option is chosen", () => {
+      const el = mount({ checked: true });
       const handler = jest.fn();
       el.addEventListener("toggle", handler);
 
       choice(el, "false").click();
 
-      expect(handler.mock.calls[0][0].detail).toEqual({
-        name: "enableThing",
-        checked: false
-      });
-    });
-  });
-
-  describe('wireFormat = "cb-sentinel" (legacy Flow CPE)', () => {
-    it("fires toggle with CB_TRUE sentinel when the input turns on", () => {
-      const el = mount({ name: "enableThing", wireFormat: "cb-sentinel" });
-      const handler = jest.fn();
-      el.addEventListener("toggle", handler);
-
-      choice(el, "true").click();
-
-      expect(handler).toHaveBeenCalledTimes(1);
-      expect(handler.mock.calls[0][0].detail).toEqual({
-        id: "enableThing",
-        newValue: true,
-        newValueDataType: "Boolean",
-        newStringValue: "CB_TRUE"
-      });
-    });
-
-    it("fires toggle with CB_FALSE sentinel when the input turns off", () => {
-      const el = mount({
-        name: "enableThing",
-        checked: true,
-        wireFormat: "cb-sentinel"
-      });
-      const handler = jest.fn();
-      el.addEventListener("toggle", handler);
-
-      choice(el, "false").click();
-
-      expect(handler.mock.calls[0][0].detail.newStringValue).toBe("CB_FALSE");
-    });
-  });
-
-  it("renders fieldLevelHelp as a help tooltip beside the visible label", () => {
-    const help = "Toggle to enable the border";
-    const el = mount({ label: "Show border", fieldLevelHelp: help });
-    return Promise.resolve().then(() => {
-      const helptext = el.shadowRoot.querySelector("lightning-helptext");
-      expect(helptext).not.toBeNull();
-      expect(helptext.content).toBe(help);
-    });
-  });
-
-  it("respects the disabled prop", () => {
-    const el = mount({ disabled: true });
-    return Promise.resolve().then(() => {
-      expect(choice(el, "false").disabled).toBe(true);
-      expect(choice(el, "true").disabled).toBe(true);
+      expect(handler.mock.calls[0][0].detail).toEqual({ checked: false });
     });
   });
 

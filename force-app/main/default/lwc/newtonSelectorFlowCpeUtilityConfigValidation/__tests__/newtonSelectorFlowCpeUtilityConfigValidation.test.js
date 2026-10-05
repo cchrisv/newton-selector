@@ -27,7 +27,7 @@ describe("c-newton-selector-flow-cpe-utility-config-validation", () => {
       dataSource: "collection"
     });
 
-    expect(issues.errors).toContain("Bind a Flow record collection variable.");
+    expect(issues.errors).toContain("Choose the record collection variable.");
     expect(
       sectionStatus("data", { ...BASE_CONFIG, dataSource: "collection" })
     ).toBe("error");
@@ -44,7 +44,7 @@ describe("c-newton-selector-flow-cpe-utility-config-validation", () => {
     const issues = sectionIssues("data", config, refs);
 
     expect(issues.errors).toContain(
-      "Map at least the Label field for the collection."
+      "Choose the field to show as each option's label."
     );
     expect(totalIssueCount(config, refs, "errors")).toBe(1);
   });
@@ -62,10 +62,10 @@ describe("c-newton-selector-flow-cpe-utility-config-validation", () => {
     };
 
     expect(sectionIssues("data", emptyConfig).errors).toContain(
-      "Add at least one custom item."
+      "Add at least one option."
     );
     expect(sectionIssues("data", incompleteConfig).warnings).toContain(
-      "1 item missing a label."
+      "Option 1 needs a label."
     );
   });
 
@@ -83,7 +83,7 @@ describe("c-newton-selector-flow-cpe-utility-config-validation", () => {
     };
 
     expect(sectionIssues("data", config).errors).not.toContain(
-      "Add at least one custom item."
+      "Add at least one option."
     );
   });
 
@@ -99,7 +99,7 @@ describe("c-newton-selector-flow-cpe-utility-config-validation", () => {
     };
 
     expect(sectionIssues("behavior", config).errors).toContain(
-      "Manual input maximum characters must be ≥ minimum characters (and ≥ 1)."
+      "Maximum characters must be at least the minimum, and at least 1."
     );
   });
 
@@ -119,15 +119,13 @@ describe("c-newton-selector-flow-cpe-utility-config-validation", () => {
     expect(dataIssues[0]).toEqual(
       expect.objectContaining({
         level: "warn",
-        icon: "triangle-alert",
-        message: "1 item missing a label."
+        message: "Option 1 needs a label."
       })
     );
     expect(behaviorIssues[0]).toEqual(
       expect.objectContaining({
         level: "error",
-        icon: "circle-alert",
-        message: expect.stringContaining("Max selections")
+        message: expect.stringContaining("Maximum selections")
       })
     );
   });

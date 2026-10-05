@@ -1,4 +1,4 @@
-/** @description Token scanner for Newton Selector legacy WHERE clause parsing. */
+/** @description Token scanner for Newton Selector WHERE clause parsing. */
 public with sharing class NewtonSelectorWhereScanner {
   private final String input;
   private Integer pos = 0;
@@ -64,7 +64,7 @@ public with sharing class NewtonSelectorWhereScanner {
 
   /**
    * @description Parses a single quoted or bare literal.
-   * @return Parsed literal value.
+   * @return Parsed literal value; null for the bare NULL keyword (a quoted 'null' stays text).
    */
   public String parseLiteral() {
     skipWhitespace();
@@ -81,7 +81,8 @@ public with sharing class NewtonSelectorWhereScanner {
     if (start == pos) {
       throw new NewtonSelectorException('Expected WHERE value.');
     }
-    return input.substring(start, pos);
+    String literal = input.substring(start, pos);
+    return literal.equalsIgnoreCase('NULL') ? null : literal;
   }
 
   /**
@@ -105,6 +106,7 @@ public with sharing class NewtonSelectorWhereScanner {
    * @return True when the token is next.
    */
   public Boolean peek(String expected) {
+    skipWhitespace();
     return pos < input.length() && input.substring(pos, pos + 1) == expected;
   }
 

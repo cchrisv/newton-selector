@@ -1,45 +1,18 @@
 <template>
-  <template lwc:if={isMultiEntry}>
-    <template lwc:if={label}>
-      <div class="slds-form-element slds-m-bottom_xx-small">
-        <label class="slds-form-element__label">{label}</label>
-        <template lwc:if={fieldLevelHelp}>
-          <lightning-helptext content={fieldLevelHelp}></lightning-helptext>
-        </template>
-      </div>
-    </template>
-    <template lwc:if={hasSelected}>
-      <div class="slds-pill_container slds-m-bottom_xx-small">
-        <template for:each={_selectedFields} for:item="field">
-          <lightning-pill
-            key={field.id}
-            label={field.title}
-            name={field.id}
-            title={field.subtitle}
-            onremove={handleRemovePill}
-          >
-            <c-newton-selector-icon
-              lwc:if={field.icon}
-              name={field.icon}
-              size="x-small"
-            ></c-newton-selector-icon>
-          </lightning-pill>
-        </template>
-      </div>
-    </template>
-  </template>
   <c-newton-selector-combobox
     mode="lookup"
     label={label}
-    field-level-help={fieldLevelHelp}
-    placeholder={placeholder}
-    variant={lookupVariant}
+    placeholder="Search fields..."
     selection={selection}
-    disabled={disabled}
     required={required}
     min-search-term-length="0"
     scroll-after-n-items="7"
     onsearch={handleSearch}
     onselectionchange={handleSelectionChange}
   ></c-newton-selector-combobox>
+  <template lwc:if={loadError}>
+    <p class="slds-form-element__help slds-text-color_error" role="alert">
+      {loadError}
+    </p>
+  </template>
 </template>

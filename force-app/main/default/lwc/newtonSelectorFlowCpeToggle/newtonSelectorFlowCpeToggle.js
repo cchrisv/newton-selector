@@ -6,85 +6,39 @@ import { LightningElement, api } from "lwc";
  * the Apache License 2.0. See repo LICENSE and NOTICE for attribution.
  */
 
-const CB_TRUE = "CB_TRUE";
-const CB_FALSE = "CB_FALSE";
-
-const WIRE_BOOLEAN = "boolean";
-const WIRE_CB_SENTINEL = "cb-sentinel";
+const NEXT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]);
 
 /**
- * Reusable two-state setting control.
+ * Two-state setting control: a radio group of an "off" and an "on" option.
+ * Keyboard: one tab stop (the checked option); arrow keys switch, Home picks
+ * off, End picks on.
  *
- * Default emits a plain `{ name, checked }` detail on a `toggle` event. Set
- * `wireFormat="cb-sentinel"` to emit the legacy Flow Builder CPE protocol shape
- * (`{ id, newValue, newValueDataType, newStringValue }` with CB_TRUE/CB_FALSE
- * sentinels) instead.
- *
- * @slot none — renders only the setting selector.
- * @fires toggle — detail shape depends on `wireFormat`.
+ * @fires toggle — detail `{ checked }`.
  */
 export default class NewtonSelectorFlowCpeToggle extends LightningElement {
-  /** @type {string} Display label for the toggle. */
+  /** @type {string} Accessible name; shown above the control unless label-hidden. */
   @api label;
-  /** @type {string} Identifier surfaced on the event detail. */
-  @api name;
-  /** @type {boolean|string} Current value — accepts true / 'true' / 'CB_TRUE' as truthy. */
-  @api checked;
-  /** @type {string} Help text rendered as the native lightning-input tooltip. */
-  @api fieldLevelHelp;
-  /** @type {boolean} Disables the toggle. */
-  @api disabled;
-  /** @type {string} Passed through to lightning-input (e.g. 'label-hidden'). */
+  /** @type {boolean} Current value. */
+  @api checked = false;
+  /** @type {string} 'label-hidden' hides the visible label. */
   @api variant;
-  /** @type {string} Text shown next to the switch when on. Empty by default. */
-  @api messageToggleActive = "";
-  /** @type {string} Text shown next to the switch when off. Empty by default. */
-  @api messageToggleInactive = "";
-  /** @type {string} Short label for the active option. */
-  @api activeLabel = "";
-  /** @type {string} Short label for the inactive option. */
-  @api inactiveLabel = "";
-  /** @type {'boolean'|'cb-sentinel'} Event detail shape. Default 'boolean'. */
-  @api wireFormat = WIRE_BOOLEAN;
+  /** @type {string} Text of the "on" option. */
+  @api activeLabel = "On";
+  /** @type {string} Text of the "off" option. */
+  @api inactiveLabel = "Off";
 
-  /**
-   * Computed truthy state — supports boolean, string 'true', and legacy CB_TRUE sentinel.
-   * @returns {boolean}
-   */
-  @api
   get isChecked() {
-    return (
-      this.checked === true ||
-      this.checked === "true" ||
-      this.checked === CB_TRUE
-    );
+    return this.checked === true;
   }
 
   get rootClass() {
-    const classes = ["newton-selector-flow-cpe-toggle"];
-    if (this.variant === "label-hidden") {
-      classes.push("newton-selector-flow-cpe-toggle_label-hidden");
-    }
-    if (this.disabled) {
-      classes.push("newton-selector-flow-cpe-toggle_disabled");
-    }
-    return classes.join(" ");
+    return this.variant === "label-hidden"
+      ? "newton-selector-flow-cpe-toggle newton-selector-flow-cpe-toggle_label-hidden"
+      : "newton-selector-flow-cpe-toggle";
   }
 
   get hasVisibleLabel() {
     return Boolean(this.label) && this.variant !== "label-hidden";
-  }
-
-  get computedAriaLabel() {
-    return this.label || this.name || "Toggle setting";
-  }
-
-  get activeText() {
-    return this.activeLabel || this.messageToggleActive || "On";
-  }
-
-  get inactiveText() {
-    return this.inactiveLabel || this.messageToggleInactive || "Off";
   }
 
   get activeOptionClass() {
@@ -96,11 +50,19 @@ export default class NewtonSelectorFlowCpeToggle extends LightningElement {
   }
 
   get activeAriaChecked() {
-    return this.isChecked ? "true" : "false";
+    return String(this.isChecked);
   }
 
   get inactiveAriaChecked() {
-    return this.isChecked ? "false" : "true";
+    return String(!this.isChecked);
+  }
+
+  get activeTabIndex() {
+    return this.isChecked ? "0" : "-1";
+  }
+
+  get inactiveTabIndex() {
+    return this.isChecked ? "-1" : "0";
   }
 
   optionClass(optionValue) {
@@ -117,27 +79,31 @@ export default class NewtonSelectorFlowCpeToggle extends LightningElement {
   }
 
   handleChoiceClick(event) {
-    const isOn = event.currentTarget.dataset.checked === "true";
-    if (this.disabled || isOn === this.isChecked) {
+    this.select(event.currentTarget.dataset.checked === "true");
+  }
+
+  handleKeydown(event) {
+    let isOn;
+    if (NEXT_KEYS.has(event.key)) {
+      isOn = event.target.dataset.checked !== "true";
+    } else if (event.key === "Home") {
+      isOn = false;
+    } else if (event.key === "End") {
+      isOn = true;
+    } else {
       return;
     }
-    this.dispatchToggle(this.name, isOn);
+    event.preventDefault();
+    this.template.querySelector(`button[data-checked="${isOn}"]`).focus();
+    this.select(isOn);
   }
 
-  handleToggle(event) {
-    this.dispatchToggle(event.target.name, event.target.checked);
-  }
-
-  dispatchToggle(name, isOn) {
-    const detail =
-      this.wireFormat === WIRE_CB_SENTINEL
-        ? {
-            id: name,
-            newValue: isOn,
-            newValueDataType: "Boolean",
-            newStringValue: isOn ? CB_TRUE : CB_FALSE
-          }
-        : { name, checked: isOn };
-    this.dispatchEvent(new CustomEvent("toggle", { detail }));
+  select(isOn) {
+    if (isOn === this.isChecked) {
+      return;
+    }
+    this.dispatchEvent(
+      new CustomEvent("toggle", { detail: { checked: isOn } })
+    );
   }
 }

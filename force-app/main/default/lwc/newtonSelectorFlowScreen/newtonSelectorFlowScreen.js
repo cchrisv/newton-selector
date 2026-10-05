@@ -1,32 +1,18 @@
-import { LightningElement, api, track } from "lwc";
+import { LightningElement, api } from "lwc";
 import {
   FlowAttributeChangeEvent,
   FlowNavigationNextEvent
 } from "lightning/flowSupport";
-import { mergeSelectorConfig } from "c/newtonSelectorFlowCpeUtilityConfigState";
-import { resolvedLayoutGridConfig } from "c/newtonSelectorUtilityConfigDefaults";
+import {
+  mergeSelectorConfig,
+  selectorPropsFromConfig
+} from "c/newtonSelectorUtilityConfigDefaults";
 
 const AUTO_ADVANCE_DELAY_MS = 150;
 
-const VALID_LAYOUTS = new Set([
-  "grid",
-  "list",
-  "horizontal",
-  "picklist",
-  "dropdown",
-  "radio",
-  "columns",
-  "dualListbox"
-]);
-
-const DEFAULT_CONFIG = mergeRuntimeConfig();
-
-function mergeRuntimeConfig(config = {}) {
-  return mergeSelectorConfig({ dataSource: "custom", ...config });
-}
-
 export default class NewtonSelectorFlowScreen extends LightningElement {
-  @api sourceRecords;
+  @api selectedRecord;
+  @api selectedRecords;
 
   _value = "";
   _values = [];
@@ -37,36 +23,40 @@ export default class NewtonSelectorFlowScreen extends LightningElement {
   _allLabels = [];
   _autoAdvanceId;
   _selectorConfigJson = "";
-  _lastParsedJson = null;
-
-  @track _config = DEFAULT_CONFIG;
+  _sourceRecords;
+  _config = mergeSelectorConfig();
+  _configInvalid = false;
+  // Built only when the config or the record collection changes, so the data
+  // selector receives the same objects on every render and does not reload.
+  _selectorProps = this.buildSelectorProps();
 
   // Flow can re-assign @api props after mount (debug runs, back/next,
-  // conditional screens, resume). With a plain `@api field` the value
-  // would update but our _config wouldn't re-parse — the selector would
-  // flash correct then revert to DEFAULT. Setter keeps them in sync, and
-  // the `v !== this._lastParsedJson` guard prevents transient empty
-  // pushes from wiping the last good config.
+  // conditional screens, resume). The setter re-parses on each new payload;
+  // an empty push keeps the last config.
   @api
   get selectorConfigJson() {
     return this._selectorConfigJson;
   }
   set selectorConfigJson(v) {
-    this._selectorConfigJson = v || "";
-    this.parseSelectorConfig(v);
+    if (!v || v === this._selectorConfigJson) return;
+    this._selectorConfigJson = v;
+    try {
+      this._config = mergeSelectorConfig(JSON.parse(v));
+      this._configInvalid = false;
+    } catch {
+      // Unreadable config: show the error state instead of an empty selector.
+      this._configInvalid = true;
+    }
+    this._selectorProps = this.buildSelectorProps();
   }
 
-  parseSelectorConfig(v) {
-    if (!v) return; // ignore transient empty/undefined; keep last good _config
-    if (v === this._lastParsedJson) return; // identical payload; skip re-parse
-    try {
-      const parsed = JSON.parse(v);
-      this._config = mergeRuntimeConfig(parsed);
-      this._lastParsedJson = v;
-    } catch {
-      // Parse error — keep the last good _config rather than flashing to
-      // DEFAULT (which would render empty/custom mode briefly).
-    }
+  @api
+  get sourceRecords() {
+    return this._sourceRecords;
+  }
+  set sourceRecords(v) {
+    this._sourceRecords = v;
+    this._selectorProps = this.buildSelectorProps();
   }
 
   @api
@@ -85,55 +75,28 @@ export default class NewtonSelectorFlowScreen extends LightningElement {
     this._values = Array.isArray(v) ? [...v] : [];
   }
 
-  @api selectedRecord;
-  @api selectedRecords;
-  // Read-through outputs — Flow can bind these to downstream screens /
-  // flows / email templates. selectedLabel/Labels reflect the label text of
-  // the current selection; allValues/allLabels reflect every option the
-  // selector rendered (post filter/sort/limit, including the None tile).
+  // Outputs. selectedLabel/Labels are the label text of the current selection;
+  // allValues/allLabels are every option the selector rendered (post
+  // filter/sort/limit, including the None tile).
   @api
   get selectedLabel() {
     return this._selectedLabel;
-  }
-  set selectedLabel(v) {
-    this._selectedLabel = v || "";
   }
   @api
   get selectedLabels() {
     return this._selectedLabels;
   }
-  set selectedLabels(v) {
-    this._selectedLabels = Array.isArray(v) ? [...v] : [];
-  }
   @api
   get allValues() {
     return this._allValues;
-  }
-  set allValues(v) {
-    this._allValues = Array.isArray(v) ? [...v] : [];
   }
   @api
   get allLabels() {
     return this._allLabels;
   }
-  set allLabels(v) {
-    this._allLabels = Array.isArray(v) ? [...v] : [];
-  }
   @api
   get selectionCount() {
     return this._selectionCount;
-  }
-  set selectionCount(v) {
-    this._selectionCount = typeof v === "number" ? v : 0;
-  }
-
-  connectedCallback() {
-    // Most of the time Flow has already set selectorConfigJson via the
-    // setter before mount. This is a safety net for bootstrap ordering
-    // edge cases where the setter hasn't fired yet.
-    if (this._selectorConfigJson && !this._lastParsedJson) {
-      this.parseSelectorConfig(this._selectorConfigJson);
-    }
   }
 
   disconnectedCallback() {
@@ -143,290 +106,24 @@ export default class NewtonSelectorFlowScreen extends LightningElement {
     }
   }
 
-  get label() {
-    return this._config.label;
-  }
-  get helpText() {
-    return this._config.helpText;
-  }
-  get fieldLevelHelp() {
-    return this._config.fieldLevelHelp;
-  }
-  get dataSource() {
-    return this._config.dataSource;
-  }
-  get layout() {
-    const layout = VALID_LAYOUTS.has(this._config.layout)
-      ? this._config.layout
-      : "grid";
-    return layout === "dropdown" ? "picklist" : layout;
-  }
-  get selectionMode() {
-    return this._config.selectionMode === "multi" ? "multi" : "single";
-  }
-  get required() {
-    return this._config.required;
-  }
-  get minSelections() {
-    return this._config.minSelections;
-  }
-  get maxSelections() {
-    return this._config.maxSelections;
-  }
-  get enableSearch() {
-    return this._config.enableSearch;
-  }
-  get showSelectAll() {
-    return this._config.showSelectAll;
-  }
-  get emptyStateMessage() {
-    return this._config.emptyStateMessage;
-  }
-  get errorStateMessage() {
-    return this._config.errorStateMessage;
+  get selectorProps() {
+    return this._selectorProps;
   }
 
-  get picklistConfig() {
-    return this._config.picklist || {};
-  }
-  get sobjectConfig() {
-    return this._config.sobject || {};
-  }
-  get customConfig() {
-    return this._config.custom || { items: [] };
-  }
-  get collectionConfig() {
-    const baseFieldMap = (this._config.collection || {}).fieldMap || {};
+  buildSelectorProps() {
+    const records = Array.isArray(this._sourceRecords)
+      ? this._sourceRecords
+      : [];
     return {
-      records: Array.isArray(this.sourceRecords) ? this.sourceRecords : [],
-      fieldMap: baseFieldMap
+      ...selectorPropsFromConfig(this._config, records),
+      forcedState: this._configInvalid ? "error" : ""
     };
-  }
-  get overrides() {
-    return this._config.overrides || {};
-  }
-  get displayConfig() {
-    return this._config.display || DEFAULT_CONFIG.display;
-  }
-
-  // Grid layout getters
-  get gridDefaults() {
-    return resolvedLayoutGridConfig(this.layout);
-  }
-  get gridCfg() {
-    return this._config.gridConfig || DEFAULT_CONFIG.gridConfig;
-  }
-  get gridMinWidth() {
-    return this.gridCfg.minWidth || this.gridDefaults.minWidth;
-  }
-  get gapHorizontal() {
-    return this.gridCfg.gapH || this.gridDefaults.gapH;
-  }
-  get gapVertical() {
-    return this.gridCfg.gapV || this.gridDefaults.gapV;
-  }
-  get tileSize() {
-    return this.gridCfg.size || this.gridDefaults.size;
-  }
-  get tileAspectRatio() {
-    return this.gridCfg.aspectRatio || this.gridDefaults.aspectRatio;
-  }
-
-  get badgeCfg() {
-    return this.gridCfg.badge || DEFAULT_CONFIG.gridConfig.badge;
-  }
-  get badgePosition() {
-    return this.badgeCfg.position || "bottom-inline";
-  }
-  get badgeVariant() {
-    return this.badgeCfg.variant || "neutral";
-  }
-  get badgeShape() {
-    return this.badgeCfg.shape || "pill";
-  }
-
-  get columns() {
-    const n = Number(this.gridCfg.columns);
-    return Number.isFinite(n) && n >= 1 && n <= 6 ? n : undefined;
-  }
-  get selectionIndicator() {
-    return (
-      this.gridCfg.selectionIndicator || this.gridDefaults.selectionIndicator
-    );
-  }
-  get elevation() {
-    return this.gridCfg.elevation || "outlined";
-  }
-  get pattern() {
-    return this.gridCfg.pattern || "none";
-  }
-  get patternTone() {
-    return this.gridCfg.patternTone || "neutral";
-  }
-  get patternHoverTone() {
-    return this.gridCfg.patternHoverTone || this.patternTone;
-  }
-  get patternSelectedTone() {
-    return this.gridCfg.patternSelectedTone || "brand";
-  }
-  get patternDisabledTone() {
-    return this.gridCfg.patternDisabledTone || "neutral";
-  }
-  get cornerStyle() {
-    return this.gridCfg.cornerStyle || "none";
-  }
-  get cornerTone() {
-    return this.gridCfg.cornerTone || "neutral";
-  }
-  get surfaceStyle() {
-    return this.gridCfg.surfaceStyle || "solid";
-  }
-  get surfaceTone() {
-    return this.gridCfg.surfaceTone || "neutral";
-  }
-  get surfaceHoverTone() {
-    return this.gridCfg.surfaceHoverTone || this.surfaceTone;
-  }
-  get surfaceSelectedTone() {
-    return this.gridCfg.surfaceSelectedTone || "brand";
-  }
-  get surfaceDisabledTone() {
-    return this.gridCfg.surfaceDisabledTone || "neutral";
-  }
-  get iconDecor() {
-    return this.gridCfg.iconDecor || this.gridDefaults.iconDecor;
-  }
-  get iconStyle() {
-    return this.gridCfg.iconStyle || this.gridDefaults.iconStyle;
-  }
-  get iconShading() {
-    return this.gridCfg.iconShading || "flat";
-  }
-  get iconTone() {
-    return this.gridCfg.iconTone || this.gridDefaults.iconTone;
-  }
-  get iconToneHex() {
-    return this.gridCfg.iconToneHex || "";
-  }
-  // Glyph tone defaults to 'auto' (inherit from iconTone) when absent.
-  get iconGlyphTone() {
-    return this.gridCfg.iconGlyphTone || "auto";
-  }
-  get iconGlyphToneHex() {
-    return this.gridCfg.iconGlyphToneHex || "";
-  }
-  // Selector-wide icon glyph size. 'auto' means "scale with tile size" —
-  // the tile's existing behavior. Explicit values (small/medium/large/etc.)
-  // pin the glyph regardless of tile size.
-  get iconSize() {
-    const raw = this.gridCfg.iconSize;
-    return raw && raw !== "auto" ? raw : "large";
-  }
-  get patternToneHex() {
-    return this.gridCfg.patternToneHex || "";
-  }
-  get patternHoverToneHex() {
-    return this.gridCfg.patternHoverToneHex || "";
-  }
-  get patternSelectedToneHex() {
-    return this.gridCfg.patternSelectedToneHex || "";
-  }
-  get patternDisabledToneHex() {
-    return this.gridCfg.patternDisabledToneHex || "";
-  }
-  get cornerToneHex() {
-    return this.gridCfg.cornerToneHex || "";
-  }
-  get surfaceToneHex() {
-    return this.gridCfg.surfaceToneHex || "";
-  }
-  get surfaceHoverToneHex() {
-    return this.gridCfg.surfaceHoverToneHex || "";
-  }
-  get surfaceSelectedToneHex() {
-    return this.gridCfg.surfaceSelectedToneHex || "";
-  }
-  get surfaceDisabledToneHex() {
-    return this.gridCfg.surfaceDisabledToneHex || "";
-  }
-  get badgeVariantHex() {
-    return this.badgeCfg?.variantHex || "";
-  }
-  // Default ON — admin flips in CPE to hide globally. Explicit false
-  // required to flip off, so legacy configs (where the key didn't exist)
-  // keep rendering icons/badges.
-  get showIcons() {
-    return this.gridCfg.showIcons !== false;
-  }
-  get showBadges() {
-    return this.gridCfg.showBadges !== false;
-  }
-
-  // None-option config lives at the top of the config (behavior-level),
-  // not under gridConfig (visual-level).
-  get includeNoneOption() {
-    return Boolean(this._config.includeNoneOption);
-  }
-  get noneOptionLabel() {
-    return this._config.noneOptionLabel || "--None--";
-  }
-  get noneOptionPosition() {
-    // Only 'start' and 'end' are legal; anything else quietly maps to
-    // 'start' so old saved configs don't break when this setting is added.
-    return this._config.noneOptionPosition === "end" ? "end" : "start";
-  }
-
-  get manualInputConfig() {
-    return this._config.manualInput || DEFAULT_CONFIG.manualInput;
-  }
-  get allowManualInput() {
-    return Boolean(this.manualInputConfig.enabled);
-  }
-  get manualInputLabel() {
-    const label = this.manualInputConfig.label;
-    return label && String(label).trim() ? String(label) : "Other";
-  }
-  get manualInputMinLength() {
-    const min = Number(this.manualInputConfig.minLength || 0);
-    return Number.isFinite(min) && min > 0 ? min : 0;
-  }
-  get manualInputMaxLength() {
-    const max = this.manualInputConfig.maxLength;
-    if (max === null || max === undefined || max === "") return undefined;
-    const n = Number(max);
-    return Number.isFinite(n) && n > 0 ? n : undefined;
-  }
-
-  // Margin + padding — empty string means "no override"; the group renderer
-  // resolves via tokenToCss, and the choice tile falls back to size-based padding.
-  get marginTop() {
-    return this.gridCfg.margin?.top ?? "";
-  }
-  get marginRight() {
-    return this.gridCfg.margin?.right ?? "";
-  }
-  get marginBottom() {
-    return this.gridCfg.margin?.bottom ?? "";
-  }
-  get marginLeft() {
-    return this.gridCfg.margin?.left ?? "";
-  }
-  get paddingTop() {
-    return this.gridCfg.padding?.top || undefined;
-  }
-  get paddingRight() {
-    return this.gridCfg.padding?.right || undefined;
-  }
-  get paddingBottom() {
-    return this.gridCfg.padding?.bottom || undefined;
-  }
-  get paddingLeft() {
-    return this.gridCfg.padding?.left || undefined;
   }
 
   handleValueChange(event) {
-    const { value, values, record, records, label, labels } = event.detail;
-    const isSingle = this.selectionMode === "single";
+    const { value, values, record, records, label, labels, manualInput } =
+      event.detail;
+    const isSingle = this._config.selectionMode !== "multi";
 
     if (isSingle) {
       this._value = value || "";
@@ -462,20 +159,19 @@ export default class NewtonSelectorFlowScreen extends LightningElement {
       );
     }
 
-    if (isSingle && this._config.autoAdvance && this._value) {
+    // Typing into the manual "Other" field changes the value on every
+    // keystroke; only a finished pick may advance the screen.
+    if (isSingle && this._config.autoAdvance && this._value && !manualInput) {
       this.triggerAutoAdvance();
     }
   }
 
-  // Data selector fires `itemschange` whenever the rendered set of options
-  // changes (picklist load, record collection refresh, filter by parent, etc.).
-  // We mirror that back out as FlowAttributeChangeEvents so admins
-  // can bind allValues/allLabels to downstream screens, email templates,
-  // or Apex actions.
+  // The data selector fires `itemschange` whenever the rendered set of options
+  // changes. Mirror it out so admins can bind allValues/allLabels downstream.
   handleItemsChange(event) {
-    const { values, labels } = event.detail || {};
-    this._allValues = Array.isArray(values) ? [...values] : [];
-    this._allLabels = Array.isArray(labels) ? [...labels] : [];
+    const { values, labels } = event.detail;
+    this._allValues = [...values];
+    this._allLabels = [...labels];
     this.dispatchEvent(
       new FlowAttributeChangeEvent("allValues", this._allValues)
     );

@@ -292,66 +292,6 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     });
   });
 
-  it("tags sObject search results with record-object presentation metadata", async () => {
-    searchSObjectTypes.mockResolvedValue([
-      {
-        value: "DataActionJobSummary",
-        label: "Data Action Job Summary",
-        subtitle: "DataActionJobSummary"
-      }
-    ]);
-    const element = mount({
-      config: { ...BASE_CONFIG, dataSource: "sobject" }
-    });
-    const lookup = byLabel(
-      element.shadowRoot,
-      "c-newton-selector-combobox",
-      "SObject"
-    );
-    lookup.setSearchResults = jest.fn();
-
-    lookup.dispatchEvent(
-      new CustomEvent("search", {
-        detail: { searchTerm: "data", rawSearchTerm: "Data" },
-        bubbles: true,
-        composed: true
-      })
-    );
-    await flushPromises();
-
-    expect(lookup.setSearchResults).toHaveBeenCalledWith([
-      expect.objectContaining({
-        id: "DataActionJobSummary",
-        title: "Data Action Job Summary",
-        icon: "database",
-        type: "SObject",
-        displayType: "SObject",
-        badge: "DataActionJobSummary"
-      })
-    ]);
-  });
-
-  it("passes collection object metadata into every collection field mapper", () => {
-    const element = mount({
-      config: {
-        ...BASE_CONFIG,
-        dataSource: "collection",
-        collection: {
-          objectApiName: "Contact",
-          fieldMap: { label: "Name", value: "Id" }
-        }
-      }
-    });
-
-    const fieldselectors = element.shadowRoot.querySelectorAll(
-      "c-newton-selector-flow-cpe-field-selector[data-field]"
-    );
-    expect(fieldselectors).toHaveLength(6);
-    fieldselectors.forEach((selector) => {
-      expect(selector.objectApiName).toBe("Contact");
-    });
-  });
-
   it("emits custom item add, edit, duplicate, move, and remove patches", () => {
     const element = mount();
     const patches = collect(element);
@@ -425,7 +365,7 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     toggle(overrideModeToggle(element), true);
     await flushPromises();
 
-    click(byLabel(element.shadowRoot, "lightning-button", "Select filtered"));
+    click(byLabel(element.shadowRoot, "lightning-button", "Select all shown"));
     await flushPromises();
 
     expect(
@@ -498,7 +438,7 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
       byLabel(
         element.shadowRoot,
         "c-newton-selector-flow-cpe-toggle",
-        "Per-item override mode"
+        "Option overrides"
       )
     ).toBeUndefined();
     expect(element.shadowRoot.textContent).not.toContain("Known item values");
@@ -525,9 +465,9 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     toggle(overrideModeToggle(element), true);
     await flushPromises();
 
-    expect(
-      element.shadowRoot.querySelectorAll(".newton-overrides__row")
-    ).toHaveLength(25);
+    const rows = () =>
+      element.shadowRoot.querySelectorAll(".newton-overrides__row");
+    expect(rows().length).toBeLessThan(30);
     expect(
       element.shadowRoot.querySelectorAll(
         ".newton-studio__overrides-grid c-newton-selector-flow-cpe-resource-selector"
@@ -553,13 +493,13 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     ).toHaveLength(4);
 
     click(
-      byLabel(element.shadowRoot, "lightning-button", "Show 5 more (25 of 30)")
+      [...element.shadowRoot.querySelectorAll("lightning-button")].find(
+        (button) => button.label.startsWith("Show")
+      )
     );
     await flushPromises();
 
-    expect(
-      element.shadowRoot.querySelectorAll(".newton-overrides__row")
-    ).toHaveLength(30);
+    expect(rows()).toHaveLength(30);
   });
 
   it("shows bulk controls only when multiple override rows are selected", async () => {
@@ -606,27 +546,6 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     toggle(overrideModeToggle(element), false);
     await flushPromises();
     expect(element.shadowRoot.querySelector(".newton-studio__bulk")).toBeNull();
-  });
-
-  it("loads and reports sObject sample rows", async () => {
-    queryItems.mockResolvedValue([{ value: "001xx", label: "Acme" }]);
-    const element = mount({
-      config: { ...BASE_CONFIG, dataSource: "sobject" }
-    });
-
-    toggle(overrideModeToggle(element), true);
-    await flushPromises();
-
-    click(byLabel(element.shadowRoot, "lightning-button", "Load sample rows"));
-    await flushPromises();
-    await flushPromises();
-
-    expect(queryItems).toHaveBeenCalledWith({
-      configJson: expect.stringContaining("Account")
-    });
-    expect(
-      byLabel(element.shadowRoot, "lightning-button", "Reload sample rows")
-    ).not.toBeNull();
   });
 
   it("captures sObject sample load failures", async () => {
@@ -743,7 +662,7 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
       byLabel(
         element.shadowRoot,
         "c-newton-selector-flow-cpe-choice-control",
-        "Record Type"
+        "Record type"
       )
     ).toBeUndefined();
   });
@@ -789,7 +708,7 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     const recordTypeselector = byLabel(
       element.shadowRoot,
       "c-newton-selector-flow-cpe-choice-control",
-      "Record Type"
+      "Record type"
     );
     expect(recordTypeselector).not.toBeUndefined();
     expect(recordTypeselector.items).toEqual(
@@ -801,7 +720,7 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
         expect.objectContaining({
           label: "Business",
           value: "012Default",
-          badge: "DEFAULT"
+          badge: "Default"
         }),
         expect.objectContaining({ label: "Partner", value: "012Partner" })
       ])

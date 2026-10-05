@@ -1,5 +1,15 @@
 import { SECTIONS } from "c/newtonSelectorFlowCpeUtilityConfigOptions";
 
+// Messages say what needs attention and how to fix it, in the editor's own
+// words. The Flow Builder panel reuses them, so both surfaces read the same.
+export const CHOOSE_COLLECTION_MESSAGE =
+  "Choose the record collection variable.";
+
+function listPositions(positions) {
+  if (positions.length === 1) return String(positions[0]);
+  return `${positions.slice(0, -1).join(", ")} and ${positions[positions.length - 1]}`;
+}
+
 export function sectionIssues(key, config, refs = {}) {
   const errors = [];
   const warnings = [];
@@ -8,35 +18,42 @@ export function sectionIssues(key, config, refs = {}) {
 
   if (key === "data") {
     if (!dataSource) {
-      errors.push("Pick a data source to continue.");
+      errors.push("Choose a data source.");
     } else if (dataSource === "picklist") {
       if (!c.picklist?.objectApiName)
-        errors.push("Select a Salesforce object.");
-      if (!c.picklist?.fieldApiName) errors.push("Select a picklist field.");
+        errors.push("Choose the object that has the picklist field.");
+      if (!c.picklist?.fieldApiName) errors.push("Choose the picklist field.");
     } else if (dataSource === "collection") {
-      if (!refs.sourceRecordsRef)
-        errors.push("Bind a Flow record collection variable.");
+      if (!refs.sourceRecordsRef) errors.push(CHOOSE_COLLECTION_MESSAGE);
       if (!c.collection?.fieldMap?.label)
-        errors.push("Map at least the Label field for the collection.");
+        errors.push("Choose the field to show as each option's label.");
     } else if (dataSource === "sobject") {
       if (!c.sobject?.sObjectApiName)
-        errors.push("Select a Salesforce object.");
-      if (!c.sobject?.labelField) warnings.push("Set a label field.");
+        errors.push("Choose the object to query.");
+      if (refs.whereIncomplete)
+        errors.push("Finish or remove the highlighted filter condition.");
     } else if (dataSource === "custom") {
       const items = c.custom?.items || [];
       if (items.length === 0 && !c.manualInput?.enabled) {
-        errors.push("Add at least one custom item.");
+        errors.push("Add at least one option.");
       }
-      const missingLabel = items.filter((item) => !item.label).length;
-      if (missingLabel) {
+      const unlabeled = items
+        .map((item, index) => (item.label ? null : index + 1))
+        .filter(Boolean);
+      if (unlabeled.length) {
         warnings.push(
-          `${missingLabel} item${missingLabel === 1 ? "" : "s"} missing a label.`
+          `${unlabeled.length === 1 ? "Option" : "Options"} ${listPositions(unlabeled)} ${unlabeled.length === 1 ? "needs" : "need"} a label.`
         );
       }
     }
   } else if (key === "behavior") {
     const min = Number(c.minSelections || 0);
-    const max = c.maxSelections == null ? null : Number(c.maxSelections);
+    const max =
+      c.maxSelections === null ||
+      c.maxSelections === undefined ||
+      c.maxSelections === ""
+        ? null
+        : Number(c.maxSelections);
     const manual = c.manualInput || {};
     const manualMin = Number(manual.minLength || 0);
     const manualMax =
@@ -44,28 +61,25 @@ export function sectionIssues(key, config, refs = {}) {
         ? null
         : Number(manual.maxLength);
     if (c.selectionMode === "multi" && max != null && max < Math.max(min, 1)) {
-      errors.push("Max selections must be ≥ min selections (and ≥ 1).");
+      errors.push(
+        "Maximum selections must be at least the minimum, and at least 1."
+      );
     }
     if (manual.enabled) {
       if (!manual.label || !String(manual.label).trim()) {
-        errors.push("Manual input needs an option label.");
+        errors.push("Give the manual input option a label.");
       }
       if (!Number.isFinite(manualMin) || manualMin < 0) {
-        errors.push("Manual input minimum characters must be 0 or greater.");
+        errors.push("Minimum characters can't be negative.");
       }
       if (
         manualMax !== null &&
         (!Number.isFinite(manualMax) || manualMax < Math.max(manualMin, 1))
       ) {
         errors.push(
-          "Manual input maximum characters must be ≥ minimum characters (and ≥ 1)."
+          "Maximum characters must be at least the minimum, and at least 1."
         );
       }
-    }
-    if (c.selectionMode === "multi" && c.autoAdvance) {
-      warnings.push(
-        "Auto-advance is single-select only — it has no effect in multi."
-      );
     }
   }
 

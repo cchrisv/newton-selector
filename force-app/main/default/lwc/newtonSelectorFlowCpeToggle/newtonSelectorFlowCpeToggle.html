@@ -5,19 +5,16 @@
         <div class="newton-selector-flow-cpe-toggle__label-row">
           <span
             class="slds-form-element__label newton-selector-flow-cpe-toggle__label"
+            >{label}</span
           >
-            {label}
-          </span>
-          <template lwc:if={fieldLevelHelp}>
-            <lightning-helptext content={fieldLevelHelp}></lightning-helptext>
-          </template>
         </div>
       </template>
       <div class="slds-form-element__control">
         <div
           class="newton-selector-flow-cpe-toggle__control"
           role="radiogroup"
-          aria-label={computedAriaLabel}
+          aria-label={label}
+          onkeydown={handleKeydown}
         >
           <button
             type="button"
@@ -25,12 +22,10 @@
             data-checked="false"
             role="radio"
             aria-checked={inactiveAriaChecked}
-            disabled={disabled}
+            tabindex={inactiveTabIndex}
             onclick={handleChoiceClick}
           >
-            <span class="newton-selector-flow-cpe-toggle__option-label"
-              >{inactiveText}</span
-            >
+            {inactiveLabel}
           </button>
           <button
             type="button"
@@ -38,12 +33,10 @@
             data-checked="true"
             role="radio"
             aria-checked={activeAriaChecked}
-            disabled={disabled}
+            tabindex={activeTabIndex}
             onclick={handleChoiceClick}
           >
-            <span class="newton-selector-flow-cpe-toggle__option-label"
-              >{activeText}</span
-            >
+            {activeLabel}
           </button>
         </div>
       </div>

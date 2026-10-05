@@ -1,5 +1,5 @@
 import { LightningElement, api, wire, track } from "lwc";
-import { getObjectInfo, getPicklistValues } from "lightning/uiObjectInfoApi";
+import { getPicklistValues } from "lightning/uiObjectInfoApi";
 import queryItems from "@salesforce/apex/NewtonSelectorRuntimeController.queryItems";
 import {
   normalizePicklist,
@@ -8,7 +8,8 @@ import {
   normalizeCustom,
   applyOverrides,
   applyDisplay,
-  MANUAL_INPUT_VALUE
+  MANUAL_INPUT_VALUE,
+  MASTER_RECORD_TYPE_ID
 } from "c/newtonSelectorUtilityDataSources";
 
 const SOURCE_PICKLIST = "picklist";
@@ -17,36 +18,51 @@ const SOURCE_SOBJECT = "sobject";
 const SOURCE_CUSTOM = "custom";
 
 export default class NewtonSelectorDataSelector extends LightningElement {
-  @api label = "";
-  @api helpText = "";
-  @api fieldLevelHelp = "";
-  // Preview-only: force a state ('' | 'empty' | 'error'). Ignored at runtime.
-  @api forcedState = "";
-  @api layout = "grid";
-  @api required = false;
-  @api minSelections = 0;
+  @api label;
+  @api helpText;
+  @api fieldLevelHelp;
+  // Force a state ('' | 'empty' | 'error'). The builder preview uses it, and
+  // the flow screen forces 'error' when its saved config cannot be read.
+  @api forcedState;
+  @api layout;
+  @api required;
+  @api minSelections;
   @api maxSelections;
-  @api showSelectAll = false;
-  @api previewMode = false;
-  @api emptyStateMessage = "No options available.";
-  @api errorStateMessage = "Could not load options.";
-  // Insert a "None" tile as an option in any selection mode. Its empty value
-  // clears the selection downstream rather than being persisted as a choice.
-  @track _sourceType = SOURCE_CUSTOM;
-  @track _picklistConfig;
-  @track _collectionConfig;
-  @track _sobjectConfig;
-  @track _customConfig;
-  @track _displayConfig;
+  @api showSelectAll;
+  @api enableSearch;
+  @api previewMode;
+  @api emptyStateMessage;
+  @api errorStateMessage;
+  @api manualInputMinLength;
+  @api manualInputMaxLength;
+  // Group appearance properties (layout spacing and tile styling), passed to
+  // c-newton-selector-group unchanged. Built by selectorPropsFromConfig().
+  @api appearance;
+
+  _sourceType;
+  _picklistConfig;
+  _collectionConfig;
+  _sobjectConfig;
+  _customConfig;
+  _displayConfig;
+  _overrides;
   _selectionMode = "single";
   _includeNoneOption = false;
-  _noneOptionLabel = "--None--";
-  _noneOptionPosition = "start";
+  _noneOptionLabel;
+  _noneOptionPosition;
   _allowManualInput = false;
-  _manualInputLabel = "Other";
+  _manualInputLabel;
   _manualInputValue = "";
   _manualInputSelected = false;
-  _enableSearch = false;
+  _noneSelected = false;
+  _connectedFlag = false;
+  _rawData = null;
+  _value = "";
+  _values = [];
+
+  @track _items = [];
+  _isLoading = false;
+  _errorMessage = "";
 
   @api
   get selectionMode() {
@@ -56,18 +72,20 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     const next = v === "multi" ? "multi" : "single";
     if (this._selectionMode === next) return;
     this._selectionMode = next;
-    this.refreshItemsForNoneOptionConfig();
+    this.reapplyNormalization();
   }
 
+  // A "None" tile can be offered in any selection mode. Its empty value
+  // clears the selection downstream rather than being persisted as a choice.
   @api
   get includeNoneOption() {
     return this._includeNoneOption;
   }
   set includeNoneOption(v) {
-    const next = v === true || v === "true" || v === "";
+    const next = Boolean(v);
     if (this._includeNoneOption === next) return;
     this._includeNoneOption = next;
-    this.refreshItemsForNoneOptionConfig();
+    this.reapplyNormalization();
   }
 
   @api
@@ -75,23 +93,20 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     return this._noneOptionLabel;
   }
   set noneOptionLabel(v) {
-    const next = v === undefined || v === null ? "--None--" : String(v);
-    if (this._noneOptionLabel === next) return;
-    this._noneOptionLabel = next;
-    this.refreshItemsForNoneOptionConfig();
+    if (this._noneOptionLabel === v) return;
+    this._noneOptionLabel = v;
+    this.reapplyNormalization();
   }
 
-  // 'start' (default) prepends; 'end' appends. Any other value falls back to
-  // 'start' so legacy configs without this key stay stable.
+  // 'start' prepends the None tile; 'end' appends it.
   @api
   get noneOptionPosition() {
     return this._noneOptionPosition;
   }
   set noneOptionPosition(v) {
-    const next = v === "end" ? "end" : "start";
-    if (this._noneOptionPosition === next) return;
-    this._noneOptionPosition = next;
-    this.refreshItemsForNoneOptionConfig();
+    if (this._noneOptionPosition === v) return;
+    this._noneOptionPosition = v;
+    this.reapplyNormalization();
   }
 
   @api
@@ -99,10 +114,10 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     return this._allowManualInput;
   }
   set allowManualInput(v) {
-    const next = v === true || v === "true" || v === "";
+    const next = Boolean(v);
     if (this._allowManualInput === next) return;
     this._allowManualInput = next;
-    this.refreshItemsForNoneOptionConfig();
+    this.reapplyNormalization();
   }
 
   @api
@@ -110,21 +125,9 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     return this._manualInputLabel;
   }
   set manualInputLabel(v) {
-    const next = v === undefined || v === null ? "Other" : String(v);
-    if (this._manualInputLabel === next) return;
-    this._manualInputLabel = next;
-    this.refreshItemsForNoneOptionConfig();
-  }
-
-  @api manualInputMinLength = 0;
-  @api manualInputMaxLength;
-
-  @api
-  get enableSearch() {
-    return this._enableSearch;
-  }
-  set enableSearch(v) {
-    this._enableSearch = v === true || v === "true" || v === "";
+    if (this._manualInputLabel === v) return;
+    this._manualInputLabel = v;
+    this.reapplyNormalization();
   }
 
   @api
@@ -132,10 +135,9 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     return this._sourceType;
   }
   set sourceType(v) {
-    const next = v || SOURCE_CUSTOM;
-    const changed = this._sourceType !== next;
-    this._sourceType = next;
-    if (this._connectedFlag && changed) this.loadData();
+    const changed = this._sourceType !== v;
+    this._sourceType = v;
+    if (changed) this.reload();
   }
 
   @api
@@ -144,9 +146,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   }
   set picklistConfig(v) {
     this._picklistConfig = v;
-    if (this._connectedFlag && this._sourceType === SOURCE_PICKLIST) {
-      if (this._rawData != null) this.reapplyNormalization();
-    }
+    if (this._sourceType === SOURCE_PICKLIST) this.reapplyNormalization();
   }
 
   @api
@@ -155,9 +155,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   }
   set collectionConfig(v) {
     this._collectionConfig = v;
-    if (this._connectedFlag && this._sourceType === SOURCE_COLLECTION) {
-      this.loadCollection();
-    }
+    if (this._sourceType === SOURCE_COLLECTION) this.reload();
   }
 
   @api
@@ -167,12 +165,9 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   set sobjectConfig(v) {
     const prev = this._sobjectConfig;
     this._sobjectConfig = v;
-    // Guard against re-querying Apex on every parent render — the modal
-    // preview rebuilds this config object on each getter call.
+    // Only a changed query goes back to Apex.
     if (JSON.stringify(prev) === JSON.stringify(v)) return;
-    if (this._connectedFlag && this._sourceType === SOURCE_SOBJECT) {
-      this.loadSObject();
-    }
+    if (this._sourceType === SOURCE_SOBJECT) this.reload();
   }
 
   @api
@@ -181,9 +176,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   }
   set customConfig(v) {
     this._customConfig = v;
-    if (this._connectedFlag && this._sourceType === SOURCE_CUSTOM) {
-      this.loadCustom();
-    }
+    if (this._sourceType === SOURCE_CUSTOM) this.reload();
   }
 
   @api
@@ -192,75 +185,8 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   }
   set displayConfig(v) {
     this._displayConfig = v;
-    if (this._connectedFlag && this._rawData != null) {
-      this.reapplyNormalization();
-    }
+    this.reapplyNormalization();
   }
-
-  // Grid layout knobs (passed through to the group renderer). Gaps / margin / padding
-  // accept SLDS 2 spacing token values ('none', '1'-'12') or passthrough CSS
-  // (e.g. '1rem'). The group renderer converts via tokenToCss().
-  @api gridMinWidth = "7.5rem";
-  @api gapHorizontal = "2";
-  @api gapVertical = "2";
-  @api marginTop = "";
-  @api marginRight = "";
-  @api marginBottom = "";
-  @api marginLeft = "";
-  @api paddingTop;
-  @api paddingRight;
-  @api paddingBottom;
-  @api paddingLeft;
-  @api size = "small";
-  // Selector-wide glyph size. 'large' (or unset) defers to the tile size
-  // default; explicit small/xx-small/etc. pins the glyph regardless.
-  @api iconSize = "large";
-  @api aspectRatio = "1:1";
-  @api badgePosition = "bottom-inline";
-  @api badgeVariant = "neutral";
-  @api badgeShape = "pill";
-  @api columns;
-  @api selectionIndicator = "frame";
-  @api elevation = "outlined";
-  // Pattern / corner / surface / icon-decor with tone siblings.
-  @api pattern = "none";
-  @api patternTone = "neutral";
-  @api patternHoverTone = "neutral";
-  @api patternSelectedTone = "brand";
-  @api patternDisabledTone = "neutral";
-  @api cornerStyle = "none";
-  @api cornerTone = "neutral";
-  @api surfaceStyle = "solid";
-  @api surfaceTone = "neutral";
-  @api surfaceHoverTone = "neutral";
-  @api surfaceSelectedTone = "brand";
-  @api surfaceDisabledTone = "neutral";
-  @api iconDecor = "square";
-  @api iconStyle = "soft";
-  @api iconShading = "flat";
-  @api iconTone = "brand";
-  @api iconGlyphTone;
-  @api iconGlyphToneHex = "";
-  @api iconToneHex = "";
-  @api patternToneHex = "";
-  @api patternHoverToneHex = "";
-  @api patternSelectedToneHex = "";
-  @api patternDisabledToneHex = "";
-  @api cornerToneHex = "";
-  @api surfaceToneHex = "";
-  @api surfaceHoverToneHex = "";
-  @api surfaceSelectedToneHex = "";
-  @api surfaceDisabledToneHex = "";
-  @api badgeVariantHex = "";
-  // undefined → render (default ON); explicit `false` → hide globally.
-  @api showIcons;
-  @api showBadges;
-
-  _overrides;
-  _refreshKey;
-  _refreshTimer;
-  _connectedFlag = false;
-  _rawData = null;
 
   @api
   get overrides() {
@@ -268,29 +194,8 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   }
   set overrides(v) {
     this._overrides = v;
-    if (this._connectedFlag && this._rawData != null) {
-      this.reapplyNormalization();
-    }
+    this.reapplyNormalization();
   }
-
-  @api
-  get refreshKey() {
-    return this._refreshKey;
-  }
-  set refreshKey(v) {
-    const changed = this._refreshKey !== v;
-    this._refreshKey = v;
-    if (!changed || !this._connectedFlag) return;
-    clearTimeout(this._refreshTimer);
-    this._refreshTimer = setTimeout(() => this.loadData(), 300);
-  }
-
-  _value = "";
-  _values = [];
-
-  @track _items = [];
-  @track _isLoading = false;
-  @track _errorMessage = "";
 
   @api
   get value() {
@@ -308,30 +213,22 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     this._values = Array.isArray(v) ? [...v] : [];
   }
 
-  // --- Picklist wires ---
-  get objectApiName() {
-    return this._picklistConfig?.objectApiName;
-  }
-  get fieldApiName() {
-    return this._picklistConfig?.fieldApiName;
-  }
+  // --- Picklist wire ---
   get recordTypeId() {
-    return this._picklistConfig?.recordTypeId || "012000000000000AAA";
+    return this._picklistConfig?.recordTypeId || MASTER_RECORD_TYPE_ID;
   }
 
   get picklistFieldRef() {
+    const objectApiName = this._picklistConfig?.objectApiName;
+    const fieldApiName = this._picklistConfig?.fieldApiName;
     if (
       this._sourceType !== SOURCE_PICKLIST ||
-      !this.objectApiName ||
-      !this.fieldApiName
-    )
+      !objectApiName ||
+      !fieldApiName
+    ) {
       return undefined;
-    return `${this.objectApiName}.${this.fieldApiName}`;
-  }
-
-  @wire(getObjectInfo, { objectApiName: "$objectApiName" })
-  wiredObjectInfo({ error }) {
-    if (error) this.handleError(error);
+    }
+    return `${objectApiName}.${fieldApiName}`;
   }
 
   @wire(getPicklistValues, {
@@ -346,11 +243,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     }
     if (data) {
       this._rawData = data;
-      this.commitItems(
-        this.enrichItems(
-          normalizePicklist(data, this._picklistConfig?.valueSource)
-        )
-      );
+      this.reapplyNormalization();
       this._isLoading = false;
       this._errorMessage = "";
     }
@@ -364,10 +257,13 @@ export default class NewtonSelectorDataSelector extends LightningElement {
 
   disconnectedCallback() {
     this._connectedFlag = false;
-    clearTimeout(this._refreshTimer);
   }
 
   // --- Data fetch strategy ---
+  reload() {
+    if (this._connectedFlag) this.loadData();
+  }
+
   async loadData() {
     const handlers = {
       [SOURCE_PICKLIST]: this.loadPicklist,
@@ -385,33 +281,16 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     }
   }
 
-  @api
-  refresh() {
-    return this.loadData();
-  }
-
   loadPicklist() {
-    // If the wire already delivered data, DON'T flip loading back to true.
-    // The wire only re-fires when objectApiName/fieldApiName change; a
-    // manual re-trigger (e.g. parent-value change, refreshKey bump) would
-    // otherwise strand the UI in the skeleton state because the wire has
-    // no reason to re-emit. Existing data is still correct.
+    // The wire only re-emits when the object/field/record type changes, so a
+    // reload with data already delivered must not strand the skeleton.
     if (this._rawData != null) return;
     this._isLoading = true;
   }
 
   loadCollection() {
-    const records = this._collectionConfig?.records || [];
-    const fieldMap = this._collectionConfig?.fieldMap || {};
-    this._rawData = { records, fieldMap };
-    const normalized = normalizeCollection(records, fieldMap);
-    const withRecords = normalized.map((item, idx) => ({
-      ...item,
-      record: records[idx]
-    }));
-    this.commitItems(
-      this.enrichItems(withRecords, { applyItemOverrides: false })
-    );
+    this._rawData = this._collectionConfig?.records || [];
+    this.reapplyNormalization();
     this._isLoading = false;
     this._errorMessage = "";
   }
@@ -420,42 +299,69 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     this._isLoading = true;
     this._errorMessage = "";
     try {
-      const configJson = JSON.stringify(this._sobjectConfig || {});
-      const dtos = await queryItems({ configJson });
-      this._rawData = dtos;
-      const normalized = normalizeSObjectDTO(dtos);
-      const withRecords = normalized.map((item, idx) => ({
-        ...item,
-        record: dtos[idx]?.record || dtos[idx]
-      }));
-      this.commitItems(this.enrichItems(withRecords));
+      // The stored config names the row cap `limit`; the Apex DTO reads `queryLimit`.
+      const { limit, ...sobjectConfig } = this._sobjectConfig || {};
+      const queryLimit = Number(limit);
+      if (queryLimit > 0) sobjectConfig.queryLimit = queryLimit;
+      const configJson = JSON.stringify(sobjectConfig);
+      this._rawData = await queryItems({ configJson });
+      this.reapplyNormalization();
     } finally {
       this._isLoading = false;
     }
   }
 
   loadCustom() {
-    const items = this._customConfig?.items || [];
-    this._rawData = items;
-    this.commitItems(this.enrichItems(normalizeCustom(items)));
+    this._rawData = this._customConfig?.items || [];
+    this.reapplyNormalization();
     this._isLoading = false;
     this._errorMessage = "";
   }
 
-  enrichItems(items, options = {}) {
-    const applyItemOverrides = options.applyItemOverrides !== false;
-    const overridden = applyItemOverrides
-      ? applyOverrides(items, this._overrides)
-      : items;
-    const displayed = applyDisplay(overridden, this._displayConfig);
-    // "None" option. Empty value means "no pick", which Flow treats as null
-    // on output. Inserted after sort+limit so its position is deterministic
-    // regardless of display rules.
-    let next = displayed;
-    if (this.includeNoneOption) {
+  normalizeSourceItems() {
+    switch (this._sourceType) {
+      case SOURCE_PICKLIST:
+        return normalizePicklist(
+          this._rawData,
+          this._picklistConfig?.valueSource
+        );
+      case SOURCE_COLLECTION:
+        return normalizeCollection(
+          this._rawData,
+          this._collectionConfig?.fieldMap
+        );
+      case SOURCE_SOBJECT:
+        return normalizeSObjectDTO(this._rawData);
+      default:
+        return normalizeCustom(this._rawData);
+    }
+  }
+
+  // Re-derives the rendered options from the loaded data after any config
+  // change (overrides, display rules, None/manual options).
+  reapplyNormalization() {
+    if (!this._connectedFlag || this._rawData == null) return;
+    const source = this.normalizeSourceItems();
+    // Per-item overrides are keyed by value and are not offered for record
+    // collections, whose rows change on every run.
+    const overridden =
+      this._sourceType === SOURCE_COLLECTION
+        ? source
+        : applyOverrides(source, this._overrides);
+    this.commitItems(
+      this.addExtraOptions(applyDisplay(overridden, this._displayConfig))
+    );
+  }
+
+  // The None and manual-input options are added after sort and limit so their
+  // positions stay fixed whatever the display rules are.
+  addExtraOptions(items) {
+    let next = items;
+    if (this._includeNoneOption) {
+      // Empty value means "no pick", which Flow reads as null.
       const none = {
         id: "__none__",
-        label: this.noneOptionLabel || "--None--",
+        label: this._noneOptionLabel,
         sublabel: "",
         icon: "",
         badge: "",
@@ -464,14 +370,14 @@ export default class NewtonSelectorDataSelector extends LightningElement {
         disabled: false
       };
       next =
-        this.noneOptionPosition === "end" ? [...next, none] : [none, ...next];
+        this._noneOptionPosition === "end" ? [...next, none] : [none, ...next];
     }
-    if (this.allowManualInput) {
+    if (this._allowManualInput) {
       next = [
         ...next,
         {
           id: MANUAL_INPUT_VALUE,
-          label: this.manualInputLabel || "Other",
+          label: this._manualInputLabel,
           sublabel: "Enter a custom value",
           icon: "square-pen",
           badge: "",
@@ -485,16 +391,15 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     return next;
   }
 
-  // Central setter — emits an `itemschange` event with `allValues` and
-  // `allLabels` so the flow wrapper can surface them as Flow outputs.
+  // Emits `itemschange` with every rendered value and label so the flow
+  // screen can surface them as Flow outputs.
   commitItems(items) {
-    const list = Array.isArray(items) ? items : [];
-    this._items = list;
+    this._items = items;
     this.dispatchEvent(
       new CustomEvent("itemschange", {
         detail: {
-          values: list.map((i) => String(i.value ?? "")),
-          labels: list.map((i) => String(i.label ?? ""))
+          values: items.map((i) => String(i.value ?? "")),
+          labels: items.map((i) => String(i.label ?? ""))
         },
         bubbles: true,
         composed: false
@@ -502,48 +407,9 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     );
   }
 
-  reapplyNormalization() {
-    if (!this._rawData) return;
-    if (this._sourceType === SOURCE_PICKLIST) {
-      this.commitItems(
-        this.enrichItems(
-          normalizePicklist(this._rawData, this._picklistConfig?.valueSource)
-        )
-      );
-    } else if (this._sourceType === SOURCE_COLLECTION) {
-      const records = this._collectionConfig?.records || [];
-      const fieldMap = this._collectionConfig?.fieldMap || {};
-      const normalized = normalizeCollection(records, fieldMap);
-      const withRecords = normalized.map((item, idx) => ({
-        ...item,
-        record: records[idx]
-      }));
-      this.commitItems(
-        this.enrichItems(withRecords, { applyItemOverrides: false })
-      );
-    } else if (this._sourceType === SOURCE_SOBJECT) {
-      const dtos = this._rawData || [];
-      const normalized = normalizeSObjectDTO(dtos);
-      const withRecords = normalized.map((item, idx) => ({
-        ...item,
-        record: dtos[idx]?.record || dtos[idx]
-      }));
-      this.commitItems(this.enrichItems(withRecords));
-    } else if (this._sourceType === SOURCE_CUSTOM) {
-      this.commitItems(this.enrichItems(normalizeCustom(this._rawData)));
-    }
-  }
-
-  refreshItemsForNoneOptionConfig() {
-    if (this._connectedFlag && this._rawData != null) {
-      this.reapplyNormalization();
-    }
-  }
-
   handleError(error) {
-    const msg =
+    this._errorMessage =
       error?.body?.message || error?.message || this.errorStateMessage;
-    this._errorMessage = msg;
     this._isLoading = false;
   }
 
@@ -553,33 +419,30 @@ export default class NewtonSelectorDataSelector extends LightningElement {
 
   // --- Selection ---
   handleSelectionChange(event) {
-    const { values, items, manualValue } = event.detail;
-    const selectedValues = Array.isArray(values) ? values : [];
-    const selectedItems = Array.isArray(items) ? items : [];
-    const noneWasPicked = selectedValues.includes("");
-    const manualWasPicked = selectedValues.includes(MANUAL_INPUT_VALUE);
+    const { values, items, manualValue, noneSelected } = event.detail;
+    const noneWasPicked = noneSelected === true;
+    const manualWasPicked = values.includes(MANUAL_INPUT_VALUE);
     this._manualInputSelected = !noneWasPicked && manualWasPicked;
+    this._noneSelected = noneWasPicked;
     if (manualValue !== undefined && manualValue !== null) {
       this._manualInputValue = String(manualValue);
     }
     if (noneWasPicked) {
       this._manualInputValue = "";
     }
-    const normalValues = selectedValues.filter(
-      (value) => value !== "" && value !== MANUAL_INPUT_VALUE
-    );
+    const normalValues = values.filter((value) => value !== MANUAL_INPUT_VALUE);
     const effectiveValues =
       !noneWasPicked && manualWasPicked && this._manualInputValue
         ? [...normalValues, this._manualInputValue]
         : normalValues;
     const effectiveItems = noneWasPicked
       ? []
-      : selectedItems.filter((item) => item?.value !== MANUAL_INPUT_VALUE);
-    const labels = effectiveItems.map((i) => String(i?.label ?? ""));
-    const manualLabel = this._manualInputValue || this.manualInputLabel;
+      : items.filter((item) => item.value !== MANUAL_INPUT_VALUE);
+    const labels = effectiveItems.map((i) => String(i.label ?? ""));
+    const manualLabel = this._manualInputValue || this._manualInputLabel;
     if (this.selectionMode === "single") {
       this._value = manualWasPicked
-        ? this._manualInputValue || ""
+        ? this._manualInputValue
         : effectiveValues[0] || "";
       this._values = [];
     } else {
@@ -601,8 +464,10 @@ export default class NewtonSelectorDataSelector extends LightningElement {
             : manualWasPicked && this.selectionMode === "multi"
               ? [...labels, manualLabel]
               : labels,
-          record: manualWasPicked ? null : effectiveItems[0] || null,
-          records: effectiveItems
+          // Only record-backed sources (SOQL, record collection) carry records.
+          record: manualWasPicked ? null : effectiveItems[0]?.record || null,
+          records: effectiveItems.map((item) => item.record).filter(Boolean),
+          manualInput: manualWasPicked
         },
         bubbles: true,
         composed: false
@@ -612,7 +477,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
 
   get selectedValuesForGroup() {
     if (this.previewMode && !this._value && this._values.length === 0) {
-      const previewValues = (this._items || [])
+      const previewValues = this._items
         .filter(
           (item) =>
             !item.disabled &&
@@ -621,16 +486,14 @@ export default class NewtonSelectorDataSelector extends LightningElement {
         )
         .map((item) => item.value);
       if (this.selectionMode === "single") {
-        return previewValues.length ? [previewValues[0]] : [];
+        return previewValues.slice(0, 1);
       }
       const max = Number(this.maxSelections);
       const cap = Number.isFinite(max) && max > 0 ? max : 2;
       return previewValues.slice(0, cap);
     }
     if (this.selectionMode === "single") {
-      if (this.hasActiveManualSelection) {
-        return [MANUAL_INPUT_VALUE];
-      }
+      if (this.hasActiveManualSelection) return [MANUAL_INPUT_VALUE];
       return this._value ? [this._value] : [];
     }
     const values = this._values.filter((value) => !this.isManualValue(value));
@@ -638,6 +501,13 @@ export default class NewtonSelectorDataSelector extends LightningElement {
       this._values.some((value) => this.isManualValue(value))
       ? [...values, MANUAL_INPUT_VALUE]
       : values;
+  }
+
+  // The None tile's value is "" (Flow reads it as null), so "nothing selected"
+  // and "None picked" look identical in value state; _noneSelected remembers
+  // the pick so the tile can show as selected.
+  get noneOptionIsSelected() {
+    return this._noneSelected && this._includeNoneOption;
   }
 
   get manualValueForGroup() {
@@ -664,7 +534,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   }
 
   get renderedValueSet() {
-    return new Set((this._items || []).map((item) => String(item.value ?? "")));
+    return new Set(this._items.map((item) => String(item.value ?? "")));
   }
 
   // --- State flags ---
@@ -682,16 +552,15 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     return (
       !this.isLoading &&
       !this.hasError &&
-      (this._items?.length || 0) === 0 &&
+      this._items.length === 0 &&
       !this.previewMode
     );
   }
   get isPopulated() {
     if (this.forcedState) return false;
-    return !this.isLoading && !this.hasError && (this._items?.length || 0) > 0;
+    return !this.isLoading && !this.hasError && this._items.length > 0;
   }
-  // When forced into error state (or no real error yet), fall back to the
-  // user-configured errorStateMessage so the preview renders something.
+  // A forced error has no load error, so it shows the configured message.
   get resolvedErrorMessage() {
     return this._errorMessage || this.errorStateMessage;
   }

@@ -5,7 +5,12 @@
   --newton-cpe-dropdown-border: var(--slds-g-color-border-base-1, #c9c9c9);
   --newton-cpe-dropdown-shadow: var(
     --slds-g-shadow-3,
-    0 8px 24px rgba(0, 0, 0, 0.14)
+    0 8px 24px
+      color-mix(
+        in oklab,
+        var(--slds-g-color-neutral-base-10, #181818) 14%,
+        transparent
+      )
   );
   --newton-cpe-dropdown-radius: var(--slds-g-radius-border-3, 0.5rem);
   --newton-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -14,30 +19,28 @@
 
 .newton-selector-icon-selector {
   position: relative;
-  z-index: var(--newton-static-v-1, 1);
+  z-index: 1;
 }
 
 .newton-selector-icon-selector_open {
-  z-index: var(--newton-static-v-9000, 9000);
+  z-index: 9000;
 }
 
 .newton-combobox {
   position: relative;
-  --newton-selector-combobox-dropdown-width: max(
-    var(--newton-static-v-100-percent, 100%),
-    var(--newton-static-v-24rem, 24rem)
-  );
-  --newton-selector-combobox-dropdown-max-height: var(
-    --newton-static-v-26rem,
-    26rem
-  );
+  --newton-selector-combobox-dropdown-width: max(100%, 24rem);
+  --newton-selector-combobox-dropdown-max-height: 26rem;
+}
+
+.newton-combobox__field {
+  position: relative;
 }
 
 .newton-combobox__trigger {
   display: inline-flex;
   align-items: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
-  width: var(--newton-static-v-100-percent, 100%);
+  width: 100%;
   justify-content: space-between;
   padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-3, 0.75rem);
   min-height: var(--slds-g-sizing-8, 2rem);
@@ -59,7 +62,7 @@
 
 .newton-combobox__label {
   flex: 1 1 auto;
-  text-align: left;
+  text-align: start;
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
   color: var(--slds-g-color-neutral-base-30, #444444);
   white-space: nowrap;
@@ -67,44 +70,61 @@
   text-overflow: ellipsis;
 }
 
+/* The clear button sits over the trigger, in the space the trigger reserves
+   for it just before the chevron (padding + chevron + gap from the end). */
+.newton-combobox__clear,
+.newton-combobox__clear-space {
+  flex: 0 0 auto;
+  width: var(--slds-g-sizing-7, 1.5rem);
+  height: var(--slds-g-sizing-7, 1.5rem);
+}
+
 .newton-combobox__clear {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: calc(
+    var(--slds-g-spacing-3, 0.75rem) + var(--slds-g-sizing-6, 1.25rem) +
+      var(--slds-g-spacing-2, 0.5rem)
+  );
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  margin-block: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--slds-g-radius-border-pill, 999px);
+  background: transparent;
+  color: inherit;
   cursor: pointer;
-  padding: var(--newton-static-v-0-125rem, 0.125rem);
-  border-radius: var(--newton-static-v-999px, 999px);
 }
 .newton-combobox__clear:hover {
   background: var(--slds-g-color-neutral-base-95, #f5f5f5);
+}
+.newton-combobox__clear:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid
+    var(--slds-g-color-brand-base-60, #0b5cab);
+  outline-offset: 1px;
 }
 
 .newton-combobox__panel-content {
   padding-bottom: var(--slds-g-spacing-2, 0.5rem);
 }
 
-.newton-tabs {
-  position: sticky;
-  top: 0;
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
-  z-index: 2;
-  border-bottom: var(--newton-static-v-1px, 1px) solid
-    var(--slds-g-color-border-base-1, #e5e5e5);
-  padding: 0 var(--slds-g-spacing-2, 0.5rem);
-  display: flex;
-  gap: var(--slds-g-spacing-1, 0.25rem);
+.newton-combobox__panel-content:focus {
+  outline: none;
 }
 
 .newton-search {
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
-  border-bottom: var(--newton-static-v-1px, 1px) solid
+  border-bottom: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-border-base-1, #e5e5e5);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
   position: sticky;
-  top: var(--newton-static-v-2-25rem, 2.25rem);
+  top: 0;
   z-index: 1;
 }
 .newton-search__input {
-  width: var(--newton-static-v-100-percent, 100%);
+  width: 100%;
 }
 
 .newton-grid {
@@ -116,13 +136,6 @@
   gap: var(--newton-selector-icon-cell-gap);
   padding: var(--slds-g-spacing-2, 0.5rem);
 }
-.newton-grid_wide {
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(var(--newton-static-v-4rem, 4rem), 1fr)
-  );
-  gap: var(--slds-g-spacing-3, 0.75rem);
-}
 
 .newton-selector-icon-cell {
   display: inline-grid;
@@ -132,7 +145,7 @@
   justify-items: center;
   gap: var(--slds-g-spacing-1, 0.25rem);
   width: var(--newton-selector-icon-cell-size);
-  min-height: var(--newton-static-v-4-75rem, 4.75rem);
+  min-height: 4.75rem;
   border: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-border-base-1, #e5e5e5);
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
@@ -166,7 +179,7 @@
 }
 
 .newton-selector-icon-cell__label {
-  max-width: var(--newton-static-v-100-percent, 100%);
+  max-width: 100%;
   color: currentColor;
   font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
   font-weight: var(--slds-g-font-weight-5, 500);
@@ -196,9 +209,6 @@
 
 @media (max-width: 40rem) {
   .newton-combobox {
-    --newton-selector-combobox-dropdown-width: var(
-      --newton-static-v-100-percent,
-      100%
-    );
+    --newton-selector-combobox-dropdown-width: 100%;
   }
 }

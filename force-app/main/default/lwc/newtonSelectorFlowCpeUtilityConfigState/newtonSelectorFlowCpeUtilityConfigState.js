@@ -1,58 +1,75 @@
 import {
-  defaultSelectorConfig,
-  mergeGridConfigWithDefaults,
+  defaultGridConfig,
   normalizeLayoutKey
 } from "c/newtonSelectorUtilityConfigDefaults";
 
-const BUILDER_CONTEXT_RESOURCE_BUCKETS = [
-  "variables",
-  "recordLookups",
-  "recordCreates",
-  "recordUpdates",
-  "constants",
-  "choices",
-  "dynamicChoiceSets",
-  "picklistChoiceSets",
-  "recordChoiceSets",
-  "collectionChoiceSets",
-  "formulas",
-  "textTemplates"
-];
+// SOQL source query defaults; the runtime applies the same ones.
+export const DEFAULT_QUERY_LIMIT = 50;
+export const MAX_QUERY_LIMIT = 2000;
 
-export function mergeSelectorConfig(initialConfig) {
-  const base = defaultSelectorConfig();
-  const incoming = initialConfig
-    ? JSON.parse(JSON.stringify(initialConfig))
-    : {};
-  const layout = normalizeLayoutKey(incoming.layout || base.layout);
+// Flow Builder resources that can hold a record collection, and the key each
+// one uses for its object type.
+const RECORD_RESOURCE_OBJECT_KEYS = {
+  variables: "objectType",
+  recordLookups: "object",
+  recordCreates: "object",
+  recordUpdates: "object"
+};
+
+// The parts of gridConfig that belong to a layout (tile footprint and grid
+// gaps). Everything else in gridConfig is style (tones, pattern, corners,
+// surface, elevation, icons, badges, selection indicator, spacing) and is
+// shared across layouts.
+const LAYOUT_GEOMETRY_KEYS = Object.freeze([
+  "minWidth",
+  "size",
+  "aspectRatio",
+  "columns",
+  "gapH",
+  "gapV"
+]);
+
+function pickGeometry(gridConfig) {
+  const source = gridConfig || {};
+  return Object.fromEntries(
+    LAYOUT_GEOMETRY_KEYS.map((key) => [key, source[key] ?? null])
+  );
+}
+
+// Switch layouts without losing work: style settings carry over, the current
+// layout's geometry is remembered in `layoutGeometry`, and the target layout
+// gets its own remembered geometry (or its preset the first time).
+export function switchLayout(config, nextLayout) {
+  const current = config || {};
+  const from = normalizeLayoutKey(current.layout || "grid");
+  const to = normalizeLayoutKey(nextLayout || "grid");
+  if (from === to) return current;
+
+  const gridConfig = current.gridConfig || defaultGridConfig(from);
+  const layoutGeometry = {
+    ...(current.layoutGeometry || {}),
+    [from]: pickGeometry(gridConfig)
+  };
+  const geometry = layoutGeometry[to] || pickGeometry(defaultGridConfig(to));
 
   return {
-    ...base,
-    ...incoming,
-    layout,
-    picklist: { ...base.picklist, ...(incoming.picklist || {}) },
-    collection: {
-      ...base.collection,
-      ...(incoming.collection || {}),
-      objectApiName:
-        incoming.collection?.objectApiName || base.collection.objectApiName,
-      fieldMap: {
-        ...base.collection.fieldMap,
-        ...(incoming.collection?.fieldMap || {})
-      }
-    },
-    sobject: { ...base.sobject, ...(incoming.sobject || {}) },
-    custom: { items: incoming.custom?.items || [] },
-    manualInput: {
-      ...base.manualInput,
-      ...(incoming.manualInput || {})
-    },
-    overrides:
-      incoming.overrides && typeof incoming.overrides === "object"
-        ? incoming.overrides
-        : {},
-    display: { ...base.display, ...(incoming.display || {}) },
-    gridConfig: mergeGridConfigWithDefaults(layout, incoming.gridConfig || {})
+    ...current,
+    layout: to,
+    layoutGeometry,
+    gridConfig: { ...gridConfig, ...geometry }
+  };
+}
+
+// "Reset appearance": every appearance setting back to the current layout's
+// defaults, and forget remembered per-layout geometry. Callers keep the
+// previous gridConfig/layoutGeometry to offer Undo.
+export function resetAppearance(config) {
+  const current = config || {};
+  const layout = normalizeLayoutKey(current.layout || "grid");
+  return {
+    ...current,
+    layoutGeometry: {},
+    gridConfig: defaultGridConfig(layout)
   };
 }
 
@@ -76,7 +93,7 @@ export function buildSobjectConfigForQuery(config) {
     whereClause: sobject.whereClause || "",
     orderByField: sobject.orderByField || "",
     orderByDirection: sobject.orderByDirection || "ASC",
-    queryLimit: Number(sobject.limit || 20),
+    queryLimit: Number(sobject.limit || DEFAULT_QUERY_LIMIT),
     labelField: sobject.labelField || "Name",
     valueField: sobject.valueField || "Id",
     sublabelField: sobject.sublabelField || "",
@@ -86,74 +103,23 @@ export function buildSobjectConfigForQuery(config) {
   };
 }
 
+// Object API name of the Flow record collection that rawRef ("{!Name}" or
+// "Name") points at, looked up in Flow Builder's builderContext.
 export function resolveRecordCollectionMetadataFromBuilderContext(
   builderContext,
   rawRef
 ) {
-  if (!rawRef || !builderContext) return { objectApiName: "", records: [] };
-  const ref = normalizeFlowReference(rawRef);
-  if (!ref) return { objectApiName: "", records: [] };
-
-  for (const bucket of BUILDER_CONTEXT_RESOURCE_BUCKETS) {
-    const list = builderContext[bucket];
-    if (!Array.isArray(list)) continue;
-    const match = list.find((resource) => resourceMatchesRef(resource, ref));
-    if (!match) continue;
-    return {
-      objectApiName:
-        match.objectType ||
-        match.object ||
-        match.sobjectType ||
-        match.subtype ||
-        "",
-      records: resolveRecordArrayFromResource(match)
-    };
-  }
-  return { objectApiName: "", records: [] };
-}
-
-export function recordCollectionSamples(
-  config,
-  builderContext,
-  sourceRecordsRef
-) {
-  const metadata = resolveRecordCollectionMetadataFromBuilderContext(
-    builderContext,
-    sourceRecordsRef
-  );
-  return metadata.records;
-}
-
-function normalizeFlowReference(rawRef) {
-  return String(rawRef)
-    .trim()
+  const ref = String(rawRef || "")
     .replace(/^\{!\s*/, "")
     .replace(/\s*\}$/, "")
     .trim();
-}
-
-function resourceMatchesRef(resource, ref) {
-  if (!resource || !ref) return false;
-  return [resource.name, resource.apiName, resource.varApiName]
-    .filter(Boolean)
-    .some((candidate) => String(candidate) === ref);
-}
-
-function resolveRecordArrayFromResource(resource) {
-  const candidates = [
-    resource.value,
-    resource.defaultValue,
-    resource.values,
-    resource.defaultValues,
-    resource.records,
-    resource.items
-  ];
-  for (const candidate of candidates) {
-    if (Array.isArray(candidate)) {
-      return candidate.filter(
-        (entry) => entry && typeof entry === "object" && !Array.isArray(entry)
-      );
-    }
+  for (const [bucket, objectKey] of Object.entries(
+    RECORD_RESOURCE_OBJECT_KEYS
+  )) {
+    const match = (builderContext?.[bucket] || []).find(
+      (resource) => resource.name === ref
+    );
+    if (match) return { objectApiName: match[objectKey] || "" };
   }
-  return [];
+  return { objectApiName: "" };
 }

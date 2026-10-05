@@ -5,18 +5,12 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd"
 >
-
   <description>
-    Complexity thresholds for the newton-selector package. Enforces the cyclomatic and
-    cognitive limits defined in code-complexity-standards.md: CC fail >15 on Apex,
-    cognitive-complexity fail >15.
+    Apex complexity limits for Newton Selector, loaded by code-analyzer.yml and
+    selected with the ApexComplexity tag. A method is reported when its cyclomatic
+    complexity reaches 10 or its cognitive complexity reaches 15; a class when its
+    totals reach 40 and 50.
   </description>
-
-  <rule ref="category/apex/design.xml/StdCyclomaticComplexity">
-    <properties>
-      <property name="reportLevel" value="10" />
-    </properties>
-  </rule>
 
   <rule ref="category/apex/design.xml/CyclomaticComplexity">
     <properties>
@@ -34,7 +28,4 @@
 
   <rule ref="category/apex/design.xml/ExcessivePublicCount" />
   <rule ref="category/apex/design.xml/ExcessiveParameterList" />
-  <rule ref="category/apex/design.xml/ExcessiveClassLength" />
-  <rule ref="category/apex/design.xml/NcssMethodCount" />
-  <rule ref="category/apex/design.xml/NcssTypeCount" />
 </ruleset>

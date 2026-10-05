@@ -25,12 +25,7 @@ private class NewtonSelectorRuntimeControllerTest {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
       Test.startTest();
-      try {
-        NewtonSelectorRuntimeController.queryItems('');
-        Assert.fail('Should have thrown for blank config');
-      } catch (AuraHandledException e) {
-        Assert.isTrue(String.isNotBlank(e.getMessage()));
-      }
+      assertQueryItemsFails('', 'Selector configuration is required.');
       Test.stopTest();
     }
   }
@@ -40,12 +35,26 @@ private class NewtonSelectorRuntimeControllerTest {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
       Test.startTest();
-      try {
-        NewtonSelectorRuntimeController.queryItems('{ not valid json');
-        Assert.fail('Should have thrown for malformed JSON');
-      } catch (AuraHandledException e) {
-        Assert.isTrue(String.isNotBlank(e.getMessage()));
-      }
+      assertQueryItemsFails(
+        '{ not valid json',
+        'Invalid selector configuration.'
+      );
+      Test.stopTest();
+    }
+  }
+
+  @IsTest
+  static void queryItemsReportsInvalidWhereValue() {
+    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
+    System.runAs(testUser) {
+      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
+      config.whereClause = 'NumberOfEmployees = abc';
+
+      Test.startTest();
+      assertQueryItemsFails(
+        JSON.serialize(config),
+        'Invalid value for NumberOfEmployees (INTEGER): abc'
+      );
       Test.stopTest();
     }
   }
@@ -109,8 +118,7 @@ private class NewtonSelectorRuntimeControllerTest {
       Test.stopTest();
 
       Assert.areEqual(true, result.valid);
-      Assert.isTrue(result.soql.contains('FROM Account'));
-      Assert.isTrue(result.soql.contains('LIMIT 1'));
+      Assert.areEqual('Query validated successfully.', result.message);
     }
   }
 
@@ -128,7 +136,31 @@ private class NewtonSelectorRuntimeControllerTest {
       Test.stopTest();
 
       Assert.areEqual(false, result.valid);
-      Assert.isTrue(String.isNotBlank(result.message));
+      Assert.areEqual(
+        'Unknown field on Account: DefinitelyMissing__c',
+        result.message
+      );
+    }
+  }
+
+  @IsTest
+  static void validateQueryReportsDatabaseError() {
+    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
+    System.runAs(testUser) {
+      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
+      config.whereClause = 'NumberOfEmployees LIKE 5';
+
+      Test.startTest();
+      NewtonSelectorQueryValidationResultDTO result = NewtonSelectorRuntimeController.validateQuery(
+        JSON.serialize(config)
+      );
+      Test.stopTest();
+
+      Assert.areEqual(false, result.valid);
+      Assert.isTrue(
+        result.message.containsIgnoreCase('LIKE'),
+        'The database error should be reported: ' + result.message
+      );
     }
   }
 
@@ -143,7 +175,7 @@ private class NewtonSelectorRuntimeControllerTest {
       Test.stopTest();
 
       Assert.areEqual(false, result.valid);
-      Assert.isTrue(result.message.contains('required'));
+      Assert.areEqual('Selector configuration is required.', result.message);
     }
   }
 
@@ -173,7 +205,19 @@ private class NewtonSelectorRuntimeControllerTest {
       Test.stopTest();
 
       Assert.areEqual(false, result.valid);
-      Assert.isTrue(result.message.contains('required'));
+      Assert.areEqual('Selector configuration is required.', result.message);
+    }
+  }
+
+  private static void assertQueryItemsFails(
+    String configJson,
+    String expectedMessage
+  ) {
+    try {
+      NewtonSelectorRuntimeController.queryItems(configJson);
+      Assert.fail('Expected failure: ' + expectedMessage);
+    } catch (AuraHandledException e) {
+      Assert.areEqual(expectedMessage, e.getMessage());
     }
   }
 }

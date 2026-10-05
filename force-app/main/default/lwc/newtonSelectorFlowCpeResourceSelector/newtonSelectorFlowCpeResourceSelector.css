@@ -1,19 +1,12 @@
 :host {
   display: block;
-  width: var(--newton-static-v-100-percent, 100%);
-  --newton-cpe-dropdown-surface: var(--slds-g-color-neutral-base-100, #ffffff);
-  --newton-cpe-dropdown-border: var(--slds-g-color-border-base-1, #c9c9c9);
-  --newton-cpe-dropdown-shadow: var(
-    --slds-g-shadow-3,
-    0 8px 24px rgba(0, 0, 0, 0.14)
-  );
-  --newton-cpe-dropdown-radius: var(--slds-g-radius-border-3, 0.5rem);
+  inline-size: 100%;
 }
 
 .newton-selector-flow-cpe-resource-selector__value-input {
   display: block;
-  width: var(--newton-static-v-100-percent, 100%);
-  padding-left: 0 !important;
+  inline-size: 100%;
+  padding-inline-start: 0 !important;
 }
 
 [data-id="resultBox"] {
@@ -22,28 +15,32 @@
 }
 
 .newton-selector-flow-cpe-resource-selector__combobox {
-  --newton-selector-combobox-dropdown-max-height: var(
-    --newton-static-v-22rem,
-    22rem
-  );
+  --newton-selector-combobox-dropdown-max-height: 22rem;
   --newton-selector-combobox-dropdown-padding: 0;
 }
 
-.newton-selector-flow-cpe-resource-selector__input-icon {
-  top: var(
-    --newton-selector-flow-cpe-resource-selector-input-icon-top,
-    56%
-  ) !important;
-}
-
+/* Keeps resource references visually aligned with the shared combobox trigger. */
 .newton-selector-flow-cpe-resource-selector__selected-trigger {
   display: inline-flex;
   align-items: center;
-  inline-size: var(--newton-static-v-100-percent, 100%);
+  inline-size: 100%;
   min-block-size: var(--slds-g-sizing-9, 2rem);
   gap: var(--slds-g-spacing-2, 0.5rem);
   padding-inline: var(--slds-g-spacing-2, 0.5rem);
   text-align: start;
+  border-color: var(--slds-g-color-border-base-1, #c9c9c9);
+  background: var(--slds-g-color-surface-1, #ffffff);
+  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
+    color-mix(
+      in oklab,
+      var(--slds-g-color-neutral-base-10, #181818) 3%,
+      transparent
+    );
+}
+
+.newton-selector-flow-cpe-resource-selector__selected-trigger:hover,
+.newton-selector-flow-cpe-resource-selector__selected-trigger:focus-visible {
+  border-color: var(--slds-g-color-brand-base-50, #0176d3);
 }
 
 .newton-selector-flow-cpe-resource-selector__selected-icon {
@@ -54,10 +51,10 @@
   inline-size: var(--slds-g-sizing-8, 1.75rem);
   block-size: var(--slds-g-sizing-8, 1.75rem);
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
-  border: var(--slds-g-sizing-border-2, 2px) solid
+  border: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-brand-base-50, #0176d3);
   color: var(--slds-g-color-brand-base-50, #0176d3);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
+  background: var(--slds-g-color-brand-base-95, #eef4ff);
 }
 
 .newton-selector-flow-cpe-resource-selector__selected-label {
@@ -116,6 +113,7 @@
 }
 
 .newton-selector-flow-cpe-resource-selector__option {
+  padding: 0;
   border: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-border-base-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
@@ -138,36 +136,10 @@
   letter-spacing: 0.04em;
 }
 
-.newton-selector-flow-cpe-resource-selector__option {
-  padding: 0;
-}
-
 .custom-text-transform_uppercase {
   text-transform: uppercase;
 }
 
 .custom-width-full {
-  width: var(--newton-static-v-100-percent, 100%);
-}
-
-/* Keep resource references visually aligned with the shared combobox trigger. */
-.newton-selector-flow-cpe-resource-selector__selected-trigger {
-  border-color: var(--slds-g-color-border-base-1, #c9c9c9);
-  background: var(--slds-g-color-surface-1, #ffffff);
-  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-    color-mix(
-      in oklab,
-      var(--slds-g-color-neutral-base-10, #181818) 3%,
-      transparent
-    );
-}
-
-.newton-selector-flow-cpe-resource-selector__selected-trigger:hover,
-.newton-selector-flow-cpe-resource-selector__selected-trigger:focus-visible {
-  border-color: var(--slds-g-color-brand-base-50, #0176d3);
-}
-
-.newton-selector-flow-cpe-resource-selector__selected-icon {
-  border-width: var(--slds-g-sizing-border-1, 1px);
-  background: var(--slds-g-color-brand-base-95, #eef4ff);
+  inline-size: 100%;
 }

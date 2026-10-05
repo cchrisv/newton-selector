@@ -1,21 +1,21 @@
-/** @description Parses legacy text WHERE clauses into validated bind-based SOQL fragments. */
+/** @description Parses text WHERE clauses into validated bind-based SOQL fragments. */
 public with sharing class NewtonSelectorWhereParser {
-  private final String objectApiName;
+  private final NewtonSelectorQueryFieldAccess access;
   private final Map<String, Object> binds;
   private final NewtonSelectorWhereScanner scanner;
 
   /**
-   * @description Creates a parser for one legacy WHERE clause.
-   * @param objectApiName Source object API name.
-   * @param input Legacy WHERE clause without the WHERE keyword.
+   * @description Creates a parser for one WHERE clause.
+   * @param access Field access for the source object.
+   * @param input WHERE clause without the WHERE keyword.
    * @param binds Shared query bind map.
    */
   public NewtonSelectorWhereParser(
-    String objectApiName,
+    NewtonSelectorQueryFieldAccess access,
     String input,
     Map<String, Object> binds
   ) {
-    this.objectApiName = objectApiName;
+    this.access = access;
     this.binds = binds;
     this.scanner = new NewtonSelectorWhereScanner(input);
   }
@@ -61,76 +61,70 @@ public with sharing class NewtonSelectorWhereParser {
   }
 
   private String parseCondition() {
-    String fieldApiName = NewtonSelectorQueryFieldAccess.canonicalFilterField(
-      objectApiName,
+    Schema.DescribeFieldResult field = access.filterableField(
       scanner.parseIdentifier()
     );
     String operator = NewtonSelectorWhereOperatorParser.parse(scanner);
-    Schema.DescribeFieldResult fieldDescribe = NewtonSelectorQueryFieldAccess.getFieldDescribe(
-      objectApiName,
-      fieldApiName
-    );
-    return buildCondition(fieldApiName, operator, fieldDescribe);
-  }
-
-  private String buildCondition(
-    String fieldApiName,
-    String operator,
-    Schema.DescribeFieldResult fieldDescribe
-  ) {
-    if (NewtonSelectorQueryValueUtil.isMultiPicklistOperator(operator)) {
-      return parseMultiPicklistCondition(fieldApiName, operator, fieldDescribe);
+    if (operator == 'INCLUDES' || operator == 'EXCLUDES') {
+      return field.getName() +
+        ' ' +
+        operator +
+        ' (' +
+        multiPicklistLiterals(field, operator) +
+        ')';
     }
     if (operator == 'IN' || operator == 'NOT IN') {
-      return parseInCondition(fieldApiName, operator, fieldDescribe);
+      return field.getName() + ' ' + operator + ' (' + inBinds(field) + ')';
     }
-    return fieldApiName +
+    return field.getName() +
       ' ' +
       operator +
       ' ' +
-      NewtonSelectorQueryValueUtil.addBind(
-        binds,
-        NewtonSelectorQueryValueUtil.coerceValue(
-          fieldDescribe,
-          scanner.parseLiteral()
-        )
-      );
+      bind(field, scanner.parseLiteral());
   }
 
-  private String parseMultiPicklistCondition(
-    String fieldApiName,
-    String operator,
-    Schema.DescribeFieldResult fieldDescribe
-  ) {
-    NewtonSelectorQueryPredicateBuilder.MultiPicklistPredicateRequest request = new NewtonSelectorQueryPredicateBuilder.MultiPicklistPredicateRequest();
-    request.fieldApiName = fieldApiName;
-    request.operator = operator;
-    request.fieldDescribe = fieldDescribe;
-    request.rawValues = scanner.parseListLiterals();
-    return NewtonSelectorQueryPredicateBuilder.buildMultiPicklistPredicate(
-      request
+  private String inBinds(Schema.DescribeFieldResult field) {
+    List<String> bindNames = new List<String>();
+    for (String rawValue : scanner.parseListLiterals()) {
+      bindNames.add(bind(field, rawValue));
+    }
+    return String.join(bindNames, ', ');
+  }
+
+  private String bind(Schema.DescribeFieldResult field, String rawValue) {
+    return NewtonSelectorQueryValueUtil.addBind(
+      binds,
+      NewtonSelectorQueryValueUtil.coerceValue(field, rawValue)
     );
   }
 
-  private String parseInCondition(
-    String fieldApiName,
-    String operator,
-    Schema.DescribeFieldResult fieldDescribe
+  private String multiPicklistLiterals(
+    Schema.DescribeFieldResult field,
+    String operator
   ) {
-    List<String> bindNames = new List<String>();
-    for (String rawValue : scanner.parseListLiterals()) {
-      bindNames.add(
-        NewtonSelectorQueryValueUtil.addBind(
-          binds,
-          NewtonSelectorQueryValueUtil.coerceValue(fieldDescribe, rawValue)
-        )
+    if (field.getType() != Schema.DisplayType.MULTIPICKLIST) {
+      throw new NewtonSelectorException(
+        operator + ' is only supported for multi-select picklist fields.'
       );
     }
-    return fieldApiName +
-      ' ' +
-      operator +
-      ' (' +
-      String.join(bindNames, ', ') +
-      ')';
+
+    List<String> literals = new List<String>();
+    for (String rawValue : scanner.parseListLiterals()) {
+      if (String.isNotBlank(rawValue)) {
+        literals.add(quoteSoqlStringLiteral(rawValue.trim()));
+      }
+    }
+    if (literals.isEmpty()) {
+      throw new NewtonSelectorException(
+        'At least one multi-select picklist value is required for ' +
+          operator +
+          '.'
+      );
+    }
+    return String.join(literals, ', ');
+  }
+
+  private static String quoteSoqlStringLiteral(String value) {
+    return '\'' + String.escapeSingleQuotes(value.replace('\\', '\\\\')) + '\'';
   }
 }

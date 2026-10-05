@@ -1,6 +1,6 @@
 <template>
   <template lwc:if={isLookupMode}>
-    <div class={formElementClass}>
+    <div class="slds-form-element">
       <template lwc:if={showExternalLabel}>
         <label class="slds-form-element__label" for={inputId}>
           <abbr lwc:if={required} class="slds-required" title="required"
@@ -14,7 +14,7 @@
       </template>
       <div class="slds-form-element__control">
         <div class="slds-combobox_container">
-          <div class={lookupComboboxClass}>
+          <div class={lookupComboboxClass} onfocusout={handleLookupFocusOut}>
             <div class={inputContainerClass} role="none">
               <template lwc:if={selectedIconName}>
                 <span
@@ -37,7 +37,7 @@
                 placeholder={computedPlaceholder}
                 value={inputDisplayValue}
                 disabled={disabled}
-                readonly={isInputReadonly}
+                readonly={hasSelection}
                 autocomplete="off"
                 role="combobox"
                 aria-autocomplete="list"
@@ -45,13 +45,10 @@
                 aria-expanded={comboboxExpanded}
                 aria-controls={_listboxId}
                 aria-activedescendant={listboxActiveOptionId}
-                aria-invalid={ariaInvalidValue}
-                aria-describedby={errorDescribedById}
                 aria-required={requiredAria}
                 oninput={handleNativeInput}
                 onkeydown={handleKeydown}
                 onfocus={handleFocus}
-                onblur={handleBlur}
               />
 
               <template lwc:if={showSearchIcon}>
@@ -138,23 +135,6 @@
                         class="slds-p-around_small slds-text-color_weak newton-selector-combobox__state"
                       >
                         {noResultsMessage}
-                        <template lwc:if={newRecordOptions.length}>
-                          <div class="slds-m-top_x-small">
-                            <template
-                              for:each={newRecordOptions}
-                              for:item="opt"
-                            >
-                              <lightning-button
-                                key={opt.value}
-                                variant="neutral"
-                                label={opt.label}
-                                data-object={opt.value}
-                                class="slds-m-right_x-small"
-                                onclick={handleNewRecord}
-                              ></lightning-button>
-                            </template>
-                          </div>
-                        </template>
                       </div>
                     </li>
                   </template>
@@ -163,50 +143,12 @@
             </template>
           </div>
         </div>
-
-        <template lwc:if={isMultiEntry}>
-          <div
-            lwc:if={hasSelection}
-            role="listbox"
-            aria-label={label}
-            aria-orientation="horizontal"
-          >
-            <ul
-              class="slds-listbox slds-listbox_inline slds-p-top_xxx-small"
-              role="group"
-              aria-label="Selected options"
-            >
-              <template for:each={pillItems} for:item="pill">
-                <li key={pill.id} role="presentation">
-                  <lightning-pill
-                    label={pill.title}
-                    title={pill.title}
-                    name={pill.id}
-                    has-error={hasLookupErrors}
-                    onremove={handleRemovePill}
-                  >
-                    <c-newton-selector-icon
-                      lwc:if={pill.icon}
-                      name={pill.icon}
-                      size="x-small"
-                    ></c-newton-selector-icon>
-                  </lightning-pill>
-                </li>
-              </template>
-            </ul>
-          </div>
-        </template>
       </div>
-      <template lwc:if={inlineErrorMessage}>
-        <div id={_errorId} class="slds-form-element__help" role="alert">
-          {inlineErrorMessage}
-        </div>
-      </template>
     </div>
   </template>
 
   <template lwc:elseif={isSelectMode}>
-    <div class={formElementClass}>
+    <div class="slds-form-element">
       <template lwc:if={showExternalLabel}>
         <label class="slds-form-element__label" for={inputId}>
           <abbr lwc:if={required} class="slds-required" title="required"
@@ -220,12 +162,8 @@
       </template>
       <div class="slds-form-element__control">
         <div class="slds-combobox_container">
-          <div class={selectComboboxClass}>
-            <div
-              class={selectInputContainerClass}
-              role="none"
-              onblur={handleSelectBlur}
-            >
+          <div class={selectComboboxClass} onfocusout={handleSelectFocusOut}>
+            <div class={selectInputContainerClass} role="none">
               <template lwc:if={selectedSelectIconName}>
                 <span
                   class="slds-icon_container slds-combobox__input-entity-icon newton-selector-combobox__input-entity-icon"
@@ -359,8 +297,6 @@
             class={computedDropdownClass}
             role={dropdownRole}
             aria-label={dropdownLabel}
-            aria-busy={ariaBusy}
-            aria-multiselectable={ariaMultiselectable}
           >
             <slot name="dropdown"></slot>
           </div>

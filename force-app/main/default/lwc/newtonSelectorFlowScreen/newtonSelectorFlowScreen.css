@@ -1,4 +1,4 @@
 :host {
   display: block;
-  width: var(--newton-static-v-100-percent, 100%);
+  width: 100%;
 }

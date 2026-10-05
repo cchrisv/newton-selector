@@ -17,8 +17,8 @@
   flex-shrink: 0;
   width: var(--newton-selector-icon-box-size);
   height: var(--newton-selector-icon-box-size);
-  max-width: var(--newton-static-v-100-percent, 100%);
-  max-height: var(--newton-static-v-100-percent, 100%);
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .newton-selector-icon__svg {
@@ -28,24 +28,24 @@
   color: currentColor;
   overflow: visible;
   forced-color-adjust: auto;
-  max-width: var(--newton-static-v-100-percent, 100%);
-  max-height: var(--newton-static-v-100-percent, 100%);
+  max-width: 100%;
+  max-height: 100%;
 }
 
-/* Size tokens mirror Lightning's size scale so existing `size="medium"` etc. call sites keep working. */
-.newton-selector-icon_size-xs {
+/* Sizes follow Lightning's icon size names. */
+.newton-selector-icon_size-xx-small {
   --newton-selector-icon-size: var(--slds-g-sizing-4, 0.75rem);
 }
-.newton-selector-icon_size-sm {
+.newton-selector-icon_size-x-small {
   --newton-selector-icon-size: var(--slds-g-sizing-5, 1rem);
 }
-.newton-selector-icon_size-md {
+.newton-selector-icon_size-small {
   --newton-selector-icon-size: var(--slds-g-sizing-7, 1.5rem);
 }
-.newton-selector-icon_size-lg {
+.newton-selector-icon_size-medium {
   --newton-selector-icon-size: var(--slds-g-sizing-9, 2rem);
 }
-.newton-selector-icon_size-xl {
+.newton-selector-icon_size-large {
   --newton-selector-icon-size: var(--slds-g-sizing-10, 3rem);
 }
 
@@ -75,9 +75,6 @@
 .newton-selector-icon_variant-success {
   color: var(--slds-g-color-success-base-40, #2e844a);
 }
-.newton-selector-icon_variant-brand {
-  color: var(--slds-g-color-brand-base-50, #0176d3);
-}
 .newton-selector-icon_variant-inverse {
-  color: var(--slds-g-color-neutral-base-100, #ffffff);
+  color: var(--slds-g-color-on-accent-1, #ffffff);
 }

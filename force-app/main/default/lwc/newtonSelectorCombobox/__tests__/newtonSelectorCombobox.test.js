@@ -100,9 +100,7 @@ describe("c-newton-selector-combobox", () => {
     const element = mount({
       open: true,
       dropdownId: "options-listbox",
-      dropdownLabel: "Account options",
-      dropdownClass: "custom-menu",
-      comboboxClass: "custom-combobox"
+      dropdownLabel: "Account options"
     });
 
     const trigger = document.createElement("button");
@@ -119,10 +117,8 @@ describe("c-newton-selector-combobox", () => {
     const listbox = element.shadowRoot.querySelector('[role="listbox"]');
 
     expect(combobox.classList.contains("slds-is-open")).toBe(true);
-    expect(combobox.classList.contains("custom-combobox")).toBe(true);
     expect(listbox.id).toMatch(/^options-listbox/);
     expect(listbox.getAttribute("aria-label")).toBe("Account options");
-    expect(listbox.classList.contains("custom-menu")).toBe(true);
   });
 
   it("does not render slotted dropdown content while closed", async () => {
@@ -162,11 +158,27 @@ describe("c-newton-selector-combobox", () => {
     });
   });
 
-  it("renders lookup input, label, required marker, and fallback placeholder", () => {
+  it("closes the select dropdown when focus leaves the combobox", async () => {
+    const element = mount({
+      mode: "select",
+      label: "Sort by",
+      options: [{ label: "Label", value: "label" }]
+    });
+    selectButton(element).click();
+    await flush();
+    expect(options(element)).toHaveLength(1);
+
+    selectButton(element).dispatchEvent(
+      new FocusEvent("focusout", { bubbles: true, relatedTarget: null })
+    );
+    await flush();
+
+    expect(options(element)).toHaveLength(0);
+  });
+
+  it("labels the lookup input and marks it required", () => {
     const element = mountLookup({ label: "Find account", required: true });
 
-    expect(input(element)).not.toBeNull();
-    expect(input(element).placeholder).toBe("Search...");
     expect(input(element).getAttribute("aria-required")).toBe("true");
     expect(element.shadowRoot.querySelector("label").textContent).toContain(
       "Find account"
@@ -181,52 +193,43 @@ describe("c-newton-selector-combobox", () => {
   });
 
   it("normalizes lookup selection values", () => {
-    const element = mountLookup({ isMultiEntry: true });
+    const element = mountLookup();
 
-    element.selection = [
-      { value: "Account", label: "Account", displayType: "SObject" },
-      { title: "No id" }
-    ];
+    element.selection = {
+      value: "Account",
+      label: "Account",
+      displayType: "SObject"
+    };
 
-    expect(element.selection).toEqual([
+    expect(element.selection).toEqual(
       expect.objectContaining({
         id: "Account",
         title: "Account",
         displayType: "SObject"
       })
-    ]);
+    );
   });
 
   it("preserves richer lookup rows when the same selection id is set again", () => {
-    const element = mountLookup({ isMultiEntry: true });
+    const element = mountLookup();
 
-    element.selection = [{ id: "1", title: "Acme Corp", icon: "building-2" }];
-    element.selection = [{ id: "1" }];
+    element.selection = { id: "1", title: "Acme Corp", icon: "building-2" };
+    element.selection = { id: "1" };
 
-    expect(element.selection[0].title).toBe("Acme Corp");
-    expect(element.selection[0].icon).toBe("building-2");
+    expect(element.selection.title).toBe("Acme Corp");
+    expect(element.selection.icon).toBe("building-2");
   });
 
-  it("renders selected single-entry lookup with icon and clear action", async () => {
+  it("renders selected single-entry lookup as read-only with a clear action", async () => {
     const element = mountLookup();
     element.selection = { id: "001", title: "Acme", icon: "building-2" };
     await flush();
 
+    expect(input(element).readOnly).toBe(true);
     expect(
-      input(element).classList.contains("slds-combobox__input-value")
-    ).toBe(true);
-    expect(
-      element.shadowRoot.querySelector(
-        ".newton-selector-combobox__input-entity-icon"
-      )
-    ).not.toBeNull();
-    expect(
-      element.shadowRoot.querySelector(
-        ".newton-selector-combobox__clear-button"
-      )
+      element.shadowRoot.querySelector('button[title="Remove selected option"]')
     ).not.toBeNull();
   });
-
   it("sets and renders lookup search results", async () => {
     const element = mountLookup();
 
@@ -252,21 +255,6 @@ describe("c-newton-selector-combobox", () => {
     await flush();
 
     expect(options(element)).toHaveLength(3);
-  });
-
-  it("applies lookup length scrolling to the dropdown, not the inner list", async () => {
-    const element = mountLookup({ scrollAfterNItems: 7 });
-
-    element.setSearchResults(SAMPLE);
-    input(element).focus();
-    await flush();
-
-    expect(dropdown(element).classList).toContain(
-      "slds-dropdown_length-with-icon-7"
-    );
-    expect(
-      element.shadowRoot.querySelector(".slds-listbox").classList
-    ).not.toContain("slds-dropdown_length-with-icon-7");
   });
 
   it("fires debounced lookup search with normalized and raw terms", () => {
@@ -316,29 +304,6 @@ describe("c-newton-selector-combobox", () => {
     expect(dropdown(element)).toBeNull();
   });
 
-  it("keeps lookup open and removes selected rows in multi-entry mode", async () => {
-    const element = mountLookup({ isMultiEntry: true });
-    const handler = jest.fn();
-    element.addEventListener("selectionchange", handler);
-
-    element.setSearchResults(SAMPLE);
-    input(element).focus();
-    await flush();
-    options(element)[0].click();
-    await flush();
-
-    expect(handler).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: { selectedIds: ["001a"] }
-      })
-    );
-    expect(dropdown(element)).not.toBeNull();
-    expect(options(element).map((option) => option.dataset.id)).toEqual([
-      "001b",
-      "001c"
-    ]);
-  });
-
   it("clears single-entry lookup selection", async () => {
     const element = mountLookup();
     const handler = jest.fn();
@@ -370,53 +335,6 @@ describe("c-newton-selector-combobox", () => {
 
     expect(handler).toHaveBeenCalledWith(
       expect.objectContaining({ detail: { selectedIds: ["001b"] } })
-    );
-  });
-
-  it("renders custom, required, and external lookup validity errors", async () => {
-    const element = mountLookup({
-      required: true,
-      messageWhenValueMissing: "Pick one."
-    });
-
-    expect(element.checkValidity()).toBe(false);
-    expect(element.reportValidity()).toBe(false);
-    await flush();
-    expect(element.shadowRoot.querySelector('[role="alert"]').textContent).toBe(
-      "Pick one."
-    );
-
-    element.setCustomValidity("Custom error.");
-    await flush();
-    expect(element.shadowRoot.querySelector('[role="alert"]').textContent).toBe(
-      "Custom error."
-    );
-
-    element.errors = [{ id: "e", message: "External error." }];
-    await flush();
-    expect(element.shadowRoot.querySelector('[role="alert"]').textContent).toBe(
-      "External error."
-    );
-  });
-
-  it("fires newrecord from the lookup no-results state", async () => {
-    const element = mountLookup({
-      newRecordOptions: [{ value: "Account", label: "Create Account" }]
-    });
-    const handler = jest.fn();
-    element.addEventListener("newrecord", handler);
-
-    element.setSearchResults([]);
-    fireInput(element, "nothing");
-    await flush();
-    element.shadowRoot
-      .querySelector('lightning-button[data-object="Account"]')
-      .click();
-
-    expect(handler).toHaveBeenCalledWith(
-      expect.objectContaining({
-        detail: { objectApiName: "Account" }
-      })
     );
   });
 

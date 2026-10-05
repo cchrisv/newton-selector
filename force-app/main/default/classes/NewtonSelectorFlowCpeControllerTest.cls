@@ -14,21 +14,13 @@ private class NewtonSelectorFlowCpeControllerTest {
       );
       Test.stopTest();
 
-      Boolean accountOk =
-        Schema.getGlobalDescribe().containsKey('Account') &&
-        Schema.getGlobalDescribe().get('Account').getDescribe().isAccessible();
-      Assert.isTrue(
-        accountOk,
-        'Account should be accessible in describe for this org'
-      );
-
-      if (fields.isEmpty()) {
-        return;
-      }
-
-      Assert.isTrue(
-        containsField(fields, 'Name'),
-        'Account.Name should be present when any Account fields are readable'
+      NewtonSelectorFlowCpeController.Field name = findField(fields, 'Name');
+      Assert.areNotEqual(null, name, 'Account.Name should be returned');
+      Assert.areEqual('STRING', name.type);
+      Assert.areEqual(
+        null,
+        findField(fields, 'Rating'),
+        'Fields the user cannot read are omitted'
       );
     }
   }
@@ -65,7 +57,7 @@ private class NewtonSelectorFlowCpeControllerTest {
   }
 
   @IsTest
-  static void testGetObjectFieldsIncludesReferenceMetadata() {
+  static void testGetObjectFieldsIncludesRelationshipName() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
       Test.startTest();
@@ -74,16 +66,11 @@ private class NewtonSelectorFlowCpeControllerTest {
       );
       Test.stopTest();
 
-      if (fields.isEmpty()) {
-        return;
-      }
-
       NewtonSelectorFlowCpeController.Field accountLookup = findField(
         fields,
         'AccountId'
       );
       Assert.areNotEqual(null, accountLookup);
-      Assert.areEqual('Account', accountLookup.parentObjectName);
       Assert.areEqual('Account', accountLookup.relationshipName);
     }
   }
@@ -96,8 +83,11 @@ private class NewtonSelectorFlowCpeControllerTest {
         'accoun'
       );
 
-      Assert.isTrue(!rows.isEmpty());
       Assert.isTrue(containsChoice(rows, 'Account'));
+      Assert.isFalse(
+        containsChoice(rows, 'Opportunity'),
+        'Objects the user cannot read are omitted'
+      );
     }
   }
 
@@ -108,7 +98,8 @@ private class NewtonSelectorFlowCpeControllerTest {
       List<NewtonSelectorFlowCpeController.ChoiceOption> rows = NewtonSelectorFlowCpeController.searchSObjectTypes(
         ''
       );
-      Assert.isTrue(!rows.isEmpty());
+      Assert.isTrue(containsChoice(rows, 'Account'));
+      Assert.isTrue(containsChoice(rows, 'Contact'));
     }
   }
 
@@ -128,7 +119,10 @@ private class NewtonSelectorFlowCpeControllerTest {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
       Assert.isTrue(
-        !NewtonSelectorFlowCpeController.searchSObjectTypes(null).isEmpty()
+        containsChoice(
+          NewtonSelectorFlowCpeController.searchSObjectTypes(null),
+          'Account'
+        )
       );
     }
   }
@@ -142,27 +136,61 @@ private class NewtonSelectorFlowCpeControllerTest {
         ''
       );
 
-      Assert.isTrue(!rows.isEmpty());
       Assert.isTrue(
         containsChoice(rows, 'Name'),
         'Account.Name should be present in the field lookup'
+      );
+      Assert.isFalse(
+        containsChoice(rows, 'Rating'),
+        'Fields the user cannot read are omitted'
       );
     }
   }
 
   @IsTest
-  static void testSearchLookupDatasetFieldsForLead() {
+  static void testFieldChoicesCarryDisplayType() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
-      if (!Schema.getGlobalDescribe().containsKey('Lead')) {
-        return;
-      }
-
       List<NewtonSelectorFlowCpeController.ChoiceOption> rows = NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject(
-        'Lead',
+        'Account',
         ''
       );
-      Assert.isTrue(!rows.isEmpty());
+
+      Map<String, String> expectedTypes = new Map<String, String>{
+        'Id' => 'ID',
+        'Name' => 'STRING',
+        'Industry' => 'PICKLIST',
+        'AnnualRevenue' => 'CURRENCY',
+        'NumberOfEmployees' => 'INTEGER',
+        'CreatedDate' => 'DATETIME',
+        'ParentId' => 'REFERENCE'
+      };
+      for (String fieldName : expectedTypes.keySet()) {
+        NewtonSelectorFlowCpeController.ChoiceOption row = findChoice(
+          rows,
+          fieldName
+        );
+        Assert.areNotEqual(null, row, fieldName + ' should be returned');
+        Assert.areEqual(expectedTypes.get(fieldName), row.type, fieldName);
+      }
+    }
+  }
+
+  @IsTest
+  static void testObjectNamesAreCaseInsensitive() {
+    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
+    System.runAs(testUser) {
+      List<NewtonSelectorFlowCpeController.ChoiceOption> rows = NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject(
+        'ACCOUNT',
+        'name'
+      );
+      List<NewtonSelectorFlowCpeController.Field> fields = NewtonSelectorFlowCpeController.getObjectFields(
+        'account'
+      );
+
+      Assert.isTrue(containsChoice(rows, 'Name'));
+      Assert.areEqual('Account', rows[0].sObjectType);
+      Assert.areNotEqual(null, findField(fields, 'Name'));
     }
   }
 
@@ -213,23 +241,14 @@ private class NewtonSelectorFlowCpeControllerTest {
         'name'
       );
 
-      if (rows.isEmpty()) {
-        return;
-      }
-
+      Assert.isTrue(containsChoice(rows, 'Name'));
       for (NewtonSelectorFlowCpeController.ChoiceOption row : rows) {
-        String fieldName = row.value == null ? '' : row.value.toLowerCase();
-        String label = row.label == null ? '' : row.label.toLowerCase();
-        Assert.isTrue(fieldName.contains('name') || label.contains('name'));
+        Assert.isTrue(
+          row.value.toLowerCase().contains('name') ||
+          row.label.toLowerCase().contains('name')
+        );
       }
     }
-  }
-
-  private static Boolean containsField(
-    List<NewtonSelectorFlowCpeController.Field> fields,
-    String fieldName
-  ) {
-    return findField(fields, fieldName) != null;
   }
 
   private static NewtonSelectorFlowCpeController.Field findField(
@@ -248,11 +267,18 @@ private class NewtonSelectorFlowCpeControllerTest {
     List<NewtonSelectorFlowCpeController.ChoiceOption> rows,
     String value
   ) {
+    return findChoice(rows, value) != null;
+  }
+
+  private static NewtonSelectorFlowCpeController.ChoiceOption findChoice(
+    List<NewtonSelectorFlowCpeController.ChoiceOption> rows,
+    String value
+  ) {
     for (NewtonSelectorFlowCpeController.ChoiceOption row : rows) {
-      if (row != null && row.value == value) {
-        return true;
+      if (row.value == value) {
+        return row;
       }
     }
-    return false;
+    return null;
   }
 }

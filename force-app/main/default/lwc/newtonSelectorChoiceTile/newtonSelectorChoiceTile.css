@@ -74,7 +74,7 @@
 
   position: relative;
   display: block;
-  width: var(--newton-static-v-100-percent, 100%);
+  width: 100%;
   isolation: isolate;
 }
 
@@ -87,7 +87,7 @@
   width: var(--slds-g-sizing-border-1, 1px);
   height: var(--slds-g-sizing-border-1, 1px);
   padding: 0;
-  margin: var(--newton-static-v-1px, -1px);
+  margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
@@ -104,7 +104,7 @@
   align-items: center;
   position: relative;
   cursor: pointer;
-  width: var(--newton-static-v-100-percent, 100%);
+  width: 100%;
   margin: 0;
 }
 
@@ -118,7 +118,13 @@
 
 .newton-selector-choice-tile__figure {
   position: relative;
-  display: flex;
+  /* Hosts that need a uniform tile family (e.g. the property editor) switch
+     the figure to a grid with a fixed visual row through these hooks, so the
+     title lands on the same line whatever the visual is. */
+  display: var(--newton-tile-figure-display, flex);
+  grid-template-rows: var(--newton-tile-figure-rows, none);
+  justify-items: center;
+  align-content: start;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -147,9 +153,9 @@
        back to the size-based default set by the .newton-selector-choice-tile_size-* modifier
        via --newton-tile-pad-base. */
   padding-top: var(--_choice-tile-pad-t);
-  padding-right: var(--_choice-tile-pad-r);
+  padding-inline-end: var(--_choice-tile-pad-r);
   padding-bottom: var(--_choice-tile-pad-b);
-  padding-left: var(--_choice-tile-pad-l);
+  padding-inline-start: var(--_choice-tile-pad-l);
   background: var(--_srf-solid-bg-current, var(--_choice-tile-surface));
   border: var(--slds-g-sizing-border-1, 1px) solid var(--_choice-tile-border);
   border-radius: var(--_choice-tile-radius);
@@ -172,6 +178,8 @@
    ============================================================================= */
 
 .newton-selector-choice-tile__icon-wrap {
+  grid-row: 1;
+  align-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -184,8 +192,13 @@
    framed visual cell as glyph-backed tiles.
    ============================================================================= */
 
-.newton-selector-choice-tile__shape-wrap {
-  --_shape-cell-size: var(--slds-g-sizing-10, 2.5rem);
+.newton-selector-choice-tile__shape-wrap,
+.newton-selector-choice-tile_framed-visual
+  .newton-selector-choice-tile__icon-wrap {
+  --_shape-cell-size: var(
+    --newton-tile-visual-size,
+    var(--slds-g-sizing-10, 2.5rem)
+  );
   --_shape-cell-ink: var(--slds-g-color-neutral-base-50, #747474);
   --_shape-cell-ring: var(--slds-g-color-border-base-1, #c9c9c9);
   --_shape-cell-bg: color-mix(
@@ -194,6 +207,8 @@
     var(--slds-g-color-neutral-base-100, #ffffff)
   );
 
+  grid-row: 1;
+  align-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -212,7 +227,9 @@
 }
 
 .newton-selector-choice-tile_size-large
-  .newton-selector-choice-tile__shape-wrap {
+  .newton-selector-choice-tile__shape-wrap,
+.newton-selector-choice-tile_size-large.newton-selector-choice-tile_framed-visual
+  .newton-selector-choice-tile__icon-wrap {
   --_shape-cell-size: var(--slds-g-sizing-10, 3rem);
 }
 
@@ -229,7 +246,7 @@
   min-block-size: var(--slds-g-sizing-border-2, 2px);
   background: transparent;
   border: var(--slds-g-sizing-border-2, 2px) solid var(--_shape-cell-ink);
-  border-radius: var(--newton-static-v-2px, 2px);
+  border-radius: var(--slds-g-radius-border-1, 0.125rem);
   flex: 0 0 auto;
   transition:
     border-color 160ms ease,
@@ -237,11 +254,17 @@
 }
 
 .newton-selector-choice-tile:not(.newton-selector-choice-tile_disabled):hover
-  .newton-selector-choice-tile__shape-wrap {
+  .newton-selector-choice-tile__shape-wrap,
+.newton-selector-choice-tile_framed-visual:not(
+    .newton-selector-choice-tile_disabled
+  ):hover
+  .newton-selector-choice-tile__icon-wrap {
   --_shape-cell-ring: var(--slds-g-color-neutral-base-50, #747474);
 }
 
-.newton-selector-choice-tile_selected .newton-selector-choice-tile__shape-wrap {
+.newton-selector-choice-tile_selected .newton-selector-choice-tile__shape-wrap,
+.newton-selector-choice-tile_selected.newton-selector-choice-tile_framed-visual
+  .newton-selector-choice-tile__icon-wrap {
   --_shape-cell-ink: var(--slds-g-color-brand-base-50, #0176d3);
   --_shape-cell-ring: var(--slds-g-color-brand-base-50, #0176d3);
   --_shape-cell-bg: color-mix(
@@ -269,17 +292,26 @@
   opacity: 0.9;
 }
 
+/* Whatever the cell holds, a shape's outline or a framed icon, takes the
+   cell's ink. */
+.newton-selector-choice-tile__shape-wrap,
+.newton-selector-choice-tile_framed-visual
+  .newton-selector-choice-tile__icon-wrap {
+  color: var(--_shape-cell-ink);
+}
+
 /* =============================================================================
    ELEMENT · Text stack (title / sub / badge)
    ============================================================================= */
 
 .newton-selector-choice-tile__text {
+  grid-row: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.125rem;
   min-width: 0;
-  max-width: var(--newton-static-v-100-percent, 100%);
+  max-width: 100%;
 }
 
 .newton-selector-choice-tile__title {
@@ -313,8 +345,7 @@
   align-items: center;
   font-size: var(--slds-g-font-scale-neg-2, 0.6875rem);
   font-weight: var(--slds-g-font-weight-7, 700);
-  padding: var(--newton-static-v-0-1875rem, 0.1875rem)
-    var(--slds-g-spacing-2, 0.5rem);
+  padding: 0.1875rem var(--slds-g-spacing-2, 0.5rem);
   background: var(--_badge-bg);
   color: var(--_badge-ink);
   letter-spacing: 0.06em;
@@ -333,7 +364,7 @@
 /* ── Shape modifiers ── */
 
 .newton-selector-choice-tile__badge_shape-pill {
-  border-radius: var(--newton-static-v-999px, 999px);
+  border-radius: var(--slds-g-radius-border-pill, 15rem);
 }
 
 .newton-selector-choice-tile__badge_shape-square {
@@ -446,27 +477,27 @@
   position: absolute;
   box-shadow:
     inset 0 0 0 1px var(--_badge-ring),
-    0 2px 6px rgba(0, 0, 0, 0.08);
+    var(--slds-g-shadow-1, 0 2px 2px 0 #0000001a);
 }
 
 .newton-selector-choice-tile__badge_pos-top-left {
   top: var(--slds-g-spacing-2, 0.5rem);
-  left: var(--slds-g-spacing-2, 0.5rem);
+  inset-inline-start: var(--slds-g-spacing-2, 0.5rem);
 }
 
 .newton-selector-choice-tile__badge_pos-top-right {
   top: var(--slds-g-spacing-2, 0.5rem);
-  right: var(--slds-g-spacing-2, 0.5rem);
+  inset-inline-end: var(--slds-g-spacing-2, 0.5rem);
 }
 
 .newton-selector-choice-tile__badge_pos-bottom-left {
   bottom: var(--slds-g-spacing-2, 0.5rem);
-  left: var(--slds-g-spacing-2, 0.5rem);
+  inset-inline-start: var(--slds-g-spacing-2, 0.5rem);
 }
 
 .newton-selector-choice-tile__badge_pos-bottom-right {
   bottom: var(--slds-g-spacing-2, 0.5rem);
-  right: var(--slds-g-spacing-2, 0.5rem);
+  inset-inline-end: var(--slds-g-spacing-2, 0.5rem);
 }
 
 /* When the checkmark indicator is selected, the floating check lives at
@@ -484,28 +515,27 @@
    both `top` and `bottom` stretches the badge across the full tile height.) */
 .newton-selector-choice-tile_size-small .newton-selector-choice-tile__badge {
   font-size: var(--slds-g-font-scale-neg-3, 0.625rem);
-  padding: var(--newton-static-v-0-125rem, 0.125rem)
-    var(--newton-static-v-0-375rem, 0.375rem);
+  padding: 0.125rem 0.375rem;
 }
 .newton-selector-choice-tile_size-small
   .newton-selector-choice-tile__badge_pos-top-left {
   top: var(--slds-g-spacing-1, 0.25rem);
-  left: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
 }
 .newton-selector-choice-tile_size-small
   .newton-selector-choice-tile__badge_pos-top-right {
   top: var(--slds-g-spacing-1, 0.25rem);
-  right: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-end: var(--slds-g-spacing-1, 0.25rem);
 }
 .newton-selector-choice-tile_size-small
   .newton-selector-choice-tile__badge_pos-bottom-left {
   bottom: var(--slds-g-spacing-1, 0.25rem);
-  left: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
 }
 .newton-selector-choice-tile_size-small
   .newton-selector-choice-tile__badge_pos-bottom-right {
   bottom: var(--slds-g-spacing-1, 0.25rem);
-  right: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-end: var(--slds-g-spacing-1, 0.25rem);
 }
 
 /* =============================================================================
@@ -517,7 +547,7 @@
   width: var(--slds-g-sizing-border-1, 1px);
   height: var(--slds-g-sizing-border-1, 1px);
   padding: 0;
-  margin: var(--newton-static-v-1px, -1px);
+  margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
@@ -525,23 +555,23 @@
 }
 
 /* =============================================================================
-   ELEMENT · Selection badge (floating circle in top-right of figure)
+   ELEMENT · Selection badge (floating circle in the top inline-end corner)
    ============================================================================= */
 
 .newton-selector-choice-tile__check {
   position: absolute;
   top: var(--slds-g-spacing-2, 0.5rem);
-  right: var(--slds-g-spacing-2, 0.5rem);
+  inset-inline-end: var(--slds-g-spacing-2, 0.5rem);
   width: var(--slds-g-sizing-7, 1.5rem);
   height: var(--slds-g-sizing-7, 1.5rem);
-  border-radius: var(--newton-static-v-50-percent, 50%);
+  border-radius: var(--slds-g-radius-border-circle, 50%);
   background: var(--_choice-tile-brand);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow:
     0 0 0 2px var(--_choice-tile-surface),
-    0 2px 8px rgba(1, 94, 170, 0.3);
+    0 2px 8px color-mix(in oklab, var(--_choice-tile-brand) 30%, transparent);
   opacity: 0;
   transform: scale(0.4);
   transition:
@@ -549,13 +579,6 @@
     transform 280ms var(--_choice-tile-spring);
   pointer-events: none;
   z-index: 2;
-}
-
-.newton-selector-choice-tile__check-icon {
-  --slds-c-icon-color-foreground-default: #ffffff;
-  --slds-c-icon-color-foreground: #ffffff;
-  --slds-c-icon-color-foreground-default: #ffffff;
-  --slds-c-icon-color-foreground: #ffffff;
 }
 
 .newton-selector-choice-tile_sel-checkmark.newton-selector-choice-tile_selected
@@ -610,7 +633,7 @@
    MODIFIER · Elevation (card depth style)
    ============================================================================= */
 
-/* Elevation now contributes only neutral depth/edge treatment. Selection
+/* Elevation contributes only neutral depth/edge treatment. Selection
    indicators add selection affordances separately so the styles compose. */
 .newton-selector-choice-tile_elev-plain .newton-selector-choice-tile__figure {
   --_srf-bg-base: var(--slds-g-color-neutral-base-100, #ffffff);
@@ -877,8 +900,8 @@
 .newton-selector-choice-tile_size-small .newton-selector-choice-tile__check {
   width: var(--slds-g-sizing-6, 1.25rem);
   height: var(--slds-g-sizing-6, 1.25rem);
-  top: var(--newton-static-v-0-375rem, 0.375rem);
-  right: var(--newton-static-v-0-375rem, 0.375rem);
+  top: 0.375rem;
+  inset-inline-end: 0.375rem;
 }
 
 .newton-selector-choice-tile_size-large .newton-selector-choice-tile__figure {
@@ -894,8 +917,8 @@
 .newton-selector-choice-tile_size-large .newton-selector-choice-tile__check {
   width: var(--slds-g-sizing-8, 1.75rem);
   height: var(--slds-g-sizing-8, 1.75rem);
-  top: var(--newton-static-v-0-625rem, 0.625rem);
-  right: var(--newton-static-v-0-625rem, 0.625rem);
+  top: 0.625rem;
+  inset-inline-end: 0.625rem;
 }
 
 /* =============================================================================
@@ -910,8 +933,9 @@
 .newton-selector-choice-tile_aspect-16-9 .newton-selector-choice-tile__figure,
 .newton-selector-choice-tile_aspect-3-4 .newton-selector-choice-tile__figure,
 .newton-selector-choice-tile_aspect-2-3 .newton-selector-choice-tile__figure {
-  width: var(--newton-static-v-100-percent, 100%);
-  height: auto;
+  width: 100%;
+  /* A host-set block size wins over the aspect ratio. */
+  height: var(--newton-tile-block-size, auto);
   min-height: 0;
 }
 
@@ -940,7 +964,7 @@
    so horizontal and vertical gaps are visually identical — no invisible
    centering whitespace from a size cap that's smaller than the column. */
 .newton-selector-choice-tile_grid .newton-selector-choice-tile__figure {
-  max-width: var(--newton-static-v-100-percent, 100%);
+  max-width: 100%;
 }
 
 /* List variant never caps — always full row width (overridden below) */
@@ -958,11 +982,11 @@
   align-items: center;
   justify-content: flex-start;
   gap: max(0.25rem, calc(var(--_choice-tile-pad-l) * 0.5));
-  padding-right: calc(
+  padding-inline-end: calc(
     var(--_choice-tile-pad-r) + var(--slds-g-spacing-8, 2.5rem)
   );
-  text-align: left;
-  width: var(--newton-static-v-100-percent, 100%);
+  text-align: start;
+  width: 100%;
   max-width: none;
   height: auto;
   min-height: 0;
@@ -974,7 +998,7 @@
     .newton-selector-choice-tile_sel-checkmark
   )
   .newton-selector-choice-tile__figure {
-  padding-right: var(--_choice-tile-pad-r);
+  padding-inline-end: var(--_choice-tile-pad-r);
 }
 
 .newton-selector-choice-tile_list .newton-selector-choice-tile__text {
@@ -984,10 +1008,10 @@
 
 .newton-selector-choice-tile_list .newton-selector-choice-tile__title,
 .newton-selector-choice-tile_list .newton-selector-choice-tile__sub {
-  text-align: left;
+  text-align: start;
 }
 
-/* In list variant the row is left-aligned with the check at far right.
+/* In list variant the row is start-aligned with the check at the far end.
    Inline badges hug the text; corner-positioned badges remain anchored. */
 .newton-selector-choice-tile_list
   .newton-selector-choice-tile__badge_pos-bottom-inline {
@@ -996,8 +1020,8 @@
 }
 
 .newton-selector-choice-tile_list .newton-selector-choice-tile__check {
-  top: var(--newton-static-v-50-percent, 50%);
-  right: var(--slds-g-spacing-3, 0.75rem);
+  top: 50%;
+  inset-inline-end: var(--slds-g-spacing-3, 0.75rem);
   transform: translateY(-50%) scale(0.4);
 }
 
@@ -1030,9 +1054,8 @@
 
 /* =============================================================================
    PATTERN OVERLAY + TONE
-   Inspired by the empty / error state backgrounds — dots, scanlines, radial
-   glow — now available as a configurable tile decoration. Layered via a
-   single absolutely-positioned ::before-like span (`.newton-selector-choice-tile__pattern`)
+   Configurable tile decoration — dots, scanlines, radial glow, etc. Layered
+   via a single absolutely-positioned span (`.newton-selector-choice-tile__pattern`)
    inside the label, sitting behind content, above surface.
    ============================================================================= */
 
@@ -1209,7 +1232,7 @@
   z-index: 1;
 }
 
-/* --- Dots pattern — airy, fine grid of tinted dots. From empty state. --- */
+/* --- Dots pattern — airy, fine grid of tinted dots. --- */
 .newton-selector-choice-tile_pattern-dots
   .newton-selector-choice-tile__pattern {
   background-image: radial-gradient(
@@ -1227,7 +1250,7 @@
   );
 }
 
-/* --- Lines pattern — horizontal scanlines. From error state. --- */
+/* --- Lines pattern — horizontal scanlines. --- */
 .newton-selector-choice-tile_pattern-lines
   .newton-selector-choice-tile__pattern {
   background-image: repeating-linear-gradient(
@@ -1262,7 +1285,7 @@
   opacity: 0.08;
 }
 
-/* --- Glow — soft radial gradient emerging from the top. From empty state. --- */
+/* --- Glow — soft radial gradient emerging from the top. --- */
 .newton-selector-choice-tile_pattern-glow
   .newton-selector-choice-tile__pattern {
   background: radial-gradient(
@@ -1287,8 +1310,8 @@
 
 /* =============================================================================
    CORNER DECORATIONS
-   Floating L-shaped brackets / dots at each tile corner. From empty/error
-   state plate. Sit inside the label with absolute positioning.
+   Floating L-shaped brackets / dots at each tile corner. Sit inside the
+   label with absolute positioning.
    ============================================================================= */
 
 .newton-selector-choice-tile__corner {
@@ -1312,30 +1335,30 @@
 .newton-selector-choice-tile_corner-trim
   .newton-selector-choice-tile__corner_tl {
   top: var(--slds-g-spacing-1, 0.25rem);
-  left: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
   border-top-width: var(--slds-g-sizing-border-1, 1px);
-  border-left-width: var(--slds-g-sizing-border-1, 1px);
+  border-inline-start-width: var(--slds-g-sizing-border-1, 1px);
 }
 .newton-selector-choice-tile_corner-trim
   .newton-selector-choice-tile__corner_tr {
   top: var(--slds-g-spacing-1, 0.25rem);
-  right: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-end: var(--slds-g-spacing-1, 0.25rem);
   border-top-width: var(--slds-g-sizing-border-1, 1px);
-  border-right-width: var(--slds-g-sizing-border-1, 1px);
+  border-inline-end-width: var(--slds-g-sizing-border-1, 1px);
 }
 .newton-selector-choice-tile_corner-trim
   .newton-selector-choice-tile__corner_bl {
   bottom: var(--slds-g-spacing-1, 0.25rem);
-  left: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
   border-bottom-width: var(--slds-g-sizing-border-1, 1px);
-  border-left-width: var(--slds-g-sizing-border-1, 1px);
+  border-inline-start-width: var(--slds-g-sizing-border-1, 1px);
 }
 .newton-selector-choice-tile_corner-trim
   .newton-selector-choice-tile__corner_br {
   bottom: var(--slds-g-spacing-1, 0.25rem);
-  right: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-end: var(--slds-g-spacing-1, 0.25rem);
   border-bottom-width: var(--slds-g-sizing-border-1, 1px);
-  border-right-width: var(--slds-g-sizing-border-1, 1px);
+  border-inline-end-width: var(--slds-g-sizing-border-1, 1px);
 }
 
 /* --- Brackets — heavier, longer L corners. --- */
@@ -1348,30 +1371,30 @@
 .newton-selector-choice-tile_corner-brackets
   .newton-selector-choice-tile__corner_tl {
   top: var(--slds-g-spacing-1, 0.25rem);
-  left: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
   border-top-width: var(--slds-g-sizing-border-2, 2px);
-  border-left-width: var(--slds-g-sizing-border-2, 2px);
+  border-inline-start-width: var(--slds-g-sizing-border-2, 2px);
 }
 .newton-selector-choice-tile_corner-brackets
   .newton-selector-choice-tile__corner_tr {
   top: var(--slds-g-spacing-1, 0.25rem);
-  right: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-end: var(--slds-g-spacing-1, 0.25rem);
   border-top-width: var(--slds-g-sizing-border-2, 2px);
-  border-right-width: var(--slds-g-sizing-border-2, 2px);
+  border-inline-end-width: var(--slds-g-sizing-border-2, 2px);
 }
 .newton-selector-choice-tile_corner-brackets
   .newton-selector-choice-tile__corner_bl {
   bottom: var(--slds-g-spacing-1, 0.25rem);
-  left: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
   border-bottom-width: var(--slds-g-sizing-border-2, 2px);
-  border-left-width: var(--slds-g-sizing-border-2, 2px);
+  border-inline-start-width: var(--slds-g-sizing-border-2, 2px);
 }
 .newton-selector-choice-tile_corner-brackets
   .newton-selector-choice-tile__corner_br {
   bottom: var(--slds-g-spacing-1, 0.25rem);
-  right: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-end: var(--slds-g-spacing-1, 0.25rem);
   border-bottom-width: var(--slds-g-sizing-border-2, 2px);
-  border-right-width: var(--slds-g-sizing-border-2, 2px);
+  border-inline-end-width: var(--slds-g-sizing-border-2, 2px);
 }
 
 /* --- Dots — single solid dot at each corner. --- */
@@ -1386,25 +1409,25 @@
 .newton-selector-choice-tile_corner-dots
   .newton-selector-choice-tile__corner_tl {
   top: var(--slds-g-spacing-1, 0.25rem);
-  left: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
 }
 .newton-selector-choice-tile_corner-dots
   .newton-selector-choice-tile__corner_tr {
   top: var(--slds-g-spacing-1, 0.25rem);
-  right: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-end: var(--slds-g-spacing-1, 0.25rem);
 }
 .newton-selector-choice-tile_corner-dots
   .newton-selector-choice-tile__corner_bl {
   bottom: var(--slds-g-spacing-1, 0.25rem);
-  left: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
 }
 .newton-selector-choice-tile_corner-dots
   .newton-selector-choice-tile__corner_br {
   bottom: var(--slds-g-spacing-1, 0.25rem);
-  right: var(--slds-g-spacing-1, 0.25rem);
+  inset-inline-end: var(--slds-g-spacing-1, 0.25rem);
 }
 
-/* Selected state: pull corners slightly inward to read as "framed in". */
+/* Selected state: corners at full strength to read as "framed in". */
 .newton-selector-choice-tile_selected .newton-selector-choice-tile__corner {
   opacity: 1;
 }
@@ -1412,11 +1435,11 @@
 /* List variant adjustments — corners still work but sit flush to the row. */
 .newton-selector-choice-tile_list .newton-selector-choice-tile__corner_tl,
 .newton-selector-choice-tile_list .newton-selector-choice-tile__corner_tr {
-  top: var(--newton-static-v-6px, 6px);
+  top: 6px;
 }
 .newton-selector-choice-tile_list .newton-selector-choice-tile__corner_bl,
 .newton-selector-choice-tile_list .newton-selector-choice-tile__corner_br {
-  bottom: var(--newton-static-v-6px, 6px);
+  bottom: 6px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1612,7 +1635,7 @@
     180deg,
     color-mix(
         in oklab,
-        var(--_srf-state-color, #747474) 14%,
+        var(--_srf-state-color) 14%,
         var(--slds-g-color-neutral-base-100, #ffffff)
       )
       0%,
@@ -1627,7 +1650,7 @@
     ellipse at 50% 0%,
     color-mix(
         in oklab,
-        var(--_srf-state-color, #747474) 18%,
+        var(--_srf-state-color) 18%,
         var(--slds-g-color-neutral-base-100, #ffffff)
       )
       0%,
@@ -1642,7 +1665,7 @@
     135deg,
     color-mix(
         in oklab,
-        var(--_srf-state-color, #747474) 16%,
+        var(--_srf-state-color) 16%,
         var(--slds-g-color-neutral-base-100, #ffffff)
       )
       0%,
@@ -1654,7 +1677,7 @@
 .newton-selector-choice-tile_surface-tint .newton-selector-choice-tile__figure {
   background: color-mix(
     in oklab,
-    var(--_srf-state-color, #747474) 10%,
+    var(--_srf-state-color) 10%,
     var(--slds-g-color-neutral-base-100, #ffffff)
   );
 }
@@ -1685,7 +1708,7 @@
     180deg,
     color-mix(
         in oklab,
-        var(--_srf-state-color, #747474) 22%,
+        var(--_srf-state-color) 22%,
         var(--slds-g-color-neutral-base-100, #ffffff)
       )
       0%,
@@ -1699,7 +1722,7 @@
     ellipse at 50% 0%,
     color-mix(
         in oklab,
-        var(--_srf-state-color, #747474) 28%,
+        var(--_srf-state-color) 28%,
         var(--slds-g-color-neutral-base-100, #ffffff)
       )
       0%,
@@ -1713,7 +1736,7 @@
     135deg,
     color-mix(
         in oklab,
-        var(--_srf-state-color, #747474) 26%,
+        var(--_srf-state-color) 26%,
         var(--slds-g-color-neutral-base-100, #ffffff)
       )
       0%,
@@ -1725,7 +1748,7 @@
   .newton-selector-choice-tile__figure {
   background: color-mix(
     in oklab,
-    var(--_srf-state-color, #747474) 18%,
+    var(--_srf-state-color) 18%,
     var(--slds-g-color-neutral-base-100, #ffffff)
   );
 }
@@ -1737,9 +1760,9 @@
    chosen iconTone.
    ============================================================================= */
 
-/* Icon wrap becomes the positioning context for decoration. When a shape
-   is active it also becomes the clipping boundary — the glyph AND decor
-   both conform to the shape, not just the decor outline. */
+/* Icon wrap becomes the positioning context for decoration. Its flex
+   centering also centers the absolutely-positioned decor (static position),
+   which keeps the decor centered in both LTR and RTL. */
 .newton-selector-choice-tile__icon-wrap {
   --_icn-decor-width: var(--slds-g-sizing-10, 2.5rem);
   --_icn-decor-height: var(--slds-g-sizing-10, 2.5rem);
@@ -1751,21 +1774,12 @@
   justify-content: center;
 }
 
-/* Fix-size the wrap so clip-path has deterministic bounds. Matches
-   icon-decor sizing so the glyph centers inside the shape. */
+/* Fix-size the wrap so it has deterministic bounds. Matches icon-decor
+   sizing so the glyph centers inside the shape. */
 .newton-selector-choice-tile__icon-wrap_shape-circle,
-.newton-selector-choice-tile__icon-wrap_shape-square,
-.newton-selector-choice-tile__icon-wrap_shape-squircle,
-.newton-selector-choice-tile__icon-wrap_shape-pill,
-.newton-selector-choice-tile__icon-wrap_shape-hexagon,
-.newton-selector-choice-tile__icon-wrap_shape-diamond {
+.newton-selector-choice-tile__icon-wrap_shape-square {
   width: var(--_icn-wrap-width);
   height: var(--_icn-wrap-height);
-}
-
-.newton-selector-choice-tile__icon-wrap_shape-pill {
-  --_icn-decor-width: var(--slds-g-sizing-13, 3.5rem);
-  --_icn-decor-height: var(--slds-g-sizing-9, 2.25rem);
 }
 
 .newton-selector-choice-tile__icon-wrap_decor-halo {
@@ -1782,46 +1796,6 @@
 .newton-selector-choice-tile__icon-wrap_style-glow {
   --_icn-decor-width: var(--slds-g-sizing-13, 3.5rem);
   --_icn-decor-height: var(--slds-g-sizing-13, 3.5rem);
-}
-
-/* Shape-based clipping — applied to the wrap so the glyph conforms to
-   the shape, not just the background decoration. Only on clip-path shapes
-   (hexagon / diamond). Rounded shapes (circle / squircle / pill) already
-   clip via border-radius on the icon-decor; we add the same radius here
-   so the background of the icon area (inside the wrap, outside the decor)
-   also takes the shape. */
-.newton-selector-choice-tile__icon-wrap_shape-hexagon {
-  clip-path: polygon(
-    25% 6.7%,
-    75% 6.7%,
-    100% 50%,
-    75% 93.3%,
-    25% 93.3%,
-    0% 50%
-  );
-}
-
-.newton-selector-choice-tile__icon-wrap_shape-diamond {
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-}
-
-/* Filled shapes: the decor fills 100% of the wrap, which is clipped by
-   shape — so the filled area IS the shape. Scale icon-decor to fill. */
-.newton-selector-choice-tile__icon-wrap_shape-circle
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-square
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-squircle
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-pill
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-hexagon
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-diamond
-  .newton-selector-choice-tile__icon-decor {
-  top: var(--newton-static-v-50-percent, 50%);
-  left: var(--newton-static-v-50-percent, 50%);
-  transform: translate(-50%, -50%);
 }
 
 /* Shared tone palette for icon decoration. */
@@ -1897,12 +1871,10 @@
   --_icn-glyph-color: var(--slds-g-color-on-accent-1, #ffffff);
 }
 
-/* Decoration base — absolutely centered circle/square behind the icon. */
+/* Decoration base — circle/square behind the icon, centered by the wrap's
+   flex alignment (no inset offsets, so it stays centered in RTL). */
 .newton-selector-choice-tile__icon-decor {
   position: absolute;
-  top: var(--newton-static-v-50-percent, 50%);
-  left: var(--newton-static-v-50-percent, 50%);
-  transform: translate(-50%, -50%);
   z-index: 0;
   pointer-events: none;
   width: var(--_icn-decor-width);
@@ -1946,40 +1918,14 @@
    fill/outline/glow treatment, optional shading, and glyph color via `color`
    on the wrap.
 
-   Shape is expressed two ways:
-     1. border-radius  — for circle / square / squircle / pill
-     2. clip-path      — for hexagon / diamond (and border-radius ignored)
+   Shape is expressed via border-radius — circle or square.
 
    Style layers on top:
      - filled   : solid tinted background
-     - outlined : transparent body + ring (SVG-masked for clipped shapes)
+     - outlined : transparent body + ring
      - soft     : dashed low-opacity outline + dimmed glyph ("empty space")
-     - glow     : soft radial gradient (former "halo")
+     - glow     : soft radial gradient
    ============================================================================= */
-
-/* ── Default icon-decor sizing when any shape is active ──────────────── */
-.newton-selector-choice-tile__icon-wrap_shape-circle
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-square
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-squircle
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-pill
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-hexagon
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-diamond
-  .newton-selector-choice-tile__icon-decor {
-  width: var(--_icn-decor-width);
-  height: var(--_icn-decor-height);
-}
-
-/* Pill is wider than tall — proportions feel "tag"-like. */
-.newton-selector-choice-tile__icon-wrap_shape-pill
-  .newton-selector-choice-tile__icon-decor {
-  width: var(--_icn-decor-width);
-  height: var(--_icn-decor-height);
-}
 
 /* Soft style is a "ghost placeholder" — slightly larger so the dashed edge
    sits comfortably outside the glyph baseline. */
@@ -2004,34 +1950,6 @@
 .newton-selector-choice-tile__icon-wrap_shape-square
   .newton-selector-choice-tile__icon-decor {
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
-}
-.newton-selector-choice-tile__icon-wrap_shape-squircle
-  .newton-selector-choice-tile__icon-decor {
-  border-radius: var(--newton-static-v-32-percent, 32%);
-}
-.newton-selector-choice-tile__icon-wrap_shape-pill
-  .newton-selector-choice-tile__icon-decor {
-  border-radius: var(--newton-static-v-999px, 999px);
-}
-
-/* --- SHAPE: clip-path-based (hexagon / diamond) ---------------------- */
-/* clip-path wins — drawn as polygons regardless of border-radius */
-.newton-selector-choice-tile__icon-wrap_shape-hexagon
-  .newton-selector-choice-tile__icon-decor {
-  clip-path: polygon(
-    25% 6.7%,
-    75% 6.7%,
-    100% 50%,
-    75% 93.3%,
-    25% 93.3%,
-    0% 50%
-  );
-  border-radius: 0;
-}
-.newton-selector-choice-tile__icon-wrap_shape-diamond
-  .newton-selector-choice-tile__icon-decor {
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  border-radius: 0;
 }
 
 /* --- STYLE: filled — solid tinted background, glyph in glyph-color ---- */
@@ -2088,9 +2006,6 @@
 }
 
 /* --- STYLE: outlined — transparent body + tone ring ------------------ */
-/* For border-radius shapes we can just use `border`. For clip-path shapes
-   we use a two-layer technique: the outer decor is the ring color, the
-   inner pseudo is the surface color set slightly inward. */
 .newton-selector-choice-tile__icon-wrap_style-outlined
   .newton-selector-choice-tile__icon-decor {
   background: transparent;
@@ -2101,31 +2016,6 @@
 
 .newton-selector-choice-tile__icon-wrap_style-outlined {
   color: var(--_icn-glyph-color, var(--_icn-color, currentColor));
-}
-
-/* clip-path shapes can't show `border` — fall back to the two-layer
-   technique: decor is filled with ring color, inner pseudo cuts the hole. */
-.newton-selector-choice-tile__icon-wrap_shape-hexagon.newton-selector-choice-tile__icon-wrap_style-outlined
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-diamond.newton-selector-choice-tile__icon-wrap_style-outlined
-  .newton-selector-choice-tile__icon-decor {
-  border: 0;
-  background: var(--_icn-color, currentColor);
-  position: relative;
-}
-
-.newton-selector-choice-tile__icon-wrap_shape-hexagon.newton-selector-choice-tile__icon-wrap_style-outlined
-  .newton-selector-choice-tile__icon-decor::before,
-.newton-selector-choice-tile__icon-wrap_shape-diamond.newton-selector-choice-tile__icon-wrap_style-outlined
-  .newton-selector-choice-tile__icon-decor::before {
-  content: "";
-  position: absolute;
-  top: var(--newton-static-v-2px, 2px);
-  left: var(--newton-static-v-2px, 2px);
-  right: var(--newton-static-v-2px, 2px);
-  bottom: var(--newton-static-v-2px, 2px);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
-  clip-path: inherit;
 }
 
 /* --- STYLE: soft — ghost placeholder, "empty space" aesthetic -------- */
@@ -2152,36 +2042,7 @@
   opacity: 0.6;
 }
 
-/* clip-path shapes can't do dashed clip-path outlines cleanly. Use two-layer
-   with a dashed-edge SVG mask fallback: fill with color-mix tint, cut inner. */
-.newton-selector-choice-tile__icon-wrap_shape-hexagon.newton-selector-choice-tile__icon-wrap_style-soft
-  .newton-selector-choice-tile__icon-decor,
-.newton-selector-choice-tile__icon-wrap_shape-diamond.newton-selector-choice-tile__icon-wrap_style-soft
-  .newton-selector-choice-tile__icon-decor {
-  background: color-mix(
-    in oklab,
-    var(--_icn-color, currentColor) 22%,
-    transparent
-  );
-  border: 0;
-  position: relative;
-}
-
-.newton-selector-choice-tile__icon-wrap_shape-hexagon.newton-selector-choice-tile__icon-wrap_style-soft
-  .newton-selector-choice-tile__icon-decor::before,
-.newton-selector-choice-tile__icon-wrap_shape-diamond.newton-selector-choice-tile__icon-wrap_style-soft
-  .newton-selector-choice-tile__icon-decor::before {
-  content: "";
-  position: absolute;
-  top: var(--newton-static-v-2px, 2px);
-  left: var(--newton-static-v-2px, 2px);
-  right: var(--newton-static-v-2px, 2px);
-  bottom: var(--newton-static-v-2px, 2px);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
-  clip-path: inherit;
-}
-
-/* --- STYLE: glow — soft radial gradient (former halo) ---------------- */
+/* --- STYLE: glow — soft radial gradient ------------------------------ */
 .newton-selector-choice-tile__icon-wrap_style-glow
   .newton-selector-choice-tile__icon-decor {
   background: radial-gradient(
@@ -2202,36 +2063,24 @@
 .newton-selector-choice-tile_size-small
   .newton-selector-choice-tile__icon-wrap_shape-circle,
 .newton-selector-choice-tile_size-small
-  .newton-selector-choice-tile__icon-wrap_shape-square,
-.newton-selector-choice-tile_size-small
-  .newton-selector-choice-tile__icon-wrap_shape-squircle,
-.newton-selector-choice-tile_size-small
-  .newton-selector-choice-tile__icon-wrap_shape-hexagon,
-.newton-selector-choice-tile_size-small
-  .newton-selector-choice-tile__icon-wrap_shape-diamond {
+  .newton-selector-choice-tile__icon-wrap_shape-square {
   --_icn-decor-width: var(--slds-g-sizing-9, 2rem);
   --_icn-decor-height: var(--slds-g-sizing-9, 2rem);
 }
 .newton-selector-choice-tile_size-large
   .newton-selector-choice-tile__icon-wrap_shape-circle,
 .newton-selector-choice-tile_size-large
-  .newton-selector-choice-tile__icon-wrap_shape-square,
-.newton-selector-choice-tile_size-large
-  .newton-selector-choice-tile__icon-wrap_shape-squircle,
-.newton-selector-choice-tile_size-large
-  .newton-selector-choice-tile__icon-wrap_shape-hexagon,
-.newton-selector-choice-tile_size-large
-  .newton-selector-choice-tile__icon-wrap_shape-diamond {
+  .newton-selector-choice-tile__icon-wrap_shape-square {
   --_icn-decor-width: var(--slds-g-sizing-10, 3rem);
   --_icn-decor-height: var(--slds-g-sizing-10, 3rem);
 }
 .newton-selector-choice-tile_size-small
   .newton-selector-choice-tile__icon-wrap_decor-halo {
-  --_icn-decor-width: var(--newton-static-v-2-5rem, 2.5rem);
-  --_icn-decor-height: var(--newton-static-v-2-5rem, 2.5rem);
+  --_icn-decor-width: 2.5rem;
+  --_icn-decor-height: 2.5rem;
 }
 .newton-selector-choice-tile_size-large
   .newton-selector-choice-tile__icon-wrap_decor-halo {
-  --_icn-decor-width: var(--newton-static-v-3-5rem, 3.5rem);
-  --_icn-decor-height: var(--newton-static-v-3-5rem, 3.5rem);
+  --_icn-decor-width: 3.5rem;
+  --_icn-decor-height: 3.5rem;
 }

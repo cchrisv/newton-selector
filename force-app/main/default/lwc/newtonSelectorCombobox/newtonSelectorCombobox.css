@@ -1,24 +1,18 @@
 :host {
   display: block;
   position: relative;
-  z-index: var(--newton-static-v-1, 1);
-  width: var(--newton-static-v-100-percent, 100%);
-  --newton-selector-combobox-dropdown-max-height: var(
-    --newton-static-v-22rem,
-    22rem
-  );
-  --newton-selector-combobox-dropdown-z-index: var(--newton-static-v-1, 1);
+  z-index: 1;
+  width: 100%;
+  --newton-selector-combobox-dropdown-max-height: 22rem;
+  --newton-selector-combobox-dropdown-z-index: 1;
   --newton-selector-combobox-dropdown-padding: 0;
-  --newton-selector-combobox-dropdown-width: var(
-    --newton-static-v-100-percent,
-    100%
-  );
+  --newton-selector-combobox-dropdown-width: 100%;
   --newton-selector-combobox-dropdown-min-width: auto;
   --newton-selector-combobox-option-gap: var(--slds-g-spacing-1, 0.25rem);
 }
 
 :host(:focus-within) {
-  z-index: var(--newton-static-v-9000, 9000);
+  z-index: 9000;
 }
 
 .newton-selector-combobox__dropdown {
@@ -35,7 +29,7 @@
   position: relative;
   overflow: visible;
   --newton-selector-combobox-dropdown-max-height: var(
-    --newton-static-v-20rem,
+    --slds-g-sizing-15,
     20rem
   );
   --newton-selector-combobox-dropdown-padding: 0;
@@ -57,8 +51,8 @@
 .newton-selector-combobox__select-button {
   display: flex;
   align-items: center;
-  width: var(--newton-static-v-100-percent, 100%);
-  text-align: left;
+  width: 100%;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -116,36 +110,6 @@
 
 .newton-selector-combobox__clear-button {
   color: var(--slds-g-color-neutral-base-40, #5c5c5c);
-}
-
-/* V1 CPE control normalization: same trigger height, edge, and menu rhythm
-   for lookup and static-select modes. */
-.newton-selector-combobox__select-button,
-.newton-selector-combobox__lookup-input {
-  min-block-size: var(--slds-g-sizing-9, 2rem);
-  border-color: var(--slds-g-color-border-base-1, #c9c9c9);
-  background: var(--slds-g-color-surface-1, #ffffff);
-  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-    color-mix(
-      in oklab,
-      var(--slds-g-color-neutral-base-10, #181818) 3%,
-      transparent
-    );
-}
-
-.newton-selector-combobox__select-button:hover,
-.newton-selector-combobox__lookup-input:hover {
-  border-color: var(--slds-g-color-border-base-1, #747474);
-}
-
-.newton-selector-combobox__select.slds-is-open
-  .newton-selector-combobox__select-button,
-.newton-selector-combobox__lookup.slds-is-open
-  .newton-selector-combobox__lookup-input,
-.newton-selector-combobox__lookup-input:focus {
-  border-color: var(--slds-g-color-brand-base-50, #0176d3);
-  box-shadow: 0 0 0 var(--slds-g-sizing-border-1, 1px)
-    var(--slds-g-color-brand-base-50, #0176d3);
 }
 
 .newton-selector-combobox__dropdown {

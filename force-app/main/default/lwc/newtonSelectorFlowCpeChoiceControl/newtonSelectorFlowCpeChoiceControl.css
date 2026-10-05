@@ -1,11 +1,4 @@
-.newton-studio-choice {
-  display: block;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
+.newton-studio-choice,
 .newton-studio-choice__control {
   min-width: 0;
 }

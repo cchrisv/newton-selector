@@ -3,41 +3,6 @@
 
 export const DEFAULT_ICON_NAME = "circle-question-mark";
 
-const LEGACY_ICON_ALIASES = Object.freeze({
-  "add-contact": "user-round-plus",
-  announcement: "megaphone",
-  apps: "grid-3x3",
-  "asset-object": "box",
-  "buyer-account": "building-2",
-  call: "phone",
-  case: "briefcase-business",
-  chart: "chart-column",
-  choice: "list-checks",
-  "date-time": "calendar-clock",
-  delete: "trash-2",
-  entity: "building-2",
-  event: "calendar",
-  favorite: "star",
-  feed: "rss",
-  "knowledge-base": "book-open",
-  "layout-banner": "panel-top",
-  lead: "user-round-plus",
-  money: "dollar-sign",
-  moneybag: "badge-dollar-sign",
-  new: "plus",
-  open: "external-link",
-  opportunity: "trending-up",
-  picklist: "list-checks",
-  preview: "eye",
-  "question-feed": "circle-question-mark",
-  "record-lookup": "search",
-  "sales-path": "route",
-  "setup-modal": "settings",
-  threedots: "ellipsis",
-  "thumbs-up": "thumbs-up",
-  "work-queue": "rows-3"
-});
-
 export const LUCIDE_ICON_PATHS = Object.freeze({
   "a-arrow-down":
     '<path d="m14 12 4 4 4-4"></path><path d="M18 16V7"></path><path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16"></path><path d="M3.304 13h6.392"></path>',
@@ -226,6 +191,8 @@ export const LUCIDE_ICON_PATHS = Object.freeze({
     '<path d="m4 6 3-3 3 3"></path><path d="M7 17V3"></path><path d="m14 6 3-3 3 3"></path><path d="M17 17V3"></path><path d="M4 21h16"></path>',
   asterisk:
     '<path d="M12 6v12"></path><path d="M17.196 9 6.804 15"></path><path d="m6.804 9 10.392 6"></path>',
+  astroid:
+    '<path d="M12.983 21.186a1 1 0 0 1-1.966 0 10 10 0 0 0-8.203-8.203 1 1 0 0 1 0-1.966 10 10 0 0 0 8.203-8.203 1 1 0 0 1 1.966 0 10 10 0 0 0 8.203 8.203 1 1 0 0 1 0 1.966 10 10 0 0 0-8.203 8.203"></path>',
   "at-sign":
     '<circle cx="12" cy="12" r="4"></circle><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"></path>',
   atom: '<circle cx="12" cy="12" r="1"></circle><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"></path><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"></path>',
@@ -1304,6 +1271,8 @@ export const LUCIDE_ICON_PATHS = Object.freeze({
     '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>',
   "folder-archive":
     '<circle cx="15" cy="19" r="2"></circle><path d="M20.9 19.8A2 2 0 0 0 22 18V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h5.1"></path><path d="M15 11v-1"></path><path d="M15 17v-2"></path>',
+  "folder-bookmark":
+    '<path d="M12 6v8l3-3 3 3V6"></path><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"></path>',
   "folder-check":
     '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path><path d="m9 13 2 2 4-4"></path>',
   "folder-clock":
@@ -3277,24 +3246,8 @@ export const LUCIDE_ICON_PATHS = Object.freeze({
     '<circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line><line x1="8" x2="14" y1="11" y2="11"></line>'
 });
 
-export const LUCIDE_ICON_NAMES = Object.freeze(Object.keys(LUCIDE_ICON_PATHS));
-
 export function normalizeIconName(name) {
-  const raw = (name || DEFAULT_ICON_NAME)
-    .trim()
-    .toLowerCase()
-    .replace(/_/g, "-");
-  if (LUCIDE_ICON_PATHS[raw]) return raw;
-  const unprefixed = raw.includes(":") ? raw.split(":").pop() : raw;
-  return (
-    LEGACY_ICON_ALIASES[raw] ||
-    LEGACY_ICON_ALIASES[unprefixed] ||
-    (LUCIDE_ICON_PATHS[unprefixed] ? unprefixed : raw)
-  );
-}
-
-export function hasLucideIcon(name) {
-  return Boolean(LUCIDE_ICON_PATHS[normalizeIconName(name)]);
+  return (name || DEFAULT_ICON_NAME).trim().toLowerCase().replace(/_/g, "-");
 }
 
 export function resolveIconContent(name) {

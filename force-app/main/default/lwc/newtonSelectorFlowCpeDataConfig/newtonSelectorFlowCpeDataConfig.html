@@ -1,1222 +1,993 @@
 <template>
-  <section class="newton-chapter newton-chapter_01" data-chapter="data">
-    <aside class="newton-chapter__mark" aria-hidden="true">
-      <span class="newton-chapter__numeral">01</span>
-      <span class="newton-chapter__rule"></span>
-    </aside>
+  <section class="newton-chapter" data-chapter="data">
     <header class="newton-chapter__head">
       <p class="newton-chapter__eyebrow">Data</p>
-      <h2 class="newton-chapter__title">Where the tiles come from</h2>
+      <h2 class="newton-chapter__title">Where the options come from</h2>
     </header>
   </section>
-  <template lwc:if={isDataSection}>
-    <!-- CARD 1 · Data source -->
+  <!-- CARD 1 · Data source -->
+  <article class="slds-card newton-studio__card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="database"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Data source
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          Pick where the options come from.
+        </p>
+      </div>
+      <lightning-helptext
+        class="newton-card__help"
+        content="Picklist pulls values from an object's picklist field. Collection binds to a Flow record collection variable. SOQL runs a custom query. Custom lets you type options inline."
+      ></lightning-helptext>
+    </header>
+    <div class="slds-card__body slds-card__body_inner">
+      <div
+        class="newton-studio__selectorgroup"
+        role="radiogroup"
+        aria-label="Data source"
+        oncardselect={handleSourceTileChange}
+      >
+        <template for:each={sourceTiles} for:item="tile">
+          <c-newton-selector-choice-tile
+            key={tile.value}
+            item={tile}
+            selected={tile._selected}
+            selection-mode="single"
+            group-name="newton-source"
+            size="small"
+            framed-visual
+            aspect-ratio="3:2"
+          ></c-newton-selector-choice-tile>
+        </template>
+      </div>
+    </div>
+  </article>
+
+  <!-- CARD 2 · Source setup (conditional; custom options are set up in
+       the Options card) -->
+  <template lwc:if={showSourceSetup}>
     <article class="slds-card newton-studio__card">
       <header class="slds-card__header newton-card__head">
-        <span
-          class="newton-card__glyph newton-card__glyph_data"
-          aria-hidden="true"
-        >
+        <span class="newton-card__glyph" aria-hidden="true">
           <c-newton-selector-icon
-            name="database"
+            name={sourceKindIcon}
             size="small"
             alternative-text=""
           ></c-newton-selector-icon>
         </span>
         <div class="newton-card__headings">
           <h3 class="slds-card__header-title slds-text-heading_small">
-            Data source
+            {sourceSetupTitle}
           </h3>
           <p
             class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
-            Pick where the options come from.
+            {sourceSetupSubtitle}
+          </p>
+        </div>
+      </header>
+      <div
+        class="slds-card__body slds-card__body_inner newton-studio__field-block"
+      >
+        <template lwc:if={_loadError}>
+          <p class="slds-text-color_error" role="alert">{_loadError}</p>
+        </template>
+        <template lwc:if={isPicklistMode}>
+          <c-newton-selector-combobox
+            mode="lookup"
+            label="Object"
+            placeholder="Search objects..."
+            required
+            min-search-term-length="0"
+            selection={picklistObjectSelection}
+            onsearch={handlePicklistObjectSearch}
+            onselectionchange={handlePicklistObjectSelect}
+          ></c-newton-selector-combobox>
+          <c-newton-selector-flow-cpe-field-selector
+            label="Picklist field"
+            required
+            field-type-filter="PICKLIST,MULTIPICKLIST"
+            object-api-name={_config.picklist.objectApiName}
+            value={_config.picklist.fieldApiName}
+            onfieldchange={handlePicklistFieldChange}
+          ></c-newton-selector-flow-cpe-field-selector>
+          <template lwc:if={hasRecordTypeOptions}>
+            <c-newton-selector-flow-cpe-choice-control
+              label="Record type"
+              value={recordTypeValue}
+              items={recordTypeOptions}
+              enable-search
+              onvaluechange={handleRecordTypeComboChange}
+              field-level-help="Pick which record type's picklist values to pull. Default uses the object's default record type for this org."
+            ></c-newton-selector-flow-cpe-choice-control>
+          </template>
+          <c-newton-selector-flow-cpe-choice-control
+            label="Output value as"
+            value={picklistValueSource}
+            items={picklistValueSourceOptions}
+            onvaluechange={handlePicklistValueSourceChange}
+          ></c-newton-selector-flow-cpe-choice-control>
+        </template>
+
+        <template lwc:if={isCollectionMode}>
+          <c-newton-selector-flow-cpe-resource-selector
+            name="sourceRecords"
+            label="Flow record collection"
+            required
+            builder-context-filter-type="SObject"
+            builder-context-filter-collection-boolean
+            value={_sourceRecordsRef}
+            onvaluechanged={handleCollectionVariableChange}
+            builder-context={builderContext}
+            automatic-output-variables={automaticOutputVariables}
+          ></c-newton-selector-flow-cpe-resource-selector>
+          <section
+            class="newton-studio__spec-sheet"
+            aria-labelledby="newton-collection-mapping-title"
+          >
+            <header class="newton-studio__spec-sheet-head">
+              <p class="newton-studio__spec-sheet-eyebrow">Field mapping</p>
+              <h4
+                id="newton-collection-mapping-title"
+                class="newton-studio__spec-sheet-title"
+              >
+                Choose which fields fill each option
+              </h4>
+            </header>
+            <div class="newton-studio__spec-grid">
+              <c-newton-selector-flow-cpe-field-selector
+                label="Label (required)"
+                data-field="label"
+                required
+                object-api-name={collectionObjectApiName}
+                value={_config.collection.fieldMap.label}
+                onfieldchange={handleCollectionFieldMapChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Value"
+                data-field="value"
+                object-api-name={collectionObjectApiName}
+                value={_config.collection.fieldMap.value}
+                onfieldchange={handleCollectionFieldMapChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Sublabel"
+                data-field="sublabel"
+                object-api-name={collectionObjectApiName}
+                value={_config.collection.fieldMap.sublabel}
+                onfieldchange={handleCollectionFieldMapChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Icon"
+                data-field="icon"
+                object-api-name={collectionObjectApiName}
+                value={_config.collection.fieldMap.icon}
+                onfieldchange={handleCollectionFieldMapChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Badge"
+                data-field="badge"
+                object-api-name={collectionObjectApiName}
+                value={_config.collection.fieldMap.badge}
+                onfieldchange={handleCollectionFieldMapChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Help text"
+                data-field="helpText"
+                object-api-name={collectionObjectApiName}
+                value={_config.collection.fieldMap.helpText}
+                onfieldchange={handleCollectionFieldMapChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+            </div>
+          </section>
+        </template>
+
+        <template lwc:if={isSObjectMode}>
+          <c-newton-selector-combobox
+            mode="lookup"
+            label="Object"
+            placeholder="Search objects..."
+            required
+            min-search-term-length="0"
+            selection={sobjectSelection}
+            onsearch={handleSObjectSearch}
+            onselectionchange={handleSObjectSelect}
+          ></c-newton-selector-combobox>
+          <section
+            class="newton-query-preview"
+            aria-labelledby="newton-query-preview-title"
+          >
+            <header class="newton-query-preview__head">
+              <div>
+                <p class="newton-query-preview__eyebrow">SOQL preview</p>
+                <h4
+                  id="newton-query-preview-title"
+                  class="newton-query-preview__title"
+                >
+                  Validate the generated query
+                </h4>
+              </div>
+              <div class="newton-query-preview__actions">
+                <button
+                  type="button"
+                  class="slds-button slds-button_icon slds-button_icon-border-filled"
+                  title="Copy query"
+                  onclick={handleCopyQueryPreview}
+                >
+                  <c-newton-selector-icon
+                    name="copy"
+                    size="x-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                  <span class="slds-assistive-text">Copy query</span>
+                </button>
+                <lightning-button
+                  variant="brand-outline"
+                  label={validateQueryLabel}
+                  onclick={handleValidateQuery}
+                  disabled={_isValidatingQuery}
+                ></lightning-button>
+              </div>
+            </header>
+            <pre
+              class="newton-query-preview__code"
+            ><code aria-label="Generated SOQL preview"><template for:each={highlightedSobjectQueryPreview} for:item="token"><span key={token.key} class={token.className}>{token.text}</span></template></code></pre>
+            <p class={queryValidationClass} role="status">
+              {queryValidationMessage}
+            </p>
+          </section>
+          <c-newton-selector-flow-cpe-where-builder
+            object-api-name={_config.sobject.sObjectApiName}
+            value={_config.sobject.whereClause}
+            builder-context={builderContext}
+            automatic-output-variables={automaticOutputVariables}
+            onchange={handleWhereChange}
+          ></c-newton-selector-flow-cpe-where-builder>
+          <c-newton-selector-combobox
+            mode="lookup"
+            label="Order by"
+            placeholder="None"
+            variant="label-stacked"
+            selection={orderByFieldSelection}
+            min-search-term-length="0"
+            scroll-after-n-items="7"
+            onsearch={handleOrderFieldSearch}
+            onselectionchange={handleOrderFieldSelectionChange}
+            class="slds-m-bottom_x-small"
+          ></c-newton-selector-combobox>
+          <c-newton-selector-flow-cpe-choice-control
+            label="Direction"
+            value={orderByDirection}
+            items={orderDirectionOptions}
+            onvaluechange={handleOrderDirectionChange}
+            class="slds-m-bottom_x-small"
+          ></c-newton-selector-flow-cpe-choice-control>
+          <lightning-input
+            type="number"
+            label="Rows to load"
+            value={_config.sobject.limit}
+            placeholder="50"
+            min="1"
+            max="2000"
+            onchange={handleLimitChange}
+            field-level-help="How many records the query returns, from 1 to 2,000. Leave empty for 50."
+          ></lightning-input>
+          <section
+            class="newton-studio__spec-sheet"
+            aria-labelledby="newton-sobject-mapping-title"
+          >
+            <header class="newton-studio__spec-sheet-head">
+              <p class="newton-studio__spec-sheet-eyebrow">Field mapping</p>
+              <h4
+                id="newton-sobject-mapping-title"
+                class="newton-studio__spec-sheet-title"
+              >
+                Choose which fields fill each option
+              </h4>
+            </header>
+            <div class="newton-studio__spec-grid">
+              <c-newton-selector-flow-cpe-field-selector
+                label="Label (required)"
+                data-field="labelField"
+                required
+                object-api-name={_config.sobject.sObjectApiName}
+                value={_config.sobject.labelField}
+                onfieldchange={handleSObjectFieldChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Value"
+                data-field="valueField"
+                object-api-name={_config.sobject.sObjectApiName}
+                value={_config.sobject.valueField}
+                onfieldchange={handleSObjectFieldChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Sublabel"
+                data-field="sublabelField"
+                object-api-name={_config.sobject.sObjectApiName}
+                value={_config.sobject.sublabelField}
+                onfieldchange={handleSObjectFieldChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Icon"
+                data-field="iconField"
+                object-api-name={_config.sobject.sObjectApiName}
+                value={_config.sobject.iconField}
+                onfieldchange={handleSObjectFieldChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Badge"
+                data-field="badgeField"
+                object-api-name={_config.sobject.sObjectApiName}
+                value={_config.sobject.badgeField}
+                onfieldchange={handleSObjectFieldChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+              <c-newton-selector-flow-cpe-field-selector
+                label="Help text"
+                data-field="helpField"
+                object-api-name={_config.sobject.sObjectApiName}
+                value={_config.sobject.helpField}
+                onfieldchange={handleSObjectFieldChange}
+              ></c-newton-selector-flow-cpe-field-selector>
+            </div>
+          </section>
+        </template>
+      </div>
+    </article>
+  </template>
+
+  <!-- CARD 3 · Options (custom source) -->
+  <template lwc:if={isCustomMode}>
+    <article class="slds-card newton-studio__card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="list"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">
+            Options
+          </h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+          >
+            Add, reorder, or remove the options users will see.
           </p>
         </div>
         <lightning-helptext
           class="newton-card__help"
-          content="Picklist pulls values from an object's picklist field. Collection binds to a Flow record collection variable. SOQL runs a custom query. Custom lets you type options inline."
+          content="Label is what users read. Value is what the flow receives when they pick the option."
         ></lightning-helptext>
       </header>
-      <div class="slds-card__body slds-card__body_inner">
-        <div
-          class="newton-studio__selectorgroup newton-studio__selectorgroup_2x2"
-          role="radiogroup"
-          aria-label="Data source"
-          oncardselect={handleSourceTileChange}
-        >
-          <template for:each={sourceTiles} for:item="tile">
-            <c-newton-selector-choice-tile
-              key={tile.value}
-              item={tile}
-              selected={tile._selected}
-              selection-mode="single"
-              group-name="newton-source"
-              size="small"
-              aspect-ratio="1:1"
-            ></c-newton-selector-choice-tile>
-          </template>
-        </div>
-      </div>
-    </article>
-
-    <!-- CARD 2 · Source setup (conditional) -->
-    <template lwc:if={hasDataSource}>
-      <article class="slds-card newton-studio__card">
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_data"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name={sourceKindIcon}
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              {sourceSetupTitle}
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              {sourceSetupSubtitle}
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="These fields configure the source you picked above. They change based on the source kind."
-          ></lightning-helptext>
-        </header>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
-        >
-          <template lwc:if={isPicklistMode}>
-            <c-newton-selector-combobox
-              mode="lookup"
-              label="Object"
-              placeholder="Search objects..."
-              required
-              min-search-term-length="0"
-              selection={picklistObjectSelection}
-              onsearch={handlePicklistObjectSearch}
-              onselectionchange={handlePicklistObjectSelect}
-            ></c-newton-selector-combobox>
-            <c-newton-selector-flow-cpe-field-selector
-              label="Picklist field"
-              required
-              field-type-filter="PICKLIST,MULTIPICKLIST"
-              object-api-name={_config.picklist.objectApiName}
-              value={_config.picklist.fieldApiName}
-              onfieldchange={handlePicklistFieldChange}
-            ></c-newton-selector-flow-cpe-field-selector>
-            <template lwc:if={hasRecordTypeOptions}>
-              <c-newton-selector-flow-cpe-choice-control
-                label="Record Type"
-                value={recordTypeValue}
-                items={recordTypeOptions}
-                variant="picklist"
-                enable-search
-                elevation="subtle"
-                selection-indicator="bar"
-                onvaluechange={handleRecordTypeComboChange}
-                field-level-help="Pick which record type's picklist values to pull. Default uses the object's default record type for this org."
-              ></c-newton-selector-flow-cpe-choice-control>
-            </template>
-            <c-newton-selector-flow-cpe-choice-control
-              label="Output value as"
-              value={picklistValueSource}
-              items={picklistValueSourceOptions}
-              variant="picklist"
-              elevation="subtle"
-              selection-indicator="bar"
-              onvaluechange={handlePicklistValueSourceChange}
-            ></c-newton-selector-flow-cpe-choice-control>
-          </template>
-
-          <template lwc:if={isCollectionMode}>
-            <c-newton-selector-flow-cpe-resource-selector
-              name="sourceRecords"
-              label="Flow record collection"
-              required
-              builder-context-filter-type="SObject"
-              builder-context-filter-collection-boolean
-              value={_sourceRecordsRef}
-              onvaluechanged={handleCollectionVariableChange}
-              builder-context={builderContext}
-              automatic-output-variables={automaticOutputVariables}
-            ></c-newton-selector-flow-cpe-resource-selector>
-            <section
-              class="newton-studio__spec-sheet"
-              aria-labelledby="newton-collection-mapping-title"
-            >
-              <header class="newton-studio__spec-sheet-head">
-                <p class="newton-studio__spec-sheet-eyebrow">Field mapping</p>
-                <h4
-                  id="newton-collection-mapping-title"
-                  class="newton-studio__spec-sheet-title"
-                >
-                  Map collection fields to tile slots
-                </h4>
-              </header>
-              <div class="newton-studio__spec-grid">
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Label (required)"
-                  data-field="label"
-                  required
-                  object-api-name={collectionObjectApiName}
-                  value={_config.collection.fieldMap.label}
-                  onfieldchange={handleCollectionFieldMapChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Value"
-                  data-field="value"
-                  object-api-name={collectionObjectApiName}
-                  value={_config.collection.fieldMap.value}
-                  onfieldchange={handleCollectionFieldMapChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Sublabel"
-                  data-field="sublabel"
-                  object-api-name={collectionObjectApiName}
-                  value={_config.collection.fieldMap.sublabel}
-                  onfieldchange={handleCollectionFieldMapChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Icon"
-                  data-field="icon"
-                  object-api-name={collectionObjectApiName}
-                  value={_config.collection.fieldMap.icon}
-                  onfieldchange={handleCollectionFieldMapChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Badge"
-                  data-field="badge"
-                  object-api-name={collectionObjectApiName}
-                  value={_config.collection.fieldMap.badge}
-                  onfieldchange={handleCollectionFieldMapChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Help text"
-                  data-field="helpText"
-                  object-api-name={collectionObjectApiName}
-                  value={_config.collection.fieldMap.helpText}
-                  onfieldchange={handleCollectionFieldMapChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-              </div>
-            </section>
-          </template>
-
-          <template lwc:if={isSObjectMode}>
-            <c-newton-selector-combobox
-              mode="lookup"
-              label="SObject"
-              placeholder="Search objects..."
-              required
-              min-search-term-length="0"
-              selection={sobjectSelection}
-              onsearch={handleSObjectSearch}
-              onselectionchange={handleSObjectSelect}
-            ></c-newton-selector-combobox>
-            <section
-              class="newton-query-preview"
-              aria-labelledby="newton-query-preview-title"
-            >
-              <header class="newton-query-preview__head">
-                <div>
-                  <p class="newton-query-preview__eyebrow">SOQL preview</p>
-                  <h4
-                    id="newton-query-preview-title"
-                    class="newton-query-preview__title"
-                  >
-                    Validate the generated query
-                  </h4>
-                </div>
-                <div class="newton-query-preview__actions">
-                  <button
-                    type="button"
-                    class="slds-button slds-button_icon slds-button_icon-border-filled"
-                    title="Copy query"
-                    onclick={handleCopyQueryPreview}
-                  >
-                    <c-newton-selector-icon
-                      name="copy"
-                      size="x-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                    <span class="slds-assistive-text">Copy query</span>
-                  </button>
-                  <lightning-button
-                    variant="brand-outline"
-                    label={validateQueryLabel}
-                    onclick={handleValidateQuery}
-                    disabled={_isValidatingQuery}
-                  ></lightning-button>
-                </div>
-              </header>
-              <pre
-                class="newton-query-preview__code"
-              ><code aria-label="Generated SOQL preview"><template for:each={highlightedSobjectQueryPreview} for:item="token"><span key={token.key} class={token.className}>{token.text}</span></template></code></pre>
-              <p class={queryValidationClass} role="status">
-                {queryValidationMessage}
-              </p>
-            </section>
-            <c-newton-selector-flow-cpe-where-builder
-              object-api-name={_config.sobject.sObjectApiName}
-              value={_config.sobject.whereClause}
-              builder-context={builderContext}
-              automatic-output-variables={automaticOutputVariables}
-              onchange={handleWhereChange}
-            ></c-newton-selector-flow-cpe-where-builder>
-            <c-newton-selector-combobox
-              mode="lookup"
-              label="Order By"
-              placeholder="Default: Last Modified"
-              variant="label-stacked"
-              selection={orderByFieldSelection}
-              min-search-term-length="0"
-              scroll-after-n-items="7"
-              onsearch={handleOrderFieldSearch}
-              onselectionchange={handleOrderFieldSelectionChange}
-              class="slds-m-bottom_x-small"
-            ></c-newton-selector-combobox>
-            <c-newton-selector-flow-cpe-choice-control
-              label="Direction"
-              value={_config.sobject.orderByDirection}
-              items={orderDirectionOptions}
-              variant="picklist"
-              onvaluechange={handleOrderDirectionChange}
-              class="slds-m-bottom_x-small"
-            ></c-newton-selector-flow-cpe-choice-control>
-            <lightning-input
-              type="number"
-              label="Limit (optional)"
-              value={_config.sobject.limit}
-              placeholder="No limit"
-              min="1"
-              max="2000"
-              onchange={handleLimitChange}
-              field-level-help="Maximum results returned (1-2000). Leave empty for no limit."
-            ></lightning-input>
-            <section
-              class="newton-studio__spec-sheet"
-              aria-labelledby="newton-sobject-mapping-title"
-            >
-              <header class="newton-studio__spec-sheet-head">
-                <p class="newton-studio__spec-sheet-eyebrow">Field mapping</p>
-                <h4
-                  id="newton-sobject-mapping-title"
-                  class="newton-studio__spec-sheet-title"
-                >
-                  Map query columns to tile slots
-                </h4>
-              </header>
-              <div class="newton-studio__spec-grid">
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Label (required)"
-                  data-field="labelField"
-                  required
-                  object-api-name={_config.sobject.sObjectApiName}
-                  value={_config.sobject.labelField}
-                  onfieldchange={handleSObjectFieldChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Value"
-                  data-field="valueField"
-                  object-api-name={_config.sobject.sObjectApiName}
-                  value={_config.sobject.valueField}
-                  onfieldchange={handleSObjectFieldChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Sublabel"
-                  data-field="sublabelField"
-                  object-api-name={_config.sobject.sObjectApiName}
-                  value={_config.sobject.sublabelField}
-                  onfieldchange={handleSObjectFieldChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Icon"
-                  data-field="iconField"
-                  object-api-name={_config.sobject.sObjectApiName}
-                  value={_config.sobject.iconField}
-                  onfieldchange={handleSObjectFieldChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Badge"
-                  data-field="badgeField"
-                  object-api-name={_config.sobject.sObjectApiName}
-                  value={_config.sobject.badgeField}
-                  onfieldchange={handleSObjectFieldChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-                <c-newton-selector-flow-cpe-field-selector
-                  label="Help text"
-                  data-field="helpField"
-                  object-api-name={_config.sobject.sObjectApiName}
-                  value={_config.sobject.helpField}
-                  onfieldchange={handleSObjectFieldChange}
-                ></c-newton-selector-flow-cpe-field-selector>
-              </div>
-            </section>
-          </template>
-
-          <template lwc:if={isCustomMode}>
-            <p class="slds-text-body_small slds-text-color_weak">
-              You'll add options in the <strong>Items</strong> card below.
-            </p>
-          </template>
-        </div>
-      </article>
-    </template>
-
-    <!-- CARD 3 · Items (conditional, per source) -->
-    <template lwc:if={isCustomMode}>
-      <article class="slds-card newton-studio__card">
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_data"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="list"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Items
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Add, reorder, or remove the options users will see.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="These are the literal options that appear as tiles. Label is what users read; value is what Flow receives when they pick."
-          ></lightning-helptext>
-        </header>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
-        >
-          <template for:each={customItems} for:item="row">
-            <article key={row.index} class="newton-studio__custom-row">
-              <header class="newton-studio__custom-row-head">
-                <h4>Option · {row.index}</h4>
-                <div
-                  class="slds-button-group"
-                  role="group"
-                  aria-label="Reorder option"
-                >
-                  <button
-                    type="button"
-                    class="slds-button slds-button_icon newton-studio__icon-button"
-                    title="Move up"
-                    aria-label="Move up"
-                    data-index={row.index}
-                    disabled={row.canMoveUp}
-                    onclick={handleCustomMoveUp}
-                  >
-                    <c-newton-selector-icon
-                      name="chevron-up"
-                      size="x-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                  </button>
-                  <button
-                    type="button"
-                    class="slds-button slds-button_icon newton-studio__icon-button"
-                    title="Move down"
-                    aria-label="Move down"
-                    data-index={row.index}
-                    disabled={row.canMoveDown}
-                    onclick={handleCustomMoveDown}
-                  >
-                    <c-newton-selector-icon
-                      name="chevron-down"
-                      size="x-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                  </button>
-                  <button
-                    type="button"
-                    class="slds-button slds-button_icon newton-studio__icon-button"
-                    title="Duplicate"
-                    aria-label="Duplicate"
-                    data-index={row.index}
-                    onclick={handleCustomDuplicateRow}
-                  >
-                    <c-newton-selector-icon
-                      name="copy"
-                      size="x-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                  </button>
-                  <button
-                    type="button"
-                    class="slds-button slds-button_icon newton-studio__icon-button newton-studio__icon-button_destructive"
-                    title="Delete"
-                    aria-label="Delete"
-                    data-index={row.index}
-                    onclick={handleCustomRemoveRow}
-                  >
-                    <c-newton-selector-icon
-                      name="trash-2"
-                      size="x-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                  </button>
-                </div>
-              </header>
-              <div class="newton-studio__custom-grid">
-                <c-newton-selector-flow-cpe-toggle
-                  label="Hide option"
-                  active-label="Hidden"
-                  inactive-label="Visible"
-                  checked={row.hidden}
-                  data-index={row.index}
-                  message-toggle-active="Hidden from preview and runtime"
-                  message-toggle-inactive="Visible in preview and runtime"
-                  ontoggle={handleCustomHiddenToggle}
-                ></c-newton-selector-flow-cpe-toggle>
-                <c-newton-selector-flow-cpe-icon-selector
-                  label="Icon"
-                  mode="combobox"
-                  value={row.icon}
-                  data-index={row.index}
-                  oniconselect={handleCustomIconChange}
-                ></c-newton-selector-flow-cpe-icon-selector>
-                <c-newton-selector-flow-cpe-resource-selector
-                  name="label"
-                  label="Label"
-                  required
-                  value={row.label}
-                  data-index={row.index}
-                  data-field="label"
-                  builder-context={builderContext}
-                  automatic-output-variables={automaticOutputVariables}
-                  builder-context-filter-type="String"
-                  allow-hard-code-reference
-                  onvaluechanged={handleCustomCellChange}
-                ></c-newton-selector-flow-cpe-resource-selector>
-                <c-newton-selector-flow-cpe-resource-selector
-                  name="value"
-                  label="Value"
-                  value={row.value}
-                  data-index={row.index}
-                  data-field="value"
-                  builder-context={builderContext}
-                  automatic-output-variables={automaticOutputVariables}
-                  builder-context-filter-type="String"
-                  allow-hard-code-reference
-                  onvaluechanged={handleCustomCellChange}
-                ></c-newton-selector-flow-cpe-resource-selector>
-                <c-newton-selector-flow-cpe-resource-selector
-                  name="sublabel"
-                  label="Sublabel"
-                  value={row.sublabel}
-                  data-index={row.index}
-                  data-field="sublabel"
-                  builder-context={builderContext}
-                  automatic-output-variables={automaticOutputVariables}
-                  builder-context-filter-type="String"
-                  allow-hard-code-reference
-                  onvaluechanged={handleCustomCellChange}
-                ></c-newton-selector-flow-cpe-resource-selector>
-                <c-newton-selector-flow-cpe-resource-selector
-                  name="badge"
-                  label="Badge"
-                  value={row.badge}
-                  data-index={row.index}
-                  data-field="badge"
-                  builder-context={builderContext}
-                  automatic-output-variables={automaticOutputVariables}
-                  builder-context-filter-type="String"
-                  allow-hard-code-reference
-                  onvaluechanged={handleCustomCellChange}
-                ></c-newton-selector-flow-cpe-resource-selector>
-                <c-newton-selector-flow-cpe-resource-selector
-                  name="helpText"
-                  label="Help text"
-                  value={row.helpText}
-                  data-index={row.index}
-                  data-field="helpText"
-                  builder-context={builderContext}
-                  automatic-output-variables={automaticOutputVariables}
-                  builder-context-filter-type="String"
-                  allow-hard-code-reference
-                  onvaluechanged={handleCustomCellChange}
-                ></c-newton-selector-flow-cpe-resource-selector>
-              </div>
-            </article>
-          </template>
-          <button
-            type="button"
-            class="slds-button slds-button_neutral newton-studio__button-with-icon"
-            onclick={handleCustomAddRow}
-          >
-            <c-newton-selector-icon
-              name="plus"
-              size="x-small"
-              box="button"
-              alternative-text=""
-            ></c-newton-selector-icon>
-            <span>Add option</span>
-          </button>
-        </div>
-      </article>
-    </template>
-
-    <template lwc:if={canCustomizeValues}>
-      <!-- Bulk-edit card (only visible when rows are selected) -->
-      <template lwc:if={hasBulkSelection}>
-        <article class="slds-card newton-studio__card newton-studio__bulk">
-          <header class="slds-card__header newton-card__head">
-            <span
-              class="newton-card__glyph newton-card__glyph_data"
-              aria-hidden="true"
-            >
-              <c-newton-selector-icon
-                name="list-checks"
-                size="small"
-                alternative-text=""
-              ></c-newton-selector-icon>
-            </span>
-            <div class="newton-card__headings">
-              <h3 class="slds-card__header-title slds-text-heading_small">
-                Bulk apply · {bulkSelectionLabel}
-              </h3>
-              <p
-                class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+      <div
+        class="slds-card__body slds-card__body_inner newton-studio__field-block"
+      >
+        <template for:each={customItems} for:item="row">
+          <article key={row.index} class="newton-studio__custom-row">
+            <header class="newton-studio__custom-row-head">
+              <h4>{row.title}</h4>
+              <div
+                class="slds-button-group"
+                role="group"
+                aria-label={row.actionsLabel}
               >
-                Set these fields on every selected option at once.
-              </p>
-            </div>
-            <lightning-helptext
-              class="newton-card__help"
-              content="Fill any of the fields to the right and click Apply to overlay them onto the selected items in one action."
-            ></lightning-helptext>
-          </header>
-          <div
-            class="slds-card__body slds-card__body_inner newton-studio__custom-grid"
-          >
-            <c-newton-selector-flow-cpe-icon-selector
-              label="Icon"
-              mode="combobox"
-              value={_bulkEditDraft.icon}
-              oniconselect={handleBulkDraftIconChange}
-            ></c-newton-selector-flow-cpe-icon-selector>
-            <c-newton-selector-flow-cpe-resource-selector
-              name="bulk-sublabel"
-              label="Subtitle"
-              value={_bulkEditDraft.sublabel}
-              data-field="sublabel"
-              builder-context={builderContext}
-              automatic-output-variables={automaticOutputVariables}
-              builder-context-filter-type="String"
-              allow-hard-code-reference
-              onvaluechanged={handleBulkDraftChange}
-            ></c-newton-selector-flow-cpe-resource-selector>
-            <c-newton-selector-flow-cpe-resource-selector
-              name="bulk-badge"
-              label="Badge"
-              value={_bulkEditDraft.badge}
-              data-field="badge"
-              builder-context={builderContext}
-              automatic-output-variables={automaticOutputVariables}
-              builder-context-filter-type="String"
-              allow-hard-code-reference
-              onvaluechanged={handleBulkDraftChange}
-            ></c-newton-selector-flow-cpe-resource-selector>
-            <c-newton-selector-flow-cpe-resource-selector
-              name="bulk-helpText"
-              label="Help text"
-              value={_bulkEditDraft.helpText}
-              data-field="helpText"
-              builder-context={builderContext}
-              automatic-output-variables={automaticOutputVariables}
-              builder-context-filter-type="String"
-              allow-hard-code-reference
-              onvaluechanged={handleBulkDraftChange}
-            ></c-newton-selector-flow-cpe-resource-selector>
-          </div>
-          <footer class="slds-card__footer newton-studio__bulk-footer">
-            <lightning-button
-              variant="base"
-              label="Clear"
-              onclick={handleClearBulkSelection}
-            ></lightning-button>
-            <lightning-button
-              variant="brand"
-              label="Apply to selected"
-              onclick={handleApplyBulk}
-              disabled={cannotApplyBulk}
-            ></lightning-button>
-          </footer>
-        </article>
-      </template>
-
-      <article class="slds-card newton-studio__card">
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_data"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="settings"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Item overrides
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Fine-tune icon, subtitle, badge, and help text on specific
-              options.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Overrides are stored per value (the option's API value). They take precedence over the raw data and apply visually without changing the source."
-          ></lightning-helptext>
-        </header>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
-        >
-          <div class="newton-studio__override-mode">
-            <c-newton-selector-flow-cpe-toggle
-              class="newton-studio__mode-control"
-              label="Per-item override mode"
-              variant="label-hidden"
-              inactive-label="Default"
-              active-label="Advanced"
-              checked={isOverrideAdvanced}
-              ontoggle={handleOverrideModeChange}
-            ></c-newton-selector-flow-cpe-toggle>
-            <lightning-helptext
-              content="Default stores no per-item overrides. Advanced enables labels, icons, badges, help text, and visibility overrides by item."
-            ></lightning-helptext>
-          </div>
-
-          <template lwc:if={isOverrideDefault}>
-            <p class="slds-text-body_regular slds-text-color_weak">
-              Default uses the source values exactly as configured above.
-            </p>
-          </template>
-
-          <template lwc:if={isOverrideAdvanced}>
-            <div class="newton-studio__overrides-toolbar">
-              <div class="slds-form-element newton-studio__search">
-                <label class="slds-assistive-text" for="newton-overrides-search"
-                  >Filter overrides</label
-                >
-                <div
-                  class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left"
+                <button
+                  type="button"
+                  class="slds-button slds-button_icon newton-studio__icon-button"
+                  title={row.moveUpLabel}
+                  aria-label={row.moveUpLabel}
+                  data-index={row.index}
+                  disabled={row.moveUpDisabled}
+                  onclick={handleCustomMoveUp}
                 >
                   <c-newton-selector-icon
-                    name="search"
+                    name="chevron-up"
                     size="x-small"
-                    box="input"
-                    class="slds-input__icon slds-input__icon_left"
+                    box="button"
                     alternative-text=""
                   ></c-newton-selector-icon>
-                  <input
-                    type="search"
-                    id="newton-overrides-search"
-                    class="slds-input"
-                    placeholder="Filter values, labels, overrides..."
-                    value={_overrideSearch}
-                    oninput={handleOverrideSearch}
-                  />
-                </div>
+                </button>
+                <button
+                  type="button"
+                  class="slds-button slds-button_icon newton-studio__icon-button"
+                  title={row.moveDownLabel}
+                  aria-label={row.moveDownLabel}
+                  data-index={row.index}
+                  disabled={row.moveDownDisabled}
+                  onclick={handleCustomMoveDown}
+                >
+                  <c-newton-selector-icon
+                    name="chevron-down"
+                    size="x-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                </button>
+                <button
+                  type="button"
+                  class="slds-button slds-button_icon newton-studio__icon-button"
+                  title={row.duplicateLabel}
+                  aria-label={row.duplicateLabel}
+                  data-index={row.index}
+                  onclick={handleCustomDuplicateRow}
+                >
+                  <c-newton-selector-icon
+                    name="copy"
+                    size="x-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                </button>
+                <button
+                  type="button"
+                  class="slds-button slds-button_icon newton-studio__icon-button newton-studio__icon-button_destructive"
+                  title={row.deleteLabel}
+                  aria-label={row.deleteLabel}
+                  data-index={row.index}
+                  onclick={handleCustomRemoveRow}
+                >
+                  <c-newton-selector-icon
+                    name="trash-2"
+                    size="x-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                </button>
               </div>
-              <lightning-button
-                variant="neutral"
-                label="Select filtered"
-                onclick={handleSelectAllFiltered}
-                disabled={hasNoFilteredOverrideRows}
-              ></lightning-button>
+            </header>
+            <div class="newton-studio__custom-grid">
+              <c-newton-selector-flow-cpe-toggle
+                label="Hide option"
+                active-label="Hidden"
+                inactive-label="Visible"
+                checked={row.hidden}
+                data-index={row.index}
+                ontoggle={handleCustomHiddenToggle}
+              ></c-newton-selector-flow-cpe-toggle>
+              <c-newton-selector-flow-cpe-icon-selector
+                label="Icon"
+                value={row.icon}
+                data-index={row.index}
+                oniconselect={handleCustomIconChange}
+              ></c-newton-selector-flow-cpe-icon-selector>
+              <c-newton-selector-flow-cpe-resource-selector
+                name="label"
+                label="Label"
+                required
+                value={row.label}
+                data-index={row.index}
+                data-field="label"
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                builder-context-filter-type="String"
+                allow-hard-code-reference
+                onvaluechanged={handleCustomCellChange}
+              ></c-newton-selector-flow-cpe-resource-selector>
+              <c-newton-selector-flow-cpe-resource-selector
+                name="value"
+                label="Value"
+                value={row.value}
+                data-index={row.index}
+                data-field="value"
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                builder-context-filter-type="String"
+                allow-hard-code-reference
+                onvaluechanged={handleCustomCellChange}
+              ></c-newton-selector-flow-cpe-resource-selector>
+              <c-newton-selector-flow-cpe-resource-selector
+                name="sublabel"
+                label="Sublabel"
+                value={row.sublabel}
+                data-index={row.index}
+                data-field="sublabel"
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                builder-context-filter-type="String"
+                allow-hard-code-reference
+                onvaluechanged={handleCustomCellChange}
+              ></c-newton-selector-flow-cpe-resource-selector>
+              <c-newton-selector-flow-cpe-resource-selector
+                name="badge"
+                label="Badge"
+                value={row.badge}
+                data-index={row.index}
+                data-field="badge"
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                builder-context-filter-type="String"
+                allow-hard-code-reference
+                onvaluechanged={handleCustomCellChange}
+              ></c-newton-selector-flow-cpe-resource-selector>
+              <c-newton-selector-flow-cpe-resource-selector
+                name="helpText"
+                label="Help text"
+                value={row.helpText}
+                data-index={row.index}
+                data-field="helpText"
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                builder-context-filter-type="String"
+                allow-hard-code-reference
+                onvaluechanged={handleCustomCellChange}
+              ></c-newton-selector-flow-cpe-resource-selector>
             </div>
+          </article>
+        </template>
+        <button
+          type="button"
+          class="slds-button slds-button_neutral newton-studio__button-with-icon"
+          onclick={handleCustomAddRow}
+        >
+          <c-newton-selector-icon
+            name="plus"
+            size="x-small"
+            box="button"
+            alternative-text=""
+          ></c-newton-selector-icon>
+          <span>Add option</span>
+        </button>
+      </div>
+    </article>
+  </template>
 
-            <template lwc:if={isValueBackedOverrideMode}>
-              <template lwc:if={hasFilteredOverrideRows}>
-                <div class="newton-studio__overrides">
-                  <template for:each={overrideRows} for:item="row">
-                    <article key={row.value} class={row.rowClass}>
-                      <header class="newton-studio__overrides-head">
-                        <label class="slds-checkbox">
-                          <input
-                            type="checkbox"
-                            checked={row.isSelected}
-                            data-value={row.value}
-                            onchange={handleToggleSelectRow}
-                          />
-                          <span class="slds-checkbox_faux"></span>
-                          <span class="slds-assistive-text">Select row</span>
-                        </label>
+  <template lwc:if={canCustomizeValues}>
+    <!-- Bulk-edit card (only visible when rows are selected) -->
+    <template lwc:if={hasBulkSelection}>
+      <article class="slds-card newton-studio__card newton-studio__bulk">
+        <header class="slds-card__header newton-card__head">
+          <span class="newton-card__glyph" aria-hidden="true">
+            <c-newton-selector-icon
+              name="list-checks"
+              size="small"
+              alternative-text=""
+            ></c-newton-selector-icon>
+          </span>
+          <div class="newton-card__headings">
+            <h3 class="slds-card__header-title slds-text-heading_small">
+              Bulk apply · {bulkSelectionLabel}
+            </h3>
+            <p
+              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+            >
+              Set these fields on every selected option at once.
+            </p>
+          </div>
+          <lightning-helptext
+            class="newton-card__help"
+            content="Empty fields are left as they are on each option."
+          ></lightning-helptext>
+        </header>
+        <div
+          class="slds-card__body slds-card__body_inner newton-studio__custom-grid"
+        >
+          <c-newton-selector-flow-cpe-icon-selector
+            label="Icon"
+            value={_bulkEditDraft.icon}
+            oniconselect={handleBulkDraftIconChange}
+          ></c-newton-selector-flow-cpe-icon-selector>
+          <c-newton-selector-flow-cpe-resource-selector
+            name="bulk-sublabel"
+            label="Sublabel"
+            value={_bulkEditDraft.sublabel}
+            data-field="sublabel"
+            builder-context={builderContext}
+            automatic-output-variables={automaticOutputVariables}
+            builder-context-filter-type="String"
+            allow-hard-code-reference
+            onvaluechanged={handleBulkDraftChange}
+          ></c-newton-selector-flow-cpe-resource-selector>
+          <c-newton-selector-flow-cpe-resource-selector
+            name="bulk-badge"
+            label="Badge"
+            value={_bulkEditDraft.badge}
+            data-field="badge"
+            builder-context={builderContext}
+            automatic-output-variables={automaticOutputVariables}
+            builder-context-filter-type="String"
+            allow-hard-code-reference
+            onvaluechanged={handleBulkDraftChange}
+          ></c-newton-selector-flow-cpe-resource-selector>
+          <c-newton-selector-flow-cpe-resource-selector
+            name="bulk-helpText"
+            label="Help text"
+            value={_bulkEditDraft.helpText}
+            data-field="helpText"
+            builder-context={builderContext}
+            automatic-output-variables={automaticOutputVariables}
+            builder-context-filter-type="String"
+            allow-hard-code-reference
+            onvaluechanged={handleBulkDraftChange}
+          ></c-newton-selector-flow-cpe-resource-selector>
+        </div>
+        <footer class="slds-card__footer newton-studio__bulk-footer">
+          <lightning-button
+            variant="base"
+            label="Clear"
+            onclick={handleClearBulkSelection}
+          ></lightning-button>
+          <lightning-button
+            variant="brand"
+            label="Apply to selected"
+            onclick={handleApplyBulk}
+            disabled={cannotApplyBulk}
+          ></lightning-button>
+        </footer>
+      </article>
+    </template>
+
+    <article class="slds-card newton-studio__card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="settings"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">
+            Option overrides
+          </h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+          >
+            Change the label, icon, sublabel, badge, help text, or visibility of
+            specific options.
+          </p>
+        </div>
+        <lightning-helptext
+          class="newton-card__help"
+          content="Overrides are matched to options by value. They change what users see without changing the source data."
+        ></lightning-helptext>
+      </header>
+      <div
+        class="slds-card__body slds-card__body_inner newton-studio__field-block"
+      >
+        <div class="newton-studio__override-mode">
+          <c-newton-selector-flow-cpe-toggle
+            class="newton-studio__mode-control"
+            label="Option overrides"
+            variant="label-hidden"
+            inactive-label="Default"
+            active-label="Advanced"
+            checked={isOverrideAdvanced}
+            ontoggle={handleOverrideModeChange}
+          ></c-newton-selector-flow-cpe-toggle>
+        </div>
+        <div class="newton-studio__undo-region" role="status">
+          <template lwc:if={showOverridesUndo}>
+            <div class="newton-studio__undo">
+              <span>Overrides cleared.</span>
+              <button
+                type="button"
+                class="slds-button newton-studio__undo-btn"
+                onclick={handleUndoClearOverrides}
+              >
+                Undo
+              </button>
+            </div>
+          </template>
+        </div>
+
+        <template lwc:if={isOverrideDefault}>
+          <p class="slds-text-body_regular slds-text-color_weak">
+            Options show exactly as the source provides them.
+          </p>
+        </template>
+
+        <template lwc:if={isOverrideAdvanced}>
+          <div class="newton-studio__overrides-toolbar">
+            <div class="slds-form-element newton-studio__search">
+              <label class="slds-assistive-text" for="newton-overrides-search"
+                >Filter overrides</label
+              >
+              <div
+                class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left"
+              >
+                <c-newton-selector-icon
+                  name="search"
+                  size="x-small"
+                  box="input"
+                  class="slds-input__icon slds-input__icon_left"
+                  alternative-text=""
+                ></c-newton-selector-icon>
+                <input
+                  type="search"
+                  id="newton-overrides-search"
+                  class="slds-input"
+                  placeholder="Filter options"
+                  value={_overrideSearch}
+                  oninput={handleOverrideSearch}
+                />
+              </div>
+            </div>
+            <lightning-button
+              variant="neutral"
+              label="Select all shown"
+              onclick={handleSelectAllFiltered}
+              disabled={hasNoFilteredOverrideRows}
+            ></lightning-button>
+          </div>
+
+          <template lwc:if={hasFilteredOverrideRows}>
+            <div class="newton-studio__overrides">
+              <template for:each={visibleOverrideRows} for:item="row">
+                <article key={row.value} class={row.rowClass}>
+                  <header class="newton-studio__overrides-head">
+                    <label class="slds-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={row.isSelected}
+                        data-value={row.value}
+                        onchange={handleToggleSelectRow}
+                      />
+                      <span class="slds-checkbox_faux"></span>
+                      <span class="slds-assistive-text">{row.selectLabel}</span>
+                    </label>
+                    <button
+                      type="button"
+                      class="newton-studio__overrides-trigger"
+                      data-value={row.value}
+                      onclick={handleToggleExpandRow}
+                      aria-expanded={row.ariaExpanded}
+                      aria-label={row.assistiveLabel}
+                    >
+                      <span
+                        class="newton-studio__overrides-preview"
+                        aria-hidden="true"
+                      >
+                        <c-newton-selector-icon
+                          name={row.previewIcon}
+                          size="small"
+                          box="option"
+                          alternative-text=""
+                        ></c-newton-selector-icon>
+                      </span>
+                      <span class="newton-studio__overrides-copy">
+                        <span class="newton-studio__overrides-name"
+                          >{row.previewLabel}</span
+                        >
+                        <span class="newton-studio__overrides-value"
+                          >{row.value}</span
+                        >
+                        <span
+                          class="newton-overrides-summary"
+                          aria-hidden="true"
+                        >
+                          <template for:each={row.summaryItems} for:item="item">
+                            <span key={item.key} class={item.className}
+                              >{item.label}</span
+                            >
+                          </template>
+                        </span>
+                      </span>
+                    </button>
+                    <div class="newton-studio__overrides-actions">
+                      <template lwc:if={row.hasCustom}>
                         <button
                           type="button"
-                          class="newton-studio__overrides-trigger"
+                          class="slds-button slds-button_icon newton-studio__icon-button"
+                          title={row.resetLabel}
+                          aria-label={row.resetLabel}
                           data-value={row.value}
-                          onclick={handleToggleExpandRow}
-                          aria-expanded={row.ariaExpanded}
-                          aria-label={row.assistiveLabel}
+                          onclick={handleClearOverride}
                         >
-                          <span
-                            class="newton-studio__overrides-preview"
-                            aria-hidden="true"
-                          >
-                            <c-newton-selector-icon
-                              name={row.previewIcon}
-                              size="small"
-                              box="option"
-                              alternative-text=""
-                            ></c-newton-selector-icon>
-                          </span>
-                          <span class="newton-studio__overrides-copy">
-                            <span class="newton-studio__overrides-name"
-                              >{row.previewLabel}</span
-                            >
-                            <span class="newton-studio__overrides-value"
-                              >{row.value}</span
-                            >
-                            <span
-                              class="newton-overrides-summary"
-                              aria-hidden="true"
-                            >
-                              <template
-                                for:each={row.summaryItems}
-                                for:item="item"
-                              >
-                                <span key={item.key} class={item.className}
-                                  >{item.label}</span
-                                >
-                              </template>
-                            </span>
-                          </span>
+                          <c-newton-selector-icon
+                            name="rotate-cw"
+                            size="x-small"
+                            box="button"
+                            alternative-text=""
+                          ></c-newton-selector-icon>
                         </button>
-                        <div class="newton-studio__overrides-actions">
-                          <template lwc:if={row.hasCustom}>
-                            <button
-                              type="button"
-                              class="slds-button slds-button_icon newton-studio__icon-button"
-                              title="Reset"
-                              aria-label="Reset"
-                              data-value={row.value}
-                              onclick={handleClearOverride}
-                            >
-                              <c-newton-selector-icon
-                                name="rotate-cw"
-                                size="x-small"
-                                box="button"
-                                alternative-text=""
-                              ></c-newton-selector-icon>
-                            </button>
-                          </template>
-                          <button
-                            type="button"
-                            class="newton-studio__overrides-chev"
-                            data-value={row.value}
-                            onclick={handleToggleExpandRow}
-                            aria-expanded={row.ariaExpanded}
-                            aria-label={row.expandLabel}
-                            title={row.expandLabel}
-                          >
-                            <c-newton-selector-icon
-                              name="chevron-down"
-                              size="x-small"
-                              box="button"
-                              alternative-text=""
-                            ></c-newton-selector-icon>
-                          </button>
-                        </div>
-                      </header>
-                      <template lwc:if={row.isExpanded}>
-                        <div class="newton-studio__overrides-grid">
-                          <c-newton-selector-flow-cpe-toggle
-                            label="Hide option"
-                            active-label="Hidden"
-                            inactive-label="Visible"
-                            checked={row.hidden}
-                            data-value={row.value}
-                            message-toggle-active="Hidden from preview and runtime"
-                            message-toggle-inactive="Visible in preview and runtime"
-                            ontoggle={handleOverrideHiddenToggle}
-                          ></c-newton-selector-flow-cpe-toggle>
-                          <c-newton-selector-flow-cpe-icon-selector
-                            label="Icon"
-                            mode="combobox"
-                            value={row.icon}
-                            data-value={row.value}
-                            oniconselect={handleOverrideIconChange}
-                          ></c-newton-selector-flow-cpe-icon-selector>
-                          <template lwc:if={row.areEditorsReady}>
-                            <c-newton-selector-flow-cpe-resource-selector
-                              name="label"
-                              label="Label override"
-                              value={row.label}
-                              data-value={row.value}
-                              data-field="label"
-                              builder-context={builderContext}
-                              automatic-output-variables={automaticOutputVariables}
-                              builder-context-filter-type="String"
-                              allow-hard-code-reference
-                              onvaluechanged={handleOverrideCellChange}
-                            ></c-newton-selector-flow-cpe-resource-selector>
-                            <c-newton-selector-flow-cpe-resource-selector
-                              name="sublabel"
-                              label="Subtitle"
-                              value={row.sublabel}
-                              data-value={row.value}
-                              data-field="sublabel"
-                              builder-context={builderContext}
-                              automatic-output-variables={automaticOutputVariables}
-                              builder-context-filter-type="String"
-                              allow-hard-code-reference
-                              onvaluechanged={handleOverrideCellChange}
-                            ></c-newton-selector-flow-cpe-resource-selector>
-                            <c-newton-selector-flow-cpe-resource-selector
-                              name="badge"
-                              label="Badge"
-                              value={row.badge}
-                              data-value={row.value}
-                              data-field="badge"
-                              builder-context={builderContext}
-                              automatic-output-variables={automaticOutputVariables}
-                              builder-context-filter-type="String"
-                              allow-hard-code-reference
-                              onvaluechanged={handleOverrideCellChange}
-                            ></c-newton-selector-flow-cpe-resource-selector>
-                            <c-newton-selector-flow-cpe-resource-selector
-                              name="helpText"
-                              label="Help text"
-                              value={row.helpText}
-                              data-value={row.value}
-                              data-field="helpText"
-                              builder-context={builderContext}
-                              automatic-output-variables={automaticOutputVariables}
-                              builder-context-filter-type="String"
-                              allow-hard-code-reference
-                              onvaluechanged={handleOverrideCellChange}
-                            ></c-newton-selector-flow-cpe-resource-selector>
-                          </template>
-                          <template lwc:else>
-                            <div class="newton-studio__override-loading">
-                              <lightning-spinner
-                                size="small"
-                                alternative-text="Loading Flow resource selectors"
-                              ></lightning-spinner>
-                            </div>
-                          </template>
-                        </div>
                       </template>
-                    </article>
+                      <button
+                        type="button"
+                        class="newton-studio__overrides-chev"
+                        data-value={row.value}
+                        onclick={handleToggleExpandRow}
+                        aria-expanded={row.ariaExpanded}
+                        aria-label={row.expandLabel}
+                        title={row.expandLabel}
+                      >
+                        <c-newton-selector-icon
+                          name="chevron-down"
+                          size="x-small"
+                          box="button"
+                          alternative-text=""
+                        ></c-newton-selector-icon>
+                      </button>
+                    </div>
+                  </header>
+                  <template lwc:if={row.isExpanded}>
+                    <div class="newton-studio__overrides-grid">
+                      <c-newton-selector-flow-cpe-toggle
+                        label="Hide option"
+                        active-label="Hidden"
+                        inactive-label="Visible"
+                        checked={row.hidden}
+                        data-value={row.value}
+                        ontoggle={handleOverrideHiddenToggle}
+                      ></c-newton-selector-flow-cpe-toggle>
+                      <c-newton-selector-flow-cpe-icon-selector
+                        label="Icon"
+                        value={row.icon}
+                        data-value={row.value}
+                        oniconselect={handleOverrideIconChange}
+                      ></c-newton-selector-flow-cpe-icon-selector>
+                      <c-newton-selector-flow-cpe-resource-selector
+                        name="label"
+                        label="Label override"
+                        value={row.label}
+                        data-value={row.value}
+                        data-field="label"
+                        builder-context={builderContext}
+                        automatic-output-variables={automaticOutputVariables}
+                        builder-context-filter-type="String"
+                        allow-hard-code-reference
+                        onvaluechanged={handleOverrideCellChange}
+                      ></c-newton-selector-flow-cpe-resource-selector>
+                      <c-newton-selector-flow-cpe-resource-selector
+                        name="sublabel"
+                        label="Sublabel"
+                        value={row.sublabel}
+                        data-value={row.value}
+                        data-field="sublabel"
+                        builder-context={builderContext}
+                        automatic-output-variables={automaticOutputVariables}
+                        builder-context-filter-type="String"
+                        allow-hard-code-reference
+                        onvaluechanged={handleOverrideCellChange}
+                      ></c-newton-selector-flow-cpe-resource-selector>
+                      <c-newton-selector-flow-cpe-resource-selector
+                        name="badge"
+                        label="Badge"
+                        value={row.badge}
+                        data-value={row.value}
+                        data-field="badge"
+                        builder-context={builderContext}
+                        automatic-output-variables={automaticOutputVariables}
+                        builder-context-filter-type="String"
+                        allow-hard-code-reference
+                        onvaluechanged={handleOverrideCellChange}
+                      ></c-newton-selector-flow-cpe-resource-selector>
+                      <c-newton-selector-flow-cpe-resource-selector
+                        name="helpText"
+                        label="Help text"
+                        value={row.helpText}
+                        data-value={row.value}
+                        data-field="helpText"
+                        builder-context={builderContext}
+                        automatic-output-variables={automaticOutputVariables}
+                        builder-context-filter-type="String"
+                        allow-hard-code-reference
+                        onvaluechanged={handleOverrideCellChange}
+                      ></c-newton-selector-flow-cpe-resource-selector>
+                    </div>
                   </template>
-                </div>
-                <template lwc:if={hasMoreOverrideRows}>
-                  <div class="slds-m-top_small slds-align_absolute-center">
-                    <lightning-button
-                      variant="neutral"
-                      label={showMoreOverrideRowsLabel}
-                      onclick={handleShowMoreOverrideRows}
-                    ></lightning-button>
-                  </div>
-                </template>
+                </article>
               </template>
-              <template lwc:else>
-                <p class="slds-text-body_regular slds-text-color_weak">
-                  Configure source values above to load override rows here.
-                </p>
-              </template>
-            </template>
-
-            <template lwc:if={isSObjectMode}>
-              <template lwc:if={hasSampleRows}>
-                <div class="newton-studio__overrides">
-                  <template for:each={overrideRows} for:item="row">
-                    <article key={row.value} class={row.rowClass}>
-                      <header class="newton-studio__overrides-head">
-                        <label class="slds-checkbox">
-                          <input
-                            type="checkbox"
-                            checked={row.isSelected}
-                            data-value={row.value}
-                            onchange={handleToggleSelectRow}
-                          />
-                          <span class="slds-checkbox_faux"></span>
-                          <span class="slds-assistive-text">Select row</span>
-                        </label>
-                        <button
-                          type="button"
-                          class="newton-studio__overrides-trigger"
-                          data-value={row.value}
-                          onclick={handleToggleExpandRow}
-                          aria-expanded={row.ariaExpanded}
-                          aria-label={row.assistiveLabel}
-                        >
-                          <span
-                            class="newton-studio__overrides-preview"
-                            aria-hidden="true"
-                          >
-                            <c-newton-selector-icon
-                              name={row.previewIcon}
-                              size="small"
-                              box="option"
-                              alternative-text=""
-                            ></c-newton-selector-icon>
-                          </span>
-                          <span class="newton-studio__overrides-copy">
-                            <span class="newton-studio__overrides-name"
-                              >{row.previewLabel}</span
-                            >
-                            <span class="newton-studio__overrides-value"
-                              >{row.value}</span
-                            >
-                            <span
-                              class="newton-overrides-summary"
-                              aria-hidden="true"
-                            >
-                              <template
-                                for:each={row.summaryItems}
-                                for:item="item"
-                              >
-                                <span key={item.key} class={item.className}
-                                  >{item.label}</span
-                                >
-                              </template>
-                            </span>
-                          </span>
-                        </button>
-                        <div class="newton-studio__overrides-actions">
-                          <template lwc:if={row.hasCustom}>
-                            <button
-                              type="button"
-                              class="slds-button slds-button_icon newton-studio__icon-button"
-                              title="Reset"
-                              aria-label="Reset"
-                              data-value={row.value}
-                              onclick={handleClearOverride}
-                            >
-                              <c-newton-selector-icon
-                                name="rotate-cw"
-                                size="x-small"
-                                box="button"
-                                alternative-text=""
-                              ></c-newton-selector-icon>
-                            </button>
-                          </template>
-                          <button
-                            type="button"
-                            class="newton-studio__overrides-chev"
-                            data-value={row.value}
-                            onclick={handleToggleExpandRow}
-                            aria-expanded={row.ariaExpanded}
-                            aria-label={row.expandLabel}
-                            title={row.expandLabel}
-                          >
-                            <c-newton-selector-icon
-                              name="chevron-down"
-                              size="x-small"
-                              box="button"
-                              alternative-text=""
-                            ></c-newton-selector-icon>
-                          </button>
-                        </div>
-                      </header>
-                      <template lwc:if={row.isExpanded}>
-                        <div class="newton-studio__overrides-grid">
-                          <c-newton-selector-flow-cpe-toggle
-                            label="Hide option"
-                            active-label="Hidden"
-                            inactive-label="Visible"
-                            checked={row.hidden}
-                            data-value={row.value}
-                            message-toggle-active="Hidden from preview and runtime"
-                            message-toggle-inactive="Visible in preview and runtime"
-                            ontoggle={handleOverrideHiddenToggle}
-                          ></c-newton-selector-flow-cpe-toggle>
-                          <c-newton-selector-flow-cpe-icon-selector
-                            label="Icon"
-                            mode="combobox"
-                            value={row.icon}
-                            data-value={row.value}
-                            oniconselect={handleOverrideIconChange}
-                          ></c-newton-selector-flow-cpe-icon-selector>
-                          <template lwc:if={row.areEditorsReady}>
-                            <c-newton-selector-flow-cpe-resource-selector
-                              name="label"
-                              label="Label override"
-                              value={row.label}
-                              data-value={row.value}
-                              data-field="label"
-                              builder-context={builderContext}
-                              automatic-output-variables={automaticOutputVariables}
-                              builder-context-filter-type="String"
-                              allow-hard-code-reference
-                              onvaluechanged={handleOverrideCellChange}
-                            ></c-newton-selector-flow-cpe-resource-selector>
-                            <c-newton-selector-flow-cpe-resource-selector
-                              name="sublabel"
-                              label="Subtitle"
-                              value={row.sublabel}
-                              data-value={row.value}
-                              data-field="sublabel"
-                              builder-context={builderContext}
-                              automatic-output-variables={automaticOutputVariables}
-                              builder-context-filter-type="String"
-                              allow-hard-code-reference
-                              onvaluechanged={handleOverrideCellChange}
-                            ></c-newton-selector-flow-cpe-resource-selector>
-                            <c-newton-selector-flow-cpe-resource-selector
-                              name="badge"
-                              label="Badge"
-                              value={row.badge}
-                              data-value={row.value}
-                              data-field="badge"
-                              builder-context={builderContext}
-                              automatic-output-variables={automaticOutputVariables}
-                              builder-context-filter-type="String"
-                              allow-hard-code-reference
-                              onvaluechanged={handleOverrideCellChange}
-                            ></c-newton-selector-flow-cpe-resource-selector>
-                            <c-newton-selector-flow-cpe-resource-selector
-                              name="helpText"
-                              label="Help text"
-                              value={row.helpText}
-                              data-value={row.value}
-                              data-field="helpText"
-                              builder-context={builderContext}
-                              automatic-output-variables={automaticOutputVariables}
-                              builder-context-filter-type="String"
-                              allow-hard-code-reference
-                              onvaluechanged={handleOverrideCellChange}
-                            ></c-newton-selector-flow-cpe-resource-selector>
-                          </template>
-                          <template lwc:else>
-                            <div class="newton-studio__override-loading">
-                              <lightning-spinner
-                                size="small"
-                                alternative-text="Loading Flow resource selectors"
-                              ></lightning-spinner>
-                            </div>
-                          </template>
-                        </div>
-                      </template>
-                    </article>
-                  </template>
-                </div>
-                <template lwc:if={hasMoreOverrideRows}>
-                  <div class="slds-m-top_small slds-align_absolute-center">
-                    <lightning-button
-                      variant="neutral"
-                      label={showMoreOverrideRowsLabel}
-                      onclick={handleShowMoreOverrideRows}
-                    ></lightning-button>
-                  </div>
-                </template>
-                <div class="slds-m-top_small">
-                  <lightning-button
-                    variant="neutral"
-                    label="Reload sample rows"
-                    onclick={handleLoadSObjectSample}
-                    disabled={_isLoadingSample}
-                  ></lightning-button>
-                </div>
-              </template>
-              <template lwc:else>
+            </div>
+            <template lwc:if={hasMoreOverrideRows}>
+              <div class="slds-m-top_small slds-align_absolute-center">
                 <lightning-button
-                  variant="brand-outline"
-                  label="Load sample rows"
+                  variant="neutral"
+                  label={showMoreOverrideRowsLabel}
+                  onclick={handleShowMoreOverrideRows}
+                ></lightning-button>
+              </div>
+            </template>
+          </template>
+          <template lwc:if={isPicklistMode}>
+            <template lwc:if={hasNoFilteredOverrideRows}>
+              <p class="slds-text-body_regular slds-text-color_weak">
+                Finish setting up the data source above to list its options
+                here.
+              </p>
+            </template>
+          </template>
+          <template lwc:if={isSObjectMode}>
+            <template lwc:if={hasSampleRows}>
+              <div class="slds-m-top_small">
+                <lightning-button
+                  variant="neutral"
+                  label="Reload sample rows"
                   onclick={handleLoadSObjectSample}
                   disabled={_isLoadingSample}
                 ></lightning-button>
-                <template lwc:if={_sampleLoadError}>
-                  <p
-                    class="slds-text-color_error slds-text-body_regular slds-m-top_x-small"
-                  >
-                    {_sampleLoadError}
-                  </p>
-                </template>
+              </div>
+            </template>
+            <template lwc:else>
+              <lightning-button
+                variant="brand-outline"
+                label="Load sample rows"
+                onclick={handleLoadSObjectSample}
+                disabled={_isLoadingSample}
+              ></lightning-button>
+              <template lwc:if={_sampleLoadError}>
+                <p
+                  class="slds-text-color_error slds-text-body_regular slds-m-top_x-small"
+                >
+                  {_sampleLoadError}
+                </p>
               </template>
             </template>
           </template>
-        </div>
-      </article>
-    </template>
+        </template>
+      </div>
+    </article>
+  </template>
 
-    <!-- CARD · Display options (sort + limit, post-fetch transform) -->
-    <template lwc:if={hasDataSource}>
-      <article class="slds-card newton-studio__card">
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_data"
-            aria-hidden="true"
+  <!-- CARD · Display options (sort + limit, post-fetch transform) -->
+  <template lwc:if={hasDataSource}>
+    <article class="slds-card newton-studio__card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="arrow-up-down"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">
+            Display options
+          </h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
-            <c-newton-selector-icon
-              name="arrow-up-down"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Display options
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Sort options and cap how many show up at runtime.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Sort is applied after overrides, so overridden labels sort correctly. Limit caps the rendered count after sorting."
-          ></lightning-helptext>
-        </header>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
-        >
-          <div class="newton-studio__field-grid">
-            <c-newton-selector-flow-cpe-choice-control
-              label="Sort by"
-              value={displaySortBy}
-              items={sortByOptions}
-              variant="picklist"
-              onvaluechange={handleDisplaySortByChange}
-              field-level-help="Order the options after they're fetched. Source order preserves the order from the data source."
-            ></c-newton-selector-flow-cpe-choice-control>
-            <template lwc:if={displaySortEnabled}>
-              <c-newton-selector-flow-cpe-choice-control
-                label="Direction"
-                value={displaySortDirection}
-                items={sortDirectionOptions}
-                variant="picklist"
-                onvaluechange={handleDisplaySortDirectionChange}
-              ></c-newton-selector-flow-cpe-choice-control>
-            </template>
-            <lightning-input
-              type="number"
-              label="Maximum options"
-              placeholder="No limit"
-              value={displayLimit}
-              min="0"
-              onchange={handleDisplayLimitChange}
-              field-level-help="Cap how many options render at runtime. Leave blank to show all."
-            ></lightning-input>
-          </div>
+            Sort options and cap how many show up at runtime.
+          </p>
         </div>
-      </article>
-    </template>
+        <lightning-helptext
+          class="newton-card__help"
+          content="Sort is applied after overrides, so overridden labels sort correctly. Limit caps the rendered count after sorting."
+        ></lightning-helptext>
+      </header>
+      <div
+        class="slds-card__body slds-card__body_inner newton-studio__field-block"
+      >
+        <div class="newton-studio__field-grid">
+          <c-newton-selector-flow-cpe-choice-control
+            label="Sort by"
+            value={displaySortBy}
+            items={sortByOptions}
+            onvaluechange={handleDisplaySortByChange}
+            field-level-help="Order the options after they're fetched. Source order preserves the order from the data source."
+          ></c-newton-selector-flow-cpe-choice-control>
+          <template lwc:if={displaySortEnabled}>
+            <c-newton-selector-flow-cpe-choice-control
+              label="Direction"
+              value={displaySortDirection}
+              items={sortDirectionOptions}
+              onvaluechange={handleDisplaySortDirectionChange}
+            ></c-newton-selector-flow-cpe-choice-control>
+          </template>
+          <lightning-input
+            type="number"
+            label="Maximum options"
+            placeholder="No limit"
+            value={displayLimit}
+            min="0"
+            onchange={handleDisplayLimitChange}
+            field-level-help="Cap how many options render at runtime. Leave blank to show all."
+          ></lightning-input>
+        </div>
+      </div>
+    </article>
   </template>
 </template>

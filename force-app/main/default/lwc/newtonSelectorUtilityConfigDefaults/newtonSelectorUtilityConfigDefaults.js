@@ -13,6 +13,9 @@ export function formatRem(n) {
   return `${rounded}rem`;
 }
 
+const DEFAULT_NONE_OPTION_LABEL = "--None--";
+const DEFAULT_MANUAL_INPUT_LABEL = "Other";
+
 const AUTO_BOX = {
   top: "",
   right: "",
@@ -28,14 +31,9 @@ const DEFAULT_BADGE_CONFIG = {
   variantHex: ""
 };
 
-const SLDS_INPUT_GRID_CONFIG = {
-  minWidth: "7.5rem",
-  gapH: "",
-  gapV: "",
+const BASE_GRID_CONFIG = {
   margin: AUTO_BOX,
   padding: AUTO_BOX,
-  size: "small",
-  aspectRatio: "1:1",
   badge: DEFAULT_BADGE_CONFIG,
   columns: null,
   selectionIndicator: "frame",
@@ -59,6 +57,8 @@ const SLDS_INPUT_GRID_CONFIG = {
   iconToneHex: "",
   iconGlyphTone: "auto",
   iconGlyphToneHex: "",
+  // "auto" scales the glyph with the tile size.
+  iconSize: "auto",
   patternToneHex: "",
   patternHoverToneHex: "",
   patternSelectedToneHex: "",
@@ -72,6 +72,7 @@ const SLDS_INPUT_GRID_CONFIG = {
   showBadges: true
 };
 
+// Per-layout geometry: tile footprint and the SLDS spacing tokens between tiles.
 const LAYOUT_PRESETS = {
   grid: {
     minWidth: "7.5rem",
@@ -125,71 +126,30 @@ const LAYOUT_PRESETS = {
 };
 
 export function normalizeLayoutKey(value) {
-  if (value === "dropdown") return "picklist";
   return Object.prototype.hasOwnProperty.call(LAYOUT_PRESETS, value)
     ? value
     : "grid";
 }
 
-function cloneBox(box) {
-  return { ...box };
-}
-
-function cloneBadge(badge) {
-  return { ...badge };
-}
-
-function cloneGridConfig(config) {
+export function defaultGridConfig(layout = "grid") {
   return {
-    ...config,
-    margin: cloneBox(config.margin || AUTO_BOX),
-    padding: cloneBox(config.padding || AUTO_BOX),
-    badge: cloneBadge(config.badge || DEFAULT_BADGE_CONFIG)
+    ...BASE_GRID_CONFIG,
+    ...LAYOUT_PRESETS[normalizeLayoutKey(layout)],
+    margin: { ...AUTO_BOX },
+    padding: { ...AUTO_BOX },
+    badge: { ...DEFAULT_BADGE_CONFIG }
   };
 }
 
-export function defaultGridConfig(layout = "grid") {
-  const key = normalizeLayoutKey(layout);
-  const preset = LAYOUT_PRESETS[key];
-  return cloneGridConfig({
-    ...SLDS_INPUT_GRID_CONFIG,
-    minWidth: preset.minWidth,
-    size: preset.size,
-    aspectRatio: preset.aspectRatio,
-    columns: null
-  });
-}
-
-export function resolvedLayoutGridConfig(layout = "grid") {
-  const key = normalizeLayoutKey(layout);
-  return cloneGridConfig({
-    ...defaultGridConfig(key),
-    ...LAYOUT_PRESETS[key],
-    margin: AUTO_BOX,
-    padding: AUTO_BOX,
-    badge: DEFAULT_BADGE_CONFIG
-  });
-}
-
-export function mergeGridConfigWithDefaults(layout = "grid", gridConfig = {}) {
-  const key = normalizeLayoutKey(layout);
-  const base = defaultGridConfig(key);
-  return cloneGridConfig({
+function mergeGridConfig(layout, gridConfig) {
+  const base = defaultGridConfig(layout);
+  return {
     ...base,
     ...gridConfig,
-    margin: {
-      ...base.margin,
-      ...(gridConfig.margin || {})
-    },
-    padding: {
-      ...base.padding,
-      ...(gridConfig.padding || {})
-    },
-    badge: {
-      ...base.badge,
-      ...(gridConfig.badge || {})
-    }
-  });
+    margin: { ...base.margin, ...gridConfig.margin },
+    padding: { ...base.padding, ...gridConfig.padding },
+    badge: { ...base.badge, ...gridConfig.badge }
+  };
 }
 
 export function defaultSelectorConfig() {
@@ -241,16 +201,155 @@ export function defaultSelectorConfig() {
     },
     custom: { items: [] },
     includeNoneOption: false,
-    noneOptionLabel: "--None--",
+    noneOptionLabel: DEFAULT_NONE_OPTION_LABEL,
     noneOptionPosition: "start",
     manualInput: {
       enabled: false,
-      label: "Other",
+      label: DEFAULT_MANUAL_INPUT_LABEL,
       minLength: 0,
       maxLength: null
     },
     overrides: {},
     display: { sortBy: "none", sortDirection: "asc", limit: null },
     gridConfig: defaultGridConfig("grid")
+  };
+}
+
+// Deep-merges a saved (possibly partial) config over the defaults. The CPE and
+// the runtime both read configs through this, so every key is always present.
+export function mergeSelectorConfig(initialConfig) {
+  const base = defaultSelectorConfig();
+  const incoming = initialConfig
+    ? JSON.parse(JSON.stringify(initialConfig))
+    : {};
+  const layout = normalizeLayoutKey(incoming.layout || base.layout);
+
+  return {
+    ...base,
+    ...incoming,
+    layout,
+    picklist: { ...base.picklist, ...incoming.picklist },
+    collection: {
+      ...base.collection,
+      ...incoming.collection,
+      fieldMap: {
+        ...base.collection.fieldMap,
+        ...incoming.collection?.fieldMap
+      }
+    },
+    sobject: { ...base.sobject, ...incoming.sobject },
+    custom: { items: incoming.custom?.items || [] },
+    manualInput: { ...base.manualInput, ...incoming.manualInput },
+    overrides:
+      incoming.overrides && typeof incoming.overrides === "object"
+        ? incoming.overrides
+        : {},
+    display: { ...base.display, ...incoming.display },
+    gridConfig: mergeGridConfig(layout, incoming.gridConfig || {})
+  };
+}
+
+// A blank label would render an empty tile, so it falls back to the default.
+function labelOrDefault(label, fallback) {
+  return label?.trim() ? label : fallback;
+}
+
+/**
+ * Maps a merged selector config to the public properties of
+ * c-newton-selector-data-selector. `appearance` holds the properties the data
+ * selector hands to c-newton-selector-group unchanged.
+ * @param {object} config - output of mergeSelectorConfig
+ * @param {Array<object>} records - Flow record collection (collection source)
+ */
+export function selectorPropsFromConfig(config, records = []) {
+  const grid = config.gridConfig;
+  // A blank gap is the editor's "Auto": the layout's standard gap.
+  const preset = LAYOUT_PRESETS[config.layout];
+  return {
+    label: config.label,
+    helpText: config.helpText,
+    fieldLevelHelp: config.fieldLevelHelp,
+    sourceType: config.dataSource,
+    layout: config.layout,
+    selectionMode: config.selectionMode,
+    required: config.required,
+    minSelections: config.minSelections,
+    maxSelections: config.maxSelections,
+    enableSearch: config.enableSearch,
+    showSelectAll: config.showSelectAll,
+    emptyStateMessage: config.emptyStateMessage,
+    errorStateMessage: config.errorStateMessage,
+    picklistConfig: config.picklist,
+    collectionConfig: { records, fieldMap: config.collection.fieldMap },
+    sobjectConfig: config.sobject,
+    customConfig: config.custom,
+    overrides: config.overrides,
+    displayConfig: config.display,
+    includeNoneOption: config.includeNoneOption,
+    noneOptionLabel: labelOrDefault(
+      config.noneOptionLabel,
+      DEFAULT_NONE_OPTION_LABEL
+    ),
+    noneOptionPosition: config.noneOptionPosition,
+    allowManualInput: config.manualInput.enabled,
+    manualInputLabel: labelOrDefault(
+      config.manualInput.label,
+      DEFAULT_MANUAL_INPUT_LABEL
+    ),
+    manualInputMinLength: config.manualInput.minLength,
+    manualInputMaxLength: config.manualInput.maxLength,
+    appearance: {
+      gridMinWidth: grid.minWidth,
+      gapHorizontal: grid.gapH || preset.gapH,
+      gapVertical: grid.gapV || preset.gapV,
+      marginTop: grid.margin.top,
+      marginRight: grid.margin.right,
+      marginBottom: grid.margin.bottom,
+      marginLeft: grid.margin.left,
+      paddingTop: grid.padding.top,
+      paddingRight: grid.padding.right,
+      paddingBottom: grid.padding.bottom,
+      paddingLeft: grid.padding.left,
+      columns: grid.columns,
+      size: grid.size,
+      aspectRatio: grid.aspectRatio,
+      iconSize: grid.iconSize,
+      badgePosition: grid.badge.position,
+      badgeVariant: grid.badge.variant,
+      badgeShape: grid.badge.shape,
+      badgeVariantHex: grid.badge.variantHex,
+      selectionIndicator: grid.selectionIndicator,
+      elevation: grid.elevation,
+      pattern: grid.pattern,
+      patternTone: grid.patternTone,
+      patternHoverTone: grid.patternHoverTone,
+      patternSelectedTone: grid.patternSelectedTone,
+      patternDisabledTone: grid.patternDisabledTone,
+      patternToneHex: grid.patternToneHex,
+      patternHoverToneHex: grid.patternHoverToneHex,
+      patternSelectedToneHex: grid.patternSelectedToneHex,
+      patternDisabledToneHex: grid.patternDisabledToneHex,
+      cornerStyle: grid.cornerStyle,
+      cornerTone: grid.cornerTone,
+      cornerToneHex: grid.cornerToneHex,
+      surfaceStyle: grid.surfaceStyle,
+      surfaceTone: grid.surfaceTone,
+      surfaceHoverTone: grid.surfaceHoverTone,
+      surfaceSelectedTone: grid.surfaceSelectedTone,
+      surfaceDisabledTone: grid.surfaceDisabledTone,
+      surfaceToneHex: grid.surfaceToneHex,
+      surfaceHoverToneHex: grid.surfaceHoverToneHex,
+      surfaceSelectedToneHex: grid.surfaceSelectedToneHex,
+      surfaceDisabledToneHex: grid.surfaceDisabledToneHex,
+      iconDecor: grid.iconDecor,
+      iconStyle: grid.iconStyle,
+      iconShading: grid.iconShading,
+      iconTone: grid.iconTone,
+      iconToneHex: grid.iconToneHex,
+      iconGlyphTone: grid.iconGlyphTone,
+      iconGlyphToneHex: grid.iconGlyphToneHex,
+      showIcons: grid.showIcons,
+      showBadges: grid.showBadges
+    }
   };
 }

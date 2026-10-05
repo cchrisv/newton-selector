@@ -1,5 +1,7 @@
 const EMPTY = "";
 export const MANUAL_INPUT_VALUE = "__newton_manual_input__";
+// Picklist values for objects without record types come from the master record type.
+export const MASTER_RECORD_TYPE_ID = "012000000000000AAA";
 
 function safeGet(record, fieldPath) {
   if (!record || !fieldPath) return EMPTY;
@@ -36,7 +38,8 @@ export function normalizeCollection(records, fieldMap) {
     badge: safeGet(record, map.badge),
     helpText: safeGet(record, map.helpText),
     value: safeGet(record, map.value) || safeGet(record, "Id") || String(index),
-    disabled: false
+    disabled: false,
+    record
   }));
 }
 
@@ -50,7 +53,8 @@ export function normalizeSObjectDTO(dtos) {
     badge: dto.badge || EMPTY,
     helpText: dto.helpText || EMPTY,
     value: dto.value || dto.id || String(index),
-    disabled: Boolean(dto.disabled)
+    disabled: false,
+    record: dto.record
   }));
 }
 
@@ -70,8 +74,7 @@ export function normalizeCustom(customItems) {
         item.value !== undefined && item.value !== null
           ? String(item.value)
           : String(index),
-      disabled: Boolean(item.disabled),
-      record: item
+      disabled: Boolean(item.disabled)
     }));
 }
 
@@ -109,20 +112,12 @@ export function applyOverrides(items, overrides) {
 }
 
 /**
- * Convert a SLDS 2 spacing token value to a CSS expression. Accepts either:
- *   - 'none' (returns '0')
- *   - '1' through '12' (returns `var(--slds-g-spacing-N, 0)`)
- *   - Any other string — treated as a passthrough CSS value (e.g. '2rem', '16px').
- * This lets legacy rem-string configs coexist with new token-based ones.
+ * Convert an SLDS 2 spacing token ('1' through '12') to a CSS expression.
+ * Anything else (empty, 'none', or not a token) is 0.
  */
 export function tokenToCss(token) {
-  if (token === null || token === undefined || token === "" || token === "none")
-    return "0";
-  const str = String(token).trim();
-  if (/^\d+$/.test(str)) {
-    return `var(--slds-g-spacing-${str}, 0)`;
-  }
-  return str;
+  const str = String(token ?? "").trim();
+  return /^\d+$/.test(str) ? `var(--slds-g-spacing-${str}, 0)` : "0";
 }
 
 /**
@@ -154,66 +149,3 @@ export function applyDisplay(items, display) {
   }
   return out;
 }
-
-export const SAMPLE_ITEMS = Object.freeze([
-  {
-    id: "s-1",
-    label: "Aurora Ridge Estate",
-    sublabel: "Flagship listing · 2024 portfolio",
-    icon: "building-2",
-    badge: "Featured",
-    helpText: "Showcase property with premium styling applied.",
-    value: "sample-1",
-    disabled: false
-  },
-  {
-    id: "s-2",
-    label: "Cascade Works Studio",
-    sublabel: "Creative agency partnership",
-    icon: "contact",
-    badge: "Tier 1",
-    helpText: "",
-    value: "sample-2",
-    disabled: false
-  },
-  {
-    id: "s-3",
-    label: "Meridian Logistics",
-    sublabel: "Q4 renewal under review",
-    icon: "trending-up",
-    badge: "Recommended",
-    helpText: "",
-    value: "sample-3",
-    disabled: false
-  },
-  {
-    id: "s-4",
-    label: "Northlight Collective",
-    sublabel: "Inbound lead · high intent",
-    icon: "user-round-plus",
-    badge: "",
-    helpText: "",
-    value: "sample-4",
-    disabled: false
-  },
-  {
-    id: "s-5",
-    label: "Halcyon Research Labs",
-    sublabel: "Enterprise pilot · signed",
-    icon: "briefcase-business",
-    badge: "Signed",
-    helpText: "",
-    value: "sample-5",
-    disabled: false
-  },
-  {
-    id: "s-6",
-    label: "Verdant Trails Co.",
-    sublabel: "Boutique retail · expansion",
-    icon: "package",
-    badge: "",
-    helpText: "",
-    value: "sample-6",
-    disabled: false
-  }
-]);

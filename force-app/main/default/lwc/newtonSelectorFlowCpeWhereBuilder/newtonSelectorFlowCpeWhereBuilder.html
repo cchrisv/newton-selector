@@ -7,21 +7,20 @@
           Build grouped filters without typing custom SOQL logic.
         </p>
       </div>
-      <template lwc:if={showManualMode}>
+      <template lwc:if={manualMode}>
         <lightning-button
           variant="neutral"
           label="Rebuild visually"
           onclick={handleRebuildVisual}
-          disabled={disabled}
         ></lightning-button>
       </template>
       <template lwc:else>
         <div class="cc-where__root-mode">
-          <span class="cc-where__mode-label">Match root</span>
+          <span class="cc-where__mode-label">Match</span>
           <div
             class="cc-where-segment-group"
             role="group"
-            aria-label="Root logic"
+            aria-label="Match all or any conditions"
           >
             <template for:each={rootLogicSegments} for:item="segment">
               <button
@@ -30,7 +29,6 @@
                 class={segment.cssClass}
                 data-value={segment.value}
                 aria-pressed={segment.ariaPressed}
-                disabled={disabled}
                 onclick={handleRootOperatorChange}
               >
                 {segment.label}
@@ -41,29 +39,23 @@
       </template>
     </header>
 
-    <template lwc:if={showManualMode}>
+    <template lwc:if={manualMode}>
       <div class="cc-where-manual">
-        <label class="cc-where-manual__label" for="cc-where-manual-input">
-          Manual WHERE clause
-        </label>
         <lightning-textarea
-          id="cc-where-manual-input"
           class="cc-where-manual__input"
           label="Manual WHERE clause"
-          variant="label-hidden"
           value={manualWhere}
-          disabled={disabled}
           oninput={handleManualInput}
         ></lightning-textarea>
         <p class="cc-where-manual__hint">
-          This legacy clause is preserved because it cannot be safely
-          represented as visual groups yet.
+          This clause can't be shown as visual conditions, so it stays as text.
+          Edit it here.
         </p>
       </div>
     </template>
 
     <template lwc:else>
-      <template lwc:if={showSelectionToolbar}>
+      <template lwc:if={hasSelection}>
         <div class="cc-where-toolbar" aria-label="WHERE builder actions">
           <div class="cc-where-toolbar__selection">
             <span class="cc-where-toolbar__label">Selected</span>
@@ -79,283 +71,244 @@
             variant="neutral"
             label="Clear"
             onclick={handleClearSelection}
-            disabled={disabled}
           ></lightning-button>
         </div>
       </template>
 
       <div class="cc-where__canvas" ondragover={handleDragOver}>
-        <template lwc:if={hasRows}>
-          <template for:each={builderRows} for:item="row">
-            <article
-              key={row.key}
-              class={row.rowClass}
-              style={row.style}
-              data-id={row.id}
-              draggable="true"
-              ondragstart={handleDragStart}
-              ondrop={handleDrop}
-            >
-              <div class="cc-where-node__rail">
-                <input
-                  type="checkbox"
-                  class="cc-where-node__check"
-                  aria-label="Select row"
-                  data-id={row.id}
-                  checked={row.selectedChecked}
-                  disabled={disabled}
-                  onchange={handleNodeSelect}
-                />
-                <button
-                  type="button"
-                  class="cc-where-node__drag"
-                  title="Drag to reorder"
-                  aria-label="Drag to reorder"
-                  disabled={disabled}
-                >
-                  <c-newton-selector-icon
-                    name="grip-vertical"
-                    size="xx-small"
-                    box="button"
-                    alternative-text=""
-                  ></c-newton-selector-icon>
-                </button>
-              </div>
+        <template for:each={builderRows} for:item="row">
+          <article
+            key={row.key}
+            class={row.rowClass}
+            style={row.style}
+            data-id={row.id}
+            draggable="true"
+            ondragstart={handleDragStart}
+            ondrop={handleDrop}
+          >
+            <div class="cc-where-node__rail">
+              <input
+                type="checkbox"
+                class="cc-where-node__check"
+                aria-label={row.selectLabel}
+                data-id={row.id}
+                checked={row.selected}
+                onchange={handleNodeSelect}
+              />
+            </div>
 
-              <template lwc:if={row.isGroup}>
-                <div class="cc-where-group">
-                  <div class="cc-where-group__meta">
-                    <span class="cc-where-group__badge">{row.title}</span>
-                    <span class="cc-where-group__count">{row.countLabel}</span>
-                  </div>
-                  <div class="cc-where-group__logic">
-                    <div
-                      class="cc-where-segment-group"
-                      role="group"
-                      aria-label="Group logic"
-                    >
-                      <template for:each={row.logicSegments} for:item="segment">
-                        <button
-                          key={segment.value}
-                          type="button"
-                          class={segment.cssClass}
-                          data-id={row.id}
-                          data-value={segment.value}
-                          aria-pressed={segment.ariaPressed}
-                          disabled={disabled}
-                          onclick={handleGroupOperatorChange}
-                        >
-                          {segment.label}
-                        </button>
-                      </template>
-                    </div>
+            <template lwc:if={row.isGroup}>
+              <div class="cc-where-group">
+                <div class="cc-where-group__meta">
+                  <span class="cc-where-group__badge">{row.title}</span>
+                  <span class="cc-where-group__count">{row.countLabel}</span>
+                </div>
+                <div class="cc-where-group__logic">
+                  <div
+                    class="cc-where-segment-group"
+                    role="group"
+                    aria-label="Group logic"
+                  >
+                    <template for:each={row.logicSegments} for:item="segment">
+                      <button
+                        key={segment.value}
+                        type="button"
+                        class={segment.cssClass}
+                        data-id={row.id}
+                        data-value={segment.value}
+                        aria-pressed={segment.ariaPressed}
+                        onclick={handleGroupOperatorChange}
+                      >
+                        {segment.label}
+                      </button>
+                    </template>
                   </div>
                 </div>
-              </template>
+              </div>
+            </template>
 
-              <template lwc:if={row.isCondition}>
-                <div class="cc-where-condition">
-                  <span
-                    class="cc-where-condition__num"
-                    title={row.numberTitle}
-                    aria-label={row.numberTitle}
-                    >{row.number}</span
-                  >
-                  <div class="cc-where-condition__fields">
-                    <c-newton-selector-combobox
-                      mode="lookup"
-                      label="Field"
-                      placeholder="Select field..."
-                      variant="label-hidden"
-                      selection={row.fieldSelection}
-                      disabled={disabled}
-                      min-search-term-length="0"
-                      scroll-after-n-items="5"
-                      data-id={row.id}
-                      onsearch={handleFieldSearch}
-                      onselectionchange={handleFieldSelectionChange}
-                    ></c-newton-selector-combobox>
+            <template lwc:if={row.isCondition}>
+              <div class="cc-where-condition">
+                <span
+                  class="cc-where-condition__num"
+                  title={row.numberTitle}
+                  aria-label={row.numberTitle}
+                  >{row.number}</span
+                >
+                <div class="cc-where-condition__fields">
+                  <c-newton-selector-combobox
+                    mode="lookup"
+                    label="Field"
+                    placeholder="Select field..."
+                    variant="label-hidden"
+                    selection={row.fieldSelection}
+                    min-search-term-length="0"
+                    scroll-after-n-items="5"
+                    data-id={row.id}
+                    onsearch={handleFieldSearch}
+                    onselectionchange={handleFieldSelectionChange}
+                  ></c-newton-selector-combobox>
+                  <c-newton-selector-flow-cpe-choice-control
+                    label="Operator"
+                    value={row.operator}
+                    items={row.operatorOptions}
+                    data-id={row.id}
+                    onvaluechange={handleOperatorChange}
+                    form-variant="label-hidden"
+                  ></c-newton-selector-flow-cpe-choice-control>
+                  <template lwc:if={row.isBooleanValue}>
                     <c-newton-selector-flow-cpe-choice-control
-                      label="Operator"
-                      value={row.operator}
-                      items={row.operatorOptions}
-                      variant="picklist"
-                      disabled={disabled}
+                      label="Value"
+                      value={row.value}
+                      items={row.booleanOptions}
                       data-id={row.id}
-                      onvaluechange={handleOperatorChange}
+                      onvaluechange={handleValueChange}
                       form-variant="label-hidden"
                     ></c-newton-selector-flow-cpe-choice-control>
-                    <template lwc:if={row.isBooleanValue}>
-                      <c-newton-selector-flow-cpe-choice-control
-                        label="Value"
-                        value={row.value}
-                        items={row.booleanOptions}
-                        variant="picklist"
-                        disabled={disabled}
-                        data-id={row.id}
-                        onvaluechange={handleValueChange}
-                        form-variant="label-hidden"
-                      ></c-newton-selector-flow-cpe-choice-control>
-                    </template>
-                    <template lwc:else>
-                      <c-newton-selector-flow-cpe-resource-selector
-                        name={row.valueName}
-                        value={row.value}
-                        value-type="reference"
-                        variant="label-hidden"
-                        builder-context={builderContext}
-                        automatic-output-variables={automaticOutputVariables}
-                        allow-hard-code-reference
-                        max-width={maxWidth}
-                        data-id={row.id}
-                        onvaluechanged={handleResourceValueChange}
-                      ></c-newton-selector-flow-cpe-resource-selector>
-                    </template>
-                  </div>
-                  <template lwc:if={row.hasError}>
-                    <p class="cc-where-condition__error" role="alert">
-                      {row.errorMessage}
-                    </p>
+                  </template>
+                  <template lwc:else>
+                    <c-newton-selector-flow-cpe-resource-selector
+                      label="Value"
+                      value={row.value}
+                      variant="label-hidden"
+                      builder-context={builderContext}
+                      automatic-output-variables={automaticOutputVariables}
+                      allow-hard-code-reference
+                      max-width="280"
+                      data-id={row.id}
+                      onvaluechanged={handleResourceValueChange}
+                    ></c-newton-selector-flow-cpe-resource-selector>
                   </template>
                 </div>
-              </template>
-
-              <div class="cc-where-node__actions">
-                <button
-                  type="button"
-                  class="cc-where-icon-button"
-                  title="Move up"
-                  aria-label="Move up"
-                  data-id={row.id}
-                  data-direction="up"
-                  disabled={disabled}
-                  onclick={handleMoveNode}
-                >
-                  <c-newton-selector-icon
-                    name="arrow-up"
-                    size="xx-small"
-                    box="button"
-                    alternative-text=""
-                  ></c-newton-selector-icon>
-                </button>
-                <button
-                  type="button"
-                  class="cc-where-icon-button"
-                  title="Move down"
-                  aria-label="Move down"
-                  data-id={row.id}
-                  data-direction="down"
-                  disabled={disabled}
-                  onclick={handleMoveNode}
-                >
-                  <c-newton-selector-icon
-                    name="arrow-down"
-                    size="xx-small"
-                    box="button"
-                    alternative-text=""
-                  ></c-newton-selector-icon>
-                </button>
-                <template lwc:if={row.isCondition}>
-                  <button
-                    type="button"
-                    class="cc-where-icon-button"
-                    title="Group with next"
-                    aria-label="Group with next"
-                    data-id={row.id}
-                    disabled={disabled}
-                    onclick={handleGroupWithNext}
-                  >
-                    <c-newton-selector-icon
-                      name="brackets"
-                      size="xx-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                  </button>
-                  <button
-                    type="button"
-                    class="cc-where-icon-button"
-                    title="Indent into previous group"
-                    aria-label="Indent into previous group"
-                    data-id={row.id}
-                    disabled={disabled}
-                    onclick={handleIndentNode}
-                  >
-                    <c-newton-selector-icon
-                      name="list-indent-increase"
-                      size="xx-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                  </button>
-                  <button
-                    type="button"
-                    class="cc-where-icon-button"
-                    title="Outdent"
-                    aria-label="Outdent"
-                    data-id={row.id}
-                    disabled={disabled}
-                    onclick={handleOutdentNode}
-                  >
-                    <c-newton-selector-icon
-                      name="list-indent-decrease"
-                      size="xx-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                  </button>
-                  <button
-                    type="button"
-                    class="cc-where-icon-button cc-where-icon-button_danger"
-                    title="Remove condition"
-                    aria-label="Remove condition"
-                    data-id={row.id}
-                    disabled={disabled}
-                    onclick={handleRemoveCondition}
-                  >
-                    <c-newton-selector-icon
-                      name="trash-2"
-                      size="xx-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                  </button>
-                </template>
-                <template lwc:if={row.isGroup}>
-                  <button
-                    type="button"
-                    class="cc-where-icon-button"
-                    title="Ungroup"
-                    aria-label="Ungroup"
-                    data-id={row.id}
-                    disabled={disabled}
-                    onclick={handleUngroup}
-                  >
-                    <c-newton-selector-icon
-                      name="ungroup"
-                      size="xx-small"
-                      box="button"
-                      alternative-text=""
-                    ></c-newton-selector-icon>
-                  </button>
+                <template lwc:if={row.hasError}>
+                  <p class="cc-where-condition__error">
+                    Finish this condition: choose a field, an operator, and a
+                    value.
+                  </p>
                 </template>
               </div>
-            </article>
-          </template>
+            </template>
+
+            <div class="cc-where-node__actions">
+              <button
+                type="button"
+                class="cc-where-icon-button"
+                title="Move up"
+                aria-label="Move up"
+                data-id={row.id}
+                data-direction="up"
+                onclick={handleMoveNode}
+              >
+                <c-newton-selector-icon
+                  name="arrow-up"
+                  size="xx-small"
+                  box="button"
+                  alternative-text=""
+                ></c-newton-selector-icon>
+              </button>
+              <button
+                type="button"
+                class="cc-where-icon-button"
+                title="Move down"
+                aria-label="Move down"
+                data-id={row.id}
+                data-direction="down"
+                onclick={handleMoveNode}
+              >
+                <c-newton-selector-icon
+                  name="arrow-down"
+                  size="xx-small"
+                  box="button"
+                  alternative-text=""
+                ></c-newton-selector-icon>
+              </button>
+              <template lwc:if={row.isCondition}>
+                <button
+                  type="button"
+                  class="cc-where-icon-button"
+                  title="Group with next"
+                  aria-label="Group with next"
+                  data-id={row.id}
+                  onclick={handleGroupWithNext}
+                >
+                  <c-newton-selector-icon
+                    name="brackets"
+                    size="xx-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                </button>
+                <button
+                  type="button"
+                  class="cc-where-icon-button"
+                  title="Indent into previous group"
+                  aria-label="Indent into previous group"
+                  data-id={row.id}
+                  onclick={handleIndentNode}
+                >
+                  <c-newton-selector-icon
+                    name="list-indent-increase"
+                    size="xx-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                </button>
+                <button
+                  type="button"
+                  class="cc-where-icon-button"
+                  title="Outdent"
+                  aria-label="Outdent"
+                  data-id={row.id}
+                  onclick={handleOutdentNode}
+                >
+                  <c-newton-selector-icon
+                    name="list-indent-decrease"
+                    size="xx-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                </button>
+                <button
+                  type="button"
+                  class="cc-where-icon-button cc-where-icon-button_danger"
+                  title="Remove condition"
+                  aria-label="Remove condition"
+                  data-id={row.id}
+                  onclick={handleRemoveCondition}
+                >
+                  <c-newton-selector-icon
+                    name="trash-2"
+                    size="xx-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                </button>
+              </template>
+              <template lwc:if={row.isGroup}>
+                <button
+                  type="button"
+                  class="cc-where-icon-button"
+                  title="Ungroup"
+                  aria-label="Ungroup"
+                  data-id={row.id}
+                  onclick={handleUngroup}
+                >
+                  <c-newton-selector-icon
+                    name="ungroup"
+                    size="xx-small"
+                    box="button"
+                    alternative-text=""
+                  ></c-newton-selector-icon>
+                </button>
+              </template>
+            </div>
+          </article>
         </template>
       </div>
 
-      <template lwc:if={hasValidationMessage}>
-        <p class="cc-where__error" role="alert">{_validationMessage}</p>
-      </template>
+      <p class="cc-where__error" role="alert">{statusMessage}</p>
 
-      <button
-        type="button"
-        class="cc-where-add"
-        data-parent-id="root"
-        disabled={disabled}
-        onclick={handleAddCondition}
-      >
+      <button type="button" class="cc-where-add" onclick={handleAddCondition}>
         <c-newton-selector-icon
           name="plus"
           size="xx-small"

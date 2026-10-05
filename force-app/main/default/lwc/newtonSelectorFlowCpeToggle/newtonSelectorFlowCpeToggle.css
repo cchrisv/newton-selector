@@ -31,7 +31,7 @@
 }
 
 .newton-selector-flow-cpe-toggle__option {
-  min-width: var(--newton-static-v-3-5rem, 3.5rem);
+  min-width: 3.5rem;
   min-height: var(--slds-g-sizing-7, 1.5rem);
   padding: 0 var(--slds-g-spacing-3, 0.75rem);
   border: 0;
@@ -93,14 +93,6 @@
   outline-offset: var(--slds-g-sizing-border-2, 2px);
 }
 
-.newton-selector-flow-cpe-toggle__option:disabled {
-  cursor: not-allowed;
-}
-
-.newton-selector-flow-cpe-toggle_disabled {
-  opacity: 0.72;
-}
-
 .newton-selector-flow-cpe-toggle_label-hidden
   .newton-selector-flow-cpe-toggle__control {
   vertical-align: middle;
@@ -108,7 +100,7 @@
 
 .newton-selector-flow-cpe-toggle_label-hidden
   .newton-selector-flow-cpe-toggle__option {
-  min-width: var(--newton-static-v-3rem, 3rem);
+  min-width: 3rem;
   padding-inline: var(--slds-g-spacing-2, 0.5rem);
 }
 

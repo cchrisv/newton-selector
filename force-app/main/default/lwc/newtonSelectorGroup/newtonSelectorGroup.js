@@ -1,38 +1,72 @@
-import { LightningElement, api, track } from "lwc";
+import { LightningElement, api } from "lwc";
+import template from "./newtonSelectorGroup.html";
 import {
   filterItems,
   tokenToCss,
   MANUAL_INPUT_VALUE
 } from "c/newtonSelectorUtilityDataSources";
 
-const MODE_SINGLE = "single";
 const MODE_MULTI = "multi";
 
-const VARIANT_GRID = "grid";
 const VARIANT_LIST = "list";
-const VARIANT_HORIZONTAL = "horizontal";
+const VARIANT_GRID = "grid";
 const VARIANT_COLUMNS = "columns";
 const VARIANT_DUAL_LISTBOX = "dualListbox";
 const VARIANT_PICKLIST = "picklist";
-const VARIANT_DROPDOWN = "dropdown";
 const VARIANT_RADIO = "radio";
-const VALID_VARIANTS = new Set([
-  VARIANT_GRID,
-  VARIANT_LIST,
-  VARIANT_HORIZONTAL,
-  VARIANT_COLUMNS,
-  VARIANT_DUAL_LISTBOX,
-  VARIANT_PICKLIST,
-  VARIANT_DROPDOWN,
-  VARIANT_RADIO
-]);
 
 const DROPZONE_AVAILABLE = "available";
 const DROPZONE_SELECTED = "selected";
 
+// Group properties handed to every choice tile unchanged.
+const TILE_STYLE_PROPS = [
+  "size",
+  "aspectRatio",
+  "iconSize",
+  "badgePosition",
+  "badgeVariant",
+  "badgeShape",
+  "badgeVariantHex",
+  "selectionIndicator",
+  "elevation",
+  "pattern",
+  "patternTone",
+  "patternHoverTone",
+  "patternSelectedTone",
+  "patternDisabledTone",
+  "patternToneHex",
+  "patternHoverToneHex",
+  "patternSelectedToneHex",
+  "patternDisabledToneHex",
+  "cornerStyle",
+  "cornerTone",
+  "cornerToneHex",
+  "surfaceStyle",
+  "surfaceTone",
+  "surfaceHoverTone",
+  "surfaceSelectedTone",
+  "surfaceDisabledTone",
+  "surfaceToneHex",
+  "surfaceHoverToneHex",
+  "surfaceSelectedToneHex",
+  "surfaceDisabledToneHex",
+  "iconDecor",
+  "iconStyle",
+  "iconShading",
+  "iconTone",
+  "iconToneHex",
+  "iconGlyphTone",
+  "iconGlyphToneHex",
+  "showIcons",
+  "showBadges"
+];
+
+// Per-render derived lists, built once in render() and read by the getters.
+const VIEWS = new WeakMap();
+
 let GROUP_COUNTER = 0;
 
-function valuesEqual(left = [], right = []) {
+function valuesEqual(left, right) {
   if (left.length !== right.length) return false;
   return left.every((value, index) => value === right[index]);
 }
@@ -40,15 +74,15 @@ function valuesEqual(left = [], right = []) {
 export default class NewtonSelectorGroup extends LightningElement {
   @api items = [];
   @api variant = VARIANT_GRID;
-  @api selectionMode = MODE_SINGLE;
+  @api selectionMode = "single";
   @api minSelections = 0;
   @api maxSelections;
   @api showSelectAll = false;
   @api enableSearch = false;
   @api previewMode = false;
 
-  // Layout knobs. Card styling lives in newtonSelectorChoiceTile; this group renderer
-  // only composes cards into layout patterns and normalizes spacing tokens.
+  // Layout knobs. Card styling lives in newtonSelectorChoiceTile; this group
+  // only composes cards into layouts and converts SLDS spacing tokens.
   @api gridMinWidth = "7.5rem";
   @api gapHorizontal = "2";
   @api gapVertical = "2";
@@ -56,25 +90,22 @@ export default class NewtonSelectorGroup extends LightningElement {
   @api marginRight = "";
   @api marginBottom = "";
   @api marginLeft = "";
-  @api paddingTop;
-  @api paddingRight;
-  @api paddingBottom;
-  @api paddingLeft;
+  // An empty padding token keeps the tile's size-based padding.
+  @api paddingTop = "";
+  @api paddingRight = "";
+  @api paddingBottom = "";
+  @api paddingLeft = "";
+  // Fixed column count (1-6) for the grid layout; anything else auto-fills.
+  @api columns;
 
-  // Per-card size + aspect.
+  // Choice tile styling (see TILE_STYLE_PROPS).
   @api size = "small";
-  @api iconSize = "large";
+  @api iconSize = "auto";
   @api aspectRatio = "1:1";
-
-  // Badge presentation.
   @api badgePosition = "bottom-inline";
   @api badgeVariant = "neutral";
   @api badgeShape = "pill";
-
-  // Fixed column count for grid variant. null/undefined/0 = auto-fill.
-  @api columns;
-
-  // Pass-through card styling knobs.
+  @api badgeVariantHex = "";
   @api selectionIndicator = "frame";
   @api elevation = "outlined";
   @api pattern = "none";
@@ -82,44 +113,46 @@ export default class NewtonSelectorGroup extends LightningElement {
   @api patternHoverTone = "neutral";
   @api patternSelectedTone = "brand";
   @api patternDisabledTone = "neutral";
+  @api patternToneHex = "";
+  @api patternHoverToneHex = "";
+  @api patternSelectedToneHex = "";
+  @api patternDisabledToneHex = "";
   @api cornerStyle = "none";
   @api cornerTone = "neutral";
+  @api cornerToneHex = "";
   @api surfaceStyle = "solid";
   @api surfaceTone = "neutral";
   @api surfaceHoverTone = "neutral";
   @api surfaceSelectedTone = "brand";
   @api surfaceDisabledTone = "neutral";
-  @api iconDecor = "square";
-  @api iconStyle = "soft";
-  @api iconShading = "flat";
-  @api iconTone = "brand";
-  @api iconGlyphTone;
-  @api iconGlyphToneHex = "";
-  @api iconToneHex = "";
-  @api patternToneHex = "";
-  @api patternHoverToneHex = "";
-  @api patternSelectedToneHex = "";
-  @api patternDisabledToneHex = "";
-  @api cornerToneHex = "";
   @api surfaceToneHex = "";
   @api surfaceHoverToneHex = "";
   @api surfaceSelectedToneHex = "";
   @api surfaceDisabledToneHex = "";
-  @api badgeVariantHex = "";
+  @api iconDecor = "square";
+  @api iconStyle = "soft";
+  @api iconShading = "flat";
+  @api iconTone = "brand";
+  @api iconToneHex = "";
+  @api iconGlyphTone;
+  @api iconGlyphToneHex = "";
   @api showIcons;
   @api showBadges;
+
   @api allowManualInput = false;
-  @api manualInputLabel = "Other";
+  @api manualInputLabel;
   @api manualInputMinLength = 0;
   @api manualInputMaxLength;
 
   _selectedValues = [];
+  _noneActive = false;
   _manualInputValue = "";
-  @track _searchTerm = "";
-  @track _dragOverZone = "";
-  @track _dualAvailableValues = [];
-  @track _dualSelectedValues = [];
-  @track _picklistOpen = false;
+  _searchTerm = "";
+  _dragOverZone = "";
+  _dualAvailableValues = [];
+  _dualSelectedValues = [];
+  _picklistOpen = false;
+  _activeIndex = -1;
   _dragValue = "";
   _groupName = `newton-group-${++GROUP_COUNTER}`;
 
@@ -128,7 +161,17 @@ export default class NewtonSelectorGroup extends LightningElement {
     return this._selectedValues;
   }
   set selectedValues(v) {
-    this._selectedValues = Array.isArray(v) ? [...v] : [];
+    this._selectedValues = Array.isArray(v) ? v : [];
+  }
+
+  // The None option's value is "", so "None picked" cannot be told apart from
+  // "nothing picked" by value; this flag carries it both ways.
+  @api
+  get noneSelected() {
+    return this._noneActive;
+  }
+  set noneSelected(v) {
+    this._noneActive = Boolean(v);
   }
 
   @api
@@ -139,37 +182,139 @@ export default class NewtonSelectorGroup extends LightningElement {
     this._manualInputValue = v === undefined || v === null ? "" : String(v);
   }
 
-  get resolvedVariant() {
-    const raw = VALID_VARIANTS.has(this.variant) ? this.variant : VARIANT_GRID;
-    return raw === VARIANT_DROPDOWN ? VARIANT_PICKLIST : raw;
+  render() {
+    VIEWS.set(this, this.buildView());
+    return template;
+  }
+
+  buildView() {
+    const tileProps = {
+      variant: this.choiceTileVariant,
+      selectionMode: this.selectionMode,
+      groupName: this._groupName
+    };
+    TILE_STYLE_PROPS.forEach((name) => {
+      tileProps[name] = this[name];
+    });
+    const selected = this.selectedValueSet;
+    const maxReached = this.maxReached(this._selectedValues.length);
+
+    if (this.isTransferLayout) {
+      const availableActive = new Set(this._dualAvailableValues);
+      const selectedActive = new Set(this._dualSelectedValues);
+      return {
+        tileProps,
+        transferAvailableItems: this.filteredItems
+          .filter((item) => !selected.has(item.value))
+          .map((item) =>
+            this.decorateCardItem(
+              item,
+              false,
+              maxReached,
+              availableActive.has(item.value)
+            )
+          ),
+        transferSelectedItems: this.selectedItemsInOrder().map((item) =>
+          this.decorateCardItem(
+            item,
+            true,
+            false,
+            selectedActive.has(item.value)
+          )
+        )
+      };
+    }
+
+    const cards = this.filteredItems.map((item) =>
+      this.decorateCardItem(item, selected.has(item.value), maxReached)
+    );
+    if (this.isRadio) {
+      return {
+        tileProps,
+        radioItems: cards.map((item) => ({
+          ...item,
+          _radioClass: [
+            "newton-radio-card",
+            this.isMulti ? "newton-radio-card_multi" : "",
+            item._selected ? "newton-radio-card_selected" : "",
+            item._disabled ? "newton-radio-card_disabled" : ""
+          ]
+            .filter(Boolean)
+            .join(" ")
+        }))
+      };
+    }
+    if (this.isPicklist) {
+      return {
+        tileProps,
+        picklistItems: cards.map((item, index) => {
+          const active = index === this._activeIndex;
+          return {
+            ...item,
+            title: item.label,
+            subtitle: item.sublabel || "",
+            _optionId: `${this._groupName}-option-${index}`,
+            _ariaSelected: String(item._selected),
+            _ariaDisabled: String(item._disabled),
+            _class: [
+              "slds-listbox__item",
+              "newton-picklist__item",
+              item._selected ? "newton-picklist__item_selected" : ""
+            ]
+              .filter(Boolean)
+              .join(" "),
+            _optionClass: active
+              ? "slds-listbox__option newton-picklist__option slds-has-focus"
+              : "slds-listbox__option newton-picklist__option"
+          };
+        })
+      };
+    }
+    return { tileProps, cards };
+  }
+
+  get view() {
+    return VIEWS.get(this);
+  }
+  get tileProps() {
+    return this.view.tileProps;
+  }
+  get cards() {
+    return this.view.cards;
+  }
+  get radioItems() {
+    return this.view.radioItems;
+  }
+  get picklistItems() {
+    return this.view.picklistItems;
+  }
+  get transferAvailableItems() {
+    return this.view.transferAvailableItems;
+  }
+  get transferSelectedItems() {
+    return this.view.transferSelectedItems;
   }
 
   get isMulti() {
     return this.selectionMode === MODE_MULTI;
   }
-  get isList() {
-    return this.resolvedVariant === VARIANT_LIST;
-  }
   get isColumns() {
-    return this.resolvedVariant === VARIANT_COLUMNS;
+    return this.variant === VARIANT_COLUMNS;
   }
   get isDualListbox() {
-    return this.resolvedVariant === VARIANT_DUAL_LISTBOX;
+    return this.variant === VARIANT_DUAL_LISTBOX;
   }
   get isPicklist() {
-    return this.resolvedVariant === VARIANT_PICKLIST;
+    return this.variant === VARIANT_PICKLIST;
   }
   get isRadio() {
-    return this.resolvedVariant === VARIANT_RADIO;
+    return this.variant === VARIANT_RADIO;
   }
   get isTransferLayout() {
     return this.isColumns || this.isDualListbox;
   }
   get isBasicCardLayout() {
     return !this.isTransferLayout && !this.isPicklist && !this.isRadio;
-  }
-  get isCardLayout() {
-    return true;
   }
   get showOuterSearch() {
     return this.enableSearch && !this.isPicklist && !this.isTransferLayout;
@@ -182,74 +327,11 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   get selectedValueSet() {
-    return new Set(this._selectedValues);
+    return new Set(this._noneActive ? [""] : this._selectedValues);
   }
 
-  get decoratedItems() {
-    const selected = this.selectedValueSet;
-    const maxReached = this.maxReached(selected.size);
-    return this.filteredItems.map((item) =>
-      this.decorateCardItem(item, selected.has(item.value), maxReached)
-    );
-  }
-
-  get transferAvailableItems() {
-    const selected = this.selectedValueSet;
-    const maxReached = this.maxReached(selected.size);
-    const active = this.dualAvailableValueSet;
-    return this.filteredItems
-      .filter((item) => !selected.has(item.value))
-      .map((item) =>
-        this.decorateCardItem(item, false, maxReached, active.has(item.value))
-      );
-  }
-
-  get transferSelectedItems() {
-    const allItems = Array.isArray(this.items) ? this.items : [];
-    const byValue = new Map(allItems.map((item) => [item.value, item]));
-    const active = this.dualSelectedValueSet;
-    return this._selectedValues
-      .map((value) => byValue.get(value))
-      .filter(Boolean)
-      .map((item) =>
-        this.decorateCardItem(item, true, false, active.has(item.value))
-      );
-  }
-
-  get radioItems() {
-    return this.decoratedItems.map((item) => ({
-      ...item,
-      _radioClass: [
-        "newton-radio-card",
-        this.isMulti ? "newton-radio-card_multi" : "",
-        item._selected ? "newton-radio-card_selected" : "",
-        item._disabled ? "newton-radio-card_disabled" : ""
-      ]
-        .filter(Boolean)
-        .join(" ")
-    }));
-  }
-
-  get picklistItems() {
-    return this.decoratedItems.map((item) => ({
-      ...item,
-      title: item.label,
-      subtitle: item.sublabel || "",
-      type: item.type || item.displayType || "",
-      _ariaSelected: String(item._selected),
-      _ariaDisabled: String(item._disabled),
-      _class: [
-        "slds-listbox__item",
-        "newton-picklist__item",
-        item._selected ? "newton-picklist__item_selected" : ""
-      ]
-        .filter(Boolean)
-        .join(" ")
-    }));
-  }
-
-  get hasPicklistItems() {
-    return this.picklistItems.length > 0;
+  get hasFilteredItems() {
+    return this.filteredItems.length > 0;
   }
 
   get hasAvailableItems() {
@@ -261,21 +343,11 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   get availableCountLabel() {
-    const count = this.transferAvailableItems.length;
-    return `${count} available`;
+    return `${this.transferAvailableItems.length} available`;
   }
 
   get selectedCountLabel() {
-    const count = this.transferSelectedItems.length;
-    return `${count} selected`;
-  }
-
-  get dualAvailableValueSet() {
-    return new Set(this._dualAvailableValues);
-  }
-
-  get dualSelectedValueSet() {
-    return new Set(this._dualSelectedValues);
+    return `${this.transferSelectedItems.length} selected`;
   }
 
   get availablePanelLabel() {
@@ -292,6 +364,14 @@ export default class NewtonSelectorGroup extends LightningElement {
 
   get selectedPanelAriaLabel() {
     return this.isColumns ? "Selected card column" : "Chosen options";
+  }
+
+  get availableLabelId() {
+    return `${this._groupName}-available-label`;
+  }
+
+  get selectedLabelId() {
+    return `${this._groupName}-selected-label`;
   }
 
   get availableEmptyMessage() {
@@ -312,7 +392,6 @@ export default class NewtonSelectorGroup extends LightningElement {
       _selected: isSelected,
       _disabled: disabled,
       _draggable: this.isColumns && !disabled && !isNone && !isManual,
-      _active: active,
       _class: [
         "newton-transfer__item",
         active ? "newton-transfer__item_active" : "",
@@ -354,13 +433,13 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   get groupClass() {
-    return `newton-group newton-group_${this.resolvedVariant}`;
+    return `newton-group newton-group_${this.variant}`;
   }
 
   get transferClass() {
     return [
       "newton-transfer",
-      `newton-transfer_${this.resolvedVariant}`,
+      `newton-transfer_${this.variant}`,
       this.isDualListbox ? "newton-transfer_has-controls" : ""
     ]
       .filter(Boolean)
@@ -376,12 +455,9 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   transferPanelClass(zone) {
-    return [
-      "newton-transfer__panel",
-      this._dragOverZone === zone ? "newton-transfer__panel_drop" : ""
-    ]
-      .filter(Boolean)
-      .join(" ");
+    return this._dragOverZone === zone
+      ? "newton-transfer__panel newton-transfer__panel_drop"
+      : "newton-transfer__panel";
   }
 
   get groupStyle() {
@@ -394,82 +470,48 @@ export default class NewtonSelectorGroup extends LightningElement {
       `--newton-group-margin-b: ${tokenToCss(this.marginBottom)}`,
       `--newton-group-margin-l: ${tokenToCss(this.marginLeft)}`
     ];
-    if (this.paddingTop !== undefined && this.paddingTop !== null) {
+    if (this.paddingTop) {
       parts.push(`--newton-tile-pad-t: ${tokenToCss(this.paddingTop)}`);
     }
-    if (this.paddingRight !== undefined && this.paddingRight !== null) {
+    if (this.paddingRight) {
       parts.push(`--newton-tile-pad-r: ${tokenToCss(this.paddingRight)}`);
     }
-    if (this.paddingBottom !== undefined && this.paddingBottom !== null) {
+    if (this.paddingBottom) {
       parts.push(`--newton-tile-pad-b: ${tokenToCss(this.paddingBottom)}`);
     }
-    if (this.paddingLeft !== undefined && this.paddingLeft !== null) {
+    if (this.paddingLeft) {
       parts.push(`--newton-tile-pad-l: ${tokenToCss(this.paddingLeft)}`);
     }
     const cols = Number(this.columns);
-    if (Number.isFinite(cols) && cols >= 1 && cols <= 6) {
+    if (Number.isInteger(cols) && cols >= 1 && cols <= 6) {
       parts.push(`--newton-group-cols: ${cols}`);
     }
     return parts.join("; ");
   }
 
   get isEmpty() {
-    return (
-      !this.previewMode &&
-      this.isBasicCardLayout &&
-      this.decoratedItems.length === 0
-    );
-  }
-
-  get isRadioEmpty() {
-    return (
-      !this.previewMode && this.isRadio && this.decoratedItems.length === 0
-    );
+    return !this.previewMode && !this.hasFilteredItems;
   }
 
   get choiceTileVariant() {
-    return this.isList ||
-      this.isTransferLayout ||
-      this.isRadio ||
-      this.isPicklist
-      ? VARIANT_LIST
-      : VARIANT_GRID;
+    return this.variant === VARIANT_GRID || this.variant === "horizontal"
+      ? VARIANT_GRID
+      : VARIANT_LIST;
   }
+
+  // --- Picklist (SLDS combobox, listbox with aria-activedescendant) ---
 
   get selectedPicklistItem() {
-    const source = Array.isArray(this.items) ? this.items : [];
-    const item = source.find(
-      (entry) => entry.value === this._selectedValues[0]
-    );
-    return item ? this.decorateCardItem(item, true, false) : null;
-  }
-
-  get selectedPicklistLabel() {
-    return this.selectedPicklistItem?.label || "";
-  }
-
-  get selectedPicklistSublabel() {
-    return this.selectedPicklistItem?.sublabel || "";
-  }
-
-  get selectedPicklistIcon() {
-    return this.isPicklistSingle ? this.selectedPicklistItem?.icon || "" : "";
-  }
-
-  get selectedPicklistBadge() {
-    return this.selectedPicklistItem?.badge || "";
-  }
-
-  get hasPicklistSelection() {
-    return this._selectedValues.length > 0;
+    const current = this._noneActive ? "" : this._selectedValues[0];
+    return this.findItem(current) || null;
   }
 
   get isPicklistSingle() {
     return this.isPicklist && !this.isMulti;
   }
 
-  get showPicklistSelectedCard() {
-    return this.isPicklistSingle && Boolean(this.selectedPicklistItem);
+  get selectedPicklistIcon() {
+    return this.isPicklistSingle ? this.selectedPicklistItem?.icon || "" : "";
   }
 
   get picklistAriaMultiselectable() {
@@ -477,19 +519,24 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   get picklistSelectionLabel() {
-    if (!this.isMulti) return "";
-    const selected = this.selectedItemsInOrder();
-    if (selected.length === 0) return "";
-    const labels = selected.map((item) => item.label).filter(Boolean);
+    const labels = this.selectedItemsInOrder()
+      .map((item) => item.label)
+      .filter(Boolean);
     const visible = labels.slice(0, 2).join(", ");
     const extra = labels.length - 2;
     return extra > 0 ? `${visible} +${extra} more` : visible;
   }
 
   get picklistClass() {
-    return ["newton-picklist", this._picklistOpen ? "newton-picklist_open" : ""]
-      .filter(Boolean)
-      .join(" ");
+    return this._picklistOpen
+      ? "newton-picklist newton-picklist_open"
+      : "newton-picklist";
+  }
+
+  get picklistComboboxClass() {
+    const base =
+      "slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click";
+    return this._picklistOpen ? `${base} slds-is-open` : base;
   }
 
   get picklistInputContainerClass() {
@@ -506,17 +553,21 @@ export default class NewtonSelectorGroup extends LightningElement {
       : base;
   }
 
-  get picklistInputId() {
-    return `${this._groupName}-picklist-input`;
-  }
-
   get picklistListboxId() {
     return `${this._groupName}-picklist-listbox`;
   }
 
+  get picklistControls() {
+    return this._picklistOpen ? this.picklistListboxId : null;
+  }
+
+  get picklistActiveDescendant() {
+    if (!this._picklistOpen) return null;
+    return this.picklistItems[this._activeIndex]?._optionId || null;
+  }
+
   get picklistInputValue() {
-    if (this.isPicklistSingle) return this.selectedPicklistLabel;
-    if (!this.hasPicklistSelection) return "";
+    if (this.isPicklistSingle) return this.selectedPicklistItem?.label || "";
     return this.picklistSelectionLabel;
   }
 
@@ -526,9 +577,8 @@ export default class NewtonSelectorGroup extends LightningElement {
 
   get picklistInputTitle() {
     if (this.isPicklistSingle) {
-      return [this.selectedPicklistLabel, this.selectedPicklistSublabel]
-        .filter(Boolean)
-        .join(" - ");
+      const item = this.selectedPicklistItem;
+      return [item?.label, item?.sublabel].filter(Boolean).join(" - ");
     }
     return this.picklistInputValue;
   }
@@ -553,11 +603,6 @@ export default class NewtonSelectorGroup extends LightningElement {
     return this._selectedValues.includes(MANUAL_INPUT_VALUE);
   }
 
-  get resolvedManualInputLabel() {
-    const label = this.manualInputLabel;
-    return label && String(label).trim() ? String(label) : "Other";
-  }
-
   get manualInputHelpText() {
     const min = Number(this.manualInputMinLength || 0);
     const max = this.manualInputMaxLength;
@@ -565,10 +610,6 @@ export default class NewtonSelectorGroup extends LightningElement {
     if (min > 0) return `At least ${min} characters`;
     if (max) return `Up to ${max} characters`;
     return "";
-  }
-
-  get hasManualInputHelpText() {
-    return Boolean(this.manualInputHelpText);
   }
 
   get dualAddDisabled() {
@@ -589,11 +630,12 @@ export default class NewtonSelectorGroup extends LightningElement {
 
   handleSearch(event) {
     this._searchTerm = event.target.value || "";
+    this._activeIndex = this._picklistOpen ? 0 : -1;
   }
 
   handleManualInput(event) {
     this._manualInputValue = event.target.value || "";
-    if (this.showManualInput && !this.previewMode) this.fireChange();
+    if (!this.previewMode) this.fireChange();
   }
 
   handleCardSelect(event) {
@@ -602,7 +644,7 @@ export default class NewtonSelectorGroup extends LightningElement {
 
     const changed = this.isMulti
       ? this.toggleMulti(value)
-      : this.setSelectedValues(value === "" ? [] : [value]);
+      : this.selectSingle(value);
     if (changed && !this.previewMode) this.fireChange();
   }
 
@@ -633,38 +675,88 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   handlePicklistToggle() {
-    this._picklistOpen = !this._picklistOpen;
+    if (this._picklistOpen) {
+      this.closePicklist();
+    } else {
+      this.openPicklist(false);
+    }
   }
 
+  // Focus stays on the trigger (or the search field); arrow keys move the
+  // active option, announced through aria-activedescendant.
   handlePicklistKeydown(event) {
-    if (event.key === "Escape") {
-      this._picklistOpen = false;
-      event.stopPropagation();
+    const { key } = event;
+    const inSearch = event.currentTarget.type === "search";
+    if (key === "Escape") {
+      if (this._picklistOpen) {
+        event.stopPropagation();
+        this.closePicklist();
+      }
       return;
     }
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      this.handlePicklistToggle();
+    if (!this._picklistOpen) {
+      if (["ArrowDown", "ArrowUp", "Enter", " "].includes(key)) {
+        event.preventDefault();
+        this.openPicklist(key === "ArrowUp");
+      }
+      return;
+    }
+    const last = this.picklistItems.length - 1;
+    if (key === "ArrowDown") {
+      this._activeIndex = Math.min(this._activeIndex + 1, last);
+    } else if (key === "ArrowUp") {
+      this._activeIndex = Math.max(this._activeIndex - 1, 0);
+    } else if (key === "Home" && !inSearch) {
+      this._activeIndex = 0;
+    } else if (key === "End" && !inSearch) {
+      this._activeIndex = last;
+    } else if (key === "Enter" || (key === " " && !inSearch)) {
+      const item = this.picklistItems[this._activeIndex];
+      if (item) this.applyPicklistValue(item.value);
+    } else {
+      return;
+    }
+    event.preventDefault();
+  }
+
+  handlePicklistFocusOut(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      this.closePicklist();
     }
   }
 
-  handlePicklistCardSelect(event) {
-    event.stopPropagation();
-    this.applyPicklistValue(event.detail?.value);
+  // Keeps focus on the trigger while an option is clicked.
+  handlePicklistOptionMouseDown(event) {
+    event.preventDefault();
   }
 
   handlePicklistOptionSelect(event) {
     this.applyPicklistValue(event.currentTarget.dataset.value);
   }
 
+  openPicklist(fromEnd) {
+    const items = this.picklistItems;
+    const selectedIndex = items.findIndex((item) => item._selected);
+    this._picklistOpen = true;
+    if (selectedIndex >= 0) {
+      this._activeIndex = selectedIndex;
+    } else {
+      this._activeIndex = fromEnd ? items.length - 1 : 0;
+    }
+  }
+
+  closePicklist() {
+    this._picklistOpen = false;
+    this._activeIndex = -1;
+  }
+
   applyPicklistValue(value) {
-    if (value === undefined || value === null) return;
     const item = this.findItem(value);
-    if (item?.disabled) return;
+    if (!item || item.disabled) return;
     const changed = this.isMulti
       ? this.toggleMulti(value)
-      : this.setSelectedValues(value === "" ? [] : [value]);
-    this._picklistOpen = this.isMulti;
+      : this.selectSingle(value);
+    if (!this.isMulti) this.closePicklist();
     if (changed && !this.previewMode) this.fireChange();
   }
 
@@ -719,9 +811,14 @@ export default class NewtonSelectorGroup extends LightningElement {
     return this.addValue(value);
   }
 
+  // The None option's value is "". Picking it clears the selection (the
+  // emitted values stay []) and marks None as the active choice.
   addValue(value) {
     if (value === "") {
-      return this.setSelectedValues([]);
+      const changed = !this._noneActive || this._selectedValues.length > 0;
+      this._selectedValues = [];
+      this._noneActive = true;
+      return changed;
     }
     if (value === MANUAL_INPUT_VALUE) {
       if (!this.isMulti) {
@@ -749,9 +846,13 @@ export default class NewtonSelectorGroup extends LightningElement {
     return this.setSelectedValues([...this._selectedValues, value]);
   }
 
+  selectSingle(value) {
+    return value === "" ? this.addValue("") : this.setSelectedValues([value]);
+  }
+
   addValues(values) {
     if (values.includes("")) {
-      return this.setSelectedValues([]);
+      return this.addValue("");
     }
     return values.reduce(
       (changed, value) => this.addValue(value) || changed,
@@ -777,6 +878,7 @@ export default class NewtonSelectorGroup extends LightningElement {
   setSelectedValues(values) {
     if (valuesEqual(this._selectedValues, values)) return false;
     this._selectedValues = [...values];
+    if (values.length > 0) this._noneActive = false;
     return true;
   }
 
@@ -833,7 +935,6 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   handleSelectAll() {
-    if (!this.isMulti) return;
     const allValues = this.filteredItems
       .filter(
         (item) =>
@@ -852,7 +953,6 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   handleClearAll() {
-    if (!this.isMulti) return;
     const changed = this.setSelectedValues([]);
     this._dualAvailableValues = [];
     this._dualSelectedValues = [];
@@ -873,6 +973,7 @@ export default class NewtonSelectorGroup extends LightningElement {
         detail: {
           values: [...this._selectedValues],
           items: this.selectedItemsInOrder(),
+          noneSelected: this._noneActive,
           manualValue: this._manualInputValue
         },
         bubbles: true,

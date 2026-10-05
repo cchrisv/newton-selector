@@ -1,14 +1,5 @@
-/** @description Value coercion and predicate helpers for Newton Selector SOQL building. */
+/** @description Bind and value-coercion helpers for Newton Selector SOQL building. */
 public with sharing class NewtonSelectorQueryValueUtil {
-  /**
-   * @description Returns true when the operator is for multi-select picklist matching.
-   * @param operator Normalized SOQL operator.
-   * @return True for INCLUDES and EXCLUDES.
-   */
-  public static Boolean isMultiPicklistOperator(String operator) {
-    return operator == 'INCLUDES' || operator == 'EXCLUDES';
-  }
-
   /**
    * @description Adds a named bind value to the bind map.
    * @param binds Bind map.
@@ -22,44 +13,78 @@ public with sharing class NewtonSelectorQueryValueUtil {
   }
 
   /**
-   * @description Converts a raw string into the field's Apex value type.
-   * @param fieldDescribe Field describe for type selection.
-   * @param rawValue Raw value from configuration.
+   * @description Converts a WHERE literal into the field's Apex value type.
+   * @param field Field describe for type selection.
+   * @param rawValue Literal text, or null for the bare NULL keyword.
    * @return Coerced Apex value.
    */
   public static Object coerceValue(
-    Schema.DescribeFieldResult fieldDescribe,
+    Schema.DescribeFieldResult field,
     String rawValue
   ) {
-    if (rawValue == null || rawValue.equalsIgnoreCase('NULL')) {
+    if (rawValue == null) {
       return null;
     }
-
-    Schema.DisplayType fieldType = fieldDescribe.getType();
-    if (fieldType == Schema.DisplayType.BOOLEAN) {
-      return rawValue.equalsIgnoreCase('TRUE');
+    try {
+      return coerceNonNull(field, rawValue);
+    } catch (TypeException e) {
+      throw invalidValue(field, rawValue);
     }
-    if (fieldType == Schema.DisplayType.INTEGER) {
-      return Integer.valueOf(rawValue);
-    }
-    if (fieldType == Schema.DisplayType.LONG) {
-      return Long.valueOf(rawValue);
-    }
-    if (isDecimalField(fieldType)) {
-      return Decimal.valueOf(rawValue);
-    }
-    if (fieldType == Schema.DisplayType.DATE) {
-      return Date.valueOf(rawValue);
-    }
-    if (fieldType == Schema.DisplayType.DATETIME) {
-      return Datetime.valueOf(rawValue);
-    }
-    return rawValue;
   }
 
-  private static Boolean isDecimalField(Schema.DisplayType fieldType) {
-    return fieldType == Schema.DisplayType.DOUBLE ||
-      fieldType == Schema.DisplayType.CURRENCY ||
-      fieldType == Schema.DisplayType.PERCENT;
+  private static Object coerceNonNull(
+    Schema.DescribeFieldResult field,
+    String rawValue
+  ) {
+    switch on field.getType() {
+      when BOOLEAN {
+        return parseBoolean(field, rawValue);
+      }
+      when INTEGER {
+        return Integer.valueOf(rawValue);
+      }
+      when LONG {
+        return Long.valueOf(rawValue);
+      }
+      when DOUBLE, CURRENCY, PERCENT {
+        return Decimal.valueOf(rawValue);
+      }
+      when DATE {
+        return Date.valueOf(rawValue);
+      }
+      when DATETIME {
+        return Datetime.valueOf(rawValue);
+      }
+      when else {
+        return rawValue;
+      }
+    }
+  }
+
+  private static Boolean parseBoolean(
+    Schema.DescribeFieldResult field,
+    String rawValue
+  ) {
+    if (rawValue.equalsIgnoreCase('TRUE')) {
+      return true;
+    }
+    if (rawValue.equalsIgnoreCase('FALSE')) {
+      return false;
+    }
+    throw invalidValue(field, rawValue);
+  }
+
+  private static NewtonSelectorException invalidValue(
+    Schema.DescribeFieldResult field,
+    String rawValue
+  ) {
+    return new NewtonSelectorException(
+      'Invalid value for ' +
+        field.getName() +
+        ' (' +
+        field.getType().name() +
+        '): ' +
+        rawValue
+    );
   }
 }

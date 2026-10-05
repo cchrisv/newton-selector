@@ -1,9 +1,5 @@
 <template>
-  <section class="newton-chapter newton-chapter_03" data-chapter="behavior">
-    <aside class="newton-chapter__mark" aria-hidden="true">
-      <span class="newton-chapter__numeral">03</span>
-      <span class="newton-chapter__rule"></span>
-    </aside>
+  <section class="newton-chapter" data-chapter="behavior">
     <header class="newton-chapter__head">
       <p class="newton-chapter__eyebrow">Behavior</p>
       <h2 class="newton-chapter__title">How users interact</h2>
@@ -15,10 +11,7 @@
       <header
         class="slds-card__header newton-card__head newton-card__head_with-action"
       >
-        <span
-          class="newton-card__glyph newton-card__glyph_behavior"
-          aria-hidden="true"
-        >
+        <span class="newton-card__glyph" aria-hidden="true">
           <c-newton-selector-icon
             name="check"
             size="small"
@@ -43,11 +36,41 @@
             ontoggle={handleSelectionModeToggle}
           ></c-newton-selector-flow-cpe-toggle>
         </span>
-        <lightning-helptext
-          class="newton-card__help"
-          content="Single = exactly one option. Multi = several options."
-        ></lightning-helptext>
       </header>
+      <div
+        class="slds-card__body slds-card__body_inner newton-studio__field-block"
+      >
+        <c-newton-selector-flow-cpe-resource-selector
+          name="defaultSelection"
+          label="Default selection"
+          value={defaultSelectionRef}
+          builder-context={builderContext}
+          automatic-output-variables={automaticOutputVariables}
+          builder-context-filter-type="String"
+          builder-context-filter-collection-boolean={isMultiSelect}
+          onvaluechanged={handleDefaultSelectionChange}
+        ></c-newton-selector-flow-cpe-resource-selector>
+        <template lwc:if={isMultiSelect}>
+          <div class="newton-studio__field-grid">
+            <lightning-input
+              type="number"
+              label="Minimum selections"
+              value={minSelectionsValue}
+              min="0"
+              placeholder="None"
+              onchange={handleMinChange}
+            ></lightning-input>
+            <lightning-input
+              type="number"
+              label="Maximum selections"
+              value={maxSelectionsValue}
+              min="1"
+              placeholder="No maximum"
+              onchange={handleMaxChange}
+            ></lightning-input>
+          </div>
+        </template>
+      </div>
     </article>
 
     <!-- CARD · Required -->
@@ -55,10 +78,7 @@
       <header
         class="slds-card__header newton-card__head newton-card__head_with-action"
       >
-        <span
-          class="newton-card__glyph newton-card__glyph_behavior"
-          aria-hidden="true"
-        >
+        <span class="newton-card__glyph" aria-hidden="true">
           <c-newton-selector-icon
             name="asterisk"
             size="small"
@@ -88,7 +108,7 @@
         </span>
         <lightning-helptext
           class="newton-card__help"
-          content="When Required is on, the selector must have a value before the Flow can continue. You can optionally override the validation message."
+          content="Users can't continue until they pick an option. An error message, if you set one, replaces every message this selector shows, including the minimum and maximum selection messages."
         ></lightning-helptext>
       </header>
       <template lwc:if={_config.required}>
@@ -97,7 +117,7 @@
         >
           <c-newton-selector-flow-cpe-resource-selector
             name="customErrorMessage"
-            label="Custom error message (optional)"
+            label="Error message (optional)"
             value={_config.customErrorMessage}
             builder-context={builderContext}
             automatic-output-variables={automaticOutputVariables}
@@ -109,16 +129,13 @@
       </template>
     </article>
 
-    <!-- CARD · Auto Nav -->
+    <!-- CARD · Auto-advance -->
     <template lwc:if={isSingleSelect}>
       <article class="slds-card newton-studio__card">
         <header
           class="slds-card__header newton-card__head newton-card__head_with-action"
         >
-          <span
-            class="newton-card__glyph newton-card__glyph_behavior"
-            aria-hidden="true"
-          >
+          <span class="newton-card__glyph" aria-hidden="true">
             <c-newton-selector-icon
               name="navigation"
               size="small"
@@ -127,122 +144,106 @@
           </span>
           <div class="newton-card__headings">
             <h3 class="slds-card__header-title slds-text-heading_small">
-              Auto navigation
+              Auto-advance
             </h3>
             <p
               class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
             >
-              Move to the next Flow screen after a selection.
+              Go to the next screen as soon as a user picks an option.
             </p>
           </div>
           <span class="newton-card__action">
             <c-newton-selector-flow-cpe-toggle
-              label="Auto-advance the flow on selection"
+              label="Auto-advance"
               variant="label-hidden"
-              active-label="Auto"
-              inactive-label="Manual"
+              active-label="On"
+              inactive-label="Off"
               checked={_config.autoAdvance}
               data-key="autoAdvance"
               ontoggle={handleToggleChange}
             ></c-newton-selector-flow-cpe-toggle>
           </span>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Fires Flow Next the moment a user picks a tile. Auto Nav is available for single-select selectors only."
-          ></lightning-helptext>
         </header>
       </article>
     </template>
 
     <!-- CARD · None option -->
-    <template lwc:if={isNoneOptionAvailable}>
-      <article class="slds-card newton-studio__card">
-        <header
-          class="slds-card__header newton-card__head newton-card__head_with-action"
+    <article class="slds-card newton-studio__card">
+      <header
+        class="slds-card__header newton-card__head newton-card__head_with-action"
+      >
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="circle-x"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">
+            None option
+          </h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+          >
+            Add an empty choice so users can clear their selection.
+          </p>
+        </div>
+        <span class="newton-card__action">
+          <c-newton-selector-flow-cpe-toggle
+            label="Include a --None-- option"
+            variant="label-hidden"
+            active-label="On"
+            inactive-label="Off"
+            checked={_config.includeNoneOption}
+            data-key="includeNoneOption"
+            ontoggle={handleToggleChange}
+          ></c-newton-selector-flow-cpe-toggle>
+        </span>
+      </header>
+      <template lwc:if={_config.includeNoneOption}>
+        <div
+          class="slds-card__body slds-card__body_inner newton-studio__field-block"
         >
-          <span
-            class="newton-card__glyph newton-card__glyph_behavior"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="circle-x"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              None option
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+          <lightning-input
+            type="text"
+            label="None option label"
+            value={_config.noneOptionLabel}
+            placeholder="--None--"
+            onchange={handleNoneOptionLabelChange}
+          ></lightning-input>
+          <div class="newton-studio__field" aria-label="None option position">
+            <p class="newton-studio__field-label">Position</p>
+            <div
+              class="newton-studio__selectorgroup"
+              role="radiogroup"
+              aria-label="None option position"
+              oncardselect={handleNoneOptionPositionChange}
             >
-              Let users clear their selection with a dedicated tile.
-            </p>
-          </div>
-          <span class="newton-card__action">
-            <c-newton-selector-flow-cpe-toggle
-              label="Include a --None-- option"
-              variant="label-hidden"
-              active-label="Include"
-              inactive-label="No none"
-              checked={noneOptionValue}
-              data-key="includeNoneOption"
-              ontoggle={handleToggleChange}
-            ></c-newton-selector-flow-cpe-toggle>
-          </span>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Adds an empty-value choice so users can clear the selector in any layout."
-          ></lightning-helptext>
-        </header>
-        <template lwc:if={noneOptionValue}>
-          <div
-            class="slds-card__body slds-card__body_inner newton-studio__field-block"
-          >
-            <lightning-input
-              type="text"
-              label="None option label"
-              value={noneOptionLabelValue}
-              placeholder="--None--"
-              disabled={isNoneOptionLabelDisabled}
-              onchange={handleNoneOptionLabelChange}
-            ></lightning-input>
-            <div class="newton-studio__field" aria-label="None option position">
-              <p class="newton-studio__field-label">Position</p>
-              <div
-                class="newton-studio__selectorgroup"
-                role="radiogroup"
-                aria-label="None option position"
-                oncardselect={handleNoneOptionPositionChange}
-              >
-                <template for:each={noneOptionPositionTiles} for:item="tile">
-                  <c-newton-selector-choice-tile
-                    key={tile.value}
-                    item={tile}
-                    selected={tile._selected}
-                    disabled={tile._disabled}
-                    selection-mode="single"
-                    group-name="newton-none-pos"
-                    size="small"
-                  ></c-newton-selector-choice-tile>
-                </template>
-              </div>
+              <template for:each={noneOptionPositionTiles} for:item="tile">
+                <c-newton-selector-choice-tile
+                  key={tile.value}
+                  item={tile}
+                  selected={tile._selected}
+                  selection-mode="single"
+                  group-name="newton-none-pos"
+                  size="small"
+                  framed-visual
+                  aspect-ratio="3:2"
+                ></c-newton-selector-choice-tile>
+              </template>
             </div>
           </div>
-        </template>
-      </article>
-    </template>
+        </div>
+      </template>
+    </article>
 
     <!-- CARD · Manual input -->
     <article class="slds-card newton-studio__card">
       <header
         class="slds-card__header newton-card__head newton-card__head_with-action"
       >
-        <span
-          class="newton-card__glyph newton-card__glyph_behavior"
-          aria-hidden="true"
-        >
+        <span class="newton-card__glyph" aria-hidden="true">
           <c-newton-selector-icon
             name="square-pen"
             size="small"
@@ -263,45 +264,42 @@
           <c-newton-selector-flow-cpe-toggle
             label="Allow manual input"
             variant="label-hidden"
-            active-label="Manual"
-            inactive-label="No manual"
-            checked={manualInputValue}
+            active-label="On"
+            inactive-label="Off"
+            checked={_config.manualInput.enabled}
             ontoggle={handleManualInputToggle}
           ></c-newton-selector-flow-cpe-toggle>
         </span>
         <lightning-helptext
           class="newton-card__help"
-          content="Adds an Other-style choice to every selector layout. When selected, the entered text is returned through the selector value output."
+          content="Adds an option users can type into, such as Other. The flow receives the typed text as the selector's value."
         ></lightning-helptext>
       </header>
-      <template lwc:if={manualInputValue}>
+      <template lwc:if={_config.manualInput.enabled}>
         <div
           class="slds-card__body slds-card__body_inner newton-studio__field-block"
         >
           <lightning-input
             type="text"
             label="Manual option label"
-            value={manualInputLabelValue}
+            value={_config.manualInput.label}
             placeholder="Other"
-            disabled={isManualInputDisabled}
             onchange={handleManualInputLabelChange}
           ></lightning-input>
           <div class="newton-studio__field-grid">
             <lightning-input
               type="number"
               label="Minimum characters"
-              value={manualInputMinLengthValue}
+              value={_config.manualInput.minLength}
               min="0"
-              disabled={isManualInputDisabled}
               onchange={handleManualInputMinLengthChange}
             ></lightning-input>
             <lightning-input
               type="number"
               label="Maximum characters"
               placeholder="Unlimited"
-              value={manualInputMaxLengthValue}
+              value={_config.manualInput.maxLength}
               min="1"
-              disabled={isManualInputDisabled}
               onchange={handleManualInputMaxLengthChange}
             ></lightning-input>
           </div>
@@ -314,10 +312,7 @@
       <header
         class="slds-card__header newton-card__head newton-card__head_with-action"
       >
-        <span
-          class="newton-card__glyph newton-card__glyph_behavior"
-          aria-hidden="true"
-        >
+        <span class="newton-card__glyph" aria-hidden="true">
           <c-newton-selector-icon
             name="search"
             size="small"
@@ -338,8 +333,8 @@
           <c-newton-selector-flow-cpe-toggle
             label="Show a search filter"
             variant="label-hidden"
-            active-label="Search"
-            inactive-label="No search"
+            active-label="On"
+            inactive-label="Off"
             checked={_config.enableSearch}
             data-key="enableSearch"
             ontoggle={handleToggleChange}
@@ -347,9 +342,14 @@
         </span>
         <lightning-helptext
           class="newton-card__help"
-          content="Search appears where it fits the selected layout: above card groups, inside picklists, and inside transfer panels."
+          content="Search sits above the tiles, inside the Dropdown list, or above each Dual listbox list."
         ></lightning-helptext>
       </header>
     </article>
+  </template>
+  <template lwc:else>
+    <p class="slds-text-body_regular slds-text-color_weak">
+      Choose a data source in Data first. Behavior settings appear here then.
+    </p>
   </template>
 </template>

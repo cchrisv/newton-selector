@@ -11,6 +11,7 @@
 
 ## Table of Contents
 
+- [Documentation](#documentation)
 - [Overview](#overview)
 - [Features at a Glance](#features-at-a-glance)
 - [Data Sources](#data-sources)
@@ -23,6 +24,22 @@
 - [Installation](#installation)
 - [Development Setup](#development-setup)
 - [Testing](#testing)
+
+---
+
+## Documentation
+
+Full guides live in [`docs/`](docs/README.md):
+
+| Need                      | Read                                                                                                                                                                                                                                                                                                   |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| What it is, for everyone  | [Overview](docs/overview.md), [Using a Newton Selector](docs/guide-using-the-selector.md)                                                                                                                                                                                                              |
+| Build your first selector | [Tutorial](docs/tutorial-first-selector.md)                                                                                                                                                                                                                                                            |
+| Do a specific task        | [SOQL](docs/howto-build-a-soql-selector.md), [collections](docs/howto-use-a-record-collection.md), [multi-select](docs/howto-multi-select-and-validation.md), [styling](docs/howto-style-a-selector.md), [outputs](docs/howto-use-outputs-in-a-flow.md), [troubleshooting](docs/howto-troubleshoot.md) |
+| Look up an option or API  | [Configuration](docs/reference-configuration.md), [Flow component](docs/reference-flow-component.md), [Apex API](docs/reference-apex-api.md), [WHERE clause](docs/reference-where-clause.md)                                                                                                           |
+| Understand the design     | [Architecture](docs/architecture.md), [Design decisions](docs/explanation-design-decisions.md), [Security model](docs/explanation-security-model.md)                                                                                                                                                   |
+| Work on the code          | [Develop and test](docs/howto-develop-and-test.md)                                                                                                                                                                                                                                                     |
+| Know the rough edges      | [Known limitations](docs/known-limitations.md)                                                                                                                                                                                                                                                         |
 
 ---
 
@@ -42,21 +59,21 @@ Drop the `Professor Flow | Newton Selector` component onto any Flow Screen and t
 
 ## Features at a Glance
 
-| Capability              | Detail                                                                                                                                |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| **4 data sources**      | Picklist field, Record collection, SOQL query, Custom static list                                                                     |
-| **7 layouts**           | Grid, List, Horizontal ribbon, Picklist/dropdown, Radio cards, Columns, Dual-listbox-style transfer                                   |
-| **Selection modes**     | Single and Multi (with configurable min/max)                                                                                          |
-| **Auto-advance**        | Automatically navigates to the next screen after a single selection                                                                   |
-| **Search/filter**       | Inline search bar filters tiles as the user types                                                                                     |
-| **Select all**          | One-click select-all button for multi-select mode                                                                                     |
-| **None option**         | Configurable --None-- tile that clears the selection (position: start or end)                                                         |
-| **Manual input**        | Optional "Other" choice with configurable label and min/max character rules                                                           |
-| **9 output variables**  | value, values, selectedRecord, selectedRecords, selectedLabel, selectedLabels, allValues, allLabels, selectionCount                   |
-| **Item overrides**      | Per-item label, icon, badge, and help text overrides for picklist and SOQL-backed options                                             |
-| **Sort and limit**      | Sort by label, value, or source order; optional result cap                                                                            |
-| **Required validation** | Block flow navigation with a configurable error message                                                                               |
-| **SLDS 2-oriented UI**  | Uses SLDS utilities, design tokens, accessibility patterns, and the SLDS linter. The repo-level SLDS linter currently passes cleanly. |
+| Capability              | Detail                                                                                                                      |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **4 data sources**      | Picklist field, Record collection, SOQL query, Custom static list                                                           |
+| **7 layouts**           | Grid, List, Horizontal ribbon, Picklist/dropdown, Radio cards, Columns, Dual-listbox-style transfer                         |
+| **Selection modes**     | Single and Multi, with optional minimum and maximum selections in multi mode                                                |
+| **Auto-advance**        | Automatically navigates to the next screen after a single selection                                                         |
+| **Search/filter**       | Inline search bar filters tiles as the user types                                                                           |
+| **Select all**          | Select-all and clear-all buttons for multi-select (runtime support; no editor control yet)                                  |
+| **None option**         | Configurable --None-- tile that clears the selection (position: start or end)                                               |
+| **Manual input**        | Optional "Other" choice with configurable label and min/max character rules                                                 |
+| **9 output variables**  | value, values, selectedRecord, selectedRecords, selectedLabel, selectedLabels, allValues, allLabels, selectionCount         |
+| **Option overrides**    | Per-option label, sublabel, icon, badge, help text, and hide overrides for Picklist and SOQL sources                        |
+| **Sort and limit**      | Sort by label, value, or source order; optional result cap                                                                  |
+| **Required validation** | Block flow navigation with a configurable error message                                                                     |
+| **SLDS 2-oriented UI**  | Uses SLDS utilities, design tokens and accessibility patterns. `npm run lint:slds` runs the SLDS linter over the components |
 
 ---
 
@@ -76,12 +93,12 @@ Accepts a Flow record collection variable (`{T[]}`) as input. A field-mapping se
 
 Issues a server-side SOQL query at runtime via `NewtonSelectorRuntimeController.queryItems`. The CPE exposes:
 
-- **Object selector** -- searchable dropdown of all accessible SObjects
+- **Object selector** -- searchable dropdown of queryable, accessible SObjects (first 80 matches)
 - **WHERE builder** -- visual clause builder with field selector, type-aware operator sets, and AND/OR logic
 - **Field mapping** -- map any field to label, sublabel, value, icon, badge, and help text
 - **ORDER BY** -- field + direction selector
-- **LIMIT** -- row cap (max 2,000)
-- **Query validation** -- design-time validation via `NewtonSelectorRuntimeController.validateQuery`, including preview SOQL for the generated query
+- **LIMIT** -- rows to load, 1 to 2,000 (blank uses 50)
+- **Query validation** -- design-time validation via `NewtonSelectorRuntimeController.validateQuery`, which runs the query once and reports the real error if it fails; a SOQL preview card shows the query the editor builds from your settings
 
 All queries run in `USER_MODE` and field-level security is enforced server-side.
 
@@ -102,35 +119,35 @@ Manual input is a behavior-level option that can add an "Other" choice to any se
 | **Grid**         | Visual, icon-forward choices; responsive tile grid with configurable column count or auto-fill |
 | **List**         | Dense option sets; stacked rows with icon, label, sublabel, and badge                          |
 | **Horizontal**   | Timeline steps, status sequences, or any scrollable ribbon of options                          |
-| **Picklist**     | Space-constrained screens; compact combobox-style selector that expands on click               |
+| **Dropdown**     | Space-constrained screens; compact combobox-style selector that expands on click               |
 | **Radio**        | Accessibility-first flows; card-styled radio group pattern                                     |
 | **Columns**      | Multi-select card movement with drag/drop between available and selected columns               |
-| **Multi-select** | Dual-listbox-style transfer pattern with add/remove controls                                   |
+| **Dual listbox** | Transfer pattern with add and remove controls                                                  |
 
 ---
 
 ## Selection Modes
 
-| Mode       | Behaviour                                                                                                                                                                 |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Single** | One option selected at a time. Outputs `value`, `selectedRecord`, `selectedLabel`, and `selectionCount`. Auto-advance applies only to this mode.                          |
-| **Multi**  | Any number of options. Configurable `minSelections` and `maxSelections` enforce constraints. Outputs `values`, `selectedRecords`, `selectedLabels`, and `selectionCount`. |
+| Mode       | Behaviour                                                                                                                                                                                       |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Single** | One option selected at a time. Outputs `value`, `selectedRecord`, `selectedLabel`, and `selectionCount`. Auto-advance applies only to this mode.                                                |
+| **Multi**  | Any number of options, optionally bounded by **Minimum selections** and **Maximum selections** (Behavior chapter). Outputs `values`, `selectedRecords`, `selectedLabels`, and `selectionCount`. |
 
-Both modes support the `required` flag, which blocks the Flow's Next button until a valid selection is made and shows a configurable error message.
+Both modes support the `required` flag, which blocks the Flow's Next button until a valid selection is made and shows a configurable error message. **Default selection** (Behavior chapter) pre-selects options from a Flow resource by setting the component's `value` (single) or `values` (multi) input.
 
 ---
 
 ## Visual Customization
 
-All visual settings are managed through the CPE's Appearance tab -- no CSS editing required.
+All visual settings are managed in the CPE's **04 Appearance** chapter -- no CSS editing required.
 
 ### Tile Size and Aspect Ratio
 
-| Size   | Column width     |
-| ------ | ---------------- |
-| Small  | 7.5 rem          |
-| Medium | 12 rem (default) |
-| Large  | 16 rem           |
+| Size            | Column width |
+| --------------- | ------------ |
+| Small (default) | 7.5 rem      |
+| Medium          | 12 rem       |
+| Large           | 16 rem       |
 
 Aspect ratio options: `1:1` (square), `4:3` (landscape), `16:9` (wide), `3:4` (portrait).
 
@@ -159,7 +176,7 @@ Every tile can carry a badge from its data source. The CPE lets you configure po
 
 ### Spacing
 
-Grid gap, margin, and padding all accept SLDS 2 spacing tokens (`1`--`12`, `none`) or raw CSS values. Linked toggles apply one value to all sides at once.
+Grid gap, margin, and padding accept SLDS 2 spacing tokens only (`1`--`9`, `none`, or Auto). Linked toggles apply one value to all sides at once.
 
 ---
 
@@ -167,87 +184,62 @@ Grid gap, margin, and padding all accept SLDS 2 spacing tokens (`1`--`12`, `none
 
 Every output is available as a Flow resource once the component is placed on a screen.
 
-| Variable          | Type      | Description                                                                  |
-| ----------------- | --------- | ---------------------------------------------------------------------------- |
-| `value`           | String    | The value of the currently selected option (single mode)                     |
-| `values`          | String[]  | All selected values (multi mode)                                             |
-| `selectedRecord`  | SObject   | The full record for the selected option (record-backed sources, single mode) |
-| `selectedRecords` | SObject[] | All selected records (record-backed sources, multi mode)                     |
-| `selectedLabel`   | String    | Display label of the selected option (single mode)                           |
-| `selectedLabels`  | String[]  | Display labels of all selected options (multi mode)                          |
-| `allValues`       | String[]  | Every value rendered by the selector, in display order                       |
-| `allLabels`       | String[]  | Every label rendered by the selector, in display order                       |
-| `selectionCount`  | Integer   | Number of currently selected options                                         |
+| Variable          | Type      | Description                                                                                                                        |
+| ----------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `value`           | String    | The value of the currently selected option (single mode)                                                                           |
+| `values`          | String[]  | All selected values (multi mode)                                                                                                   |
+| `selectedRecord`  | SObject   | The source record for the selected option (SOQL: `Id` plus the queried fields; Collection: the record; Custom and Picklist: empty) |
+| `selectedRecords` | SObject[] | All selected records (SOQL and Collection sources, multi mode; empty for Custom and Picklist)                                      |
+| `selectedLabel`   | String    | Display label of the selected option (single mode)                                                                                 |
+| `selectedLabels`  | String[]  | Display labels of all selected options (multi mode)                                                                                |
+| `allValues`       | String[]  | Every value rendered by the selector, in display order                                                                             |
+| `allLabels`       | String[]  | Every label rendered by the selector, in display order                                                                             |
+| `selectionCount`  | Integer   | Number of currently selected options                                                                                               |
 
 ---
 
 ## Component Architecture
 
-The project uses a layered LWC architecture. Layer roles stay in the design docs; bundle names describe product purpose.
+Two entry points share one rendering stack. The Flow screen component renders the selector at runtime. The Custom Property Editor (CPE) configures it in Flow Builder and previews it with the same components.
 
 ```
-newtonSelectorFlowScreen                         <- Flow Screen component (entry point)
-  +-- newtonSelectorFlowCpe                      <- Custom Property Editor (Flow Builder panel)
-        +-- newtonSelectorFlowCpeConfigModal     <- LightningModal shell and configuration orchestration
-              +-- newtonSelectorFlowCpeStudio    <- Studio layout, left navigation, splitter, scroll container
-              +-- newtonSelectorFlowCpeConfigPreview
-                                                    <- Live/fallback preview and preview-state controls
-              +-- newtonSelectorFlowCpeDataConfig
-              +-- newtonSelectorFlowCpeContentConfig
-              +-- newtonSelectorFlowCpeBehaviorConfig
-              +-- newtonSelectorFlowCpeAppearanceConfig
+newtonSelectorFlowScreen                  Flow Screen component (runtime entry point)
+  +-- newtonSelectorDataSelector          Data loading, source switching, selection state, validate()
+        +-- newtonSelectorGroup           Layout renderer, search/select-all, transfer controls
+              +-- newtonSelectorChoiceTile    One option (icon, label, sublabel, badge)
 
-newtonSelectorDataSelector                       <- Data loading, source switching, state machine
-  +-- newtonSelectorGroup                        <- Layout renderer, search/select-all, transfer controls
-        +-- newtonSelectorChoiceTile             <- Individual tile (icon, label, sublabel, badge)
+newtonSelectorFlowCpe                     Custom Property Editor panel in Flow Builder
+  +-- newtonSelectorFlowCpeConfigModal    LightningModal shell and orchestration
+        +-- newtonSelectorFlowCpeStudio   Split layout: preview | four scrolling chapters
+        +-- newtonSelectorFlowCpeConfigPreview   Live preview (reuses DataSelector with sample data)
+        +-- newtonSelectorFlowCpeDataConfig / ContentConfig / BehaviorConfig / AppearanceConfig
 
-Configuration helpers
-  newtonSelectorFlowCpeResourceSelector          <- Flow Builder resource/merge-field combobox
-  newtonSelectorFlowCpeWhereBuilder              <- Visual SOQL WHERE clause builder
-
-Input and selector controls
-  newtonSelectorFlowCpeCustomLookup              <- Searchable lookup with server typeahead
-  newtonSelectorFlowCpeFieldSelector             <- Object-scoped field selector
-  newtonSelectorFlowCpeIconSelector              <- SLDS icon name selector
-  newtonSelectorFlowCpeChoiceControl             <- Option-tile control used in CPE sections
-  newtonSelectorFlowCpeLookupChoiceOption        <- Lookup option renderer
-
-Reusable primitives
-  newtonSelectorCombobox                        <- Shared SLDS combobox shell for picker-style controls
-  newtonSelectorFlowCpeToggle                    <- Reusable toggle switch (boolean or CB_TRUE/CB_FALSE wire format)
-  newtonSelectorIcon                             <- Icon renderer with Lucide-style SVG catalog
-  newtonSelectorChoiceTile                       <- Choice tile (label / sublabel / badge / icon)
-
-Utilities
-newtonSelectorUtilityDataSources               <- Normalizers for all 4 data sources; filter/sort/limit
-  newtonSelectorUtilityConfigDefaults            <- Shared default selector configuration
-  newtonSelectorFlowCpeUtilityHelpers            <- Flow Builder context helpers (merge fields, types)
-  newtonSelectorFlowCpeUtilityConfigOptions      <- Shared option metadata for CPE and modal controls
-  newtonSelectorFlowCpeUtilityConfigState        <- Immutable config merge/patch helpers and preview/query mapping
-  newtonSelectorFlowCpeUtilityDropdown           <- Viewport-aware dropdown positioning helper
-  newtonSelectorFlowCpeUtilityConfigStyles       <- Style token helpers for CPE and preview rendering
-  newtonSelectorFlowCpeUtilityConfigValidation   <- Configuration issue generation and save-blocking rules
-  newtonSelectorFlowCpeUtilitySearchHighlight    <- Search result highlighting helper
+Editor controls: ResourceSelector, WhereBuilder, FieldSelector, IconSelector, ChoiceControl,
+                 LookupChoiceOption, Toggle, and the shared newtonSelectorCombobox
+Primitives:      newtonSelectorIcon (Lucide-style SVG catalog)
+Utilities:       newtonSelectorUtilityConfigDefaults, newtonSelectorUtilityDataSources,
+                 newtonSelectorFlowCpeUtility{ConfigOptions,ConfigState,ConfigStyles,
+                 ConfigValidation,Helpers,SearchHighlight}
 ```
 
-The config modal has been decomposed into shell, studio layout, preview, state, validation, and chapter-body modules. `newtonSelectorFlowCpeConfigModal` still owns orchestration, save handling, and cross-section state.
+The editor saves the whole configuration as one JSON string (`selectorConfigJson`) on the Flow screen element. See [Architecture](docs/architecture.md) for the full tree, data flow and design-time flow.
 
 ---
 
 ## Apex Layer
 
-| Class                                    | Role                                                                                                                                                                   |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NewtonSelectorRuntimeController`        | Runtime SOQL endpoint plus design-time query validation. Deserializes query config JSON and delegates to the service layer.                                            |
-| `NewtonSelectorService`                  | Maps SObject records to `NewtonSelectorItemDTO` instances using field mappings from `NewtonSelectorQueryDTO`.                                                          |
-| `NewtonSelectorRecordQuery`              | Builds and executes the dynamic SOQL query in `USER_MODE`. Validates object and field accessibility; allowlists WHERE fields/operators; enforces a 2,000-row hard cap. |
-| `NewtonSelectorQueryDTO`                 | Input DTO: object API name, structured filters, legacy WHERE clause, ORDER BY, LIMIT, and field mappings.                                                              |
-| `NewtonSelectorQueryValidationResultDTO` | Output DTO for CPE query validation status, message, and generated SOQL preview.                                                                                       |
-| `NewtonSelectorItemDTO`                  | Output DTO: `id`, `label`, `sublabel`, `icon`, `badge`, `helpText`, `value`, `disabled`.                                                                               |
-| `NewtonSelectorException`                | Typed exception surfaced to the LWC as an `AuraHandledException`.                                                                                                      |
-| `NewtonSelectorFlowCpeController`        | Design-time Apex for the CPE: `searchSObjectTypes`, `searchFields`, `getObjectFields` -- powers the object/field selectors in the config modal.                        |
+Apex is used only by the SOQL data source (runtime) and by the editor's object and field pickers (design time). Picklist, collection and custom sources run entirely in the browser.
 
-All classes run `with sharing`. SOQL is executed via `Database.queryWithBinds` with `AccessLevel.USER_MODE` to respect field-level security and object permissions. Legacy WHERE text is parsed into allowlisted predicates before execution.
+| Group           | Classes                                                                                                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Entry points    | `NewtonSelectorRuntimeController` (`queryItems`, `validateQuery`), `NewtonSelectorFlowCpeController` (`searchSObjectTypes`, `searchLookupDatasetFieldsForObject`, `getObjectFields`) |
+| Query execution | `NewtonSelectorService`, `NewtonSelectorRecordQuery` (`Database.queryWithBinds` in `USER_MODE`), `NewtonSelectorQueryBuilder` (limits, ordering, bind assembly)                      |
+| Validation      | `NewtonSelectorQueryFieldAccess`, `NewtonSelectorQueryValueUtil`                                                                                                                     |
+| WHERE parsing   | `NewtonSelectorWhereParser`, `NewtonSelectorWhereScanner`, `NewtonSelectorWhereOperatorParser`                                                                                       |
+| CPE describe    | `NewtonSelectorFlowCpeDescribeService`                                                                                                                                               |
+| Data and errors | `NewtonSelectorQueryDTO`, `NewtonSelectorItemDTO`, `NewtonSelectorQueryValidationResultDTO`, `NewtonSelectorException`                                                               |
+
+Runtime classes run `with sharing`, object and field names are validated against describe results, every WHERE value is a bind variable (except `INCLUDES`/`EXCLUDES`, which are escaped literals), and results are capped at 2,000 rows. See the [Apex API reference](docs/reference-apex-api.md) and the [security model](docs/explanation-security-model.md).
 
 ---
 
@@ -286,7 +278,13 @@ sf org open --target-org newton-dev
 
 ### Post-install
 
-1. Confirm the target users have access to the Apex classes if your org requires explicit Apex class permissions. This repository does not currently ship a `NewtonSelector` permission set.
+1. Assign a permission set. `Newton_Selector_User` grants what people running a Flow need (the runtime Apex). `Newton_Selector_Admin` adds the editor's object and field pickers for people who build Flows. Users still need object and field access for whatever each selector reads.
+
+   ```bash
+   sf org assign permset --name Newton_Selector_User --target-org my-org
+   sf org assign permset --name Newton_Selector_Admin --target-org my-org
+   ```
+
 2. In Flow Builder, drag **Professor Flow | Newton Selector** onto a Screen element.
 3. Click the component to open the CPE and configure your data source, content, behavior, layout, and appearance.
 
@@ -300,6 +298,9 @@ npm install
 
 # Run the linter
 npm run lint
+
+# Run the SLDS linter over the components
+npm run lint:slds
 
 # Format all source files
 npm run prettier
@@ -329,20 +330,20 @@ npm run test:unit:coverage
 
 Test files live under `force-app/main/default/lwc/<component>/__tests__/`.
 
-### Flow Builder Smoke and E2E
+### End-to-end tests (Playwright)
 
 ```bash
 # Install the Chromium browser used by Playwright
-npm run smoke:flow-builder:install
+npm run test:e2e:install
 
-# Run the Flow Builder UI smoke test
-npm run smoke:flow-builder
+# Flow Builder: drive the editor, save, retrieve and debug the Flow
+SF_TARGET_ORG=my-org npm run test:e2e:builder
 
-# Run the deeper Flow Builder persistence E2E
-npm run test:e2e:flow-builder
+# Runtime: run a multi-screen Flow through every layout, behavior and data source
+SF_TARGET_ORG=my-org npm run test:e2e:runtime
 ```
 
-The E2E script generates a temporary `Newton_Selector_E2E` Flow source file only for deployment, removes it after the run, and writes screenshots plus retrieved metadata under `output/playwright/`.
+Both scripts require `SF_TARGET_ORG` and expect `force-app` to be deployed. Each generates its Flow into the `fixtures` package directory, deploys it, removes the local file after the run, and writes `results.json`, `diagnostics.json` and screenshots under `output/playwright/`. See [How to develop and test](docs/howto-develop-and-test.md).
 
 ### Apex Tests
 
