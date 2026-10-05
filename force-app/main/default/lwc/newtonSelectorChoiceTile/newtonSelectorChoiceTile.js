@@ -1,4 +1,5 @@
 import { LightningElement, api } from "lwc";
+import { isHexColor } from "c/newtonSelectorUtilityConfigDefaults";
 
 const MODE_SINGLE = "single";
 const MODE_MULTI = "multi";
@@ -7,7 +8,7 @@ const VARIANT_LIST = "list";
 const VALID_VARIANTS = new Set([VARIANT_GRID, VARIANT_LIST]);
 const VALID_SIZES = new Set(["small", "medium", "large"]);
 const DEFAULT_SIZE = "small";
-const VALID_ASPECTS = new Set(["1:1", "4:3", "3:2", "16:9", "3:4", "2:3"]);
+const VALID_ASPECTS = new Set(["1:1", "4:3", "3:2", "16:9", "3:4"]);
 const DEFAULT_ASPECT = "1:1";
 
 // Badge presentation axes — configurable globally on the selector. The actual
@@ -159,12 +160,16 @@ const VALID_TONES = new Set([
 const DEFAULT_TONE = "neutral";
 const DEFAULT_ICON_TONE = "brand";
 
-// Loose hex validator — accepts "#RGB", "#RRGGBB", "#RRGGBBAA", case-insensitive.
-const HEX_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+// An arrow key in a radio group checks the next radio and fires change on it,
+// not on the radio that received the keydown, so the flag is shared by every
+// tile. Set on keydown, cleared on keyup.
+const ARROW_KEYS = new Set(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]);
+let arrowKeyDown = false;
+
 function safeHex(v) {
   if (!v) return "";
   const s = String(v).trim();
-  return HEX_RE.test(s) ? s : "";
+  return isHexColor(s) ? s : "";
 }
 
 function aspectClassKey(aspect) {
@@ -175,16 +180,16 @@ function resolveTone(tone, fallback) {
   return VALID_TONES.has(tone) ? tone : fallback;
 }
 
-function resolveHex(hex, fallbackHex = "") {
-  return safeHex(hex) || fallbackHex;
-}
-
 export default class NewtonSelectorChoiceTile extends LightningElement {
   @api item = {};
   @api variant = VARIANT_GRID;
   @api selected = false;
   @api disabled = false;
   @api selectionMode = MODE_SINGLE;
+  // Renders the tile without its native radio or checkbox, for hosts whose
+  // own element carries the option semantics (the Dropdown and Dual listbox
+  // rows are role="option"). The host handles selection.
+  @api presentational = false;
   @api groupName = "newtonSelectorChoiceTile";
   @api size = DEFAULT_SIZE;
   @api aspectRatio = DEFAULT_ASPECT;
@@ -197,14 +202,14 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   @api elevation = DEFAULT_ELEVATION;
   @api pattern = DEFAULT_PATTERN;
   @api patternTone = DEFAULT_TONE;
-  @api patternHoverTone;
+  @api patternHoverTone = DEFAULT_TONE;
   @api patternSelectedTone;
   @api patternDisabledTone;
   @api cornerStyle = DEFAULT_CORNER;
   @api cornerTone = DEFAULT_TONE;
   @api surfaceStyle = DEFAULT_SURFACE;
   @api surfaceTone = DEFAULT_TONE;
-  @api surfaceHoverTone;
+  @api surfaceHoverTone = DEFAULT_TONE;
   @api surfaceSelectedTone;
   @api surfaceDisabledTone;
   @api iconDecor = DEFAULT_ICON_DECOR;
@@ -249,7 +254,8 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   get resolvedSize() {
     return VALID_SIZES.has(this.size) ? this.size : DEFAULT_SIZE;
   }
-  // Values outside the tile's aspect set (list layouts use 'auto') use the default.
+  // Values outside the tile's aspect set use the default. List tiles size to
+  // their content and carry no aspect class.
   get resolvedAspect() {
     return VALID_ASPECTS.has(this.aspectRatio)
       ? this.aspectRatio
@@ -294,7 +300,7 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
     return resolveTone(this.patternTone, DEFAULT_TONE);
   }
   get resolvedPatternHoverTone() {
-    return resolveTone(this.patternHoverTone, this.resolvedPatternTone);
+    return resolveTone(this.patternHoverTone, DEFAULT_TONE);
   }
   get resolvedPatternSelectedTone() {
     return resolveTone(this.patternSelectedTone, "brand");
@@ -325,7 +331,7 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
     return resolveTone(this.surfaceTone, DEFAULT_TONE);
   }
   get resolvedSurfaceHoverTone() {
-    return resolveTone(this.surfaceHoverTone, this.resolvedSurfaceTone);
+    return resolveTone(this.surfaceHoverTone, DEFAULT_TONE);
   }
   get resolvedSurfaceSelectedTone() {
     return resolveTone(this.surfaceSelectedTone, "brand");
@@ -365,21 +371,17 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   }
   // Glyph tone — if not set, follow iconTone (one color for icon and
   // decoration); an explicit tone splits them.
-  //   - 'auto' or undefined → follow iconTone
-  //   - 'contrast'          → white for filled decoration, tone for others
-  //   - any valid tone      → use that tone explicitly
+  //   - 'auto', unset or 'contrast' → white on a filled decoration,
+  //                                   iconTone otherwise
+  //   - any valid tone              → use that tone explicitly
   get resolvedIconGlyphTone() {
-    if (this.iconGlyphTone === "auto" || !this.iconGlyphTone) {
-      // Glyph follows the decor tone, but for filled decoration
-      // we render white text for contrast.
-      return this.hasIconDecor && this.resolvedIconStyle === "filled"
+    const glyph = this.iconGlyphTone;
+    if (!glyph || glyph === "auto" || glyph === "contrast") {
+      return this.resolvedIconStyle === "filled"
         ? "contrast"
         : this.resolvedIconTone;
     }
-    if (this.iconGlyphTone === "contrast") return "contrast";
-    return VALID_TONES.has(this.iconGlyphTone)
-      ? this.iconGlyphTone
-      : this.resolvedIconTone;
+    return VALID_TONES.has(glyph) ? glyph : this.resolvedIconTone;
   }
   get resolvedIconGlyphHex() {
     if (this.resolvedIconGlyphTone !== "custom") return "";
@@ -393,19 +395,19 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   }
   get resolvedPatternHex() {
     if (this.resolvedPatternTone !== "custom") return "";
-    return resolveHex(this.patternToneHex);
+    return safeHex(this.patternToneHex);
   }
   get resolvedPatternHoverHex() {
     if (this.resolvedPatternHoverTone !== "custom") return "";
-    return resolveHex(this.patternHoverToneHex, this.resolvedPatternHex);
+    return safeHex(this.patternHoverToneHex);
   }
   get resolvedPatternSelectedHex() {
     if (this.resolvedPatternSelectedTone !== "custom") return "";
-    return resolveHex(this.patternSelectedToneHex, this.resolvedPatternHex);
+    return safeHex(this.patternSelectedToneHex);
   }
   get resolvedPatternDisabledHex() {
     if (this.resolvedPatternDisabledTone !== "custom") return "";
-    return resolveHex(this.patternDisabledToneHex, this.resolvedPatternHex);
+    return safeHex(this.patternDisabledToneHex);
   }
   get resolvedCornerHex() {
     if (this.resolvedCornerTone !== "custom") return "";
@@ -413,19 +415,19 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   }
   get resolvedSurfaceHex() {
     if (this.resolvedSurfaceTone !== "custom") return "";
-    return resolveHex(this.surfaceToneHex);
+    return safeHex(this.surfaceToneHex);
   }
   get resolvedSurfaceHoverHex() {
     if (this.resolvedSurfaceHoverTone !== "custom") return "";
-    return resolveHex(this.surfaceHoverToneHex, this.resolvedSurfaceHex);
+    return safeHex(this.surfaceHoverToneHex);
   }
   get resolvedSurfaceSelectedHex() {
     if (this.resolvedSurfaceSelectedTone !== "custom") return "";
-    return resolveHex(this.surfaceSelectedToneHex, this.resolvedSurfaceHex);
+    return safeHex(this.surfaceSelectedToneHex);
   }
   get resolvedSurfaceDisabledHex() {
     if (this.resolvedSurfaceDisabledTone !== "custom") return "";
-    return resolveHex(this.surfaceDisabledToneHex, this.resolvedSurfaceHex);
+    return safeHex(this.surfaceDisabledToneHex);
   }
   // Badge custom hex — active only when resolvedBadgeVariant === 'custom'.
   get resolvedBadgeHex() {
@@ -491,16 +493,6 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
       `newton-selector-choice-tile__icon-wrap_glyph-${this.resolvedIconGlyphTone}`
     ].join(" ");
   }
-  // Icon decorations use Lucide glyphs, so CSS owns the color consistently.
-  get iconVariant() {
-    if (this.hasIconDecor) return "";
-
-    const tone = this.resolvedIconTone;
-    if (tone === "error") return "error";
-    if (tone === "warning") return "warning";
-    if (tone === "success") return "success";
-    return "";
-  }
   get badgeClass() {
     return [
       "newton-selector-choice-tile__badge",
@@ -519,6 +511,12 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   }
   get inputName() {
     return this.isMulti ? "" : this.groupName;
+  }
+  get hasInput() {
+    return !this.presentational;
+  }
+  get labelFor() {
+    return this.presentational ? null : this.inputId;
   }
   get inputId() {
     const key = this.item?.id || this.item?.value || "x";
@@ -555,10 +553,6 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   get hasSublabel() {
     return Boolean(this.item?.sublabel);
   }
-  get isDisabled() {
-    return this.disabled || Boolean(this.item?.disabled);
-  }
-
   get shapeStyle() {
     const s = this.item?.shape;
     if (!s) return "";
@@ -574,7 +568,6 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
       "newton-selector-choice-tile",
       `newton-selector-choice-tile_${this.resolvedVariant}`,
       `newton-selector-choice-tile_size-${this.resolvedSize}`,
-      `newton-selector-choice-tile_aspect-${aspectClassKey(this.resolvedAspect)}`,
       `newton-selector-choice-tile_sel-${this.resolvedSelectionIndicator}`,
       `newton-selector-choice-tile_elev-${this.resolvedElevation}`,
       `newton-selector-choice-tile_pattern-${this.resolvedPattern}`,
@@ -590,18 +583,42 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
       `newton-selector-choice-tile_sstone-${this.resolvedSurfaceSelectedTone}`,
       `newton-selector-choice-tile_sdtone-${this.resolvedSurfaceDisabledTone}`
     ];
+    if (this.resolvedVariant === VARIANT_GRID) {
+      parts.push(
+        `newton-selector-choice-tile_aspect-${aspectClassKey(this.resolvedAspect)}`
+      );
+    }
     if (this.framedVisual)
       parts.push("newton-selector-choice-tile_framed-visual");
     if (this.selected) parts.push("newton-selector-choice-tile_selected");
-    if (this.isDisabled) parts.push("newton-selector-choice-tile_disabled");
+    if (this.disabled) parts.push("newton-selector-choice-tile_disabled");
     return parts.join(" ");
   }
 
+  // A checked radio fires no change event, so a click on the selected tile is
+  // reported as its own event. cardselect stays a real change.
+  handleClick() {
+    if (this.selected && !this.isMulti) this.dispatchTileEvent("cardrepick");
+  }
+
+  // `fromArrowKey` marks a change made by browsing the radios with the arrow
+  // keys; the selection changes, but the screen must not auto-advance.
   handleChange() {
-    if (this.isDisabled) return;
+    this.dispatchTileEvent("cardselect", { fromArrowKey: arrowKeyDown });
+  }
+
+  handleKeyDown(event) {
+    arrowKeyDown = ARROW_KEYS.has(event.key);
+  }
+
+  handleKeyUp() {
+    arrowKeyDown = false;
+  }
+
+  dispatchTileEvent(type, detail) {
     this.dispatchEvent(
-      new CustomEvent("cardselect", {
-        detail: { value: this.item?.value, id: this.item?.id },
+      new CustomEvent(type, {
+        detail: { value: this.item?.value, ...detail },
         bubbles: true,
         composed: false
       })

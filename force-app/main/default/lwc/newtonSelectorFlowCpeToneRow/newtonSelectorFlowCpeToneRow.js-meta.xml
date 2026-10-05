@@ -2,8 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
     <isExposed>false</isExposed>
-    <masterLabel
-  >Newton Selector Flow CPE | Search Highlight Utility</masterLabel>
+    <masterLabel>Newton Selector Flow CPE | Tone Row</masterLabel>
     <description
-  >Pure-function tokenizer for highlighting search matches inside option rows.</description>
+  >Tone chip row with a custom hex color editor for the Appearance chapter. Emits tonechange and hexchange with detail {key, value}.</description>
 </LightningComponentBundle>

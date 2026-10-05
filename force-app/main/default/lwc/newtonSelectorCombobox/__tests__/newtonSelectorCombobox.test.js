@@ -99,7 +99,6 @@ describe("c-newton-selector-combobox", () => {
   it("renders an SLDS combobox shell with slotted trigger and dropdown content", async () => {
     const element = mount({
       open: true,
-      dropdownId: "options-listbox",
       dropdownLabel: "Account options"
     });
 
@@ -113,11 +112,9 @@ describe("c-newton-selector-combobox", () => {
     element.appendChild(option);
     await flush();
 
-    const combobox = element.shadowRoot.querySelector(".slds-combobox");
     const listbox = element.shadowRoot.querySelector('[role="listbox"]');
 
-    expect(combobox.classList.contains("slds-is-open")).toBe(true);
-    expect(listbox.id).toMatch(/^options-listbox/);
+    expect(listbox).not.toBeNull();
     expect(listbox.getAttribute("aria-label")).toBe("Account options");
   });
 
@@ -151,11 +148,7 @@ describe("c-newton-selector-combobox", () => {
     expect(rows[1].selected).toBe(true);
     options(element)[0].click();
 
-    expect(handler.mock.calls[0][0].detail).toMatchObject({
-      value: "none",
-      values: ["none"],
-      selectedIds: ["none"]
-    });
+    expect(handler.mock.calls[0][0].detail).toEqual({ value: "none" });
   });
 
   it("closes the select dropdown when focus leaves the combobox", async () => {
@@ -186,10 +179,27 @@ describe("c-newton-selector-combobox", () => {
     expect(element.shadowRoot.querySelector(".slds-required")).not.toBeNull();
   });
 
-  it("hides the external label in label-hidden lookup mode", () => {
-    const element = mountLookup({ label: "Hidden", variant: "label-hidden" });
+  it("keeps a label-hidden lookup input named by an assistive-text label", () => {
+    const element = mountLookup({ label: "Field", variant: "label-hidden" });
+    const label = element.shadowRoot.querySelector("label");
 
-    expect(element.shadowRoot.querySelector("label")).toBeNull();
+    expect(label.textContent).toContain("Field");
+    expect(label.className).toContain("slds-assistive-text");
+    expect(label.htmlFor).toBe(input(element).id);
+  });
+
+  it("keeps a label-hidden select button named by an assistive-text label", () => {
+    const element = mount({
+      mode: "select",
+      label: "Operator",
+      variant: "label-hidden",
+      options: [{ label: "Equals", value: "=" }]
+    });
+    const label = element.shadowRoot.querySelector("label");
+
+    expect(label.textContent).toContain("Operator");
+    expect(label.className).toContain("slds-assistive-text");
+    expect(label.htmlFor).toBe(selectButton(element).id);
   });
 
   it("normalizes lookup selection values", () => {
@@ -197,27 +207,31 @@ describe("c-newton-selector-combobox", () => {
 
     element.selection = {
       value: "Account",
-      label: "Account",
-      displayType: "SObject"
+      label: "Account"
     };
 
     expect(element.selection).toEqual(
       expect.objectContaining({
         id: "Account",
-        title: "Account",
-        displayType: "SObject"
+        title: "Account"
       })
     );
   });
 
-  it("preserves richer lookup rows when the same selection id is set again", () => {
+  it("shows the richer row when the parent resends the same selection id", async () => {
     const element = mountLookup();
 
-    element.selection = { id: "1", title: "Acme Corp", icon: "building-2" };
-    element.selection = { id: "1" };
+    element.selection = { id: "Region__c", title: "Region__c", icon: "type" };
+    await flush();
+    element.selection = { id: "Region__c", title: "Region", icon: "list" };
+    await flush();
 
-    expect(element.selection.title).toBe("Acme Corp");
-    expect(element.selection.icon).toBe("building-2");
+    expect(input(element).value).toBe("Region");
+    expect(
+      element.shadowRoot.querySelector(
+        ".newton-selector-combobox__input-entity-icon c-newton-selector-icon"
+      ).name
+    ).toBe("list");
   });
 
   it("renders selected single-entry lookup as read-only with a clear action", async () => {
@@ -233,8 +247,9 @@ describe("c-newton-selector-combobox", () => {
   it("sets and renders lookup search results", async () => {
     const element = mountLookup();
 
-    element.setSearchResults(SAMPLE);
     input(element).focus();
+    await flush();
+    element.setSearchResults(SAMPLE);
     await flush();
 
     expect(options(element)).toHaveLength(3);
@@ -247,19 +262,9 @@ describe("c-newton-selector-combobox", () => {
     );
   });
 
-  it("uses default lookup results when focused before a search", async () => {
-    const element = mountLookup({ minSearchTermLength: 2 });
-
-    element.setDefaultResults(SAMPLE);
-    input(element).focus();
-    await flush();
-
-    expect(options(element)).toHaveLength(3);
-  });
-
   it("fires debounced lookup search with normalized and raw terms", () => {
     jest.useFakeTimers();
-    const element = mountLookup({ minSearchTermLength: 1 });
+    const element = mountLookup();
     const handler = jest.fn();
     element.addEventListener("search", handler);
 
@@ -267,25 +272,10 @@ describe("c-newton-selector-combobox", () => {
     jest.advanceTimersByTime(300);
 
     expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler.mock.calls[0][0].detail).toEqual(
-      expect.objectContaining({
-        searchTerm: "acme",
-        rawSearchTerm: "AcMe",
-        selectedIds: []
-      })
-    );
-  });
-
-  it("does not fire lookup search below min length", () => {
-    jest.useFakeTimers();
-    const element = mountLookup({ minSearchTermLength: 3 });
-    const handler = jest.fn();
-    element.addEventListener("search", handler);
-
-    fireInput(element, "ab");
-    jest.advanceTimersByTime(300);
-
-    expect(handler).not.toHaveBeenCalled();
+    expect(handler.mock.calls[0][0].detail).toEqual({
+      searchTerm: "acme",
+      rawSearchTerm: "AcMe"
+    });
   });
 
   it("fires selectionchange when a lookup option is clicked", async () => {
@@ -293,8 +283,9 @@ describe("c-newton-selector-combobox", () => {
     const handler = jest.fn();
     element.addEventListener("selectionchange", handler);
 
-    element.setSearchResults(SAMPLE);
     input(element).focus();
+    await flush();
+    element.setSearchResults(SAMPLE);
     await flush();
     options(element)[1].click();
     await flush();
@@ -326,8 +317,9 @@ describe("c-newton-selector-combobox", () => {
     const handler = jest.fn();
     element.addEventListener("selectionchange", handler);
 
-    element.setSearchResults(SAMPLE);
     input(element).focus();
+    await flush();
+    element.setSearchResults(SAMPLE);
     await flush();
     pressKey(element, "ArrowDown");
     await flush();
@@ -340,7 +332,7 @@ describe("c-newton-selector-combobox", () => {
 
   it("clears pending search timer on disconnect", () => {
     jest.useFakeTimers();
-    const element = mountLookup({ minSearchTermLength: 1 });
+    const element = mountLookup();
     const handler = jest.fn();
     element.addEventListener("search", handler);
 

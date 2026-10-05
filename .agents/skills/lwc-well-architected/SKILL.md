@@ -1,6 +1,6 @@
 ---
 name: lwc-well-architected
-description: "Atomic design framework for scalable LWC development. Use when: creating new Lightning Web Components, refactoring existing LWC, reviewing LWC code, determining component level (atom/molecule/organism/template/page/utility/flow), enforcing unidirectional data flow, adding accessibility or SLDS compliance, writing LWC Jest tests, migrating god components, or building Flow-reactive screen components."
+description: "Atomic design framework for scalable LWC development. Use when: creating new Lightning Web Components, refactoring existing LWC, reviewing LWC code, determining component level (atom/molecule/organism/template/page/utility/flow), enforcing unidirectional data flow, adding accessibility or SLDS compliance, migrating god components, or building Flow-reactive screen components."
 argument-hint: "Component name or task, e.g. 'create atom for toggle switch' or 'review newtonSelectorDataSelector'"
 ---
 
@@ -14,7 +14,6 @@ Atomic design for scalable, maintainable Salesforce interfaces. Build **systems 
 - Refactoring an existing LWC (identifies anti-patterns, enforces level boundaries)
 - Code-reviewing LWC pull requests (checklist-driven)
 - Determining what level a component should be
-- Writing or improving Jest tests for LWC
 - Building Flow CPE (Custom Property Editor) components
 - Migrating legacy monolithic components to atomic design
 
@@ -45,15 +44,16 @@ For Newton Selector, component level is an architectural classification, not par
 of the public LWC bundle name. Keep `Utility` only for technical modules where it
 clarifies the purpose.
 
-| Level    | Pattern                    | Example                           |
-|----------|----------------------------|-----------------------------------|
-| Atom     | `{app}{Name}`              | `newtonCheckbox`                  |
-| Molecule | `{app}{Name}`              | `newtonSelectorFlowCpeFieldSelector`            |
-| Organism | `{app}{Name}`              | `newtonSelectorDataSelector`             |
-| Template | `{app}{Name}`              | `newtonSelectorFlowCpeStudio`           |
-| Page     | `{app}Page{Name}`          | `newtonPageSelectorManager`       |
-| Utility  | `{app}Utility{Name}`       | `newtonSelectorFlowCpeUtilityHelpers`          |
-| Flow     | `{app}Flow{Name}`          | `newtonSelectorFlowScreen`                 |
+| Level    | Pattern              | Example                               |
+|----------|----------------------|---------------------------------------|
+| Atom     | `{app}{Name}`        | `newtonSelectorFlowCpeToggle`         |
+| Molecule | `{app}{Name}`        | `newtonSelectorFlowCpeIconSelector`   |
+| Organism | `{app}{Name}`        | `newtonSelectorDataSelector`          |
+| Template | `{app}{Name}`        | `newtonSelectorFlowCpeStudio`         |
+| Utility  | `{app}Utility{Name}` | `newtonSelectorFlowCpeUtilityHelpers` |
+| Flow     | `{app}Flow{Name}`    | `newtonSelectorFlowScreen`            |
+
+Newton Selector has no Page-level bundle; it runs inside Flow screens.
 
 - `{app}` = project/team prefix (e.g., `newton`, `core`, `admissions`)
 - Name describes **what** the component does, not **how**
@@ -100,7 +100,7 @@ Apply level-specific rules strictly:
 
 **Utilities** — Pure JS modules (not LWC components).
 - Stateless exports (or module-level caches with clear invalidation)
-- Importable by any level: `import { normalize } from 'c/newtonSelectorUtilityDataSources'`
+- Importable by any level: `import { normalizePicklist } from 'c/newtonSelectorUtilityDataSources'`
 - Single technical concern per module
 
 **Flow Components** — Thin wrappers around organisms.
@@ -144,19 +144,12 @@ Apply level-specific rules strictly:
 - Organism handles loading/error/empty? ✓ FLS/sharing? ✓
 - Flow component uses `FlowAttributeChangeEvent`? ✓ Has `validate()`? ✓
 
-### 6. Write Tests
+### 6. Verify
 
-> Testing patterns and examples: [Testing reference](./references/testing.md)
-
-| Level    | Test Focus                                            |
-|----------|-------------------------------------------------------|
-| Atom     | Renders correctly, emits events with correct `detail` |
-| Molecule | Coordinates children, transforms events properly      |
-| Organism | Business logic, Apex mock data, all UI states         |
-| Utility  | Pure function input/output, cache behavior            |
-| Flow     | `FlowAttributeChangeEvent` dispatch, `validate()`    |
-
-**Test file structure:** `componentName/__tests__/componentName.test.js`
+Follow `AGENTS.md` ("Testing philosophy"): verify behavior end to end by
+extending the E2E script that covers it (`scripts/e2e/`). Do not add a Jest
+test per component. Add an isolated test only when AGENTS' justification steps
+are met. Details: [Testing reference](./references/testing.md)
 
 ### 7. Detect Anti-Patterns
 

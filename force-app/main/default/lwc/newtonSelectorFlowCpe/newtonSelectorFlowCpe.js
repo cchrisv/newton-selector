@@ -7,6 +7,7 @@ import {
 import {
   ASPECT_TILES,
   BADGE_POSITIONS,
+  BADGE_TONE_SWATCHES,
   CORNER_TILES,
   ELEVATION_TILES,
   ICON_DECOR_TILES,
@@ -14,19 +15,20 @@ import {
   PATTERN_TILES,
   SECTIONS,
   SELECTION_INDICATOR_TILES,
+  SIZE_TILES,
   SOURCE_TILES,
+  SPACING_TILES,
   SURFACE_TILES,
   TONE_SWATCHES
 } from "c/newtonSelectorFlowCpeUtilityConfigOptions";
 import {
+  DEFAULT_QUERY_LIMIT,
+  defaultGridConfig,
   manualInputLabelOf,
   mergeSelectorConfig,
   noneOptionLabelOf
 } from "c/newtonSelectorUtilityConfigDefaults";
-import {
-  DEFAULT_QUERY_LIMIT,
-  resolveRecordCollectionMetadataFromBuilderContext
-} from "c/newtonSelectorFlowCpeUtilityConfigState";
+import { recordCollectionObjectType } from "c/newtonSelectorFlowCpeUtilityConfigState";
 import {
   formattedValue,
   getDataType
@@ -39,28 +41,16 @@ const VALUES_KEY = "values";
 const UNREADABLE_CONFIG_MESSAGE =
   "The saved configuration can't be read. Open Edit configuration to set it up again.";
 
-const SPACING_TOKEN_TO_PX = {
-  none: "0",
-  1: "4",
-  2: "8",
-  3: "12",
-  4: "16",
-  5: "20",
-  6: "24",
-  7: "32",
-  8: "40",
-  9: "48"
-};
-
 // The summary quotes the editor's own tile labels, never stored values.
 function labelOf(options, value, fallback = "") {
   return options.find((option) => option.value === value)?.label || fallback;
 }
 
 function fmtToken(t) {
-  if (t == null || t === "") return "auto";
-  const px = SPACING_TOKEN_TO_PX[String(t)];
-  return px != null ? `${px}px` : String(t);
+  return (
+    SPACING_TILES.find((tile) => tile.value === String(t))?.sublabel ||
+    String(t)
+  );
 }
 
 export default class NewtonSelectorFlowCpe extends LightningElement {
@@ -73,7 +63,6 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
   _valueRef = "";
   _valuesRef = "";
   _lastGenericSObject = "";
-  _lastHydratedJson = null; // perf: short-circuits re-parse on duplicate setter calls
   // The stored JSON didn't parse. It stays stored until the admin saves.
   _configUnreadable = false;
   _errors = [];
@@ -105,12 +94,7 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
 
   hydrate() {
     const json = this.readInput(CONFIG_KEY);
-    // Short-circuit: if the serialized config is byte-identical to what
-    // we've already parsed, skip the O(n) JSON.parse + spread. Flow
-    // Builder can call `set inputVariables` several times during panel
-    // setup with the same payload — this avoids repeated work.
-    if (json && json !== this._lastHydratedJson) {
-      this._lastHydratedJson = json;
+    if (json) {
       try {
         this._config = mergeSelectorConfig(JSON.parse(json));
         this._configUnreadable = false;
@@ -168,14 +152,12 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
   // --- Section 1: Data source (what's feeding the selector) ---------------
   get dataSection() {
     const c = this._config;
-    if (!c.dataSource) return null;
-
     const kind = labelOf(SOURCE_TILES, c.dataSource);
     const lines = [];
 
     if (this.isPicklistMode) {
-      const o = c.picklist?.objectApiName;
-      const f = c.picklist?.fieldApiName;
+      const o = c.picklist.objectApiName;
+      const f = c.picklist.fieldApiName;
       if (o && f) {
         lines.push({ key: "binding", text: `${o}.${f}`, mono: true });
       } else {
@@ -185,7 +167,7 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
           muted: true
         });
       }
-      if (c.picklist?.recordTypeId) {
+      if (c.picklist.recordTypeId) {
         lines.push({ key: "rt", text: "Filtered by record type", muted: true });
       }
     } else if (this.isCollectionMode) {
@@ -197,7 +179,7 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
           text: "No collection bound",
           muted: true
         });
-      const mapped = Object.values(c.collection?.fieldMap || {}).filter(
+      const mapped = Object.values(c.collection.fieldMap).filter(
         Boolean
       ).length;
       if (mapped)
@@ -207,23 +189,22 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
           muted: true
         });
     } else if (this.isSObjectMode) {
-      const o = c.sobject?.sObjectApiName;
+      const o = c.sobject.sObjectApiName;
       if (o) lines.push({ key: "binding", text: o, mono: true });
       else
         lines.push({ key: "missing", text: "No object selected", muted: true });
       const meta = [];
-      if (c.sobject?.whereClause) meta.push("Filtered");
-      if (c.sobject?.orderByField)
+      if (c.sobject.whereClause) meta.push("Filtered");
+      if (c.sobject.orderByField)
         meta.push(
           `${meta.length ? "sorted" : "Sorted"} by ${c.sobject.orderByField}`
         );
       meta.push(
-        `${meta.length ? "up" : "Up"} to ${Number(c.sobject?.limit) || DEFAULT_QUERY_LIMIT} options`
+        `${meta.length ? "up" : "Up"} to ${Number(c.sobject.queryLimit) || DEFAULT_QUERY_LIMIT} options`
       );
-      if (meta.length)
-        lines.push({ key: "meta", text: meta.join(", "), muted: true });
+      lines.push({ key: "meta", text: meta.join(", "), muted: true });
     } else if (this.isCustomMode) {
-      const n = c.custom?.items?.length || 0;
+      const n = c.custom.items.length;
       lines.push({
         key: "count",
         text: n === 0 ? "No options yet" : `${n} option${n === 1 ? "" : "s"}`,
@@ -288,7 +269,7 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
         muted: true
       });
     }
-    if (c.includeNoneOption && c.selectionMode === "single") {
+    if (c.includeNoneOption) {
       const pos = c.noneOptionPosition === "end" ? "end" : "start";
       const lbl = noneOptionLabelOf(c);
       lines.push({
@@ -297,7 +278,7 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
         muted: true
       });
     }
-    if (c.manualInput?.enabled) {
+    if (c.manualInput.enabled) {
       const label = manualInputLabelOf(c);
       const min = Number(c.manualInput.minLength || 0);
       const max = c.manualInput.maxLength;
@@ -337,7 +318,8 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
   // --- Section 4: Appearance (how it looks) -----------------------------
   get appearanceLines() {
     const c = this._config;
-    const g = c.gridConfig || {};
+    const g = c.gridConfig;
+    const preset = defaultGridConfig(c.layout);
     const lines = [];
 
     const layoutName = labelOf(LAYOUT_TILES, c.layout, "Grid");
@@ -355,30 +337,36 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
     }
 
     // Tile size — full words, not initials
-    const sizeMap = { small: "Small", medium: "Medium", large: "Large" };
-    const sizeName = sizeMap[g.size] || "Small";
-    const aspect = g.aspectRatio || "1:1";
+    const sizeName = labelOf(SIZE_TILES, g.size, "Small");
+    const aspect = g.aspectRatio;
     const aspectName = labelOf(ASPECT_TILES, aspect, aspect).toLowerCase();
+    const showsAspect = c.layout === "grid" || c.layout === "horizontal";
     lines.push({
       key: "tile",
-      text: `${sizeName} tiles, ${aspectName}`,
+      text: showsAspect
+        ? `${sizeName} tiles, ${aspectName}`
+        : `${sizeName} tiles`,
       muted: true
     });
 
-    // Gaps — only if non-default
-    const gapH = fmtToken(g.gapH);
-    const gapV = fmtToken(g.gapV);
-    if (gapH !== "auto" || gapV !== "auto") {
+    // Gaps, only when they differ from the layout's preset.
+    if (g.gapH !== preset.gapH || g.gapV !== preset.gapV) {
+      const gapH = fmtToken(g.gapH);
+      const gapV = fmtToken(g.gapV);
       const gapText = gapH === gapV ? `${gapH} gaps` : `${gapH} × ${gapV} gaps`;
       lines.push({ key: "gap", text: gapText, muted: true });
     }
 
-    // Badge — only if position is set
-    const badge = g.badge || {};
-    if (badge.position) {
+    // Badge, only when shown and not the default placement/tone.
+    const badge = g.badge;
+    if (
+      g.showBadges !== false &&
+      (badge.position !== preset.badge.position ||
+        badge.variant !== preset.badge.variant)
+    ) {
       lines.push({
         key: "badge",
-        text: `Badge: ${labelOf(BADGE_POSITIONS, badge.position, "Inline")}, ${labelOf(TONE_SWATCHES, badge.variant, "Neutral")}`,
+        text: `Badge: ${labelOf(BADGE_POSITIONS, badge.position, "Inline")}, ${labelOf(BADGE_TONE_SWATCHES, badge.variant, "Neutral")}`,
         muted: true
       });
     }
@@ -507,7 +495,7 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
     const result = await NewtonSelectorFlowCpeConfigModal.open({
       size: "large",
       description: "Configure Newton Selector",
-      initialConfig: JSON.parse(JSON.stringify(this._config)),
+      initialConfig: this._config,
       initialSourceRecordsRef: this._sourceRecordsRef,
       initialValueRef: this._valueRef,
       initialValuesRef: this._valuesRef,
@@ -544,9 +532,7 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
       );
     }
     this.syncGenericTypeMapping();
-    const serialized = JSON.stringify(this._config);
-    this._lastHydratedJson = serialized; // keep short-circuit in sync with our own change
-    this.dispatchCpeChange(CONFIG_KEY, serialized, "String");
+    this.dispatchCpeChange(CONFIG_KEY, JSON.stringify(this._config), "String");
     this.refreshErrors();
   }
 
@@ -572,14 +558,12 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
     if (this.isSObjectMode) return this._config.sobject.sObjectApiName || "";
     if (this.isCollectionMode) {
       return (
-        this._config.collection?.objectApiName ||
-        resolveRecordCollectionMetadataFromBuilderContext(
-          this.builderContext,
-          this._sourceRecordsRef
-        ).objectApiName ||
-        ""
+        this._config.collection.objectApiName ||
+        recordCollectionObjectType(this.builderContext, this._sourceRecordsRef)
       );
     }
+    // Flow needs T resolved for the {T} outputs even though Custom options
+    // have no object; Account exists in every org.
     if (this.hasDataSource) return "Account";
     return "";
   }

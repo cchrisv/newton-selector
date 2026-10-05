@@ -39,16 +39,14 @@ describe("serializeValue", () => {
     ["Acme", "STRING", "=", "'Acme'"],
     ["O'Brien", "STRING", "=", "'O\\'Brien'"],
     ["foo\\bar", "STRING", "=", "'foo\\\\bar'"],
-    ["{!myVar}", "STRING", "=", "{!myVar}"],
-    ["{$User.Id}", "REFERENCE", "=", "{$User.Id}"],
+    ["{!myVar}", "STRING", "=", "'{!myVar}'"],
     ["acme", "STRING", "LIKE", "'%acme%'"],
     ["acme%", "STRING", "LIKE", "'acme%'"],
     ["a_me", "STRING", "LIKE", "'a_me'"],
-    ["{!searchTerm}", "STRING", "LIKE", "{!searchTerm}"],
+    ["{!searchTerm}", "STRING", "LIKE", "'{!searchTerm}'"],
     ["a , b ,, c ", "STRING", "IN", "('a', 'b', 'c')"],
     ["O'Brien,Smith", "PICKLIST", "NOT IN", "('O\\'Brien', 'Smith')"],
     ["1.5, 2.5", "DOUBLE", "IN", "(1.5, 2.5)"],
-    ["{!myCollection}", "STRING", "IN", "{!myCollection}"],
     ["Children's, B", "MULTIPICKLIST", "INCLUDES", "('Children\\'s', 'B')"],
     ["42", "INTEGER", "=", "42"],
     ["1000.50", "CURRENCY", "<=", "1000.50"],
@@ -57,8 +55,7 @@ describe("serializeValue", () => {
     ["no", "BOOLEAN", "=", "FALSE"],
     ["{!flag}", "BOOLEAN", "=", "{!flag}"],
     ["2026-04-17", "DATE", "=", "2026-04-17"],
-    ["2026-04-17T23:59:59Z", "DATETIME", "<=", "2026-04-17T23:59:59Z"],
-    ["TODAY", "DATE", ">", "TODAY"]
+    ["2026-04-17T23:59:59Z", "DATETIME", "<=", "2026-04-17T23:59:59Z"]
   ])("%s as %s with %s → %s", (raw, type, operator, expected) => {
     expect(serializeValue(raw, type, operator)).toBe(expected);
   });
@@ -73,14 +70,15 @@ describe("parseWhere", () => {
     "this is not soql",
     "a = '1' AND b = '2' OR c = '3'",
     "Name NOT LIKE '%test%'",
-    "Name = 'unterminated"
+    "Name = 'unterminated",
+    "Account.Name = 'Acme'",
+    "Amount <> 5"
   ])("returns null for a clause it can't show visually: %s", (input) => {
     expect(parseWhere(input)).toBeNull();
   });
 
   it.each([
     ["Name = 'Acme'", { field: "Name", operator: "=", value: "Acme" }],
-    ["Account.Name = 'Acme'", { field: "Account.Name", value: "Acme" }],
     ["Name = 'O\\'Brien'", { value: "O'Brien" }],
     ["Name LIKE '%Acme%'", { operator: "LIKE", value: "Acme" }],
     ["Name LIKE 'Acme%'", { value: "Acme%" }],
@@ -89,8 +87,7 @@ describe("parseWhere", () => {
       { operator: "IN", value: "Customer, Prospect" }
     ],
     ["Topics__c INCLUDES ('A', 'B')", { operator: "INCLUDES", value: "A, B" }],
-    ["OwnerId = {!$User.Id}", { value: "{!$User.Id}" }],
-    ["Amount <> 5", { operator: "!=", value: "5" }],
+    ["OwnerId = '{!$User.Id}'", { value: "{!$User.Id}" }],
     ["IsActive__c = TRUE", { value: "TRUE" }]
   ])("reads %s", (input, expected) => {
     expect(parseWhere(input).children[0]).toMatchObject(expected);
@@ -131,12 +128,13 @@ describe("treeToWhere", () => {
     children
   });
 
-  it("leaves out incomplete conditions and keeps the complete ones", () => {
+  it("leaves out conditions with an error and keeps the valid ones", () => {
     expect(
       treeToWhere(
         root("AND", [
           condition("Industry", "=", ""),
           condition("", "=", "x"),
+          condition("Industry", "IN", "{!myCollection}"),
           condition("NumberOfEmployees", ">", "500", "INTEGER"),
           condition("AnnualRevenue", "=", 0, "CURRENCY")
         ])

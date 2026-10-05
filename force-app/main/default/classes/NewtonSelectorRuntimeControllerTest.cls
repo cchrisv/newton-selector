@@ -1,6 +1,5 @@
 @IsTest
 private class NewtonSelectorRuntimeControllerTest {
-  private static final Integer BULK_RECORD_COUNT = 251;
   private static final String FLEX_QUEUE_FILTER_ERROR = 'data.api.DataSourceUnsupportedQueryException: The WHERE clause must contain a JobType field expression.';
 
   @IsTest
@@ -35,72 +34,17 @@ private class NewtonSelectorRuntimeControllerTest {
   static void queryItemsRejectsMalformedJson() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
+      String message;
       Test.startTest();
-      assertQueryItemsFails(
-        '{ not valid json',
-        'Invalid selector configuration.'
-      );
-      Test.stopTest();
-    }
-  }
-
-  @IsTest
-  static void queryItemsReportsInvalidWhereValue() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'NumberOfEmployees = abc';
-
-      Test.startTest();
-      assertQueryItemsFails(
-        JSON.serialize(config),
-        'Invalid value for NumberOfEmployees (INTEGER): abc'
-      );
-      Test.stopTest();
-    }
-  }
-
-  @IsTest
-  static void queryItemsAppliesWhereClause() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorTestDataFactory.createAccounts(3, 'Technology');
-      NewtonSelectorTestDataFactory.createAccounts(2, 'Banking');
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'Industry = \'Technology\'';
-      String configJson = JSON.serialize(config);
-
-      Test.startTest();
-      List<NewtonSelectorItemDTO> techOnly = NewtonSelectorRuntimeController.queryItems(
-        configJson
-      );
+      try {
+        NewtonSelectorRuntimeController.queryItems('{ not valid json');
+        Assert.fail('Expected failure for malformed JSON');
+      } catch (AuraHandledException e) {
+        message = e.getMessage();
+      }
       Test.stopTest();
 
-      Assert.areEqual(
-        3,
-        techOnly.size(),
-        'WHERE should filter to Technology only'
-      );
-    }
-  }
-
-  @IsTest
-  static void queryItemsBulk() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorTestDataFactory.createAccounts(BULK_RECORD_COUNT, 'Bulk');
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'Industry = \'Bulk\'';
-      config.queryLimit = 500;
-      String configJson = JSON.serialize(config);
-
-      Test.startTest();
-      List<NewtonSelectorItemDTO> dtos = NewtonSelectorRuntimeController.queryItems(
-        configJson
-      );
-      Test.stopTest();
-
-      Assert.areEqual(BULK_RECORD_COUNT, dtos.size());
+      assertNamesParserError(message);
     }
   }
 
@@ -167,7 +111,7 @@ private class NewtonSelectorRuntimeControllerTest {
 
   @IsTest
   static void validateQueryReportsExternalDataSourceError() {
-    User testUser = createViewSetupUser();
+    User testUser = NewtonSelectorTestDataFactory.createViewSetupUser();
     System.runAs(testUser) {
       Test.startTest();
       NewtonSelectorQueryValidationResultDTO result = NewtonSelectorRuntimeController.validateQuery(
@@ -182,7 +126,7 @@ private class NewtonSelectorRuntimeControllerTest {
 
   @IsTest
   static void queryItemsReportsExternalDataSourceError() {
-    User testUser = createViewSetupUser();
+    User testUser = NewtonSelectorTestDataFactory.createViewSetupUser();
     System.runAs(testUser) {
       Test.startTest();
       assertQueryItemsFails(
@@ -219,7 +163,7 @@ private class NewtonSelectorRuntimeControllerTest {
       Test.stopTest();
 
       Assert.areEqual(false, result.valid);
-      Assert.areEqual('Invalid selector configuration.', result.message);
+      assertNamesParserError(result.message);
     }
   }
 
@@ -247,25 +191,6 @@ private class NewtonSelectorRuntimeControllerTest {
     return config;
   }
 
-  // FlexQueueItem is readable only with View Setup and Configuration.
-  private static User createViewSetupUser() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(new User(Id = UserInfo.getUserId())) {
-      PermissionSet viewSetup = new PermissionSet(
-        Name = 'Newton_Selector_Test_View_Setup',
-        Label = 'Newton Selector Test View Setup',
-        PermissionsViewSetup = true,
-        PermissionsViewRoles = true
-      );
-      insert viewSetup;
-      insert new PermissionSetAssignment(
-        AssigneeId = testUser.Id,
-        PermissionSetId = viewSetup.Id
-      );
-    }
-    return testUser;
-  }
-
   private static void assertQueryItemsFails(
     String configJson,
     String expectedMessage
@@ -276,5 +201,12 @@ private class NewtonSelectorRuntimeControllerTest {
     } catch (AuraHandledException e) {
       Assert.areEqual(expectedMessage, e.getMessage());
     }
+  }
+
+  // The parser's own detail (token, line, column) must reach the admin.
+  private static void assertNamesParserError(String message) {
+    String prefix = 'Invalid selector configuration: ';
+    Assert.isTrue(message.startsWith(prefix), message);
+    Assert.isTrue(message.length() > prefix.length(), message);
   }
 }

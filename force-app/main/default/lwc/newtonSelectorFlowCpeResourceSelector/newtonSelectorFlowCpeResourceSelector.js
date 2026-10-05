@@ -11,7 +11,6 @@ import { LightningElement, wire, api } from "lwc";
 import { getObjectInfo } from "lightning/uiObjectInfoApi";
 import {
   TYPE_ICON_MAP,
-  fetchFields,
   loadErrorMessage,
   formattedValue,
   isReference,
@@ -19,13 +18,37 @@ import {
   removeFormatting,
   flowComboboxDefaults
 } from "c/newtonSelectorFlowCpeUtilityHelpers";
+import getObjectFields from "@salesforce/apex/NewtonSelectorFlowCpeController.getObjectFields";
 
 /** Shown when allowHardCodeReference is true (CPE / manual merge fields). */
 const MANUAL_REFERENCE_PLACEHOLDER = "Pick a resource or type a value";
 const MERGE_FIELD_CACHE = new WeakMap();
 const PROCESSED_OPTIONS_CACHE = new WeakMap();
 
+// The option's meta line: "ApiName — Type", without the name when it repeats
+// the label.
+function optionSubtitle(value, label, displayType) {
+  return [value && value !== label ? value : "", displayType]
+    .filter(Boolean)
+    .join(" — ");
+}
+
+// UI API data types that hold text; a text picker lists fields of any of them.
+const TEXT_DATA_TYPES = new Set([
+  "string",
+  "textarea",
+  "picklist",
+  "combobox",
+  "email",
+  "phone",
+  "url",
+  "encryptedstring"
+]);
+
 const OUTPUTS_FROM_LABEL = "Outputs from ";
+const GLOBAL_VARIABLES_TYPE = "Global Variables";
+const OPTION_CLASS =
+  "slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta newton-selector-flow-cpe-resource-selector__option";
 
 const GLOBAL_VARIABLE_ICONS = Object.freeze({
   $Flow: "workflow",
@@ -59,48 +82,52 @@ const GLOBAL_VARIABLE_OBJECTS = Object.freeze({
   $UserRole: "UserRole"
 });
 
-function coerceFlowBoolean(value) {
-  if (value === true || value === "true" || value === "TRUE") {
-    return true;
-  }
-  if (
-    value === false ||
-    value === "false" ||
-    value === "FALSE" ||
-    value === "0"
-  ) {
-    return false;
-  }
-  return Boolean(value);
-}
-
 function getIconNameByType(variableType) {
   return TYPE_ICON_MAP[String(variableType || "").toUpperCase()];
+}
+
+function isDrillable(row) {
+  return row.isObject || row.storeOutputAutomatically || row.globalVariable;
 }
 
 export default class NewtonSelectorFlowCpeResourceSelector extends LightningElement {
   @api name;
   @api label;
   @api required = false;
-  @api builderContextFilterType;
-  @api builderContextFilterCollectionBoolean;
   @api maxWidth;
   /** 'standard' (default) | 'label-hidden' — hides the label visually but keeps it for screen readers. */
   @api variant = "standard";
 
-  // An owner-supplied error (for example a value this field can't take). The
-  // inner input reports it, so the text box itself is marked invalid and
-  // linked to the message.
+  @api
+  get builderContextFilterType() {
+    return this._builderContextFilterType;
+  }
+  set builderContextFilterType(value) {
+    this._builderContextFilterType = value;
+    this.processOptions();
+  }
+  _builderContextFilterType;
+
+  @api
+  get builderContextFilterCollectionBoolean() {
+    return this._builderContextFilterCollectionBoolean;
+  }
+  set builderContextFilterCollectionBoolean(value) {
+    this._builderContextFilterCollectionBoolean = value;
+    this.processOptions();
+  }
+  _builderContextFilterCollectionBoolean;
+
+  // An owner-supplied error (for example a value this field can't take),
+  // shown under the field and linked to it.
   @api
   get errorMessage() {
     return this._errorMessage;
   }
   set errorMessage(value) {
     this._errorMessage = value || "";
-    this._errorPending = true;
   }
   _errorMessage = "";
-  _errorPending = false;
 
   @api
   get allowHardCodeReference() {
@@ -115,6 +142,9 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
 
   _dataType;
   _value;
+  // The last value received or reported; Back returns to it.
+  _committedRaw = "";
+  _committedType;
   allOptions;
   _options = [];
   _mergeFields = [];
@@ -124,10 +154,14 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   _RecordObject; // Used when a start element is in the flow
   hasError = false;
   loadError = "";
+  loadingOptions = false;
   isMenuOpen = false;
   isDataModified = false;
   selfEvent = false;
   key = 0;
+  _activeIndex = -1;
+  _scrollActivePending = false;
+  _focusTriggerPending = false;
   _selectedOptionObjectType = "";
   _selectedOptionIsCollection = false;
   _selectedOptionLabel = "";
@@ -138,7 +172,10 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
     noDataAvailable:
       "No matching resources. Check the spelling, or create the resource in the Toolbox.",
     invalidReferenceError:
-      "This flow has no resource with that name. To enter plain text, leave out the {! }."
+      "This flow has no resource with that name. To enter plain text, leave out the {! }.",
+    loading: "Loading fields…",
+    back: "Back",
+    drillHint: "Press Right Arrow to open."
   };
 
   typeDescriptors = [
@@ -181,19 +218,11 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
       objectTypeField: "object",
       isCollectionField: "getFirstRecordOnly"
     },
+    // An automatically stored Create Records element holds the new record's Id.
     {
       apiName: flowComboboxDefaults.recordCreatesType,
       label: "Variables",
-      dataType: "SObject",
-      objectTypeField: "object",
-      isCollectionField: "getFirstRecordOnly"
-    },
-    {
-      apiName: flowComboboxDefaults.recordUpdatesType,
-      label: "Variables",
-      dataType: "SObject",
-      objectTypeField: "object",
-      isCollectionField: "getFirstRecordOnly"
+      dataType: flowComboboxDefaults.stringDataType
     },
     {
       apiName: "formulas",
@@ -205,11 +234,6 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
       label: "Actions",
       dataType: flowComboboxDefaults.actionType
     },
-    {
-      apiName: "globalVariables",
-      label: "Global Variables",
-      dataType: flowComboboxDefaults.stringDataType
-    }, // Not within Flow Metadata API but compiled to allow Global Variables to be used
     {
       apiName: "screens.actions",
       label: "Screen Actions",
@@ -226,10 +250,16 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   set value(value) {
     this._dataType = getDataType(value);
     this.applyInternalValue(removeFormatting(value));
+    this._committedRaw = this._value;
+    this._committedType = this._dataType;
   }
 
   get committedValue() {
     return this._value ? formattedValue(this._value, this._dataType) : "";
+  }
+
+  get inputValue() {
+    return this._value || "";
   }
 
   /**
@@ -272,12 +302,7 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   }
 
   getCachedMergeFields(builderContext) {
-    this._RecordObject = builderContext?.start?.object;
-    if (!builderContext || typeof builderContext !== "object") {
-      return this.adjustOptions(
-        this.generateMergeFieldsFromBuilderContext(builderContext)
-      );
-    }
+    this._RecordObject = builderContext.start?.object;
     let cached = MERGE_FIELD_CACHE.get(builderContext);
     if (!cached) {
       cached = this.adjustOptions(
@@ -296,11 +321,10 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   }
 
   get selectedDisplayLabel() {
-    const selectedOption = this.selectedOption;
     return (
       this._selectedOptionLabel ||
-      selectedOption?.label ||
-      this.formatSelectedDisplayValue(this._value)
+      this.selectedOption?.label ||
+      removeFormatting(this._value || "")
     );
   }
 
@@ -314,7 +338,7 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   }
 
   get selectedOption() {
-    const value = this.formatSelectedDisplayValue(this._value);
+    const value = removeFormatting(this._value || "");
     const parts = value.split(".").filter(Boolean);
     const candidates = new Set(
       [value, parts[0], parts[parts.length - 1]].filter(Boolean)
@@ -329,21 +353,79 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
     });
   }
 
-  get emptyMessage() {
-    return this.loadError || this.labels.noDataAvailable;
+  // The rows the menu shows, in display order.
+  get visibleRows() {
+    return this._options.flatMap((group) => group.options);
   }
 
-  formatSelectedDisplayValue(value) {
-    const cleanValue = removeFormatting(value || "");
-    const parts = cleanValue.split(".").filter(Boolean);
-    if (parts.length === 2 && parts[0] === parts[1]) {
-      return parts[0];
+  get activeRow() {
+    return this.isMenuOpen && this._activeIndex >= 0
+      ? this.visibleRows[this._activeIndex]
+      : undefined;
+  }
+
+  get optionGroups() {
+    let index = 0;
+    return this._options.map((group, groupIndex) => ({
+      ...group,
+      headingId: `resource-group-${groupIndex}`,
+      options: group.options.map((option) => {
+        const optionIndex = index++;
+        const isActive = optionIndex === this._activeIndex;
+        return {
+          ...option,
+          index: optionIndex,
+          optionId: `resource-option-${optionIndex}`,
+          ariaSelected: isActive ? "true" : "false",
+          optionClass: isActive
+            ? `${OPTION_CLASS} newton-selector-flow-cpe-resource-selector__option_active`
+            : OPTION_CLASS,
+          isDrillable: isDrillable(option)
+        };
+      })
+    }));
+  }
+
+  get hasNoOptions() {
+    return !this._options.length;
+  }
+
+  get isDrilledIn() {
+    return !!this._selectedFieldPath;
+  }
+
+  get emptyMessage() {
+    if (this.loadingOptions) {
+      return this.labels.loading;
     }
-    return cleanValue;
+    return this.loadError || this.labels.noDataAvailable;
   }
 
   get dropdownExpanded() {
     return this.isMenuOpen ? "true" : "false";
+  }
+
+  get listboxId() {
+    return this.isMenuOpen ? "resource-listbox" : null;
+  }
+
+  get activeOptionId() {
+    return this.activeRow ? `resource-option-${this._activeIndex}` : null;
+  }
+
+  get errorText() {
+    return (
+      this._errorMessage ||
+      (this.hasError ? this.labels.invalidReferenceError : "")
+    );
+  }
+
+  get ariaInvalid() {
+    return this.errorText ? "true" : "false";
+  }
+
+  get errorDescribedBy() {
+    return this.errorText ? "resource-help" : null;
   }
 
   setOptions(value) {
@@ -408,6 +490,7 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   @wire(getObjectInfo, { objectApiName: "$_selectedObjectType" })
   _getObjectInfo({ error, data }) {
     if (error) {
+      this.loadingOptions = false;
       this.setOptions([]);
       this.loadError = loadErrorMessage("fields", error);
     } else if (data) {
@@ -421,40 +504,39 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
         const curObjectType = curFieldData.referenceToInfos.length
           ? curFieldData.referenceToInfos[0].apiName
           : null;
-        tempOptions.push(
-          this.generateOptionLine(
+        // Flow walks a lookup by its relationship name ({!acc.Owner.Name}).
+        // Polymorphic lookups need a typed segment, so they are not opened.
+        const drillable =
+          curDataType === "SObject" &&
+          !!curFieldData.relationshipName &&
+          curFieldData.referenceToInfos.length === 1;
+        tempOptions.push({
+          ...this.generateOptionLine(
             curDataType,
             curFieldData.label,
             curFieldData.apiName,
             false,
             curObjectType,
             getIconNameByType(curDataType),
-            curDataType === "SObject",
+            drillable,
             curDataType === "SObject" ? curObjectType : curDataType,
             flowComboboxDefaults.defaultKeyPrefix + this.key++
-          )
-        );
+          ),
+          relationshipName: drillable
+            ? curFieldData.relationshipName
+            : undefined
+        });
       });
+      this.loadingOptions = false;
       this.setOptions([{ type: data.label + " Fields", options: tempOptions }]);
     }
   }
 
-  getTypes() {
-    return this.typeDescriptors.map(
-      (curTypeDescriptor) => curTypeDescriptor.apiName
-    );
-  }
-
-  getTypeDescriptor(typeApiName) {
-    return this.typeDescriptors.find(
-      (curTypeDescriptor) => curTypeDescriptor.apiName === typeApiName
-    );
-  }
-
+  // A saved one-hop path ("acc.Name") reopens on that record's fields.
   determineSelectedType() {
     if (this._value && this.allOptions) {
       const valParts = this._value.replace(/[^a-zA-Z0-9._-]/g, "").split(".");
-      if (valParts.length > 1) {
+      if (valParts.length === 2) {
         this.allOptions.forEach((curOption) => {
           const localOptions = curOption.options;
           const selectedOption = localOptions.find(
@@ -473,16 +555,10 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   generateMergeFieldsFromBuilderContext(builderContext) {
     const optionsByType = {};
 
-    this.getTypes().forEach((curType) => {
-      const typeParts = curType.split("."); // e.g. 'screen.fields'
-      let typeOptions = [];
+    this.typeDescriptors.forEach((localType) => {
+      const typeParts = localType.apiName.split("."); // e.g. 'screen.fields'
 
-      // A record-triggered flow's "start" names the $Record object.
-      if (builderContext?.start) {
-        this._RecordObject = builderContext.start.object;
-      }
-
-      if (typeParts.length && builderContext[typeParts[0]]) {
+      if (builderContext[typeParts[0]]) {
         let objectToExamine = builderContext;
         let parentNodeLabel = "";
         typeParts.forEach((curTypePart) => {
@@ -525,31 +601,13 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
             }
           }
         });
-        const localType = this.getTypeDescriptor(curType);
 
-        const curTypeOptions = this.getOptionLines(
-          objectToExamine,
-          "varLabel",
-          "varApiName",
-          "dataType",
-          localType.isCollectionField
-            ? localType.isCollectionField
-            : flowComboboxDefaults.isCollectionField,
-          localType.objectTypeField ? localType.objectTypeField : "objectType",
-          localType
-        );
-        if (curTypeOptions.length) {
-          typeOptions = [...typeOptions, ...curTypeOptions];
-        }
+        const typeOptions = this.getOptionLines(objectToExamine, localType);
         if (typeOptions.length) {
-          if (optionsByType[localType.label]) {
-            optionsByType[localType.label] = [
-              ...optionsByType[localType.label],
-              ...typeOptions
-            ];
-          } else {
-            optionsByType[localType.label] = typeOptions;
-          }
+          optionsByType[localType.label] = [
+            ...(optionsByType[localType.label] || []),
+            ...typeOptions
+          ];
         }
       }
     });
@@ -564,9 +622,8 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
       })
     );
 
-    const globalVariablesType = this.getTypeDescriptor("globalVariables").label;
-    optionsByType[globalVariablesType] = [
-      ...(optionsByType[globalVariablesType] || []),
+    optionsByType[GLOBAL_VARIABLES_TYPE] = [
+      ...(optionsByType[GLOBAL_VARIABLES_TYPE] || []),
       ...globalVariables
     ];
 
@@ -582,32 +639,33 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
       label,
       value,
       isCollection: false,
-      objectType: "objectType",
+      objectType: null,
       optionIcon: icon,
       isObject: false,
       globalVariable: false,
       displayType,
+      subtitle: optionSubtitle(value, label, displayType),
       key: flowComboboxDefaults.defaultGlobalVariableKeyPrefix + this.key++,
-      flowType: "reference",
       storeOutputAutomatically: false
     };
   }
 
-  getOptionLines(
-    objectArray,
-    labelField,
-    valueField,
-    typeField,
-    isCollectionField,
-    objectTypeField,
-    typeDescriptor
-  ) {
+  getOptionLines(objectArray, typeDescriptor) {
+    const isCollectionField =
+      typeDescriptor.isCollectionField ||
+      flowComboboxDefaults.isCollectionField;
+    const objectTypeField = typeDescriptor.objectTypeField || "objectType";
+    const isActionCall =
+      typeDescriptor.apiName === flowComboboxDefaults.actionType;
+    const isScreenAction =
+      typeDescriptor.dataType === flowComboboxDefaults.screenActionType;
+    // Get and Create Records are resources only when they store their output
+    // automatically.
+    const isRecordElement =
+      typeDescriptor.apiName === flowComboboxDefaults.recordLookupsType ||
+      typeDescriptor.apiName === flowComboboxDefaults.recordCreatesType;
     const typeOptions = [];
     objectArray.forEach((curObject) => {
-      const isActionCall =
-        typeDescriptor.apiName === flowComboboxDefaults.actionType;
-      const isScreenAction =
-        typeDescriptor.dataType === flowComboboxDefaults.screenActionType;
       const isScreenComponent =
         typeDescriptor.dataType === flowComboboxDefaults.screenComponentType &&
         curObject.storeOutputAutomatically;
@@ -620,20 +678,21 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
           ? flowComboboxDefaults.actionType
           : isScreenComponent
             ? flowComboboxDefaults.screenComponentType
-            : this.getTypeByDescriptor(curObject[typeField], typeDescriptor);
+            : this.getTypeByDescriptor(curObject.dataType, typeDescriptor);
       const label =
         isActionCall || isScreenAction
           ? OUTPUTS_FROM_LABEL + curObject.name
-          : curObject[labelField]
-            ? curObject[labelField]
-            : curObject[valueField];
+          : curObject.varLabel
+            ? curObject.varLabel
+            : curObject.varApiName;
       const curIsCollection = this.isCollection(curObject, isCollectionField);
       const storeOutputAutomatically =
-        (curObject.storeOutputAutomatically &&
-          typeDescriptor.dataType !== "SObject") ||
-        typeDescriptor.dataType === flowComboboxDefaults.screenActionType;
+        isScreenAction ||
+        isScreenComponent ||
+        (isActionCall && !!curObject.storeOutputAutomatically);
       if (
         !isSection &&
+        (!isRecordElement || curObject.storeOutputAutomatically) &&
         (!isScreenAction || this.automaticOutputVariables[curObject.name])
       ) {
         typeOptions.push(
@@ -642,8 +701,8 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
             label,
             // A screen component's "Screen.Component" name is offered as "Component".
             typeDescriptor.dataType === flowComboboxDefaults.screenComponentType
-              ? curObject[valueField].split(".")[1]
-              : curObject[valueField],
+              ? curObject.varApiName.split(".")[1]
+              : curObject.varApiName,
             typeDescriptor.apiName === flowComboboxDefaults.recordLookupsType
               ? !curIsCollection
               : !!curIsCollection,
@@ -655,7 +714,6 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
               ? curObject[objectTypeField]
               : curDataType,
             flowComboboxDefaults.defaultKeyPrefix + this.key++,
-            null,
             storeOutputAutomatically
           )
         );
@@ -665,37 +723,55 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   }
 
   isCollection(curObject, isCollectionField) {
-    if (Object.prototype.hasOwnProperty.call(curObject, isCollectionField)) {
-      return coerceFlowBoolean(curObject[isCollectionField]);
-    }
-    return coerceFlowBoolean(curObject[flowComboboxDefaults.isCollectionField]);
+    return Object.prototype.hasOwnProperty.call(curObject, isCollectionField)
+      ? curObject[isCollectionField]
+      : curObject[flowComboboxDefaults.isCollectionField];
   }
 
-  matchesBuilderContextFilter(option, filterType, hasCollectionFilter) {
-    if (!filterType) {
-      return true;
+  matchesType(option, filterType) {
+    const types = [
+      String(option.displayType || "").toLowerCase(),
+      String(option.type || "").toLowerCase()
+    ];
+    if (filterType === "string") {
+      return types.some((type) => TEXT_DATA_TYPES.has(type));
     }
+    return types.includes(filterType);
+  }
 
-    const optionType = String(option.type || "").toLowerCase();
-    const optionDisplayType = String(option.displayType || "").toLowerCase();
-
+  // A text picker also lists single records, to open them and pick a field.
+  matchesBuilderContextFilter(option, filterType, hasCollectionFilter) {
     if (filterType === "sobject") {
-      return optionType === "sobject" || option.isObject === true;
+      return (
+        String(option.type || "").toLowerCase() === "sobject" ||
+        option.isObject === true
+      );
     }
 
     return (
-      optionDisplayType === filterType ||
-      optionType === filterType ||
-      (option.storeOutputAutomatically === true && !hasCollectionFilter)
+      this.matchesType(option, filterType) ||
+      (option.storeOutputAutomatically === true && !hasCollectionFilter) ||
+      (filterType === "string" && option.isObject && !option.isCollection)
+    );
+  }
+
+  // A global variable row ($Record, $User) only opens its fields in every
+  // picker; in a text picker a record row does too, since the record itself
+  // is not a text value.
+  isDrillOnly(row) {
+    const filterType = String(
+      this.builderContextFilterType || ""
+    ).toLowerCase();
+    return (
+      row.globalVariable ||
+      (filterType === "string" &&
+        row.isObject &&
+        !this.matchesType(row, filterType))
     );
   }
 
   getTypeByDescriptor(curObjectFieldType, typeDescriptor) {
-    if (!typeDescriptor) {
-      return flowComboboxDefaults.stringDataType;
-    } else if (
-      typeDescriptor.apiName === flowComboboxDefaults.recordLookupsType
-    ) {
+    if (typeDescriptor.apiName === flowComboboxDefaults.recordLookupsType) {
       return flowComboboxDefaults.dataTypeSObject;
     }
     return curObjectFieldType
@@ -713,7 +789,6 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
     isObject,
     displayType,
     key,
-    flowType,
     storeOutputAutomatically
   ) {
     return {
@@ -726,60 +801,68 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
       isObject: isObject,
       globalVariable: false,
       displayType: displayType,
+      subtitle: optionSubtitle(value, label, displayType),
       key: key,
-      flowType: flowType ? flowType : flowComboboxDefaults.referenceDataType,
       storeOutputAutomatically: storeOutputAutomatically
     };
   }
 
+  rowFromEvent(event) {
+    event.stopPropagation(); // stops the window generic click handlers from firing 2x more times
+    return this.visibleRows[Number(event.currentTarget.dataset.index)];
+  }
+
+  handleOptionClick(event) {
+    this.chooseRow(this.rowFromEvent(event));
+  }
+
   handleOpenObject(event) {
-    this.doOpenObject(
-      event,
-      event.currentTarget.dataset.optionValue,
-      event.currentTarget.dataset.objectType
-    );
+    this.openObject(this.rowFromEvent(event));
   }
 
   handleOpenScreenComponent(event) {
-    const screenComponentName =
-      event.currentTarget.dataset.optionValue.split(".");
-    this.doOpenAction(
-      event,
-      screenComponentName.length > 1
-        ? screenComponentName[1]
-        : event.currentTarget.dataset.optionValue
-    );
+    this.openOutputs(this.rowFromEvent(event));
   }
 
-  handleSetSelectedRecord(event) {
-    event.stopPropagation(); // stops the window generic click handlers from firing 2x more times
-    const dataset = event.currentTarget.dataset;
-    if (
-      this._value &&
-      this._value.endsWith(dataset.value) &&
-      dataset.objectType
-    ) {
-      this.doOpenObject(event, dataset.value, dataset.objectType);
-      return;
+  handleOpenGlobalVariable(event) {
+    this.openGlobalVariable(this.rowFromEvent(event));
+  }
+
+  chooseRow(row) {
+    if (this.isDrillOnly(row)) {
+      this.drillInto(row);
+    } else {
+      this.selectOption(row);
     }
-    this._dataType = dataset.flowType;
-    this._selectedOptionObjectType = dataset.objectType || "";
-    this._selectedOptionIsCollection = dataset.isCollection === "true";
-    this._selectedOptionLabel = dataset.label || "";
-    this._selectedOptionIcon = dataset.icon || "";
+  }
+
+  selectOption(row) {
+    this._dataType = flowComboboxDefaults.referenceDataType;
+    this._selectedOptionObjectType = row.objectType || "";
+    this._selectedOptionIsCollection = row.isCollection === true;
+    this._selectedOptionLabel = row.label || "";
+    this._selectedOptionIcon = row.optionIcon || "";
     this.applyInternalValue(
-      this.getFullPath(this._selectedFieldPath, dataset.value)
+      this.getFullPath(this._selectedFieldPath, row.value)
     );
     this.isDataModified = true;
     this.hasError = false;
     this.closeOptionDialog();
   }
 
-  handleOpenGlobalVariable(event) {
-    event.stopPropagation();
-    const value = event.currentTarget.dataset.optionValue;
-    this._selectedFieldPath =
-      (this._selectedFieldPath ? this._selectedFieldPath + "." : "") + value;
+  drillInto(row) {
+    if (row.isObject) {
+      this.openObject(row);
+    } else if (row.storeOutputAutomatically) {
+      this.openOutputs(row);
+    } else {
+      this.openGlobalVariable(row);
+    }
+  }
+
+  openGlobalVariable(row) {
+    const value = row.value;
+    this._selectedFieldPath = this.getFullPath(this._selectedFieldPath, value);
     this.applyInternalValue(this._selectedFieldPath + ".");
 
     const group = `${value} Outputs`;
@@ -796,8 +879,13 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
       return;
     }
 
-    fetchFields(GLOBAL_VARIABLE_OBJECTS[value] || this._RecordObject)
+    this.loadingOptions = true;
+    this.setOptions([]);
+    getObjectFields({
+      objectName: GLOBAL_VARIABLE_OBJECTS[value] || this._RecordObject
+    })
       .then((fields) => {
+        this.loadingOptions = false;
         this.setOptions([
           {
             type: group,
@@ -806,31 +894,40 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
                 field.label,
                 field.type,
                 field.name,
-                getIconNameByType(field.type),
-                "String"
+                getIconNameByType(field.type)
               )
             )
           }
         ]);
       })
       .catch((error) => {
+        this.loadingOptions = false;
         this.setOptions([]);
         this.loadError = loadErrorMessage("fields", error);
       });
   }
 
-  doOpenObject(event, value, objectType) {
-    event.stopPropagation();
-    this._selectedFieldPath =
-      (this._selectedFieldPath ? this._selectedFieldPath + "." : "") + value;
+  // The root rows leave the menu while the object's fields load, so none of
+  // them can be picked under the new path.
+  openObject(row) {
+    this._selectedFieldPath = this.getFullPath(
+      this._selectedFieldPath,
+      row.relationshipName || row.value
+    );
+    if (row.objectType !== this._selectedObjectType) {
+      this.loadingOptions = true;
+      this.setOptions([]);
+    }
     this.applyInternalValue(this._selectedFieldPath + ".");
-    this._selectedObjectType = objectType;
+    this._selectedObjectType = row.objectType;
   }
 
-  doOpenAction(event, value) {
-    event.stopPropagation();
-    this._selectedFieldPath =
-      (this._selectedFieldPath ? this._selectedFieldPath + "." : "") + value;
+  openOutputs(row) {
+    const parts = row.value.split(".");
+    this._selectedFieldPath = this.getFullPath(
+      this._selectedFieldPath,
+      parts.length > 1 ? parts[1] : row.value
+    );
     this.applyInternalValue(this._selectedFieldPath + ".");
     this.getActionOutputs(this._selectedFieldPath);
   }
@@ -854,7 +951,6 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
           curDataType === "SObject",
           curDataType === "SObject" ? curObjectType : curDataType,
           flowComboboxDefaults.defaultKeyPrefix + this.key++,
-          undefined,
           !!this.automaticOutputVariables[path + "." + output.apiName]
         )
       );
@@ -863,10 +959,11 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   }
 
   dispatchValueChangedEvent() {
+    this._committedRaw = this._value;
+    this._committedType = this._dataType;
     this.dispatchEvent(
       new CustomEvent("valuechanged", {
         detail: {
-          id: this.name,
           newValue: this.committedValue,
           objectType: this._selectedOptionObjectType || ""
         }
@@ -874,16 +971,27 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
     );
   }
 
-  resetData() {
-    this.applyInternalValue("");
-    this.resetTypeOptions();
-    this.closeOptionDialog();
+  // Back only navigates: it returns to the resource list and keeps the value.
+  handleBack(event) {
+    event.stopPropagation();
+    this.goBack();
+  }
+
+  goBack() {
+    this._selectedFieldPath = "";
+    this._selectedObjectType = null;
+    this.loadingOptions = false;
+    this._value = this._committedRaw;
+    this._dataType = this._committedType;
+    this.isDataSelected = !!this._value;
+    this.setOptions(this._mergeFields);
   }
 
   resetTypeOptions() {
     this.isDataModified = true;
     this._selectedFieldPath = "";
     this._selectedObjectType = null;
+    this.loadingOptions = false;
     this._selectedOptionObjectType = "";
     this._selectedOptionIsCollection = false;
     this._selectedOptionLabel = "";
@@ -897,12 +1005,24 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   }
 
   closeOptionDialog(setValueInput) {
+    // Leaving a drilled list without picking a field restores the committed
+    // value instead of keeping the partial path ("rec."). The input still
+    // shows that path until the next render, so it is not read back.
+    const leavesPartialPath =
+      setValueInput &&
+      this.isDrilledIn &&
+      this._value === this._selectedFieldPath + ".";
+    if (leavesPartialPath) {
+      this.goBack();
+      this.isDataModified = false;
+    }
     if (this._value) {
       this.isDataSelected = true;
     }
     this.isMenuOpen = false;
+    this._activeIndex = -1;
 
-    if (setValueInput) {
+    if (setValueInput && !leavesPartialPath) {
       this.setValueInput();
     }
 
@@ -917,12 +1037,16 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   }
 
   renderedCallback() {
-    if (!this._errorPending) return;
-    const input = this.template.querySelector('[data-id="userinput"]');
-    if (!input) return;
-    this._errorPending = false;
-    input.setCustomValidity(this._errorMessage);
-    input.reportValidity();
+    if (this._scrollActivePending) {
+      this._scrollActivePending = false;
+      this.template
+        .querySelector(`[role="option"][data-index="${this._activeIndex}"]`)
+        ?.scrollIntoView({ block: "nearest" });
+    }
+    if (this._focusTriggerPending) {
+      this._focusTriggerPending = false;
+      this.template.querySelector('[role="combobox"]').focus();
+    }
   }
 
   disconnectedCallback() {
@@ -957,6 +1081,7 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   };
 
   processOptions(searchString) {
+    this._activeIndex = -1;
     let searchLC = "";
 
     if (searchString) {
@@ -978,15 +1103,9 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
       return;
     }
 
-    // Coerce the collection filter to a real boolean. Bare HTML attributes
-    // (e.g. `<c-newton-selector-flow-cpe-resource-selector builder-context-filter-collection-boolean>`) arrive
-    // as empty string `""`, which breaks the strict `isCollection === ...`
-    // compare below. Treat `""` and `"true"` as `true`; explicit `{false}`
-    // stays false. `undefined` means "no filter" and is preserved.
-    const filterColRaw = this.builderContextFilterCollectionBoolean;
-    const filterColDefined = typeof filterColRaw !== "undefined";
-    const filterColBool =
-      filterColRaw === "" || filterColRaw === "true" || filterColRaw === true;
+    const filterColDefined =
+      typeof this.builderContextFilterCollectionBoolean !== "undefined";
+    const filterColBool = this.builderContextFilterCollectionBoolean === true;
 
     const options = [];
     (this.allOptions || []).forEach((curOption) => {
@@ -1050,26 +1169,22 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   }
 
   handleSearchField(event) {
-    // The inner input's `change` is composed; keep it from leaking out as if
-    // this component's value changed (its public event is `valuechanged`).
+    // The input event is composed; keep it from leaking out as if this
+    // component's value changed (its public event is `valuechanged`).
     event.stopPropagation();
     const currentText = event.target.value;
     if (!currentText || !currentText.includes(".")) {
       this.resetTypeOptions();
     }
     this._dataType = getDataType(currentText);
+    // The box shows `_value`, so it follows the typing.
+    this._value = currentText;
     this.isDataModified = true;
     this.isDataSelected = false;
 
     this.processOptions(currentText);
     if (this.allOptions.length) {
       this.openOptionDialog();
-    }
-  }
-
-  handleSearchKeyUp(event) {
-    if (event.key === "Enter" || event.key === "Tab") {
-      this.toggleMenu();
     }
   }
 
@@ -1081,12 +1196,72 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
     }
   }
 
+  setActive(index) {
+    this._activeIndex = index;
+    this._scrollActivePending = true;
+  }
+
+  moveActive(step) {
+    this.openOptionDialog();
+    const count = this.visibleRows.length;
+    if (!count) return;
+    const from =
+      this._activeIndex < 0 ? (step > 0 ? -1 : count) : this._activeIndex;
+    this.setActive((from + step + count) % count);
+  }
+
+  // The editable-combobox keyboard model: arrows move through the options,
+  // Enter picks the active one, Right Arrow opens it, Left Arrow goes back.
   handleKeyDown(event) {
-    if (this.isMenuOpen && (event.key === "Tab" || event.key === "Escape")) {
-      this.closeOptionDialog(true);
-      if (event.key === "Escape") {
-        event.stopPropagation();
-      }
+    const row = this.activeRow;
+    switch (event.key) {
+      case "ArrowDown":
+      case "ArrowUp":
+        event.preventDefault();
+        this.moveActive(event.key === "ArrowDown" ? 1 : -1);
+        break;
+      case "Home":
+      case "End":
+        if (row) {
+          event.preventDefault();
+          this.setActive(
+            event.key === "Home" ? 0 : this.visibleRows.length - 1
+          );
+        }
+        break;
+      case "ArrowRight":
+        if (row && isDrillable(row)) {
+          event.preventDefault();
+          this.drillInto(row);
+        }
+        break;
+      case "ArrowLeft":
+        if (this.isMenuOpen && this.isDrilledIn && (row || this.hasNoOptions)) {
+          event.preventDefault();
+          this.goBack();
+        }
+        break;
+      case "Enter":
+        event.preventDefault();
+        if (row) {
+          this._focusTriggerPending = true;
+          this.chooseRow(row);
+        } else {
+          this.toggleMenu();
+        }
+        break;
+      case "Escape":
+        if (this.isMenuOpen) {
+          this.closeOptionDialog(true);
+          event.stopPropagation();
+        }
+        break;
+      case "Tab":
+        if (this.isMenuOpen) {
+          this.closeOptionDialog(true);
+        }
+        break;
+      default:
     }
   }
 
@@ -1134,22 +1309,20 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   }
 
   get formElementClass() {
-    let resultClass = "slds-form-element";
-    if (this.hasError) {
-      resultClass += " slds-has-error slds-m-bottom_medium";
-    }
-    return resultClass;
+    return this.errorText
+      ? "slds-form-element slds-has-error"
+      : "slds-form-element";
   }
 
   get labelClass() {
     return this.variant === "label-hidden"
       ? "slds-assistive-text"
-      : "slds-form-element__label custom-width-full";
+      : "slds-form-element__label slds-size_full";
   }
 
   get labelClassForPill() {
     return this.variant === "label-hidden"
       ? "slds-assistive-text"
-      : "slds-form-element__label slds-no-flex custom-width-full";
+      : "slds-form-element__label slds-no-flex slds-size_full";
   }
 }

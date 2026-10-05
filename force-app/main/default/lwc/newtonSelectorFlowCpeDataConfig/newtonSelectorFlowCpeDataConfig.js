@@ -1,30 +1,47 @@
 import { api, LightningElement, track, wire } from "lwc";
 import { getObjectInfo, getPicklistValues } from "lightning/uiObjectInfoApi";
-import { defaultSelectorConfig } from "c/newtonSelectorUtilityConfigDefaults";
-import { MASTER_RECORD_TYPE_ID } from "c/newtonSelectorUtilityDataSources";
 import {
-  loadErrorMessage,
-  readResourceValue
-} from "c/newtonSelectorFlowCpeUtilityHelpers";
-import {
+  DEFAULT_QUERY_LIMIT,
   MAX_QUERY_LIMIT,
-  buildSobjectConfigForQuery,
-  resolveRecordCollectionMetadataFromBuilderContext
+  defaultSelectorConfig
+} from "c/newtonSelectorUtilityConfigDefaults";
+import {
+  MASTER_RECORD_TYPE_ID,
+  OVERRIDE_TEXT_FIELDS,
+  errorMessageOf,
+  normalizePicklist
+} from "c/newtonSelectorUtilityDataSources";
+import { loadErrorMessage } from "c/newtonSelectorFlowCpeUtilityHelpers";
+import {
+  hasFlowValues,
+  recordCollectionObjectType,
+  whereClauseWithSampleFlowValues
 } from "c/newtonSelectorFlowCpeUtilityConfigState";
 import {
   ORDER_DIRECTION_OPTIONS,
-  OVERRIDE_FIELDS,
   PICKLIST_VALUE_SOURCE_OPTIONS,
   SORT_BY_OPTIONS,
   SORT_DIRECTION_OPTIONS,
-  SOURCE_TILES
+  SOURCE_TILES,
+  tileList
 } from "c/newtonSelectorFlowCpeUtilityConfigOptions";
+import getObjectFields from "@salesforce/apex/NewtonSelectorFlowCpeController.getObjectFields";
 import searchSObjectTypes from "@salesforce/apex/NewtonSelectorFlowCpeController.searchSObjectTypes";
-import searchLookupDatasetFieldsForObject from "@salesforce/apex/NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject";
 import queryItems from "@salesforce/apex/NewtonSelectorRuntimeController.queryItems";
 import validateQuery from "@salesforce/apex/NewtonSelectorRuntimeController.validateQuery";
 
-const DEFAULT_RECORD_TYPE_VALUE = "__NewtonDefaultRecordType__";
+// A blank recordTypeId loads the master record type's values, in the editor
+// and at runtime alike.
+const MASTER_RECORD_TYPE_VALUE = "__NewtonMasterRecordType__";
+const MASTER_RECORD_TYPE_OPTION = {
+  label: "Master (all values)",
+  value: MASTER_RECORD_TYPE_VALUE,
+  subtitle: "Uses every active value of the field",
+  icon: "list-checks"
+};
+const BULK_EDIT_FIELDS = OVERRIDE_TEXT_FIELDS.filter(
+  (field) => field !== "label"
+);
 const OVERRIDE_VISIBLE_INCREMENT = 25;
 const OVERRIDE_MODE_ADVANCED = "advanced";
 const OVERRIDE_MODE_DEFAULT = "default";
@@ -71,14 +88,25 @@ const SOQL_KEYWORDS = new Set([
 const SOQL_BOOLEAN_LITERALS = new Set(["TRUE", "FALSE"]);
 const SOQL_NULL_LITERALS = new Set(["NULL"]);
 const SOQL_OBJECT_CONTEXT_KEYWORDS = new Set(["FROM", "UPDATE"]);
-const EMPTY_COLLECTION_FIELD_MAP = {
-  label: "",
-  sublabel: "",
-  icon: "",
-  value: "",
-  badge: "",
-  helpText: ""
-};
+
+function emptyBulkDraft() {
+  return Object.fromEntries(BULK_EDIT_FIELDS.map((field) => [field, ""]));
+}
+
+function isObjectRow(row, apiName) {
+  return String(row?.value || "").toLowerCase() === apiName.toLowerCase();
+}
+
+// The lookup shows exactly the row it is given: the searched row with the
+// object's label once known, otherwise the API name.
+function objectSelection(row, apiName) {
+  if (!apiName) return [];
+  return [
+    isObjectRow(row, apiName)
+      ? row
+      : { id: apiName, title: apiName, icon: "box" }
+  ];
+}
 
 function isIdentifierStart(char) {
   return /[A-Za-z_$]/.test(char);
@@ -238,7 +266,6 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
 
   @track _picklistValues = [];
   @track _recordTypeOptions = [];
-  @track _defaultRecordTypeId = MASTER_RECORD_TYPE_ID;
   @track _sobjectSampleRows = [];
   @track _sampleLoadError = "";
   @track _isLoadingSample = false;
@@ -247,70 +274,86 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
   @track _overrideVisibleLimit = OVERRIDE_VISIBLE_INCREMENT;
   @track _overrideMode = "";
   @track _bulkSelection = {};
-  @track _bulkEditDraft = { icon: "", sublabel: "", badge: "", helpText: "" };
+  @track _bulkEditDraft = emptyBulkDraft();
   @track _queryValidation = null;
   @track _isValidatingQuery = false;
-  _loadError = "";
+  _copyStatus = null;
+  _sampleIgnoresWhere = false;
+  _searchError = "";
+  _recordTypeError = "";
+  _picklistValuesError = "";
+  _picklistObjectRow = null;
+  _sobjectRow = null;
+  _objectRowRequests = new Set();
 
-  get _config() {
-    return this.config || defaultSelectorConfig();
+  renderedCallback() {
+    if (this.isPicklistMode) {
+      this.resolveObjectRow(
+        "_picklistObjectRow",
+        this.config.picklist.objectApiName
+      );
+    }
+    if (this.isSObjectMode) {
+      this.resolveObjectRow("_sobjectRow", this.config.sobject.sObjectApiName);
+    }
   }
-  set _config(value) {
+
+  // A saved config holds only the object's API name, so its label comes from
+  // the same search the lookup runs.
+  async resolveObjectRow(field, apiName) {
+    const request = `${field}:${apiName}`;
+    if (
+      !apiName ||
+      isObjectRow(this[field], apiName) ||
+      this._objectRowRequests.has(request)
+    ) {
+      return;
+    }
+    this._objectRowRequests.add(request);
+    try {
+      const rows = await searchSObjectTypes({ searchKey: apiName });
+      this[field] = rows.find((row) => isObjectRow(row, apiName)) || null;
+    } catch (error) {
+      this._searchError = loadErrorMessage("objects", error);
+    }
+  }
+
+  emit(config) {
     this.dispatchEvent(
-      new CustomEvent("configpatch", { detail: { path: [], value } })
+      new CustomEvent("configpatch", { detail: { value: config } })
     );
   }
 
-  get _sourceRecordsRef() {
-    return this.sourceRecordsRef || "";
-  }
-  set _sourceRecordsRef(value) {
-    this.dispatchRefChange("sourceRecordsRef", value);
-  }
-
   get hasDataSource() {
-    return Boolean(this._config.dataSource);
+    return Boolean(this.config.dataSource);
   }
   get isPicklistMode() {
-    return this._config.dataSource === "picklist";
+    return this.config.dataSource === "picklist";
   }
   get isCollectionMode() {
-    return this._config.dataSource === "collection";
+    return this.config.dataSource === "collection";
   }
   get isSObjectMode() {
-    return this._config.dataSource === "sobject";
+    return this.config.dataSource === "sobject";
   }
   get isCustomMode() {
-    return this._config.dataSource === "custom";
+    return this.config.dataSource === "custom";
   }
   get canCustomizeValues() {
     return this.isPicklistMode || this.isSObjectMode;
   }
 
   get sourceTiles() {
-    const active = this._config.dataSource;
-    return SOURCE_TILES.map((tile) => ({
-      ...tile,
-      id: tile.value,
-      _selected: tile.value === active
-    }));
+    return tileList(SOURCE_TILES, this.config.dataSource);
   }
-  get sourceKindLabel() {
-    return (
-      SOURCE_TILES.find((tile) => tile.value === this._config.dataSource)
-        ?.label || ""
-    );
+  get activeSourceTile() {
+    return SOURCE_TILES.find((tile) => tile.value === this.config.dataSource);
   }
   get sourceSetupTitle() {
-    return this.sourceKindLabel
-      ? `${this.sourceKindLabel} setup`
-      : "Source setup";
+    return `${this.activeSourceTile.label} setup`;
   }
   get sourceKindIcon() {
-    return (
-      SOURCE_TILES.find((tile) => tile.value === this._config.dataSource)
-        ?.icon || "database"
-    );
+    return this.activeSourceTile.icon;
   }
   get sourceSetupSubtitle() {
     if (this.isPicklistMode)
@@ -336,191 +379,251 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
 
   handleSourceTileChange(event) {
     const value = event.detail?.value;
-    if (value) {
-      this._config = { ...this._config, dataSource: value };
+    if (value && value !== this.config.dataSource) {
+      this.resetOverridesForNewSource();
+      this._searchError = "";
+      this.emit({ ...this.config, dataSource: value, overrides: {} });
       this.dispatchFilterValidity(false);
     }
   }
-  async handlePicklistObjectSearch(event) {
-    await this.runSObjectSearch(event.detail.searchTerm, event.target);
+  // Searches overlap while the admin types; only the latest one per lookup
+  // may write its results, or a slow earlier search overwrites a newer one.
+  _objectSearchSeq = new Map();
+
+  async handleObjectSearch(event) {
+    const lookup = event.currentTarget;
+    const seq = (this._objectSearchSeq.get(lookup) || 0) + 1;
+    this._objectSearchSeq.set(lookup, seq);
+    const isLatest = () => this._objectSearchSeq.get(lookup) === seq;
+    try {
+      const results = await searchSObjectTypes({
+        searchKey: event.detail.searchTerm || ""
+      });
+      if (!isLatest()) return;
+      this._searchError = "";
+      lookup.setSearchResults(results);
+    } catch (error) {
+      if (!isLatest()) return;
+      this._searchError = loadErrorMessage("objects", error);
+      lookup.setSearchResults([]);
+    }
   }
   handlePicklistObjectSelect(event) {
-    const selectedId = event.detail.selectedIds?.[0];
-    this._config = {
-      ...this._config,
+    const objectApiName = event.detail.selectedIds?.[0] || "";
+    this._picklistObjectRow = event.currentTarget.getSelection()[0] || null;
+    const objectChanged = objectApiName !== this.config.picklist.objectApiName;
+    if (objectChanged) this.resetOverridesForNewSource();
+    this._recordTypeError = "";
+    this._picklistValuesError = "";
+    this.emit({
+      ...this.config,
       picklist: {
-        ...this._config.picklist,
-        objectApiName: selectedId || "",
+        ...this.config.picklist,
+        objectApiName,
         fieldApiName: "",
         recordTypeId: ""
-      }
-    };
+      },
+      ...(objectChanged ? { overrides: {} } : {})
+    });
   }
   handlePicklistFieldChange(event) {
-    this._config = {
-      ...this._config,
-      picklist: {
-        ...this._config.picklist,
-        fieldApiName: event.detail.fieldApiName || ""
-      }
-    };
+    const fieldApiName = event.detail.fieldApiName || "";
+    const fieldChanged = fieldApiName !== this.config.picklist.fieldApiName;
+    if (fieldChanged) this.resetOverridesForNewSource();
+    this._picklistValuesError = "";
+    this.emit({
+      ...this.config,
+      picklist: { ...this.config.picklist, fieldApiName },
+      ...(fieldChanged ? { overrides: {} } : {})
+    });
   }
   handleRecordTypeComboChange(event) {
     const value = event.detail.value;
-    this._config = {
-      ...this._config,
+    this.emit({
+      ...this.config,
       picklist: {
-        ...this._config.picklist,
-        recordTypeId: value === DEFAULT_RECORD_TYPE_VALUE ? "" : value
+        ...this.config.picklist,
+        recordTypeId: value === MASTER_RECORD_TYPE_VALUE ? "" : value
       }
-    };
+    });
   }
   handlePicklistValueSourceChange(event) {
-    this._config = {
-      ...this._config,
+    this.emit({
+      ...this.config,
       picklist: {
-        ...this._config.picklist,
+        ...this.config.picklist,
         valueSource: event.detail.value
       }
-    };
+    });
   }
 
   handleCollectionVariableChange(event) {
-    const nextRef = readResourceValue(event);
+    const nextRef = event.detail.newValue;
     const nextObject =
       event.detail.objectType ||
-      resolveRecordCollectionMetadataFromBuilderContext(
-        this.builderContext,
-        nextRef
-      ).objectApiName;
-    const currentObject = this._config.collection?.objectApiName || "";
-    this._sourceRecordsRef = nextRef;
-    this._config = {
-      ...this._config,
+      recordCollectionObjectType(this.builderContext, nextRef);
+    const currentObject = this.config.collection.objectApiName;
+    this.dispatchRefChange("sourceRecordsRef", nextRef);
+    this.emit({
+      ...this.config,
       collection: {
-        ...this._config.collection,
+        ...this.config.collection,
         objectApiName: nextObject || "",
         fieldMap:
           !nextRef || (nextObject && nextObject !== currentObject)
-            ? { ...EMPTY_COLLECTION_FIELD_MAP }
-            : { ...(this._config.collection?.fieldMap || {}) }
+            ? defaultSelectorConfig().collection.fieldMap
+            : { ...this.config.collection.fieldMap }
       }
-    };
+    });
   }
   handleCollectionFieldMapChange(event) {
     const field = event.currentTarget.dataset.field;
     const value = event.detail.fieldApiName;
-    this._config = {
-      ...this._config,
+    this.emit({
+      ...this.config,
       collection: {
-        ...this._config.collection,
-        fieldMap: { ...this._config.collection.fieldMap, [field]: value }
+        ...this.config.collection,
+        fieldMap: { ...this.config.collection.fieldMap, [field]: value }
       }
-    };
-  }
-  async handleSObjectSearch(event) {
-    await this.runSObjectSearch(event.detail.searchTerm, event.target);
+    });
   }
   handleSObjectSelect(event) {
-    const selectedId = event.detail.selectedIds?.[0];
-    this._config = {
-      ...this._config,
+    const sObjectApiName = event.detail.selectedIds?.[0] || "";
+    this._sobjectRow = event.currentTarget.getSelection()[0] || null;
+    const current = this.config.sobject;
+    const objectChanged = sObjectApiName !== current.sObjectApiName;
+    const defaults = defaultSelectorConfig().sobject;
+    if (objectChanged) this.resetOverridesForNewSource();
+    this.emit({
+      ...this.config,
       sobject: {
-        ...this._config.sobject,
-        sObjectApiName: selectedId || "",
+        ...current,
+        sObjectApiName,
         whereClause: "",
-        orderByField: ""
-      }
-    };
-    this._sobjectSampleRows = [];
-    this._queryValidation = null;
+        orderByField: "",
+        ...(objectChanged
+          ? {
+              labelField: defaults.labelField,
+              valueField: defaults.valueField,
+              sublabelField: defaults.sublabelField,
+              iconField: defaults.iconField,
+              badgeField: defaults.badgeField,
+              helpField: defaults.helpField
+            }
+          : {})
+      },
+      ...(objectChanged ? { overrides: {} } : {})
+    });
+    this.resetSampleRows();
+    this.resetQueryStatus();
     this.dispatchFilterValidity(false);
   }
   handleWhereChange(event) {
-    this._config = {
-      ...this._config,
-      sobject: {
-        ...this._config.sobject,
-        whereClause: event.detail.value
-      }
-    };
-    this._queryValidation = null;
+    const whereClause = event.detail.value;
+    if (whereClause !== this.config.sobject.whereClause) {
+      this.resetSampleRows();
+    }
+    this.emit({
+      ...this.config,
+      sobject: { ...this.config.sobject, whereClause }
+    });
+    this.resetQueryStatus();
     this.dispatchFilterValidity(event.detail.incomplete);
   }
-  handleOrderFieldSearch(event) {
-    const lookup = event.currentTarget;
-    const objectApiName = this._config.sobject?.sObjectApiName || "";
-    if (!objectApiName) {
-      lookup.setSearchResults([]);
-      return;
-    }
-    searchLookupDatasetFieldsForObject({
-      objectApiName,
-      searchKey: event.detail.rawSearchTerm || ""
-    })
-      .then((rows) => {
-        this._loadError = "";
-        lookup.setSearchResults(rows);
-      })
-      .catch((error) => {
-        this._loadError = loadErrorMessage("fields", error);
-        lookup.setSearchResults([]);
-      });
+  handleWhereValidityChange(event) {
+    this.dispatchFilterValidity(event.detail.incomplete);
   }
-  handleOrderFieldSelectionChange(event) {
-    const row = event.currentTarget.getSelection()[0];
-    this._config = {
-      ...this._config,
-      sobject: {
-        ...this._config.sobject,
-        orderByField: row?.id ? String(row.id) : ""
-      }
-    };
-    this._queryValidation = null;
-  }
+  // LIMIT keeps the first rows in sort order, so the order decides which
+  // records load.
   handleOrderDirectionChange(event) {
-    this._config = {
-      ...this._config,
+    if (event.detail.value !== this.orderByDirection) this.resetSampleRows();
+    this.emit({
+      ...this.config,
       sobject: {
-        ...this._config.sobject,
+        ...this.config.sobject,
         orderByDirection: event.detail.value
       }
-    };
-    this._queryValidation = null;
+    });
+    this.resetQueryStatus();
   }
   handleLimitChange(event) {
     const n = parseInt(event.detail.value, 10);
-    const limit = n > 0 ? Math.min(n, MAX_QUERY_LIMIT) : null;
-    this._config = {
-      ...this._config,
-      sobject: { ...this._config.sobject, limit }
-    };
-    this._queryValidation = null;
+    const queryLimit = n > 0 ? Math.min(n, MAX_QUERY_LIMIT) : null;
+    if (queryLimit !== this.config.sobject.queryLimit) this.resetSampleRows();
+    this.emit({
+      ...this.config,
+      sobject: { ...this.config.sobject, queryLimit }
+    });
+    this.resetQueryStatus();
   }
   handleSObjectFieldChange(event) {
     const field = event.currentTarget.dataset.field;
-    this._config = {
-      ...this._config,
-      sobject: {
-        ...this._config.sobject,
-        [field]: event.detail.fieldApiName || ""
-      }
-    };
+    const value = event.detail.fieldApiName || "";
+    // Label and Value feed the sample rows' keys and labels; Order by decides
+    // which records fall under LIMIT.
+    if (
+      (field === "valueField" ||
+        field === "labelField" ||
+        field === "orderByField") &&
+      value !== this.config.sobject[field]
+    ) {
+      this.resetSampleRows();
+    }
+    this.emit({
+      ...this.config,
+      sobject: { ...this.config.sobject, [field]: value }
+    });
+    this.resetQueryStatus();
+  }
+
+  resetQueryStatus() {
     this._queryValidation = null;
+    this._copyStatus = null;
+  }
+  resetSampleRows() {
+    this._sobjectSampleRows = [];
+    this._sampleLoadError = "";
+    this._bulkSelection = {};
+    this._expandedOverrideValue = "";
+  }
+  // Overrides are keyed by the values of one picklist field or one query; a
+  // new source makes those keys meaningless, so they are dropped for good.
+  resetOverridesForNewSource() {
+    this._clearedOverrides = null;
+    this._overrideMode = "";
+    this._expandedOverrideValue = "";
+    this._overrideSearch = "";
+    this._overrideVisibleLimit = OVERRIDE_VISIBLE_INCREMENT;
+    this._bulkSelection = {};
+    this._bulkEditDraft = emptyBulkDraft();
   }
 
   async handleValidateQuery() {
     this._isValidatingQuery = true;
-    this._queryValidation = null;
+    this.resetQueryStatus();
     try {
-      this._queryValidation = await validateQuery({
-        configJson: JSON.stringify(buildSobjectConfigForQuery(this._config))
+      const sobject = this.config.sobject;
+      const usesFlowValues = hasFlowValues(sobject.whereClause);
+      const whereClause = usesFlowValues
+        ? whereClauseWithSampleFlowValues(
+            sobject.whereClause,
+            await getObjectFields({ objectName: sobject.sObjectApiName })
+          )
+        : sobject.whereClause;
+      const result = await validateQuery({
+        configJson: JSON.stringify({ ...sobject, whereClause })
       });
+      this._queryValidation =
+        usesFlowValues && result.valid
+          ? {
+              ...result,
+              message: `${result.message} Flow values were checked with sample values; the flow fills in the real ones at run time.`
+            }
+          : result;
     } catch (error) {
       this._queryValidation = {
         valid: false,
-        message:
-          error?.body?.message || error?.message || "Unable to validate query."
+        message: errorMessageOf(error, "Unable to validate query.")
       };
     } finally {
       this._isValidatingQuery = false;
@@ -530,85 +633,42 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
   async handleCopyQueryPreview() {
     try {
       await navigator.clipboard.writeText(this.sobjectQueryPreview);
-      this._queryValidation = {
-        valid: true,
-        message: "Query copied to clipboard."
-      };
-    } catch {
-      this._queryValidation = {
-        valid: false,
-        message: "Could not copy the query preview."
-      };
-    }
-  }
-  async runSObjectSearch(searchTerm, lookupComponent) {
-    try {
-      const results = await searchSObjectTypes({ searchKey: searchTerm || "" });
-      this._loadError = "";
-      lookupComponent.setSearchResults(
-        results.map((row) => ({
-          id: row.value,
-          title: row.label,
-          subtitle: row.subtitle,
-          icon: row.icon || "database",
-          sObjectType: row.sObjectType,
-          type: "SObject",
-          displayType: "SObject",
-          badge: row.value
-        }))
-      );
+      this._copyStatus = { ok: true, message: "Query copied to clipboard." };
     } catch (error) {
-      this._loadError = loadErrorMessage("objects", error);
-      lookupComponent.setSearchResults([]);
+      this._copyStatus = {
+        ok: false,
+        message: errorMessageOf(error, "Copy failed.")
+      };
     }
   }
 
   get picklistObjectSelection() {
-    const objectApiName = this._config.picklist?.objectApiName;
-    return objectApiName
-      ? [
-          {
-            id: objectApiName,
-            title: objectApiName,
-            icon: "database",
-            type: "SObject",
-            displayType: "SObject",
-            badge: objectApiName
-          }
-        ]
-      : [];
+    return objectSelection(
+      this._picklistObjectRow,
+      this.config.picklist.objectApiName
+    );
   }
   get sobjectSelection() {
-    const objectApiName = this._config.sobject?.sObjectApiName;
-    return objectApiName
-      ? [{ id: objectApiName, title: objectApiName, icon: "sparkle" }]
-      : [];
-  }
-  get orderByFieldSelection() {
-    const field = this._config.sobject?.orderByField;
-    return field
-      ? { id: field, title: field, subtitle: "", icon: "type" }
-      : null;
+    return objectSelection(
+      this._sobjectRow,
+      this.config.sobject.sObjectApiName
+    );
   }
   get picklistObjectApiName() {
     return this.isPicklistMode
-      ? this._config.picklist?.objectApiName || null
+      ? this.config.picklist.objectApiName || null
       : null;
   }
   get picklistFieldRef() {
-    const obj = this._config.picklist?.objectApiName;
-    const field = this._config.picklist?.fieldApiName;
+    const obj = this.config.picklist.objectApiName;
+    const field = this.config.picklist.fieldApiName;
     return this.isPicklistMode && obj && field ? `${obj}.${field}` : undefined;
   }
   get picklistRecordTypeId() {
-    return (
-      this._config.picklist?.recordTypeId ||
-      this._defaultRecordTypeId ||
-      MASTER_RECORD_TYPE_ID
-    );
+    return this.config.picklist.recordTypeId || MASTER_RECORD_TYPE_ID;
   }
   get picklistValueSource() {
-    return this._config.picklist?.valueSource || "apiName";
+    return this.config.picklist.valueSource;
   }
   get recordTypeOptions() {
     return this._recordTypeOptions;
@@ -617,50 +677,46 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     return this._recordTypeOptions.length > 0;
   }
   get recordTypeValue() {
-    return this._config.picklist?.recordTypeId || DEFAULT_RECORD_TYPE_VALUE;
+    return this.config.picklist.recordTypeId || MASTER_RECORD_TYPE_VALUE;
   }
   get hasSampleRows() {
     return this._sobjectSampleRows.length > 0;
   }
 
-  get collectionResourceMetadata() {
-    return resolveRecordCollectionMetadataFromBuilderContext(
-      this.builderContext,
-      this._sourceRecordsRef
-    );
-  }
-
   get collectionObjectApiName() {
     return (
-      this._config.collection?.objectApiName ||
-      this.collectionResourceMetadata.objectApiName ||
-      ""
+      this.config.collection.objectApiName ||
+      recordCollectionObjectType(this.builderContext, this.sourceRecordsRef)
     );
   }
 
   get orderByDirection() {
-    return buildSobjectConfigForQuery(this._config).orderByDirection;
+    return this.config.sobject.orderByDirection || "ASC";
+  }
+
+  get hasSobjectObject() {
+    return Boolean(this.config.sobject.sObjectApiName);
   }
 
   get sobjectQueryPreview() {
-    const config = buildSobjectConfigForQuery(this._config);
-    const objectApiName = config.sObjectApiName || "Object";
+    const sobject = this.config.sobject;
     const fields = [
       "Id",
-      config.labelField,
-      config.valueField,
-      config.sublabelField,
-      config.iconField,
-      config.badgeField,
-      config.helpField
+      sobject.labelField || "Name",
+      sobject.valueField || "Id",
+      sobject.sublabelField,
+      sobject.iconField,
+      sobject.badgeField,
+      sobject.helpField,
+      sobject.orderByField
     ].filter(Boolean);
     const selectFields = Array.from(new Set(fields));
-    const where = config.whereClause ? ` WHERE ${config.whereClause}` : "";
-    const order = config.orderByField
-      ? ` ORDER BY ${config.orderByField} ${config.orderByDirection}`
+    const where = sobject.whereClause ? ` WHERE ${sobject.whereClause}` : "";
+    const order = sobject.orderByField
+      ? ` ORDER BY ${sobject.orderByField} ${this.orderByDirection}`
       : "";
-    const limit = ` LIMIT ${config.queryLimit}`;
-    return `SELECT ${selectFields.join(", ")} FROM ${objectApiName}${where}${order}${limit}`;
+    const limit = ` LIMIT ${Number(sobject.queryLimit) || DEFAULT_QUERY_LIMIT}`;
+    return `SELECT ${selectFields.join(", ")} FROM ${sobject.sObjectApiName}${where}${order}${limit}`;
   }
 
   get highlightedSobjectQueryPreview() {
@@ -681,62 +737,48 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     return this._queryValidation.message || "";
   }
 
+  get copyStatusMessage() {
+    return this._copyStatus?.message || "";
+  }
+  get copyStatusClass() {
+    if (!this._copyStatus) return "";
+    return this._copyStatus.ok
+      ? "newton-query-preview__status newton-query-preview__status_success"
+      : "newton-query-preview__status newton-query-preview__status_error";
+  }
+
   get validateQueryLabel() {
     return this._isValidatingQuery ? "Validating" : "Validate query";
   }
 
   @wire(getObjectInfo, { objectApiName: "$picklistObjectApiName" })
   wiredObjectInfo({ data, error }) {
-    if (error) {
-      this._loadError = loadErrorMessage("record types", error);
-    }
+    this._recordTypeError = error
+      ? loadErrorMessage("record types", error)
+      : "";
     if (!data?.recordTypeInfos) {
-      this._defaultRecordTypeId = MASTER_RECORD_TYPE_ID;
       this._recordTypeOptions = [];
       return;
     }
 
-    const recordTypes = Object.values(data.recordTypeInfos).filter(
-      (recordType) => recordType.available !== false
-    );
-    this._defaultRecordTypeId =
-      data.defaultRecordTypeId || MASTER_RECORD_TYPE_ID;
-    const defaultRecordType = recordTypes.find(
-      (recordType) => recordType.recordTypeId === this._defaultRecordTypeId
-    );
-    const defaultName = defaultRecordType?.name || "Master";
-    const explicitRecordTypes = recordTypes
-      .filter((recordType) => !recordType.master)
+    const userDefaultRecordTypeId = data.defaultRecordTypeId;
+    const explicitRecordTypes = Object.values(data.recordTypeInfos)
+      .filter(
+        (recordType) => recordType.available !== false && !recordType.master
+      )
       .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")))
       .map((recordType) => ({
         label: recordType.name,
         value: recordType.recordTypeId,
-        sublabel: recordType.developerName || recordType.recordTypeId,
+        subtitle: recordType.recordTypeId,
         icon: "id-card",
         badge:
-          recordType.recordTypeId === this._defaultRecordTypeId ? "Default" : ""
+          recordType.recordTypeId === userDefaultRecordTypeId ? "Default" : ""
       }));
 
-    if (explicitRecordTypes.length === 0) {
-      this._recordTypeOptions = [];
-      return;
-    }
-
-    this._recordTypeOptions = [
-      ...this.defaultRecordTypeOptions(defaultName),
-      ...explicitRecordTypes
-    ];
-  }
-
-  defaultRecordTypeOptions(defaultName) {
-    return [
-      {
-        label: `Default (${defaultName})`,
-        value: DEFAULT_RECORD_TYPE_VALUE,
-        sublabel: "Uses this object's default record type",
-        icon: "list-checks"
-      }
-    ];
+    this._recordTypeOptions = explicitRecordTypes.length
+      ? [MASTER_RECORD_TYPE_OPTION, ...explicitRecordTypes]
+      : [];
   }
 
   @wire(getPicklistValues, {
@@ -744,9 +786,9 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     fieldApiName: "$picklistFieldRef"
   })
   wiredPicklistValues({ data, error }) {
-    if (error) {
-      this._loadError = loadErrorMessage("picklist values", error);
-    }
+    this._picklistValuesError = error
+      ? loadErrorMessage("picklist values", error)
+      : "";
     this._picklistValues = data?.values || [];
   }
 
@@ -756,7 +798,7 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
   // Each option row names its option, so its buttons and heading make sense
   // out of context ("Delete Gold plan", "Option 2: Gold plan").
   get customItems() {
-    return (this._config.custom?.items || []).map((item, index, items) => {
+    return this.config.custom.items.map((item, index, items) => {
       const position = index + 1;
       const name = item.label || `option ${position}`;
       return {
@@ -778,10 +820,10 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
   }
   handleCustomAddRow() {
     const items = [
-      ...(this._config.custom?.items || []),
+      ...this.config.custom.items,
       { label: "", value: "", sublabel: "", icon: "", badge: "", helpText: "" }
     ];
-    this._config = { ...this._config, custom: { items } };
+    this.emit({ ...this.config, custom: { items } });
   }
   handleCustomRemoveRow(event) {
     this.updateCustomItems((items) =>
@@ -796,18 +838,17 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
   }
   handleCustomMoveUp(event) {
     const index = Number(event.currentTarget.dataset.index);
-    if (index > 0) this.swapCustomItems(index, index - 1);
+    this.swapCustomItems(index, index - 1);
   }
   handleCustomMoveDown(event) {
     const index = Number(event.currentTarget.dataset.index);
-    const items = this._config.custom?.items || [];
-    if (index < items.length - 1) this.swapCustomItems(index, index + 1);
+    this.swapCustomItems(index, index + 1);
   }
   handleCustomCellChange(event) {
     const index = Number(event.currentTarget.dataset.index);
     const field = event.currentTarget.dataset.field;
     this.updateCustomItems((items) => {
-      items[index] = { ...items[index], [field]: readResourceValue(event) };
+      items[index] = { ...items[index], [field]: event.detail.newValue };
     });
   }
   handleCustomIconChange(event) {
@@ -823,9 +864,9 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     });
   }
   updateCustomItems(mutator) {
-    const items = [...(this._config.custom?.items || [])];
+    const items = [...this.config.custom.items];
     mutator(items);
-    this._config = { ...this._config, custom: { items } };
+    this.emit({ ...this.config, custom: { items } });
   }
   swapCustomItems(from, to) {
     this.updateCustomItems((items) => {
@@ -833,37 +874,34 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     });
   }
 
+  // Override keys are the option values the runtime builds, so the rows come
+  // from the same normalizers. SOQL sample rows come from the same Apex call
+  // as the runtime's, which returns finished items.
   get _allOverrideRows() {
-    const overrides = this._config.overrides || {};
-    let source = [];
+    const overrides = this.config.overrides;
+    let items = [];
     if (this.isPicklistMode) {
-      const useLabel = this.picklistValueSource === "label";
-      source = this._picklistValues.map((value) => ({
-        value: useLabel ? value.label : value.value,
-        originalLabel: value.label
-      }));
+      items = normalizePicklist(
+        { values: this._picklistValues },
+        this.picklistValueSource
+      );
     } else if (this.isSObjectMode) {
-      source = this._sobjectSampleRows.map((dto) => ({
-        value: dto.value || dto.id,
-        originalLabel: dto.label || dto.id
-      }));
+      items = this._sobjectSampleRows;
     }
-    return source.map((row) => {
-      const override = overrides[row.value] || {};
+    return items.map((item) => {
+      const override = overrides[item.value] || {};
       return {
-        value: row.value,
-        originalLabel: row.originalLabel,
+        value: item.value,
+        originalLabel: item.label || item.id,
         label: override.label || "",
         icon: override.icon || "",
         sublabel: override.sublabel || "",
         badge: override.badge || "",
         helpText: override.helpText || "",
         hidden: override.hidden === true,
-        hasCustom: OVERRIDE_FIELDS.some((field) => {
-          return field === "hidden"
-            ? override.hidden === true
-            : Boolean(override[field]);
-        })
+        hasCustom:
+          override.hidden === true ||
+          OVERRIDE_TEXT_FIELDS.some((field) => Boolean(override[field]))
       };
     });
   }
@@ -877,10 +915,11 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
         )
       : this._allOverrideRows;
   }
+  get _shownOverrideRows() {
+    return this._filteredOverrideRows.slice(0, this._overrideVisibleLimit);
+  }
   get visibleOverrideRows() {
-    return this._filteredOverrideRows
-      .slice(0, this._overrideVisibleLimit)
-      .map((row) => this.decorateOverrideRow(row));
+    return this._shownOverrideRows.map((row) => this.decorateOverrideRow(row));
   }
   decorateOverrideRow(row) {
     const isExpanded = row.value === this._expandedOverrideValue;
@@ -921,7 +960,7 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     return this._filteredOverrideRows.length;
   }
   get visibleOverrideCount() {
-    return this.visibleOverrideRows.length;
+    return this._shownOverrideRows.length;
   }
   get hasMoreOverrideRows() {
     return this.visibleOverrideCount < this.filteredOverrideCount;
@@ -947,7 +986,7 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     return !this.canApplyBulk;
   }
   get hasConfiguredOverrides() {
-    return Object.keys(this._config.overrides || {}).length > 0;
+    return Object.keys(this.config.overrides).length > 0;
   }
   get overrideMode() {
     return (
@@ -979,9 +1018,9 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     this._bulkSelection = {};
     if (value === OVERRIDE_MODE_DEFAULT && this.hasConfiguredOverrides) {
       this._clearedOverrides = JSON.parse(
-        JSON.stringify(this._config.overrides)
+        JSON.stringify(this.config.overrides)
       );
-      this._config = { ...this._config, overrides: {} };
+      this.emit({ ...this.config, overrides: {} });
     }
   }
 
@@ -993,10 +1032,9 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
   }
   handleUndoClearOverrides() {
     const overrides = this._clearedOverrides;
-    if (!overrides) return;
     this._clearedOverrides = null;
     this._overrideMode = OVERRIDE_MODE_ADVANCED;
-    this._config = { ...this._config, overrides };
+    this.emit({ ...this.config, overrides });
   }
   handleToggleExpandRow(event) {
     const value = event.currentTarget.dataset.value;
@@ -1013,15 +1051,15 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
   handleClearBulkSelection() {
     this._bulkSelection = {};
   }
-  handleSelectAllFiltered() {
+  handleSelectAllShown() {
     const next = { ...this._bulkSelection };
-    for (const row of this._filteredOverrideRows) next[row.value] = true;
+    for (const row of this._shownOverrideRows) next[row.value] = true;
     this._bulkSelection = next;
   }
   handleBulkDraftChange(event) {
     this._bulkEditDraft = {
       ...this._bulkEditDraft,
-      [event.currentTarget.dataset.field]: readResourceValue(event)
+      [event.currentTarget.dataset.field]: event.detail.newValue
     };
   }
   handleBulkDraftIconChange(event) {
@@ -1031,27 +1069,26 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     };
   }
   handleApplyBulk() {
-    if (!this.canApplyBulk) return;
-    const overrides = { ...(this._config.overrides || {}) };
+    const overrides = { ...this.config.overrides };
     for (const value of Object.keys(this._bulkSelection).filter(
       (key) => this._bulkSelection[key]
     )) {
       const next = { ...(overrides[value] || {}) };
-      for (const field of ["icon", "sublabel", "badge", "helpText"]) {
+      for (const field of BULK_EDIT_FIELDS) {
         if (this._bulkEditDraft[field])
           next[field] = this._bulkEditDraft[field];
       }
       overrides[value] = next;
     }
-    this._config = { ...this._config, overrides };
-    this._bulkEditDraft = { icon: "", sublabel: "", badge: "", helpText: "" };
+    this.emit({ ...this.config, overrides });
+    this._bulkEditDraft = emptyBulkDraft();
     this._bulkSelection = {};
   }
   handleOverrideCellChange(event) {
     this.setOverride(
       event.currentTarget.dataset.value,
       event.currentTarget.dataset.field,
-      readResourceValue(event)
+      event.detail.newValue
     );
   }
   handleOverrideIconChange(event) {
@@ -1070,30 +1107,27 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
   }
   handleClearOverride(event) {
     const value = event.currentTarget.dataset.value;
-    const overrides = { ...(this._config.overrides || {}) };
+    const overrides = { ...this.config.overrides };
     delete overrides[value];
-    this._config = { ...this._config, overrides };
+    this.emit({ ...this.config, overrides });
   }
   setOverride(value, field, newValue) {
     if (!value) return;
     const nextForValue = {
-      ...(this._config.overrides?.[value] || {}),
+      ...(this.config.overrides[value] || {}),
       [field]: newValue || ""
     };
     if (field === "hidden" && newValue !== true) {
       delete nextForValue.hidden;
     }
-    const overrides = { ...(this._config.overrides || {}) };
+    const overrides = { ...this.config.overrides };
     if (
-      OVERRIDE_FIELDS.every((key) => {
-        return key === "hidden"
-          ? nextForValue.hidden !== true
-          : !nextForValue[key];
-      })
+      nextForValue.hidden !== true &&
+      OVERRIDE_TEXT_FIELDS.every((key) => !nextForValue[key])
     )
       delete overrides[value];
     else overrides[value] = nextForValue;
-    this._config = { ...this._config, overrides };
+    this.emit({ ...this.config, overrides });
   }
   overrideSummaryItems(row) {
     const items = [];
@@ -1122,7 +1156,7 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     if (row.sublabel) {
       items.push({
         key: "sublabel",
-        label: "Subtitle",
+        label: "Sublabel",
         className: "slds-badge newton-overrides-summary__badge"
       });
     }
@@ -1155,12 +1189,15 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
     this._isLoadingSample = true;
     this._sampleLoadError = "";
     try {
-      const dtos = await queryItems({
-        configJson: JSON.stringify(buildSobjectConfigForQuery(this._config))
+      const sobject = this.config.sobject;
+      this._sampleIgnoresWhere = hasFlowValues(sobject.whereClause);
+      this._sobjectSampleRows = await queryItems({
+        configJson: JSON.stringify(
+          this._sampleIgnoresWhere ? { ...sobject, whereClause: "" } : sobject
+        )
       });
-      this._sobjectSampleRows = Array.isArray(dtos) ? dtos : [];
     } catch (error) {
-      this._sampleLoadError = `Couldn't load sample rows. ${error?.body?.message || error?.message || "Check the query and try again."}`;
+      this._sampleLoadError = loadErrorMessage("sample rows", error);
       this._sobjectSampleRows = [];
     } finally {
       this._isLoadingSample = false;
@@ -1168,44 +1205,35 @@ export default class NewtonSelectorFlowCpeDataConfig extends LightningElement {
   }
 
   get displaySortBy() {
-    return this._config.display?.sortBy || "none";
+    return this.config.display.sortBy;
   }
   get displaySortDirection() {
-    return this._config.display?.sortDirection || "asc";
+    return this.config.display.sortDirection;
   }
   get displayLimit() {
-    return this._config.display?.limit ?? "";
+    return this.config.display.limit ?? "";
   }
   get displaySortEnabled() {
     return this.displaySortBy !== "none";
   }
   handleDisplaySortByChange(event) {
-    this._config = {
-      ...this._config,
-      display: {
-        ...(this._config.display || {}),
-        sortBy: event.detail.value
-      }
-    };
+    this.emit({
+      ...this.config,
+      display: { ...this.config.display, sortBy: event.detail.value }
+    });
   }
   handleDisplaySortDirectionChange(event) {
-    this._config = {
-      ...this._config,
-      display: {
-        ...(this._config.display || {}),
-        sortDirection: event.detail.value
-      }
-    };
+    this.emit({
+      ...this.config,
+      display: { ...this.config.display, sortDirection: event.detail.value }
+    });
   }
   handleDisplayLimitChange(event) {
-    const raw = event.target.value;
-    this._config = {
-      ...this._config,
-      display: {
-        ...(this._config.display || {}),
-        limit: raw === "" || raw == null ? null : Math.max(0, Number(raw))
-      }
-    };
+    const n = parseInt(event.target.value, 10);
+    this.emit({
+      ...this.config,
+      display: { ...this.config.display, limit: n > 0 ? n : null }
+    });
   }
 
   dispatchRefChange(name, value) {

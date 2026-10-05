@@ -1,12 +1,6 @@
 import { LightningElement, api } from "lwc";
-import {
-  DEFAULT_ICON_NAME,
-  normalizeIconName,
-  resolveIconContent
-} from "./lucideIconPaths";
+import { resolveIconContent } from "./lucideIconPaths";
 
-const VALID_VARIANTS = new Set(["error", "warning", "success", "inverse"]);
-const VALID_BOXES = new Set(["input", "button", "option", "tile"]);
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const ICON_TAG_PATTERN = /<([a-z]+)((?:\s+[a-zA-Z0-9:-]+="[^"]*")*)\s*\/?>/g;
 const ATTR_PATTERN = /([a-zA-Z0-9:-]+)="([^"]*)"/g;
@@ -16,8 +10,9 @@ export default class NewtonSelectorIcon extends LightningElement {
   /** @type {'xx-small'|'x-small'|'small'|'medium'|'large'} */
   @api size = "small";
   @api alternativeText = "";
+  /** @type {'input'|'button'|'option'|'tile'|''} */
   @api box = "";
-  /** @type {'error'|'warning'|'success'|'inverse'|undefined} */
+  /** @type {'error'|'inverse'|undefined} */
   @api variant;
 
   _renderedIconContent;
@@ -50,12 +45,8 @@ export default class NewtonSelectorIcon extends LightningElement {
     nodes.forEach((node) => svg.appendChild(node));
   }
 
-  get resolvedIconName() {
-    return normalizeIconName(this.name || DEFAULT_ICON_NAME);
-  }
-
   get iconContent() {
-    return resolveIconContent(this.resolvedIconName);
+    return resolveIconContent(this.name);
   }
 
   get wrapperClass() {
@@ -63,10 +54,10 @@ export default class NewtonSelectorIcon extends LightningElement {
       "newton-selector-icon",
       `newton-selector-icon_size-${this.size}`
     ];
-    if (VALID_BOXES.has(this.box)) {
+    if (this.box) {
       cls.push(`newton-selector-icon_box-${this.box}`);
     }
-    if (VALID_VARIANTS.has(this.variant)) {
+    if (this.variant) {
       cls.push(`newton-selector-icon_variant-${this.variant}`);
     }
     return cls.join(" ");

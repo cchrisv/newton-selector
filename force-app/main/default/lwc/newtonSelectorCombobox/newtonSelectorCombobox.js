@@ -2,23 +2,9 @@ import { LightningElement, api } from "lwc";
 
 let comboboxCounter = 0;
 const DEFAULT_DEBOUNCE_MS = 300;
-const DEFAULT_MIN_SEARCH = 2;
-const MODE_MULTI = "multi";
+const SELECT_PLACEHOLDER = "Choose an option";
 
-function normalizeResult(result) {
-  if (!result || typeof result !== "object") {
-    return {
-      id: "",
-      sObjectType: "",
-      icon: "",
-      title: "",
-      subtitle: "",
-      type: "",
-      displayType: "",
-      badge: ""
-    };
-  }
-  const source = result;
+function normalizeResult(source) {
   const idRaw =
     source.id != null && String(source.id) !== "" ? source.id : source.value;
   const titleRaw =
@@ -32,12 +18,7 @@ function normalizeResult(result) {
     icon: String(source.icon || ""),
     title: titleRaw == null ? "" : String(titleRaw),
     subtitle: source.subtitle == null ? "" : String(source.subtitle),
-    type: String(
-      source.type || source.displayType || source.resourceType || ""
-    ),
-    displayType: String(
-      source.displayType || source.type || source.resourceType || ""
-    ),
+    type: String(source.type || ""),
     badge: String(source.badge || "")
   };
 }
@@ -45,37 +26,27 @@ function normalizeResult(result) {
 export default class NewtonSelectorCombobox extends LightningElement {
   @api mode = "slot";
   @api open = false;
-  @api dropdownClass = "";
-  @api dropdownId = "";
-  @api dropdownLabel = "Options";
+  @api dropdownLabel;
   @api dropdownRole = "listbox";
-  @api label = "Search";
+  @api label;
   @api placeholder = "";
   @api variant = "label-stacked";
   @api required = false;
-  @api disabled = false;
-  @api minSearchTermLength = DEFAULT_MIN_SEARCH;
-  @api scrollAfterNItems = null;
-  @api fieldLevelHelp;
-  @api selectionMode = "single";
   @api enableSearch = false;
-  @api placeholderWhenEmpty = "Choose an option";
 
-  _fallbackDropdownId = `newton-selector-combobox-listbox-${++comboboxCounter}`;
   _selection = [];
   _options = [];
-  _defaultOptions = [];
   _selectOptions = [];
-  _selectValues = [];
+  _selectValue = "";
   _selectOpen = false;
   _selectSearchTerm = "";
+  _selectActiveIndex = -1;
   _dropdownOpen = false;
   _loading = false;
   _inputValue = "";
-  _searchTerm = "";
   _debounceTimer;
   _activeIndex = -1;
-  _listboxId = `newton-selector-combobox-lb-${comboboxCounter}`;
+  _listboxId = `newton-selector-combobox-lb-${++comboboxCounter}`;
   _inputId = `newton-selector-combobox-input-${comboboxCounter}`;
 
   disconnectedCallback() {
@@ -85,35 +56,21 @@ export default class NewtonSelectorCombobox extends LightningElement {
     }
   }
 
+  // The parent's row is the only source of what is displayed, so a richer row
+  // with the same id (for example, a field label once metadata loads) replaces
+  // the one shown.
   @api
   set selection(value) {
     if (value == null) {
-      if (this._selection.length) {
-        this._selection = [];
-      }
+      this._selection = [];
       return;
     }
-    let incoming;
-    if (Array.isArray(value)) {
-      incoming = value.map(normalizeResult).filter((row) => row.id);
-    } else {
-      const one = normalizeResult(value);
-      incoming = one.id ? [one] : [];
-    }
-    const currentIds = this._selection.map((row) => row.id).join("\u0001");
-    const nextIds = incoming.map((row) => row.id).join("\u0001");
-    if (currentIds === nextIds && currentIds !== "") {
-      return;
-    }
-    this._selection = incoming;
+    const rows = Array.isArray(value) ? value : [value];
+    this._selection = rows.map(normalizeResult).filter((row) => row.id);
   }
 
   get selection() {
     return this._selection[0] || null;
-  }
-
-  get isOpen() {
-    return this.open === true || this.open === "true";
   }
 
   get isLookupMode() {
@@ -124,34 +81,16 @@ export default class NewtonSelectorCombobox extends LightningElement {
     return this.mode === "select";
   }
 
-  get isMultiSelectMode() {
-    return this.selectionMode === MODE_MULTI;
-  }
-
-  get resolvedDropdownId() {
-    return this.dropdownId || this._fallbackDropdownId;
-  }
-
   get computedComboboxClass() {
-    return [
-      "slds-combobox",
-      "slds-dropdown-trigger",
-      "slds-dropdown-trigger_click",
-      this.isOpen ? "slds-is-open" : ""
-    ]
-      .filter(Boolean)
-      .join(" ");
+    return this.open
+      ? "slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open"
+      : "slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click";
   }
 
-  get computedDropdownClass() {
-    return [
-      "slds-dropdown",
-      "slds-dropdown_fluid",
-      "newton-selector-combobox__dropdown",
-      this.dropdownClass
-    ]
-      .filter(Boolean)
-      .join(" ");
+  get labelClass() {
+    return this.variant === "label-hidden"
+      ? "slds-form-element__label slds-assistive-text"
+      : "slds-form-element__label";
   }
 
   @api
@@ -167,23 +106,11 @@ export default class NewtonSelectorCombobox extends LightningElement {
   @api
   set value(value) {
     if (value === undefined) return;
-    this._selectValues = value === null || value === "" ? [] : [String(value)];
+    this._selectValue = value === null ? "" : String(value);
   }
 
   get value() {
-    return this._selectValues[0] || "";
-  }
-
-  @api
-  set values(value) {
-    if (value === undefined) return;
-    this._selectValues = Array.isArray(value)
-      ? value.map((item) => String(item)).filter(Boolean)
-      : [];
-  }
-
-  get values() {
-    return [...this._selectValues];
+    return this._selectValue;
   }
 
   get inputId() {
@@ -194,30 +121,14 @@ export default class NewtonSelectorCombobox extends LightningElement {
     return this._selection.map((row) => row.id);
   }
 
-  get selectValueSet() {
-    return new Set(this._selectValues);
-  }
-
-  get selectedSelectOptions() {
-    const selected = this.selectValueSet;
-    return this._selectOptions.filter((row) => selected.has(row.id));
-  }
-
   get selectedSelectOption() {
-    return this.selectedSelectOptions[0] || null;
+    return (
+      this._selectOptions.find((row) => row.id === this._selectValue) || null
+    );
   }
 
   get selectButtonLabel() {
-    if (this.isMultiSelectMode) {
-      const labels = this.selectedSelectOptions
-        .map((row) => row.title)
-        .filter(Boolean);
-      if (!labels.length) return this.placeholderWhenEmpty;
-      const visible = labels.slice(0, 2).join(", ");
-      const extra = labels.length - 2;
-      return extra > 0 ? `${visible} +${extra} more` : visible;
-    }
-    return this.selectedSelectOption?.title || this.placeholderWhenEmpty;
+    return this.selectedSelectOption?.title || SELECT_PLACEHOLDER;
   }
 
   get selectedSelectIconName() {
@@ -253,35 +164,38 @@ export default class NewtonSelectorCombobox extends LightningElement {
     return this._selectOpen ? "chevron-up" : "chevron-down";
   }
 
-  get computedSelectDropdownClass() {
-    return [
-      "slds-dropdown",
-      "slds-dropdown_fluid",
-      "newton-selector-combobox__dropdown",
-      "newton-selector-combobox__select-dropdown",
-      this.scrollableClass
-    ].join(" ");
-  }
-
   get filteredSelectOptions() {
-    const selected = this.selectValueSet;
     const term = this._selectSearchTerm.trim().toLowerCase();
     return this._selectOptions
       .filter((row) => {
         if (!term) return true;
-        return [row.title, row.subtitle, row.id, row.type, row.displayType]
+        return [row.title, row.subtitle, row.id, row.type]
           .join(" ")
           .toLowerCase()
           .includes(term);
       })
-      .map((row, index) => ({
-        ...row,
-        key: `${row.id}-${index}`,
-        optionId: `${this._listboxId}-select-${index}`,
-        isSelected: selected.has(row.id),
-        ariaSelected: String(selected.has(row.id)),
-        searchTerm: term
-      }));
+      .map((row, index) => {
+        const isSelected = row.id === this._selectValue;
+        const isActive = index === this._selectActiveIndex;
+        return {
+          ...row,
+          key: `${row.id}-${index}`,
+          index,
+          optionId: `${this._listboxId}-select-${index}`,
+          isSelected,
+          ariaSelected: String(isSelected),
+          optionClass: isActive
+            ? "slds-media slds-listbox__option slds-listbox__option_entity slds-media_small newton-selector-combobox__option slds-has-focus newton-selector-combobox__option_active"
+            : "slds-media slds-listbox__option slds-listbox__option_entity slds-media_small newton-selector-combobox__option",
+          searchTerm: term
+        };
+      });
+  }
+
+  get selectActiveOptionId() {
+    return (
+      this.filteredSelectOptions[this._selectActiveIndex]?.optionId || null
+    );
   }
 
   get hasSelectOptions() {
@@ -290,10 +204,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
 
   get hasSelection() {
     return this._selection.length > 0;
-  }
-
-  get showExternalLabel() {
-    return this.variant === "label-stacked";
   }
 
   get selectedIconName() {
@@ -306,10 +216,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
 
   get showSearchIcon() {
     return !this.hasSelection;
-  }
-
-  get showClearButton() {
-    return this.hasSelection && !this.disabled;
   }
 
   get inputContainerClass() {
@@ -329,10 +235,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
     return this.required ? "true" : "false";
   }
 
-  get listboxClass() {
-    return "slds-listbox slds-listbox_vertical newton-selector-combobox__listbox";
-  }
-
   get listboxActiveOptionId() {
     const row = this.displayedOptions[this._activeIndex];
     return row ? row.optionId : null;
@@ -340,46 +242,23 @@ export default class NewtonSelectorCombobox extends LightningElement {
 
   get displayedOptions() {
     const term = this._dropdownOpen
-      ? this._searchTerm.trim().toLowerCase()
+      ? this._inputValue.trim().toLowerCase()
       : "";
     return this._options.map((row, index) => ({
       key: row.id + index,
       id: row.id,
+      index,
       sObjectType: row.sObjectType,
       icon: row.icon,
       title: row.title,
       subtitle: row.subtitle,
       type: row.type,
-      displayType: row.displayType,
       badge: row.badge,
       optionId: `${this._listboxId}-opt-${index}`,
       searchTerm: term,
       isActive: index === this._activeIndex,
       ariaSelected: index === this._activeIndex ? "true" : "false"
     }));
-  }
-
-  get scrollableClass() {
-    const value = this.scrollAfterNItems;
-    if (value != null) {
-      const count = Number(value);
-      if (count === 5 || count === 7 || count === 10) {
-        return `slds-dropdown_length-with-icon-${count}`;
-      }
-    }
-    return "";
-  }
-
-  get effectiveMinSearchLength() {
-    const value = this.minSearchTermLength;
-    if (value === null || value === undefined || value === "") {
-      return DEFAULT_MIN_SEARCH;
-    }
-    const count = Number(value);
-    if (Number.isNaN(count)) {
-      return DEFAULT_MIN_SEARCH;
-    }
-    return Math.max(0, Math.floor(count));
   }
 
   get comboboxExpanded() {
@@ -396,23 +275,9 @@ export default class NewtonSelectorCombobox extends LightningElement {
     return this._loading ? "true" : "false";
   }
 
-  get computedPlaceholder() {
-    return this.placeholder || "Search...";
-  }
-
-  get computedLookupDropdownClass() {
-    return [
-      "slds-dropdown",
-      "slds-dropdown_fluid",
-      "newton-selector-combobox__dropdown",
-      "newton-selector-combobox__lookup-dropdown",
-      this.scrollableClass
-    ].join(" ");
-  }
-
   get noResultsMessage() {
-    const term = (this._searchTerm || "").trim();
-    return term ? "No results found." : "No options available.";
+    const term = this.isSelectMode ? this._selectSearchTerm : this._inputValue;
+    return term.trim() ? "No results found." : "No options available.";
   }
 
   @api
@@ -424,23 +289,39 @@ export default class NewtonSelectorCombobox extends LightningElement {
   }
 
   @api
-  setDefaultResults(results) {
-    const rows = Array.isArray(results) ? results : [];
-    this._defaultOptions = rows.map(normalizeResult);
-  }
-
-  @api
   getSelection() {
     return this._selection.map((row) => ({ ...row }));
   }
 
+  openSelect(fromEnd) {
+    this._selectOpen = true;
+    const rows = this.filteredSelectOptions;
+    const selectedIndex = rows.findIndex((row) => row.isSelected);
+    if (selectedIndex >= 0) {
+      this._selectActiveIndex = selectedIndex;
+    } else {
+      this._selectActiveIndex = fromEnd ? rows.length - 1 : 0;
+    }
+    this._scrollActiveIntoView(this._selectActiveIndex);
+  }
+
+  closeSelect() {
+    this._selectOpen = false;
+    this._selectActiveIndex = -1;
+    this._selectSearchTerm = "";
+  }
+
   handleSelectToggle() {
-    if (this.disabled) return;
-    this._selectOpen = !this._selectOpen;
+    if (this._selectOpen) {
+      this.closeSelect();
+    } else {
+      this.openSelect(false);
+    }
   }
 
   handleSelectSearch(event) {
     this._selectSearchTerm = event.target.value || "";
+    this._selectActiveIndex = this.filteredSelectOptions.length ? 0 : -1;
   }
 
   handleSelectOptionMouseDown(event) {
@@ -448,39 +329,16 @@ export default class NewtonSelectorCombobox extends LightningElement {
   }
 
   handleSelectOption(event) {
-    const value = event.currentTarget.dataset.value;
-    if (value === undefined || value === null) return;
-    const row = this._selectOptions.find((option) => option.id === value);
-    if (row?.disabled) return;
+    this.commitSelectValue(event.currentTarget.dataset.value);
+  }
 
-    const current = this.selectValueSet;
-    let values;
-    if (this.isMultiSelectMode) {
-      if (current.has(value)) {
-        current.delete(value);
-      } else {
-        current.add(value);
-      }
-      values = [...current];
-      this._selectOpen = true;
-    } else {
-      values = value === "" ? [] : [value];
-      this._selectOpen = false;
-    }
-
-    this._selectValues = values;
-    const selectedRows = this.selectedSelectOptions.map((option) => ({
-      ...option
-    }));
+  commitSelectValue(value) {
+    this._selectValue = value;
+    this.closeSelect();
+    this.refs.selectButton.focus();
     this.dispatchEvent(
       new CustomEvent("selectionchange", {
-        detail: {
-          selectedIds: values,
-          value: values[0] || "",
-          values,
-          item: selectedRows[0] || null,
-          items: selectedRows
-        }
+        detail: { value }
       })
     );
   }
@@ -489,26 +347,57 @@ export default class NewtonSelectorCombobox extends LightningElement {
   // user moves elsewhere.
   handleSelectFocusOut(event) {
     if (!event.currentTarget.contains(event.relatedTarget)) {
-      this._selectOpen = false;
+      this.closeSelect();
     }
   }
 
+  // Select-only combobox keyboard model, shared by the button and the filter
+  // input. Space types into the filter, and Home/End move its caret.
   handleSelectKeydown(event) {
-    if (event.key === "Escape") {
-      this._selectOpen = false;
-      event.stopPropagation();
+    const key = event.key;
+    const inSearch = event.currentTarget.type === "search";
+    if (!this._selectOpen) {
+      if (["ArrowDown", "ArrowUp", "Enter", " "].includes(key)) {
+        event.preventDefault();
+        this.openSelect(key === "ArrowUp");
+      }
       return;
     }
-    if (event.key === "Enter" || event.key === " ") {
+    if (key === "Escape") {
       event.preventDefault();
-      this.handleSelectToggle();
+      event.stopPropagation();
+      this.closeSelect();
+      this.refs.selectButton.focus();
+      return;
     }
+    const last = this.filteredSelectOptions.length - 1;
+    let next = this._selectActiveIndex;
+    if (key === "ArrowDown") {
+      next = Math.min(next + 1, last);
+    } else if (key === "ArrowUp") {
+      next = Math.max(next - 1, 0);
+    } else if (key === "Home" && !inSearch) {
+      next = 0;
+    } else if (key === "End" && !inSearch) {
+      next = last;
+    } else if (key === "Enter" || (key === " " && !inSearch)) {
+      event.preventDefault();
+      const row = this.filteredSelectOptions[this._selectActiveIndex];
+      if (row) {
+        this.commitSelectValue(row.id);
+      }
+      return;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    this._selectActiveIndex = last < 0 ? -1 : next;
+    this._scrollActiveIntoView(this._selectActiveIndex);
   }
 
   handleNativeInput(event) {
-    this._inputValue = event.target.value;
-    const raw = this._inputValue || "";
-    this._searchTerm = raw;
+    this._inputValue = event.target.value || "";
+    const raw = this._inputValue;
     this.openDropdown();
     if (this._debounceTimer) {
       clearTimeout(this._debounceTimer);
@@ -521,23 +410,12 @@ export default class NewtonSelectorCombobox extends LightningElement {
   }
 
   fireSearch(raw) {
-    const sanitized = raw.trim().toLowerCase();
-    const min = this.effectiveMinSearchLength;
-    if (sanitized.length < min) {
-      this._options = this._defaultOptions.length
-        ? [...this._defaultOptions]
-        : [];
-      this._activeIndex = this._options.length ? 0 : -1;
-      this._loading = false;
-      return;
-    }
     this._loading = true;
     this.dispatchEvent(
       new CustomEvent("search", {
         detail: {
-          searchTerm: sanitized,
-          rawSearchTerm: raw,
-          selectedIds: this.selectedIds
+          searchTerm: raw.trim().toLowerCase(),
+          rawSearchTerm: raw
         }
       })
     );
@@ -545,7 +423,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
 
   handleClearSelection() {
     this._selection = [];
-    this._searchTerm = "";
     this._inputValue = "";
     this.dispatchEvent(
       new CustomEvent("selectionchange", {
@@ -561,18 +438,8 @@ export default class NewtonSelectorCombobox extends LightningElement {
       return;
     }
     this.openDropdown();
-    if (this.disabled) {
-      return;
-    }
-    const min = this.effectiveMinSearchLength;
-    if (min === 0 && !String(this._inputValue || "").trim() && !this._loading) {
+    if (!this._inputValue.trim() && !this._loading) {
       this.fireSearch("");
-      return;
-    }
-    if (!this._inputValue && this._defaultOptions.length) {
-      this._options = [...this._defaultOptions];
-      this._activeIndex = this._options.length ? 0 : -1;
-      this._loading = false;
     }
   }
 
@@ -587,9 +454,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
   }
 
   openDropdown() {
-    if (this.disabled) {
-      return;
-    }
     this._dropdownOpen = true;
   }
 
@@ -615,7 +479,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
     this._selection = [row];
     this._options = [];
     this.closeDropdown();
-    this._searchTerm = "";
     this._inputValue = "";
     this.dispatchEvent(
       new CustomEvent("selectionchange", {
@@ -631,8 +494,19 @@ export default class NewtonSelectorCombobox extends LightningElement {
       this.closeDropdown();
       return;
     }
+    // An open list consumes Esc, so the editor modal does not also treat it
+    // as "discard changes". A closed list lets it through.
+    if (event.key === "Escape") {
+      if (this._dropdownOpen) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.closeDropdown();
+      }
+      return;
+    }
     if (
       !this._dropdownOpen &&
+      !this.hasSelection &&
       (event.key === "ArrowDown" || event.key === "Enter")
     ) {
       this.openDropdown();
@@ -643,40 +517,41 @@ export default class NewtonSelectorCombobox extends LightningElement {
     if (event.key === "ArrowDown") {
       event.preventDefault();
       this._activeIndex = (this._activeIndex + 1) % this._options.length;
-      this._scrollActiveIntoView();
+      this._scrollActiveIntoView(this._activeIndex);
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
       this._activeIndex =
         (this._activeIndex - 1 + this._options.length) % this._options.length;
-      this._scrollActiveIntoView();
+      this._scrollActiveIntoView(this._activeIndex);
     } else if (event.key === "Home") {
       event.preventDefault();
       this._activeIndex = 0;
-      this._scrollActiveIntoView();
+      this._scrollActiveIntoView(this._activeIndex);
     } else if (event.key === "End") {
       event.preventDefault();
       this._activeIndex = Math.max(this._options.length - 1, 0);
-      this._scrollActiveIntoView();
+      this._scrollActiveIntoView(this._activeIndex);
     } else if (event.key === "Enter") {
       event.preventDefault();
       const row = this._options[this._activeIndex];
       if (row) {
         this.applySelection(row);
       }
-    } else if (event.key === "Escape") {
-      this.closeDropdown();
     }
   }
 
-  _scrollActiveIntoView() {
-    const optionId = this.listboxActiveOptionId;
-    if (!optionId) {
+  // Looks the row up by data-index: LWC rewrites template ids under synthetic
+  // shadow, so an id selector would not match.
+  _scrollActiveIntoView(index) {
+    if (index < 0) {
       return;
     }
-
     Promise.resolve().then(() => {
-      const element = this.template.querySelector(`[id="${optionId}"]`);
-      element?.scrollIntoView({ block: "nearest", inline: "nearest" });
+      this.template
+        .querySelector(
+          `.newton-selector-combobox__option[data-index="${index}"]`
+        )
+        ?.scrollIntoView({ block: "nearest", inline: "nearest" });
     });
   }
 }

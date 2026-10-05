@@ -1,7 +1,10 @@
 <template>
   <!-- SLDS 2 form-element pattern. The label uses the standard field label
          class only so the selector aligns with lightning-input labels. -->
-  <fieldset class="slds-form-element newton-data-selector">
+  <fieldset
+    class="slds-form-element newton-data-selector"
+    aria-describedby={describedBy}
+  >
     <template lwc:if={hasLabel}>
       <legend class="slds-form-element__label newton-data-selector__label">
         <template lwc:if={required}>
@@ -17,6 +20,7 @@
       </legend>
       <template lwc:if={hasHelp}>
         <div
+          id="selector-help"
           class="slds-form-element__help newton-data-selector__help"
           role="note"
         >
@@ -58,23 +62,26 @@
               <c-newton-selector-icon
                 name="circle-alert"
                 size="small"
-                alternative-text={labels.errorIconAlt}
+                alternative-text=""
               ></c-newton-selector-icon>
             </span>
           </div>
           <p class="newton-state__message">{resolvedErrorMessage}</p>
-          <button
-            type="button"
-            class="newton-state__retry"
-            onclick={handleRetry}
-          >
-            <c-newton-selector-icon
-              name="rotate-cw"
-              size="xx-small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-            <span>{labels.tryAgain}</span>
-          </button>
+          <template lwc:if={canRetry}>
+            <button
+              type="button"
+              class="slds-button slds-button_neutral"
+              onclick={handleRetry}
+            >
+              <c-newton-selector-icon
+                class="slds-button__icon_left"
+                name="rotate-cw"
+                size="xx-small"
+                alternative-text=""
+              ></c-newton-selector-icon>
+              {labels.tryAgain}
+            </button>
+          </template>
         </div>
       </template>
 
@@ -112,12 +119,11 @@
           selection-mode={selectionMode}
           selected-values={selectedValuesForGroup}
           none-selected={noneOptionIsSelected}
-          min-selections={minSelections}
           max-selections={maxSelections}
           show-select-all={showSelectAll}
           enable-search={enableSearch}
           preview-mode={previewMode}
-          allow-manual-input={allowManualInput}
+          field-label={label}
           manual-input-label={manualInputLabel}
           manual-input-value={manualValueForGroup}
           manual-input-min-length={manualInputMinLength}
@@ -127,5 +133,14 @@
         ></c-newton-selector-group>
       </template>
     </div>
+    <template lwc:if={hasValidationMessage}>
+      <div
+        id="selector-error"
+        class="slds-form-element__help slds-text-color_error"
+        role="alert"
+      >
+        {validationMessage}
+      </div>
+    </template>
   </fieldset>
 </template>

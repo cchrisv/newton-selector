@@ -2,11922 +2,3122 @@
 // Do not edit directly.
 
 const ICONS_BY_NAME = Object.freeze({
-  "a-arrow-down": {
-    id: "lucide-a-arrow-down",
-    iconName: "a-arrow-down",
-    set: "lucide",
-    name: "a-arrow-down",
-    humanLabel: "a arrow down"
-  },
-  "a-arrow-up": {
-    id: "lucide-a-arrow-up",
-    iconName: "a-arrow-up",
-    set: "lucide",
-    name: "a-arrow-up",
-    humanLabel: "a arrow up"
-  },
-  "a-large-small": {
-    id: "lucide-a-large-small",
-    iconName: "a-large-small",
-    set: "lucide",
-    name: "a-large-small",
-    humanLabel: "a large small"
-  },
-  accessibility: {
-    id: "lucide-accessibility",
-    iconName: "accessibility",
-    set: "lucide",
-    name: "accessibility",
-    humanLabel: "accessibility"
-  },
-  activity: {
-    id: "lucide-activity",
-    iconName: "activity",
-    set: "lucide",
-    name: "activity",
-    humanLabel: "activity"
-  },
-  "air-vent": {
-    id: "lucide-air-vent",
-    iconName: "air-vent",
-    set: "lucide",
-    name: "air-vent",
-    humanLabel: "air vent"
-  },
-  airplay: {
-    id: "lucide-airplay",
-    iconName: "airplay",
-    set: "lucide",
-    name: "airplay",
-    humanLabel: "airplay"
-  },
-  "alarm-clock": {
-    id: "lucide-alarm-clock",
-    iconName: "alarm-clock",
-    set: "lucide",
-    name: "alarm-clock",
-    humanLabel: "alarm clock"
-  },
+  "a-arrow-down": { iconName: "a-arrow-down", humanLabel: "a arrow down" },
+  "a-arrow-up": { iconName: "a-arrow-up", humanLabel: "a arrow up" },
+  "a-large-small": { iconName: "a-large-small", humanLabel: "a large small" },
+  accessibility: { iconName: "accessibility", humanLabel: "accessibility" },
+  activity: { iconName: "activity", humanLabel: "activity" },
+  "air-vent": { iconName: "air-vent", humanLabel: "air vent" },
+  airplay: { iconName: "airplay", humanLabel: "airplay" },
+  "alarm-clock": { iconName: "alarm-clock", humanLabel: "alarm clock" },
   "alarm-clock-check": {
-    id: "lucide-alarm-clock-check",
     iconName: "alarm-clock-check",
-    set: "lucide",
-    name: "alarm-clock-check",
     humanLabel: "alarm clock check"
   },
   "alarm-clock-minus": {
-    id: "lucide-alarm-clock-minus",
     iconName: "alarm-clock-minus",
-    set: "lucide",
-    name: "alarm-clock-minus",
     humanLabel: "alarm clock minus"
   },
   "alarm-clock-off": {
-    id: "lucide-alarm-clock-off",
     iconName: "alarm-clock-off",
-    set: "lucide",
-    name: "alarm-clock-off",
     humanLabel: "alarm clock off"
   },
   "alarm-clock-plus": {
-    id: "lucide-alarm-clock-plus",
     iconName: "alarm-clock-plus",
-    set: "lucide",
-    name: "alarm-clock-plus",
     humanLabel: "alarm clock plus"
   },
-  "alarm-smoke": {
-    id: "lucide-alarm-smoke",
-    iconName: "alarm-smoke",
-    set: "lucide",
-    name: "alarm-smoke",
-    humanLabel: "alarm smoke"
-  },
-  album: {
-    id: "lucide-album",
-    iconName: "album",
-    set: "lucide",
-    name: "album",
-    humanLabel: "album"
-  },
+  "alarm-smoke": { iconName: "alarm-smoke", humanLabel: "alarm smoke" },
+  album: { iconName: "album", humanLabel: "album" },
   "align-center-horizontal": {
-    id: "lucide-align-center-horizontal",
     iconName: "align-center-horizontal",
-    set: "lucide",
-    name: "align-center-horizontal",
     humanLabel: "align center horizontal"
   },
   "align-center-vertical": {
-    id: "lucide-align-center-vertical",
     iconName: "align-center-vertical",
-    set: "lucide",
-    name: "align-center-vertical",
     humanLabel: "align center vertical"
   },
   "align-end-horizontal": {
-    id: "lucide-align-end-horizontal",
     iconName: "align-end-horizontal",
-    set: "lucide",
-    name: "align-end-horizontal",
     humanLabel: "align end horizontal"
   },
   "align-end-vertical": {
-    id: "lucide-align-end-vertical",
     iconName: "align-end-vertical",
-    set: "lucide",
-    name: "align-end-vertical",
     humanLabel: "align end vertical"
   },
   "align-horizontal-distribute-center": {
-    id: "lucide-align-horizontal-distribute-center",
     iconName: "align-horizontal-distribute-center",
-    set: "lucide",
-    name: "align-horizontal-distribute-center",
     humanLabel: "align horizontal distribute center"
   },
   "align-horizontal-distribute-end": {
-    id: "lucide-align-horizontal-distribute-end",
     iconName: "align-horizontal-distribute-end",
-    set: "lucide",
-    name: "align-horizontal-distribute-end",
     humanLabel: "align horizontal distribute end"
   },
   "align-horizontal-distribute-start": {
-    id: "lucide-align-horizontal-distribute-start",
     iconName: "align-horizontal-distribute-start",
-    set: "lucide",
-    name: "align-horizontal-distribute-start",
     humanLabel: "align horizontal distribute start"
   },
   "align-horizontal-justify-center": {
-    id: "lucide-align-horizontal-justify-center",
     iconName: "align-horizontal-justify-center",
-    set: "lucide",
-    name: "align-horizontal-justify-center",
     humanLabel: "align horizontal justify center"
   },
   "align-horizontal-justify-end": {
-    id: "lucide-align-horizontal-justify-end",
     iconName: "align-horizontal-justify-end",
-    set: "lucide",
-    name: "align-horizontal-justify-end",
     humanLabel: "align horizontal justify end"
   },
   "align-horizontal-justify-start": {
-    id: "lucide-align-horizontal-justify-start",
     iconName: "align-horizontal-justify-start",
-    set: "lucide",
-    name: "align-horizontal-justify-start",
     humanLabel: "align horizontal justify start"
   },
   "align-horizontal-space-around": {
-    id: "lucide-align-horizontal-space-around",
     iconName: "align-horizontal-space-around",
-    set: "lucide",
-    name: "align-horizontal-space-around",
     humanLabel: "align horizontal space around"
   },
   "align-horizontal-space-between": {
-    id: "lucide-align-horizontal-space-between",
     iconName: "align-horizontal-space-between",
-    set: "lucide",
-    name: "align-horizontal-space-between",
     humanLabel: "align horizontal space between"
   },
   "align-start-horizontal": {
-    id: "lucide-align-start-horizontal",
     iconName: "align-start-horizontal",
-    set: "lucide",
-    name: "align-start-horizontal",
     humanLabel: "align start horizontal"
   },
   "align-start-vertical": {
-    id: "lucide-align-start-vertical",
     iconName: "align-start-vertical",
-    set: "lucide",
-    name: "align-start-vertical",
     humanLabel: "align start vertical"
   },
   "align-vertical-distribute-center": {
-    id: "lucide-align-vertical-distribute-center",
     iconName: "align-vertical-distribute-center",
-    set: "lucide",
-    name: "align-vertical-distribute-center",
     humanLabel: "align vertical distribute center"
   },
   "align-vertical-distribute-end": {
-    id: "lucide-align-vertical-distribute-end",
     iconName: "align-vertical-distribute-end",
-    set: "lucide",
-    name: "align-vertical-distribute-end",
     humanLabel: "align vertical distribute end"
   },
   "align-vertical-distribute-start": {
-    id: "lucide-align-vertical-distribute-start",
     iconName: "align-vertical-distribute-start",
-    set: "lucide",
-    name: "align-vertical-distribute-start",
     humanLabel: "align vertical distribute start"
   },
   "align-vertical-justify-center": {
-    id: "lucide-align-vertical-justify-center",
     iconName: "align-vertical-justify-center",
-    set: "lucide",
-    name: "align-vertical-justify-center",
     humanLabel: "align vertical justify center"
   },
   "align-vertical-justify-end": {
-    id: "lucide-align-vertical-justify-end",
     iconName: "align-vertical-justify-end",
-    set: "lucide",
-    name: "align-vertical-justify-end",
     humanLabel: "align vertical justify end"
   },
   "align-vertical-justify-start": {
-    id: "lucide-align-vertical-justify-start",
     iconName: "align-vertical-justify-start",
-    set: "lucide",
-    name: "align-vertical-justify-start",
     humanLabel: "align vertical justify start"
   },
   "align-vertical-space-around": {
-    id: "lucide-align-vertical-space-around",
     iconName: "align-vertical-space-around",
-    set: "lucide",
-    name: "align-vertical-space-around",
     humanLabel: "align vertical space around"
   },
   "align-vertical-space-between": {
-    id: "lucide-align-vertical-space-between",
     iconName: "align-vertical-space-between",
-    set: "lucide",
-    name: "align-vertical-space-between",
     humanLabel: "align vertical space between"
   },
-  ambulance: {
-    id: "lucide-ambulance",
-    iconName: "ambulance",
-    set: "lucide",
-    name: "ambulance",
-    humanLabel: "ambulance"
-  },
-  ampersand: {
-    id: "lucide-ampersand",
-    iconName: "ampersand",
-    set: "lucide",
-    name: "ampersand",
-    humanLabel: "ampersand"
-  },
-  ampersands: {
-    id: "lucide-ampersands",
-    iconName: "ampersands",
-    set: "lucide",
-    name: "ampersands",
-    humanLabel: "ampersands"
-  },
-  amphora: {
-    id: "lucide-amphora",
-    iconName: "amphora",
-    set: "lucide",
-    name: "amphora",
-    humanLabel: "amphora"
-  },
-  anchor: {
-    id: "lucide-anchor",
-    iconName: "anchor",
-    set: "lucide",
-    name: "anchor",
-    humanLabel: "anchor"
-  },
-  angry: {
-    id: "lucide-angry",
-    iconName: "angry",
-    set: "lucide",
-    name: "angry",
-    humanLabel: "angry"
-  },
-  annoyed: {
-    id: "lucide-annoyed",
-    iconName: "annoyed",
-    set: "lucide",
-    name: "annoyed",
-    humanLabel: "annoyed"
-  },
-  antenna: {
-    id: "lucide-antenna",
-    iconName: "antenna",
-    set: "lucide",
-    name: "antenna",
-    humanLabel: "antenna"
-  },
-  anvil: {
-    id: "lucide-anvil",
-    iconName: "anvil",
-    set: "lucide",
-    name: "anvil",
-    humanLabel: "anvil"
-  },
-  aperture: {
-    id: "lucide-aperture",
-    iconName: "aperture",
-    set: "lucide",
-    name: "aperture",
-    humanLabel: "aperture"
-  },
-  "app-window": {
-    id: "lucide-app-window",
-    iconName: "app-window",
-    set: "lucide",
-    name: "app-window",
-    humanLabel: "app window"
-  },
+  ambulance: { iconName: "ambulance", humanLabel: "ambulance" },
+  ampersand: { iconName: "ampersand", humanLabel: "ampersand" },
+  ampersands: { iconName: "ampersands", humanLabel: "ampersands" },
+  amphora: { iconName: "amphora", humanLabel: "amphora" },
+  anchor: { iconName: "anchor", humanLabel: "anchor" },
+  angry: { iconName: "angry", humanLabel: "angry" },
+  annoyed: { iconName: "annoyed", humanLabel: "annoyed" },
+  antenna: { iconName: "antenna", humanLabel: "antenna" },
+  anvil: { iconName: "anvil", humanLabel: "anvil" },
+  aperture: { iconName: "aperture", humanLabel: "aperture" },
+  "app-window": { iconName: "app-window", humanLabel: "app window" },
   "app-window-mac": {
-    id: "lucide-app-window-mac",
     iconName: "app-window-mac",
-    set: "lucide",
-    name: "app-window-mac",
     humanLabel: "app window mac"
   },
-  apple: {
-    id: "lucide-apple",
-    iconName: "apple",
-    set: "lucide",
-    name: "apple",
-    humanLabel: "apple"
-  },
-  archive: {
-    id: "lucide-archive",
-    iconName: "archive",
-    set: "lucide",
-    name: "archive",
-    humanLabel: "archive"
-  },
+  apple: { iconName: "apple", humanLabel: "apple" },
+  archive: { iconName: "archive", humanLabel: "archive" },
   "archive-restore": {
-    id: "lucide-archive-restore",
     iconName: "archive-restore",
-    set: "lucide",
-    name: "archive-restore",
     humanLabel: "archive restore"
   },
-  "archive-x": {
-    id: "lucide-archive-x",
-    iconName: "archive-x",
-    set: "lucide",
-    name: "archive-x",
-    humanLabel: "archive x"
-  },
-  armchair: {
-    id: "lucide-armchair",
-    iconName: "armchair",
-    set: "lucide",
-    name: "armchair",
-    humanLabel: "armchair"
-  },
+  "archive-x": { iconName: "archive-x", humanLabel: "archive x" },
+  armchair: { iconName: "armchair", humanLabel: "armchair" },
   "arrow-big-down": {
-    id: "lucide-arrow-big-down",
     iconName: "arrow-big-down",
-    set: "lucide",
-    name: "arrow-big-down",
     humanLabel: "arrow big down"
   },
   "arrow-big-down-dash": {
-    id: "lucide-arrow-big-down-dash",
     iconName: "arrow-big-down-dash",
-    set: "lucide",
-    name: "arrow-big-down-dash",
     humanLabel: "arrow big down dash"
   },
   "arrow-big-left": {
-    id: "lucide-arrow-big-left",
     iconName: "arrow-big-left",
-    set: "lucide",
-    name: "arrow-big-left",
     humanLabel: "arrow big left"
   },
   "arrow-big-left-dash": {
-    id: "lucide-arrow-big-left-dash",
     iconName: "arrow-big-left-dash",
-    set: "lucide",
-    name: "arrow-big-left-dash",
     humanLabel: "arrow big left dash"
   },
   "arrow-big-right": {
-    id: "lucide-arrow-big-right",
     iconName: "arrow-big-right",
-    set: "lucide",
-    name: "arrow-big-right",
     humanLabel: "arrow big right"
   },
   "arrow-big-right-dash": {
-    id: "lucide-arrow-big-right-dash",
     iconName: "arrow-big-right-dash",
-    set: "lucide",
-    name: "arrow-big-right-dash",
     humanLabel: "arrow big right dash"
   },
-  "arrow-big-up": {
-    id: "lucide-arrow-big-up",
-    iconName: "arrow-big-up",
-    set: "lucide",
-    name: "arrow-big-up",
-    humanLabel: "arrow big up"
-  },
+  "arrow-big-up": { iconName: "arrow-big-up", humanLabel: "arrow big up" },
   "arrow-big-up-dash": {
-    id: "lucide-arrow-big-up-dash",
     iconName: "arrow-big-up-dash",
-    set: "lucide",
-    name: "arrow-big-up-dash",
     humanLabel: "arrow big up dash"
   },
-  "arrow-down": {
-    id: "lucide-arrow-down",
-    iconName: "arrow-down",
-    set: "lucide",
-    name: "arrow-down",
-    humanLabel: "arrow down"
-  },
+  "arrow-down": { iconName: "arrow-down", humanLabel: "arrow down" },
   "arrow-down-0-1": {
-    id: "lucide-arrow-down-0-1",
     iconName: "arrow-down-0-1",
-    set: "lucide",
-    name: "arrow-down-0-1",
     humanLabel: "arrow down 0 1"
   },
   "arrow-down-1-0": {
-    id: "lucide-arrow-down-1-0",
     iconName: "arrow-down-1-0",
-    set: "lucide",
-    name: "arrow-down-1-0",
     humanLabel: "arrow down 1 0"
   },
   "arrow-down-a-z": {
-    id: "lucide-arrow-down-a-z",
     iconName: "arrow-down-a-z",
-    set: "lucide",
-    name: "arrow-down-a-z",
     humanLabel: "arrow down a z"
   },
   "arrow-down-from-line": {
-    id: "lucide-arrow-down-from-line",
     iconName: "arrow-down-from-line",
-    set: "lucide",
-    name: "arrow-down-from-line",
     humanLabel: "arrow down from line"
   },
   "arrow-down-left": {
-    id: "lucide-arrow-down-left",
     iconName: "arrow-down-left",
-    set: "lucide",
-    name: "arrow-down-left",
     humanLabel: "arrow down left"
   },
   "arrow-down-narrow-wide": {
-    id: "lucide-arrow-down-narrow-wide",
     iconName: "arrow-down-narrow-wide",
-    set: "lucide",
-    name: "arrow-down-narrow-wide",
     humanLabel: "arrow down narrow wide"
   },
   "arrow-down-right": {
-    id: "lucide-arrow-down-right",
     iconName: "arrow-down-right",
-    set: "lucide",
-    name: "arrow-down-right",
     humanLabel: "arrow down right"
   },
   "arrow-down-to-dot": {
-    id: "lucide-arrow-down-to-dot",
     iconName: "arrow-down-to-dot",
-    set: "lucide",
-    name: "arrow-down-to-dot",
     humanLabel: "arrow down to dot"
   },
   "arrow-down-to-line": {
-    id: "lucide-arrow-down-to-line",
     iconName: "arrow-down-to-line",
-    set: "lucide",
-    name: "arrow-down-to-line",
     humanLabel: "arrow down to line"
   },
-  "arrow-down-up": {
-    id: "lucide-arrow-down-up",
-    iconName: "arrow-down-up",
-    set: "lucide",
-    name: "arrow-down-up",
-    humanLabel: "arrow down up"
-  },
+  "arrow-down-up": { iconName: "arrow-down-up", humanLabel: "arrow down up" },
   "arrow-down-wide-narrow": {
-    id: "lucide-arrow-down-wide-narrow",
     iconName: "arrow-down-wide-narrow",
-    set: "lucide",
-    name: "arrow-down-wide-narrow",
     humanLabel: "arrow down wide narrow"
   },
   "arrow-down-z-a": {
-    id: "lucide-arrow-down-z-a",
     iconName: "arrow-down-z-a",
-    set: "lucide",
-    name: "arrow-down-z-a",
     humanLabel: "arrow down z a"
   },
-  "arrow-left": {
-    id: "lucide-arrow-left",
-    iconName: "arrow-left",
-    set: "lucide",
-    name: "arrow-left",
-    humanLabel: "arrow left"
-  },
+  "arrow-left": { iconName: "arrow-left", humanLabel: "arrow left" },
   "arrow-left-from-line": {
-    id: "lucide-arrow-left-from-line",
     iconName: "arrow-left-from-line",
-    set: "lucide",
-    name: "arrow-left-from-line",
     humanLabel: "arrow left from line"
   },
   "arrow-left-right": {
-    id: "lucide-arrow-left-right",
     iconName: "arrow-left-right",
-    set: "lucide",
-    name: "arrow-left-right",
     humanLabel: "arrow left right"
   },
   "arrow-left-to-line": {
-    id: "lucide-arrow-left-to-line",
     iconName: "arrow-left-to-line",
-    set: "lucide",
-    name: "arrow-left-to-line",
     humanLabel: "arrow left to line"
   },
-  "arrow-right": {
-    id: "lucide-arrow-right",
-    iconName: "arrow-right",
-    set: "lucide",
-    name: "arrow-right",
-    humanLabel: "arrow right"
-  },
+  "arrow-right": { iconName: "arrow-right", humanLabel: "arrow right" },
   "arrow-right-from-line": {
-    id: "lucide-arrow-right-from-line",
     iconName: "arrow-right-from-line",
-    set: "lucide",
-    name: "arrow-right-from-line",
     humanLabel: "arrow right from line"
   },
   "arrow-right-left": {
-    id: "lucide-arrow-right-left",
     iconName: "arrow-right-left",
-    set: "lucide",
-    name: "arrow-right-left",
     humanLabel: "arrow right left"
   },
   "arrow-right-to-line": {
-    id: "lucide-arrow-right-to-line",
     iconName: "arrow-right-to-line",
-    set: "lucide",
-    name: "arrow-right-to-line",
     humanLabel: "arrow right to line"
   },
-  "arrow-up": {
-    id: "lucide-arrow-up",
-    iconName: "arrow-up",
-    set: "lucide",
-    name: "arrow-up",
-    humanLabel: "arrow up"
-  },
-  "arrow-up-0-1": {
-    id: "lucide-arrow-up-0-1",
-    iconName: "arrow-up-0-1",
-    set: "lucide",
-    name: "arrow-up-0-1",
-    humanLabel: "arrow up 0 1"
-  },
-  "arrow-up-1-0": {
-    id: "lucide-arrow-up-1-0",
-    iconName: "arrow-up-1-0",
-    set: "lucide",
-    name: "arrow-up-1-0",
-    humanLabel: "arrow up 1 0"
-  },
-  "arrow-up-a-z": {
-    id: "lucide-arrow-up-a-z",
-    iconName: "arrow-up-a-z",
-    set: "lucide",
-    name: "arrow-up-a-z",
-    humanLabel: "arrow up a z"
-  },
-  "arrow-up-down": {
-    id: "lucide-arrow-up-down",
-    iconName: "arrow-up-down",
-    set: "lucide",
-    name: "arrow-up-down",
-    humanLabel: "arrow up down"
-  },
+  "arrow-up": { iconName: "arrow-up", humanLabel: "arrow up" },
+  "arrow-up-0-1": { iconName: "arrow-up-0-1", humanLabel: "arrow up 0 1" },
+  "arrow-up-1-0": { iconName: "arrow-up-1-0", humanLabel: "arrow up 1 0" },
+  "arrow-up-a-z": { iconName: "arrow-up-a-z", humanLabel: "arrow up a z" },
+  "arrow-up-down": { iconName: "arrow-up-down", humanLabel: "arrow up down" },
   "arrow-up-from-dot": {
-    id: "lucide-arrow-up-from-dot",
     iconName: "arrow-up-from-dot",
-    set: "lucide",
-    name: "arrow-up-from-dot",
     humanLabel: "arrow up from dot"
   },
   "arrow-up-from-line": {
-    id: "lucide-arrow-up-from-line",
     iconName: "arrow-up-from-line",
-    set: "lucide",
-    name: "arrow-up-from-line",
     humanLabel: "arrow up from line"
   },
-  "arrow-up-left": {
-    id: "lucide-arrow-up-left",
-    iconName: "arrow-up-left",
-    set: "lucide",
-    name: "arrow-up-left",
-    humanLabel: "arrow up left"
-  },
+  "arrow-up-left": { iconName: "arrow-up-left", humanLabel: "arrow up left" },
   "arrow-up-narrow-wide": {
-    id: "lucide-arrow-up-narrow-wide",
     iconName: "arrow-up-narrow-wide",
-    set: "lucide",
-    name: "arrow-up-narrow-wide",
     humanLabel: "arrow up narrow wide"
   },
   "arrow-up-right": {
-    id: "lucide-arrow-up-right",
     iconName: "arrow-up-right",
-    set: "lucide",
-    name: "arrow-up-right",
     humanLabel: "arrow up right"
   },
   "arrow-up-to-line": {
-    id: "lucide-arrow-up-to-line",
     iconName: "arrow-up-to-line",
-    set: "lucide",
-    name: "arrow-up-to-line",
     humanLabel: "arrow up to line"
   },
   "arrow-up-wide-narrow": {
-    id: "lucide-arrow-up-wide-narrow",
     iconName: "arrow-up-wide-narrow",
-    set: "lucide",
-    name: "arrow-up-wide-narrow",
     humanLabel: "arrow up wide narrow"
   },
-  "arrow-up-z-a": {
-    id: "lucide-arrow-up-z-a",
-    iconName: "arrow-up-z-a",
-    set: "lucide",
-    name: "arrow-up-z-a",
-    humanLabel: "arrow up z a"
-  },
+  "arrow-up-z-a": { iconName: "arrow-up-z-a", humanLabel: "arrow up z a" },
   "arrows-up-from-line": {
-    id: "lucide-arrows-up-from-line",
     iconName: "arrows-up-from-line",
-    set: "lucide",
-    name: "arrows-up-from-line",
     humanLabel: "arrows up from line"
   },
-  asterisk: {
-    id: "lucide-asterisk",
-    iconName: "asterisk",
-    set: "lucide",
-    name: "asterisk",
-    humanLabel: "asterisk"
-  },
-  astroid: {
-    id: "lucide-astroid",
-    iconName: "astroid",
-    set: "lucide",
-    name: "astroid",
-    humanLabel: "astroid"
-  },
-  "at-sign": {
-    id: "lucide-at-sign",
-    iconName: "at-sign",
-    set: "lucide",
-    name: "at-sign",
-    humanLabel: "at sign"
-  },
-  atom: {
-    id: "lucide-atom",
-    iconName: "atom",
-    set: "lucide",
-    name: "atom",
-    humanLabel: "atom"
-  },
-  "audio-lines": {
-    id: "lucide-audio-lines",
-    iconName: "audio-lines",
-    set: "lucide",
-    name: "audio-lines",
-    humanLabel: "audio lines"
-  },
+  asterisk: { iconName: "asterisk", humanLabel: "asterisk" },
+  astroid: { iconName: "astroid", humanLabel: "astroid" },
+  "at-sign": { iconName: "at-sign", humanLabel: "at sign" },
+  atom: { iconName: "atom", humanLabel: "atom" },
+  "audio-lines": { iconName: "audio-lines", humanLabel: "audio lines" },
   "audio-waveform": {
-    id: "lucide-audio-waveform",
     iconName: "audio-waveform",
-    set: "lucide",
-    name: "audio-waveform",
     humanLabel: "audio waveform"
   },
-  award: {
-    id: "lucide-award",
-    iconName: "award",
-    set: "lucide",
-    name: "award",
-    humanLabel: "award"
-  },
-  axe: {
-    id: "lucide-axe",
-    iconName: "axe",
-    set: "lucide",
-    name: "axe",
-    humanLabel: "axe"
-  },
-  "axis-3d": {
-    id: "lucide-axis-3d",
-    iconName: "axis-3d",
-    set: "lucide",
-    name: "axis-3d",
-    humanLabel: "axis 3d"
-  },
-  baby: {
-    id: "lucide-baby",
-    iconName: "baby",
-    set: "lucide",
-    name: "baby",
-    humanLabel: "baby"
-  },
-  backpack: {
-    id: "lucide-backpack",
-    iconName: "backpack",
-    set: "lucide",
-    name: "backpack",
-    humanLabel: "backpack"
-  },
-  badge: {
-    id: "lucide-badge",
-    iconName: "badge",
-    set: "lucide",
-    name: "badge",
-    humanLabel: "badge"
-  },
-  "badge-alert": {
-    id: "lucide-badge-alert",
-    iconName: "badge-alert",
-    set: "lucide",
-    name: "badge-alert",
-    humanLabel: "badge alert"
-  },
-  "badge-cent": {
-    id: "lucide-badge-cent",
-    iconName: "badge-cent",
-    set: "lucide",
-    name: "badge-cent",
-    humanLabel: "badge cent"
-  },
-  "badge-check": {
-    id: "lucide-badge-check",
-    iconName: "badge-check",
-    set: "lucide",
-    name: "badge-check",
-    humanLabel: "badge check"
-  },
+  award: { iconName: "award", humanLabel: "award" },
+  axe: { iconName: "axe", humanLabel: "axe" },
+  "axis-3d": { iconName: "axis-3d", humanLabel: "axis 3d" },
+  baby: { iconName: "baby", humanLabel: "baby" },
+  backpack: { iconName: "backpack", humanLabel: "backpack" },
+  badge: { iconName: "badge", humanLabel: "badge" },
+  "badge-alert": { iconName: "badge-alert", humanLabel: "badge alert" },
+  "badge-cent": { iconName: "badge-cent", humanLabel: "badge cent" },
+  "badge-check": { iconName: "badge-check", humanLabel: "badge check" },
   "badge-dollar-sign": {
-    id: "lucide-badge-dollar-sign",
     iconName: "badge-dollar-sign",
-    set: "lucide",
-    name: "badge-dollar-sign",
     humanLabel: "badge dollar sign"
   },
-  "badge-euro": {
-    id: "lucide-badge-euro",
-    iconName: "badge-euro",
-    set: "lucide",
-    name: "badge-euro",
-    humanLabel: "badge euro"
-  },
+  "badge-euro": { iconName: "badge-euro", humanLabel: "badge euro" },
   "badge-indian-rupee": {
-    id: "lucide-badge-indian-rupee",
     iconName: "badge-indian-rupee",
-    set: "lucide",
-    name: "badge-indian-rupee",
     humanLabel: "badge indian rupee"
   },
-  "badge-info": {
-    id: "lucide-badge-info",
-    iconName: "badge-info",
-    set: "lucide",
-    name: "badge-info",
-    humanLabel: "badge info"
-  },
+  "badge-info": { iconName: "badge-info", humanLabel: "badge info" },
   "badge-japanese-yen": {
-    id: "lucide-badge-japanese-yen",
     iconName: "badge-japanese-yen",
-    set: "lucide",
-    name: "badge-japanese-yen",
     humanLabel: "badge japanese yen"
   },
-  "badge-minus": {
-    id: "lucide-badge-minus",
-    iconName: "badge-minus",
-    set: "lucide",
-    name: "badge-minus",
-    humanLabel: "badge minus"
-  },
-  "badge-percent": {
-    id: "lucide-badge-percent",
-    iconName: "badge-percent",
-    set: "lucide",
-    name: "badge-percent",
-    humanLabel: "badge percent"
-  },
-  "badge-plus": {
-    id: "lucide-badge-plus",
-    iconName: "badge-plus",
-    set: "lucide",
-    name: "badge-plus",
-    humanLabel: "badge plus"
-  },
+  "badge-minus": { iconName: "badge-minus", humanLabel: "badge minus" },
+  "badge-percent": { iconName: "badge-percent", humanLabel: "badge percent" },
+  "badge-plus": { iconName: "badge-plus", humanLabel: "badge plus" },
   "badge-pound-sterling": {
-    id: "lucide-badge-pound-sterling",
     iconName: "badge-pound-sterling",
-    set: "lucide",
-    name: "badge-pound-sterling",
     humanLabel: "badge pound sterling"
   },
   "badge-question-mark": {
-    id: "lucide-badge-question-mark",
     iconName: "badge-question-mark",
-    set: "lucide",
-    name: "badge-question-mark",
     humanLabel: "badge question mark"
   },
   "badge-russian-ruble": {
-    id: "lucide-badge-russian-ruble",
     iconName: "badge-russian-ruble",
-    set: "lucide",
-    name: "badge-russian-ruble",
     humanLabel: "badge russian ruble"
   },
   "badge-swiss-franc": {
-    id: "lucide-badge-swiss-franc",
     iconName: "badge-swiss-franc",
-    set: "lucide",
-    name: "badge-swiss-franc",
     humanLabel: "badge swiss franc"
   },
   "badge-turkish-lira": {
-    id: "lucide-badge-turkish-lira",
     iconName: "badge-turkish-lira",
-    set: "lucide",
-    name: "badge-turkish-lira",
     humanLabel: "badge turkish lira"
   },
-  "badge-x": {
-    id: "lucide-badge-x",
-    iconName: "badge-x",
-    set: "lucide",
-    name: "badge-x",
-    humanLabel: "badge x"
-  },
-  "baggage-claim": {
-    id: "lucide-baggage-claim",
-    iconName: "baggage-claim",
-    set: "lucide",
-    name: "baggage-claim",
-    humanLabel: "baggage claim"
-  },
-  balloon: {
-    id: "lucide-balloon",
-    iconName: "balloon",
-    set: "lucide",
-    name: "balloon",
-    humanLabel: "balloon"
-  },
-  ban: {
-    id: "lucide-ban",
-    iconName: "ban",
-    set: "lucide",
-    name: "ban",
-    humanLabel: "ban"
-  },
-  banana: {
-    id: "lucide-banana",
-    iconName: "banana",
-    set: "lucide",
-    name: "banana",
-    humanLabel: "banana"
-  },
-  bandage: {
-    id: "lucide-bandage",
-    iconName: "bandage",
-    set: "lucide",
-    name: "bandage",
-    humanLabel: "bandage"
-  },
-  banknote: {
-    id: "lucide-banknote",
-    iconName: "banknote",
-    set: "lucide",
-    name: "banknote",
-    humanLabel: "banknote"
-  },
+  "badge-x": { iconName: "badge-x", humanLabel: "badge x" },
+  "baggage-claim": { iconName: "baggage-claim", humanLabel: "baggage claim" },
+  balloon: { iconName: "balloon", humanLabel: "balloon" },
+  ban: { iconName: "ban", humanLabel: "ban" },
+  banana: { iconName: "banana", humanLabel: "banana" },
+  bandage: { iconName: "bandage", humanLabel: "bandage" },
+  banknote: { iconName: "banknote", humanLabel: "banknote" },
   "banknote-arrow-down": {
-    id: "lucide-banknote-arrow-down",
     iconName: "banknote-arrow-down",
-    set: "lucide",
-    name: "banknote-arrow-down",
     humanLabel: "banknote arrow down"
   },
   "banknote-arrow-up": {
-    id: "lucide-banknote-arrow-up",
     iconName: "banknote-arrow-up",
-    set: "lucide",
-    name: "banknote-arrow-up",
     humanLabel: "banknote arrow up"
   },
-  "banknote-x": {
-    id: "lucide-banknote-x",
-    iconName: "banknote-x",
-    set: "lucide",
-    name: "banknote-x",
-    humanLabel: "banknote x"
-  },
-  barcode: {
-    id: "lucide-barcode",
-    iconName: "barcode",
-    set: "lucide",
-    name: "barcode",
-    humanLabel: "barcode"
-  },
-  barrel: {
-    id: "lucide-barrel",
-    iconName: "barrel",
-    set: "lucide",
-    name: "barrel",
-    humanLabel: "barrel"
-  },
-  baseline: {
-    id: "lucide-baseline",
-    iconName: "baseline",
-    set: "lucide",
-    name: "baseline",
-    humanLabel: "baseline"
-  },
-  bath: {
-    id: "lucide-bath",
-    iconName: "bath",
-    set: "lucide",
-    name: "bath",
-    humanLabel: "bath"
-  },
-  battery: {
-    id: "lucide-battery",
-    iconName: "battery",
-    set: "lucide",
-    name: "battery",
-    humanLabel: "battery"
-  },
+  "banknote-x": { iconName: "banknote-x", humanLabel: "banknote x" },
+  barcode: { iconName: "barcode", humanLabel: "barcode" },
+  barrel: { iconName: "barrel", humanLabel: "barrel" },
+  baseline: { iconName: "baseline", humanLabel: "baseline" },
+  bath: { iconName: "bath", humanLabel: "bath" },
+  battery: { iconName: "battery", humanLabel: "battery" },
   "battery-charging": {
-    id: "lucide-battery-charging",
     iconName: "battery-charging",
-    set: "lucide",
-    name: "battery-charging",
     humanLabel: "battery charging"
   },
-  "battery-full": {
-    id: "lucide-battery-full",
-    iconName: "battery-full",
-    set: "lucide",
-    name: "battery-full",
-    humanLabel: "battery full"
-  },
-  "battery-low": {
-    id: "lucide-battery-low",
-    iconName: "battery-low",
-    set: "lucide",
-    name: "battery-low",
-    humanLabel: "battery low"
-  },
+  "battery-full": { iconName: "battery-full", humanLabel: "battery full" },
+  "battery-low": { iconName: "battery-low", humanLabel: "battery low" },
   "battery-medium": {
-    id: "lucide-battery-medium",
     iconName: "battery-medium",
-    set: "lucide",
-    name: "battery-medium",
     humanLabel: "battery medium"
   },
-  "battery-plus": {
-    id: "lucide-battery-plus",
-    iconName: "battery-plus",
-    set: "lucide",
-    name: "battery-plus",
-    humanLabel: "battery plus"
-  },
+  "battery-plus": { iconName: "battery-plus", humanLabel: "battery plus" },
   "battery-warning": {
-    id: "lucide-battery-warning",
     iconName: "battery-warning",
-    set: "lucide",
-    name: "battery-warning",
     humanLabel: "battery warning"
   },
-  beaker: {
-    id: "lucide-beaker",
-    iconName: "beaker",
-    set: "lucide",
-    name: "beaker",
-    humanLabel: "beaker"
-  },
-  bean: {
-    id: "lucide-bean",
-    iconName: "bean",
-    set: "lucide",
-    name: "bean",
-    humanLabel: "bean"
-  },
-  "bean-off": {
-    id: "lucide-bean-off",
-    iconName: "bean-off",
-    set: "lucide",
-    name: "bean-off",
-    humanLabel: "bean off"
-  },
-  bed: {
-    id: "lucide-bed",
-    iconName: "bed",
-    set: "lucide",
-    name: "bed",
-    humanLabel: "bed"
-  },
-  "bed-double": {
-    id: "lucide-bed-double",
-    iconName: "bed-double",
-    set: "lucide",
-    name: "bed-double",
-    humanLabel: "bed double"
-  },
-  "bed-single": {
-    id: "lucide-bed-single",
-    iconName: "bed-single",
-    set: "lucide",
-    name: "bed-single",
-    humanLabel: "bed single"
-  },
-  beef: {
-    id: "lucide-beef",
-    iconName: "beef",
-    set: "lucide",
-    name: "beef",
-    humanLabel: "beef"
-  },
-  "beef-off": {
-    id: "lucide-beef-off",
-    iconName: "beef-off",
-    set: "lucide",
-    name: "beef-off",
-    humanLabel: "beef off"
-  },
-  beer: {
-    id: "lucide-beer",
-    iconName: "beer",
-    set: "lucide",
-    name: "beer",
-    humanLabel: "beer"
-  },
-  "beer-off": {
-    id: "lucide-beer-off",
-    iconName: "beer-off",
-    set: "lucide",
-    name: "beer-off",
-    humanLabel: "beer off"
-  },
-  bell: {
-    id: "lucide-bell",
-    iconName: "bell",
-    set: "lucide",
-    name: "bell",
-    humanLabel: "bell"
-  },
-  "bell-check": {
-    id: "lucide-bell-check",
-    iconName: "bell-check",
-    set: "lucide",
-    name: "bell-check",
-    humanLabel: "bell check"
-  },
-  "bell-dot": {
-    id: "lucide-bell-dot",
-    iconName: "bell-dot",
-    set: "lucide",
-    name: "bell-dot",
-    humanLabel: "bell dot"
-  },
-  "bell-electric": {
-    id: "lucide-bell-electric",
-    iconName: "bell-electric",
-    set: "lucide",
-    name: "bell-electric",
-    humanLabel: "bell electric"
-  },
-  "bell-minus": {
-    id: "lucide-bell-minus",
-    iconName: "bell-minus",
-    set: "lucide",
-    name: "bell-minus",
-    humanLabel: "bell minus"
-  },
-  "bell-off": {
-    id: "lucide-bell-off",
-    iconName: "bell-off",
-    set: "lucide",
-    name: "bell-off",
-    humanLabel: "bell off"
-  },
-  "bell-plus": {
-    id: "lucide-bell-plus",
-    iconName: "bell-plus",
-    set: "lucide",
-    name: "bell-plus",
-    humanLabel: "bell plus"
-  },
-  "bell-ring": {
-    id: "lucide-bell-ring",
-    iconName: "bell-ring",
-    set: "lucide",
-    name: "bell-ring",
-    humanLabel: "bell ring"
-  },
+  beaker: { iconName: "beaker", humanLabel: "beaker" },
+  bean: { iconName: "bean", humanLabel: "bean" },
+  "bean-off": { iconName: "bean-off", humanLabel: "bean off" },
+  bed: { iconName: "bed", humanLabel: "bed" },
+  "bed-double": { iconName: "bed-double", humanLabel: "bed double" },
+  "bed-single": { iconName: "bed-single", humanLabel: "bed single" },
+  beef: { iconName: "beef", humanLabel: "beef" },
+  "beef-off": { iconName: "beef-off", humanLabel: "beef off" },
+  beer: { iconName: "beer", humanLabel: "beer" },
+  "beer-off": { iconName: "beer-off", humanLabel: "beer off" },
+  bell: { iconName: "bell", humanLabel: "bell" },
+  "bell-check": { iconName: "bell-check", humanLabel: "bell check" },
+  "bell-dot": { iconName: "bell-dot", humanLabel: "bell dot" },
+  "bell-electric": { iconName: "bell-electric", humanLabel: "bell electric" },
+  "bell-minus": { iconName: "bell-minus", humanLabel: "bell minus" },
+  "bell-off": { iconName: "bell-off", humanLabel: "bell off" },
+  "bell-plus": { iconName: "bell-plus", humanLabel: "bell plus" },
+  "bell-ring": { iconName: "bell-ring", humanLabel: "bell ring" },
   "between-horizontal-end": {
-    id: "lucide-between-horizontal-end",
     iconName: "between-horizontal-end",
-    set: "lucide",
-    name: "between-horizontal-end",
     humanLabel: "between horizontal end"
   },
   "between-horizontal-start": {
-    id: "lucide-between-horizontal-start",
     iconName: "between-horizontal-start",
-    set: "lucide",
-    name: "between-horizontal-start",
     humanLabel: "between horizontal start"
   },
   "between-vertical-end": {
-    id: "lucide-between-vertical-end",
     iconName: "between-vertical-end",
-    set: "lucide",
-    name: "between-vertical-end",
     humanLabel: "between vertical end"
   },
   "between-vertical-start": {
-    id: "lucide-between-vertical-start",
     iconName: "between-vertical-start",
-    set: "lucide",
-    name: "between-vertical-start",
     humanLabel: "between vertical start"
   },
-  "biceps-flexed": {
-    id: "lucide-biceps-flexed",
-    iconName: "biceps-flexed",
-    set: "lucide",
-    name: "biceps-flexed",
-    humanLabel: "biceps flexed"
-  },
-  bike: {
-    id: "lucide-bike",
-    iconName: "bike",
-    set: "lucide",
-    name: "bike",
-    humanLabel: "bike"
-  },
-  binary: {
-    id: "lucide-binary",
-    iconName: "binary",
-    set: "lucide",
-    name: "binary",
-    humanLabel: "binary"
-  },
-  binoculars: {
-    id: "lucide-binoculars",
-    iconName: "binoculars",
-    set: "lucide",
-    name: "binoculars",
-    humanLabel: "binoculars"
-  },
-  biohazard: {
-    id: "lucide-biohazard",
-    iconName: "biohazard",
-    set: "lucide",
-    name: "biohazard",
-    humanLabel: "biohazard"
-  },
-  bird: {
-    id: "lucide-bird",
-    iconName: "bird",
-    set: "lucide",
-    name: "bird",
-    humanLabel: "bird"
-  },
-  birdhouse: {
-    id: "lucide-birdhouse",
-    iconName: "birdhouse",
-    set: "lucide",
-    name: "birdhouse",
-    humanLabel: "birdhouse"
-  },
-  bitcoin: {
-    id: "lucide-bitcoin",
-    iconName: "bitcoin",
-    set: "lucide",
-    name: "bitcoin",
-    humanLabel: "bitcoin"
-  },
-  blend: {
-    id: "lucide-blend",
-    iconName: "blend",
-    set: "lucide",
-    name: "blend",
-    humanLabel: "blend"
-  },
-  blinds: {
-    id: "lucide-blinds",
-    iconName: "blinds",
-    set: "lucide",
-    name: "blinds",
-    humanLabel: "blinds"
-  },
-  blocks: {
-    id: "lucide-blocks",
-    iconName: "blocks",
-    set: "lucide",
-    name: "blocks",
-    humanLabel: "blocks"
-  },
-  bluetooth: {
-    id: "lucide-bluetooth",
-    iconName: "bluetooth",
-    set: "lucide",
-    name: "bluetooth",
-    humanLabel: "bluetooth"
-  },
+  "biceps-flexed": { iconName: "biceps-flexed", humanLabel: "biceps flexed" },
+  bike: { iconName: "bike", humanLabel: "bike" },
+  binary: { iconName: "binary", humanLabel: "binary" },
+  binoculars: { iconName: "binoculars", humanLabel: "binoculars" },
+  biohazard: { iconName: "biohazard", humanLabel: "biohazard" },
+  bird: { iconName: "bird", humanLabel: "bird" },
+  birdhouse: { iconName: "birdhouse", humanLabel: "birdhouse" },
+  bitcoin: { iconName: "bitcoin", humanLabel: "bitcoin" },
+  blend: { iconName: "blend", humanLabel: "blend" },
+  blinds: { iconName: "blinds", humanLabel: "blinds" },
+  blocks: { iconName: "blocks", humanLabel: "blocks" },
+  bluetooth: { iconName: "bluetooth", humanLabel: "bluetooth" },
   "bluetooth-connected": {
-    id: "lucide-bluetooth-connected",
     iconName: "bluetooth-connected",
-    set: "lucide",
-    name: "bluetooth-connected",
     humanLabel: "bluetooth connected"
   },
-  "bluetooth-off": {
-    id: "lucide-bluetooth-off",
-    iconName: "bluetooth-off",
-    set: "lucide",
-    name: "bluetooth-off",
-    humanLabel: "bluetooth off"
-  },
+  "bluetooth-off": { iconName: "bluetooth-off", humanLabel: "bluetooth off" },
   "bluetooth-searching": {
-    id: "lucide-bluetooth-searching",
     iconName: "bluetooth-searching",
-    set: "lucide",
-    name: "bluetooth-searching",
     humanLabel: "bluetooth searching"
   },
-  bold: {
-    id: "lucide-bold",
-    iconName: "bold",
-    set: "lucide",
-    name: "bold",
-    humanLabel: "bold"
-  },
-  bolt: {
-    id: "lucide-bolt",
-    iconName: "bolt",
-    set: "lucide",
-    name: "bolt",
-    humanLabel: "bolt"
-  },
-  bomb: {
-    id: "lucide-bomb",
-    iconName: "bomb",
-    set: "lucide",
-    name: "bomb",
-    humanLabel: "bomb"
-  },
-  bone: {
-    id: "lucide-bone",
-    iconName: "bone",
-    set: "lucide",
-    name: "bone",
-    humanLabel: "bone"
-  },
-  book: {
-    id: "lucide-book",
-    iconName: "book",
-    set: "lucide",
-    name: "book",
-    humanLabel: "book"
-  },
-  "book-a": {
-    id: "lucide-book-a",
-    iconName: "book-a",
-    set: "lucide",
-    name: "book-a",
-    humanLabel: "book a"
-  },
-  "book-alert": {
-    id: "lucide-book-alert",
-    iconName: "book-alert",
-    set: "lucide",
-    name: "book-alert",
-    humanLabel: "book alert"
-  },
-  "book-audio": {
-    id: "lucide-book-audio",
-    iconName: "book-audio",
-    set: "lucide",
-    name: "book-audio",
-    humanLabel: "book audio"
-  },
-  "book-check": {
-    id: "lucide-book-check",
-    iconName: "book-check",
-    set: "lucide",
-    name: "book-check",
-    humanLabel: "book check"
-  },
-  "book-copy": {
-    id: "lucide-book-copy",
-    iconName: "book-copy",
-    set: "lucide",
-    name: "book-copy",
-    humanLabel: "book copy"
-  },
-  "book-dashed": {
-    id: "lucide-book-dashed",
-    iconName: "book-dashed",
-    set: "lucide",
-    name: "book-dashed",
-    humanLabel: "book dashed"
-  },
-  "book-down": {
-    id: "lucide-book-down",
-    iconName: "book-down",
-    set: "lucide",
-    name: "book-down",
-    humanLabel: "book down"
-  },
+  bold: { iconName: "bold", humanLabel: "bold" },
+  bolt: { iconName: "bolt", humanLabel: "bolt" },
+  bomb: { iconName: "bomb", humanLabel: "bomb" },
+  bone: { iconName: "bone", humanLabel: "bone" },
+  book: { iconName: "book", humanLabel: "book" },
+  "book-a": { iconName: "book-a", humanLabel: "book a" },
+  "book-alert": { iconName: "book-alert", humanLabel: "book alert" },
+  "book-audio": { iconName: "book-audio", humanLabel: "book audio" },
+  "book-check": { iconName: "book-check", humanLabel: "book check" },
+  "book-copy": { iconName: "book-copy", humanLabel: "book copy" },
+  "book-dashed": { iconName: "book-dashed", humanLabel: "book dashed" },
+  "book-down": { iconName: "book-down", humanLabel: "book down" },
   "book-headphones": {
-    id: "lucide-book-headphones",
     iconName: "book-headphones",
-    set: "lucide",
-    name: "book-headphones",
     humanLabel: "book headphones"
   },
-  "book-heart": {
-    id: "lucide-book-heart",
-    iconName: "book-heart",
-    set: "lucide",
-    name: "book-heart",
-    humanLabel: "book heart"
-  },
-  "book-image": {
-    id: "lucide-book-image",
-    iconName: "book-image",
-    set: "lucide",
-    name: "book-image",
-    humanLabel: "book image"
-  },
-  "book-key": {
-    id: "lucide-book-key",
-    iconName: "book-key",
-    set: "lucide",
-    name: "book-key",
-    humanLabel: "book key"
-  },
-  "book-lock": {
-    id: "lucide-book-lock",
-    iconName: "book-lock",
-    set: "lucide",
-    name: "book-lock",
-    humanLabel: "book lock"
-  },
-  "book-marked": {
-    id: "lucide-book-marked",
-    iconName: "book-marked",
-    set: "lucide",
-    name: "book-marked",
-    humanLabel: "book marked"
-  },
-  "book-minus": {
-    id: "lucide-book-minus",
-    iconName: "book-minus",
-    set: "lucide",
-    name: "book-minus",
-    humanLabel: "book minus"
-  },
-  "book-open": {
-    id: "lucide-book-open",
-    iconName: "book-open",
-    set: "lucide",
-    name: "book-open",
-    humanLabel: "book open"
-  },
+  "book-heart": { iconName: "book-heart", humanLabel: "book heart" },
+  "book-image": { iconName: "book-image", humanLabel: "book image" },
+  "book-key": { iconName: "book-key", humanLabel: "book key" },
+  "book-lock": { iconName: "book-lock", humanLabel: "book lock" },
+  "book-marked": { iconName: "book-marked", humanLabel: "book marked" },
+  "book-minus": { iconName: "book-minus", humanLabel: "book minus" },
+  "book-open": { iconName: "book-open", humanLabel: "book open" },
   "book-open-check": {
-    id: "lucide-book-open-check",
     iconName: "book-open-check",
-    set: "lucide",
-    name: "book-open-check",
     humanLabel: "book open check"
   },
   "book-open-text": {
-    id: "lucide-book-open-text",
     iconName: "book-open-text",
-    set: "lucide",
-    name: "book-open-text",
     humanLabel: "book open text"
   },
-  "book-plus": {
-    id: "lucide-book-plus",
-    iconName: "book-plus",
-    set: "lucide",
-    name: "book-plus",
-    humanLabel: "book plus"
-  },
-  "book-search": {
-    id: "lucide-book-search",
-    iconName: "book-search",
-    set: "lucide",
-    name: "book-search",
-    humanLabel: "book search"
-  },
-  "book-text": {
-    id: "lucide-book-text",
-    iconName: "book-text",
-    set: "lucide",
-    name: "book-text",
-    humanLabel: "book text"
-  },
-  "book-type": {
-    id: "lucide-book-type",
-    iconName: "book-type",
-    set: "lucide",
-    name: "book-type",
-    humanLabel: "book type"
-  },
-  "book-up": {
-    id: "lucide-book-up",
-    iconName: "book-up",
-    set: "lucide",
-    name: "book-up",
-    humanLabel: "book up"
-  },
-  "book-up-2": {
-    id: "lucide-book-up-2",
-    iconName: "book-up-2",
-    set: "lucide",
-    name: "book-up-2",
-    humanLabel: "book up 2"
-  },
-  "book-user": {
-    id: "lucide-book-user",
-    iconName: "book-user",
-    set: "lucide",
-    name: "book-user",
-    humanLabel: "book user"
-  },
-  "book-x": {
-    id: "lucide-book-x",
-    iconName: "book-x",
-    set: "lucide",
-    name: "book-x",
-    humanLabel: "book x"
-  },
-  bookmark: {
-    id: "lucide-bookmark",
-    iconName: "bookmark",
-    set: "lucide",
-    name: "bookmark",
-    humanLabel: "bookmark"
-  },
+  "book-plus": { iconName: "book-plus", humanLabel: "book plus" },
+  "book-search": { iconName: "book-search", humanLabel: "book search" },
+  "book-text": { iconName: "book-text", humanLabel: "book text" },
+  "book-type": { iconName: "book-type", humanLabel: "book type" },
+  "book-up": { iconName: "book-up", humanLabel: "book up" },
+  "book-up-2": { iconName: "book-up-2", humanLabel: "book up 2" },
+  "book-user": { iconName: "book-user", humanLabel: "book user" },
+  "book-x": { iconName: "book-x", humanLabel: "book x" },
+  bookmark: { iconName: "bookmark", humanLabel: "bookmark" },
   "bookmark-check": {
-    id: "lucide-bookmark-check",
     iconName: "bookmark-check",
-    set: "lucide",
-    name: "bookmark-check",
     humanLabel: "bookmark check"
   },
   "bookmark-minus": {
-    id: "lucide-bookmark-minus",
     iconName: "bookmark-minus",
-    set: "lucide",
-    name: "bookmark-minus",
     humanLabel: "bookmark minus"
   },
-  "bookmark-off": {
-    id: "lucide-bookmark-off",
-    iconName: "bookmark-off",
-    set: "lucide",
-    name: "bookmark-off",
-    humanLabel: "bookmark off"
-  },
-  "bookmark-plus": {
-    id: "lucide-bookmark-plus",
-    iconName: "bookmark-plus",
-    set: "lucide",
-    name: "bookmark-plus",
-    humanLabel: "bookmark plus"
-  },
-  "bookmark-x": {
-    id: "lucide-bookmark-x",
-    iconName: "bookmark-x",
-    set: "lucide",
-    name: "bookmark-x",
-    humanLabel: "bookmark x"
-  },
-  "boom-box": {
-    id: "lucide-boom-box",
-    iconName: "boom-box",
-    set: "lucide",
-    name: "boom-box",
-    humanLabel: "boom box"
-  },
-  bot: {
-    id: "lucide-bot",
-    iconName: "bot",
-    set: "lucide",
-    name: "bot",
-    humanLabel: "bot"
-  },
+  "bookmark-off": { iconName: "bookmark-off", humanLabel: "bookmark off" },
+  "bookmark-plus": { iconName: "bookmark-plus", humanLabel: "bookmark plus" },
+  "bookmark-x": { iconName: "bookmark-x", humanLabel: "bookmark x" },
+  "boom-box": { iconName: "boom-box", humanLabel: "boom box" },
+  bot: { iconName: "bot", humanLabel: "bot" },
   "bot-message-square": {
-    id: "lucide-bot-message-square",
     iconName: "bot-message-square",
-    set: "lucide",
-    name: "bot-message-square",
     humanLabel: "bot message square"
   },
-  "bot-off": {
-    id: "lucide-bot-off",
-    iconName: "bot-off",
-    set: "lucide",
-    name: "bot-off",
-    humanLabel: "bot off"
-  },
-  "bottle-wine": {
-    id: "lucide-bottle-wine",
-    iconName: "bottle-wine",
-    set: "lucide",
-    name: "bottle-wine",
-    humanLabel: "bottle wine"
-  },
-  "bow-arrow": {
-    id: "lucide-bow-arrow",
-    iconName: "bow-arrow",
-    set: "lucide",
-    name: "bow-arrow",
-    humanLabel: "bow arrow"
-  },
-  box: {
-    id: "lucide-box",
-    iconName: "box",
-    set: "lucide",
-    name: "box",
-    humanLabel: "box"
-  },
-  boxes: {
-    id: "lucide-boxes",
-    iconName: "boxes",
-    set: "lucide",
-    name: "boxes",
-    humanLabel: "boxes"
-  },
-  braces: {
-    id: "lucide-braces",
-    iconName: "braces",
-    set: "lucide",
-    name: "braces",
-    humanLabel: "braces"
-  },
-  brackets: {
-    id: "lucide-brackets",
-    iconName: "brackets",
-    set: "lucide",
-    name: "brackets",
-    humanLabel: "brackets"
-  },
-  brain: {
-    id: "lucide-brain",
-    iconName: "brain",
-    set: "lucide",
-    name: "brain",
-    humanLabel: "brain"
-  },
-  "brain-circuit": {
-    id: "lucide-brain-circuit",
-    iconName: "brain-circuit",
-    set: "lucide",
-    name: "brain-circuit",
-    humanLabel: "brain circuit"
-  },
-  "brain-cog": {
-    id: "lucide-brain-cog",
-    iconName: "brain-cog",
-    set: "lucide",
-    name: "brain-cog",
-    humanLabel: "brain cog"
-  },
-  "brick-wall": {
-    id: "lucide-brick-wall",
-    iconName: "brick-wall",
-    set: "lucide",
-    name: "brick-wall",
-    humanLabel: "brick wall"
-  },
+  "bot-off": { iconName: "bot-off", humanLabel: "bot off" },
+  "bottle-wine": { iconName: "bottle-wine", humanLabel: "bottle wine" },
+  "bow-arrow": { iconName: "bow-arrow", humanLabel: "bow arrow" },
+  box: { iconName: "box", humanLabel: "box" },
+  boxes: { iconName: "boxes", humanLabel: "boxes" },
+  braces: { iconName: "braces", humanLabel: "braces" },
+  brackets: { iconName: "brackets", humanLabel: "brackets" },
+  brain: { iconName: "brain", humanLabel: "brain" },
+  "brain-circuit": { iconName: "brain-circuit", humanLabel: "brain circuit" },
+  "brain-cog": { iconName: "brain-cog", humanLabel: "brain cog" },
+  "brick-wall": { iconName: "brick-wall", humanLabel: "brick wall" },
   "brick-wall-fire": {
-    id: "lucide-brick-wall-fire",
     iconName: "brick-wall-fire",
-    set: "lucide",
-    name: "brick-wall-fire",
     humanLabel: "brick wall fire"
   },
   "brick-wall-shield": {
-    id: "lucide-brick-wall-shield",
     iconName: "brick-wall-shield",
-    set: "lucide",
-    name: "brick-wall-shield",
     humanLabel: "brick wall shield"
   },
-  briefcase: {
-    id: "lucide-briefcase",
-    iconName: "briefcase",
-    set: "lucide",
-    name: "briefcase",
-    humanLabel: "briefcase"
-  },
+  briefcase: { iconName: "briefcase", humanLabel: "briefcase" },
   "briefcase-business": {
-    id: "lucide-briefcase-business",
     iconName: "briefcase-business",
-    set: "lucide",
-    name: "briefcase-business",
     humanLabel: "briefcase business"
   },
   "briefcase-conveyor-belt": {
-    id: "lucide-briefcase-conveyor-belt",
     iconName: "briefcase-conveyor-belt",
-    set: "lucide",
-    name: "briefcase-conveyor-belt",
     humanLabel: "briefcase conveyor belt"
   },
   "briefcase-medical": {
-    id: "lucide-briefcase-medical",
     iconName: "briefcase-medical",
-    set: "lucide",
-    name: "briefcase-medical",
     humanLabel: "briefcase medical"
   },
   "bring-to-front": {
-    id: "lucide-bring-to-front",
     iconName: "bring-to-front",
-    set: "lucide",
-    name: "bring-to-front",
     humanLabel: "bring to front"
   },
-  brush: {
-    id: "lucide-brush",
-    iconName: "brush",
-    set: "lucide",
-    name: "brush",
-    humanLabel: "brush"
-  },
+  brush: { iconName: "brush", humanLabel: "brush" },
   "brush-cleaning": {
-    id: "lucide-brush-cleaning",
     iconName: "brush-cleaning",
-    set: "lucide",
-    name: "brush-cleaning",
     humanLabel: "brush cleaning"
   },
-  bubbles: {
-    id: "lucide-bubbles",
-    iconName: "bubbles",
-    set: "lucide",
-    name: "bubbles",
-    humanLabel: "bubbles"
-  },
-  bug: {
-    id: "lucide-bug",
-    iconName: "bug",
-    set: "lucide",
-    name: "bug",
-    humanLabel: "bug"
-  },
-  "bug-off": {
-    id: "lucide-bug-off",
-    iconName: "bug-off",
-    set: "lucide",
-    name: "bug-off",
-    humanLabel: "bug off"
-  },
-  "bug-play": {
-    id: "lucide-bug-play",
-    iconName: "bug-play",
-    set: "lucide",
-    name: "bug-play",
-    humanLabel: "bug play"
-  },
-  building: {
-    id: "lucide-building",
-    iconName: "building",
-    set: "lucide",
-    name: "building",
-    humanLabel: "building"
-  },
-  "building-2": {
-    id: "lucide-building-2",
-    iconName: "building-2",
-    set: "lucide",
-    name: "building-2",
-    humanLabel: "building 2"
-  },
-  bus: {
-    id: "lucide-bus",
-    iconName: "bus",
-    set: "lucide",
-    name: "bus",
-    humanLabel: "bus"
-  },
-  "bus-front": {
-    id: "lucide-bus-front",
-    iconName: "bus-front",
-    set: "lucide",
-    name: "bus-front",
-    humanLabel: "bus front"
-  },
-  cable: {
-    id: "lucide-cable",
-    iconName: "cable",
-    set: "lucide",
-    name: "cable",
-    humanLabel: "cable"
-  },
-  "cable-car": {
-    id: "lucide-cable-car",
-    iconName: "cable-car",
-    set: "lucide",
-    name: "cable-car",
-    humanLabel: "cable car"
-  },
-  cake: {
-    id: "lucide-cake",
-    iconName: "cake",
-    set: "lucide",
-    name: "cake",
-    humanLabel: "cake"
-  },
-  "cake-slice": {
-    id: "lucide-cake-slice",
-    iconName: "cake-slice",
-    set: "lucide",
-    name: "cake-slice",
-    humanLabel: "cake slice"
-  },
-  calculator: {
-    id: "lucide-calculator",
-    iconName: "calculator",
-    set: "lucide",
-    name: "calculator",
-    humanLabel: "calculator"
-  },
-  calendar: {
-    id: "lucide-calendar",
-    iconName: "calendar",
-    set: "lucide",
-    name: "calendar",
-    humanLabel: "calendar"
-  },
-  "calendar-1": {
-    id: "lucide-calendar-1",
-    iconName: "calendar-1",
-    set: "lucide",
-    name: "calendar-1",
-    humanLabel: "calendar 1"
-  },
+  bubbles: { iconName: "bubbles", humanLabel: "bubbles" },
+  bug: { iconName: "bug", humanLabel: "bug" },
+  "bug-off": { iconName: "bug-off", humanLabel: "bug off" },
+  "bug-play": { iconName: "bug-play", humanLabel: "bug play" },
+  building: { iconName: "building", humanLabel: "building" },
+  "building-2": { iconName: "building-2", humanLabel: "building 2" },
+  bus: { iconName: "bus", humanLabel: "bus" },
+  "bus-front": { iconName: "bus-front", humanLabel: "bus front" },
+  cable: { iconName: "cable", humanLabel: "cable" },
+  "cable-car": { iconName: "cable-car", humanLabel: "cable car" },
+  cake: { iconName: "cake", humanLabel: "cake" },
+  "cake-slice": { iconName: "cake-slice", humanLabel: "cake slice" },
+  calculator: { iconName: "calculator", humanLabel: "calculator" },
+  calendar: { iconName: "calendar", humanLabel: "calendar" },
+  "calendar-1": { iconName: "calendar-1", humanLabel: "calendar 1" },
   "calendar-arrow-down": {
-    id: "lucide-calendar-arrow-down",
     iconName: "calendar-arrow-down",
-    set: "lucide",
-    name: "calendar-arrow-down",
     humanLabel: "calendar arrow down"
   },
   "calendar-arrow-up": {
-    id: "lucide-calendar-arrow-up",
     iconName: "calendar-arrow-up",
-    set: "lucide",
-    name: "calendar-arrow-up",
     humanLabel: "calendar arrow up"
   },
   "calendar-check": {
-    id: "lucide-calendar-check",
     iconName: "calendar-check",
-    set: "lucide",
-    name: "calendar-check",
     humanLabel: "calendar check"
   },
   "calendar-check-2": {
-    id: "lucide-calendar-check-2",
     iconName: "calendar-check-2",
-    set: "lucide",
-    name: "calendar-check-2",
     humanLabel: "calendar check 2"
   },
   "calendar-clock": {
-    id: "lucide-calendar-clock",
     iconName: "calendar-clock",
-    set: "lucide",
-    name: "calendar-clock",
     humanLabel: "calendar clock"
   },
-  "calendar-cog": {
-    id: "lucide-calendar-cog",
-    iconName: "calendar-cog",
-    set: "lucide",
-    name: "calendar-cog",
-    humanLabel: "calendar cog"
-  },
-  "calendar-days": {
-    id: "lucide-calendar-days",
-    iconName: "calendar-days",
-    set: "lucide",
-    name: "calendar-days",
-    humanLabel: "calendar days"
-  },
-  "calendar-fold": {
-    id: "lucide-calendar-fold",
-    iconName: "calendar-fold",
-    set: "lucide",
-    name: "calendar-fold",
-    humanLabel: "calendar fold"
-  },
+  "calendar-cog": { iconName: "calendar-cog", humanLabel: "calendar cog" },
+  "calendar-days": { iconName: "calendar-days", humanLabel: "calendar days" },
+  "calendar-fold": { iconName: "calendar-fold", humanLabel: "calendar fold" },
   "calendar-heart": {
-    id: "lucide-calendar-heart",
     iconName: "calendar-heart",
-    set: "lucide",
-    name: "calendar-heart",
     humanLabel: "calendar heart"
   },
   "calendar-minus": {
-    id: "lucide-calendar-minus",
     iconName: "calendar-minus",
-    set: "lucide",
-    name: "calendar-minus",
     humanLabel: "calendar minus"
   },
   "calendar-minus-2": {
-    id: "lucide-calendar-minus-2",
     iconName: "calendar-minus-2",
-    set: "lucide",
-    name: "calendar-minus-2",
     humanLabel: "calendar minus 2"
   },
-  "calendar-off": {
-    id: "lucide-calendar-off",
-    iconName: "calendar-off",
-    set: "lucide",
-    name: "calendar-off",
-    humanLabel: "calendar off"
-  },
-  "calendar-plus": {
-    id: "lucide-calendar-plus",
-    iconName: "calendar-plus",
-    set: "lucide",
-    name: "calendar-plus",
-    humanLabel: "calendar plus"
-  },
+  "calendar-off": { iconName: "calendar-off", humanLabel: "calendar off" },
+  "calendar-plus": { iconName: "calendar-plus", humanLabel: "calendar plus" },
   "calendar-plus-2": {
-    id: "lucide-calendar-plus-2",
     iconName: "calendar-plus-2",
-    set: "lucide",
-    name: "calendar-plus-2",
     humanLabel: "calendar plus 2"
   },
   "calendar-range": {
-    id: "lucide-calendar-range",
     iconName: "calendar-range",
-    set: "lucide",
-    name: "calendar-range",
     humanLabel: "calendar range"
   },
   "calendar-search": {
-    id: "lucide-calendar-search",
     iconName: "calendar-search",
-    set: "lucide",
-    name: "calendar-search",
     humanLabel: "calendar search"
   },
-  "calendar-sync": {
-    id: "lucide-calendar-sync",
-    iconName: "calendar-sync",
-    set: "lucide",
-    name: "calendar-sync",
-    humanLabel: "calendar sync"
-  },
-  "calendar-x": {
-    id: "lucide-calendar-x",
-    iconName: "calendar-x",
-    set: "lucide",
-    name: "calendar-x",
-    humanLabel: "calendar x"
-  },
-  "calendar-x-2": {
-    id: "lucide-calendar-x-2",
-    iconName: "calendar-x-2",
-    set: "lucide",
-    name: "calendar-x-2",
-    humanLabel: "calendar x 2"
-  },
-  calendars: {
-    id: "lucide-calendars",
-    iconName: "calendars",
-    set: "lucide",
-    name: "calendars",
-    humanLabel: "calendars"
-  },
-  camera: {
-    id: "lucide-camera",
-    iconName: "camera",
-    set: "lucide",
-    name: "camera",
-    humanLabel: "camera"
-  },
-  "camera-off": {
-    id: "lucide-camera-off",
-    iconName: "camera-off",
-    set: "lucide",
-    name: "camera-off",
-    humanLabel: "camera off"
-  },
-  candy: {
-    id: "lucide-candy",
-    iconName: "candy",
-    set: "lucide",
-    name: "candy",
-    humanLabel: "candy"
-  },
-  "candy-cane": {
-    id: "lucide-candy-cane",
-    iconName: "candy-cane",
-    set: "lucide",
-    name: "candy-cane",
-    humanLabel: "candy cane"
-  },
-  "candy-off": {
-    id: "lucide-candy-off",
-    iconName: "candy-off",
-    set: "lucide",
-    name: "candy-off",
-    humanLabel: "candy off"
-  },
-  cannabis: {
-    id: "lucide-cannabis",
-    iconName: "cannabis",
-    set: "lucide",
-    name: "cannabis",
-    humanLabel: "cannabis"
-  },
-  "cannabis-off": {
-    id: "lucide-cannabis-off",
-    iconName: "cannabis-off",
-    set: "lucide",
-    name: "cannabis-off",
-    humanLabel: "cannabis off"
-  },
-  captions: {
-    id: "lucide-captions",
-    iconName: "captions",
-    set: "lucide",
-    name: "captions",
-    humanLabel: "captions"
-  },
-  "captions-off": {
-    id: "lucide-captions-off",
-    iconName: "captions-off",
-    set: "lucide",
-    name: "captions-off",
-    humanLabel: "captions off"
-  },
-  car: {
-    id: "lucide-car",
-    iconName: "car",
-    set: "lucide",
-    name: "car",
-    humanLabel: "car"
-  },
-  "car-front": {
-    id: "lucide-car-front",
-    iconName: "car-front",
-    set: "lucide",
-    name: "car-front",
-    humanLabel: "car front"
-  },
+  "calendar-sync": { iconName: "calendar-sync", humanLabel: "calendar sync" },
+  "calendar-x": { iconName: "calendar-x", humanLabel: "calendar x" },
+  "calendar-x-2": { iconName: "calendar-x-2", humanLabel: "calendar x 2" },
+  calendars: { iconName: "calendars", humanLabel: "calendars" },
+  camera: { iconName: "camera", humanLabel: "camera" },
+  "camera-off": { iconName: "camera-off", humanLabel: "camera off" },
+  candy: { iconName: "candy", humanLabel: "candy" },
+  "candy-cane": { iconName: "candy-cane", humanLabel: "candy cane" },
+  "candy-off": { iconName: "candy-off", humanLabel: "candy off" },
+  cannabis: { iconName: "cannabis", humanLabel: "cannabis" },
+  "cannabis-off": { iconName: "cannabis-off", humanLabel: "cannabis off" },
+  captions: { iconName: "captions", humanLabel: "captions" },
+  "captions-off": { iconName: "captions-off", humanLabel: "captions off" },
+  car: { iconName: "car", humanLabel: "car" },
+  "car-front": { iconName: "car-front", humanLabel: "car front" },
   "car-taxi-front": {
-    id: "lucide-car-taxi-front",
     iconName: "car-taxi-front",
-    set: "lucide",
-    name: "car-taxi-front",
     humanLabel: "car taxi front"
   },
-  caravan: {
-    id: "lucide-caravan",
-    iconName: "caravan",
-    set: "lucide",
-    name: "caravan",
-    humanLabel: "caravan"
-  },
-  "card-sim": {
-    id: "lucide-card-sim",
-    iconName: "card-sim",
-    set: "lucide",
-    name: "card-sim",
-    humanLabel: "card sim"
-  },
-  carrot: {
-    id: "lucide-carrot",
-    iconName: "carrot",
-    set: "lucide",
-    name: "carrot",
-    humanLabel: "carrot"
-  },
-  "case-lower": {
-    id: "lucide-case-lower",
-    iconName: "case-lower",
-    set: "lucide",
-    name: "case-lower",
-    humanLabel: "case lower"
-  },
+  caravan: { iconName: "caravan", humanLabel: "caravan" },
+  "card-sim": { iconName: "card-sim", humanLabel: "card sim" },
+  carrot: { iconName: "carrot", humanLabel: "carrot" },
+  "case-lower": { iconName: "case-lower", humanLabel: "case lower" },
   "case-sensitive": {
-    id: "lucide-case-sensitive",
     iconName: "case-sensitive",
-    set: "lucide",
-    name: "case-sensitive",
     humanLabel: "case sensitive"
   },
-  "case-upper": {
-    id: "lucide-case-upper",
-    iconName: "case-upper",
-    set: "lucide",
-    name: "case-upper",
-    humanLabel: "case upper"
-  },
-  "cassette-tape": {
-    id: "lucide-cassette-tape",
-    iconName: "cassette-tape",
-    set: "lucide",
-    name: "cassette-tape",
-    humanLabel: "cassette tape"
-  },
-  cast: {
-    id: "lucide-cast",
-    iconName: "cast",
-    set: "lucide",
-    name: "cast",
-    humanLabel: "cast"
-  },
-  castle: {
-    id: "lucide-castle",
-    iconName: "castle",
-    set: "lucide",
-    name: "castle",
-    humanLabel: "castle"
-  },
-  cat: {
-    id: "lucide-cat",
-    iconName: "cat",
-    set: "lucide",
-    name: "cat",
-    humanLabel: "cat"
-  },
-  cctv: {
-    id: "lucide-cctv",
-    iconName: "cctv",
-    set: "lucide",
-    name: "cctv",
-    humanLabel: "cctv"
-  },
-  "cctv-off": {
-    id: "lucide-cctv-off",
-    iconName: "cctv-off",
-    set: "lucide",
-    name: "cctv-off",
-    humanLabel: "cctv off"
-  },
-  "chart-area": {
-    id: "lucide-chart-area",
-    iconName: "chart-area",
-    set: "lucide",
-    name: "chart-area",
-    humanLabel: "chart area"
-  },
-  "chart-bar": {
-    id: "lucide-chart-bar",
-    iconName: "chart-bar",
-    set: "lucide",
-    name: "chart-bar",
-    humanLabel: "chart bar"
-  },
-  "chart-bar-big": {
-    id: "lucide-chart-bar-big",
-    iconName: "chart-bar-big",
-    set: "lucide",
-    name: "chart-bar-big",
-    humanLabel: "chart bar big"
-  },
+  "case-upper": { iconName: "case-upper", humanLabel: "case upper" },
+  "cassette-tape": { iconName: "cassette-tape", humanLabel: "cassette tape" },
+  cast: { iconName: "cast", humanLabel: "cast" },
+  castle: { iconName: "castle", humanLabel: "castle" },
+  cat: { iconName: "cat", humanLabel: "cat" },
+  cctv: { iconName: "cctv", humanLabel: "cctv" },
+  "cctv-off": { iconName: "cctv-off", humanLabel: "cctv off" },
+  "chart-area": { iconName: "chart-area", humanLabel: "chart area" },
+  "chart-bar": { iconName: "chart-bar", humanLabel: "chart bar" },
+  "chart-bar-big": { iconName: "chart-bar-big", humanLabel: "chart bar big" },
   "chart-bar-decreasing": {
-    id: "lucide-chart-bar-decreasing",
     iconName: "chart-bar-decreasing",
-    set: "lucide",
-    name: "chart-bar-decreasing",
     humanLabel: "chart bar decreasing"
   },
   "chart-bar-increasing": {
-    id: "lucide-chart-bar-increasing",
     iconName: "chart-bar-increasing",
-    set: "lucide",
-    name: "chart-bar-increasing",
     humanLabel: "chart bar increasing"
   },
   "chart-bar-stacked": {
-    id: "lucide-chart-bar-stacked",
     iconName: "chart-bar-stacked",
-    set: "lucide",
-    name: "chart-bar-stacked",
     humanLabel: "chart bar stacked"
   },
   "chart-candlestick": {
-    id: "lucide-chart-candlestick",
     iconName: "chart-candlestick",
-    set: "lucide",
-    name: "chart-candlestick",
     humanLabel: "chart candlestick"
   },
-  "chart-column": {
-    id: "lucide-chart-column",
-    iconName: "chart-column",
-    set: "lucide",
-    name: "chart-column",
-    humanLabel: "chart column"
-  },
+  "chart-column": { iconName: "chart-column", humanLabel: "chart column" },
   "chart-column-big": {
-    id: "lucide-chart-column-big",
     iconName: "chart-column-big",
-    set: "lucide",
-    name: "chart-column-big",
     humanLabel: "chart column big"
   },
   "chart-column-decreasing": {
-    id: "lucide-chart-column-decreasing",
     iconName: "chart-column-decreasing",
-    set: "lucide",
-    name: "chart-column-decreasing",
     humanLabel: "chart column decreasing"
   },
   "chart-column-increasing": {
-    id: "lucide-chart-column-increasing",
     iconName: "chart-column-increasing",
-    set: "lucide",
-    name: "chart-column-increasing",
     humanLabel: "chart column increasing"
   },
   "chart-column-stacked": {
-    id: "lucide-chart-column-stacked",
     iconName: "chart-column-stacked",
-    set: "lucide",
-    name: "chart-column-stacked",
     humanLabel: "chart column stacked"
   },
-  "chart-gantt": {
-    id: "lucide-chart-gantt",
-    iconName: "chart-gantt",
-    set: "lucide",
-    name: "chart-gantt",
-    humanLabel: "chart gantt"
-  },
-  "chart-line": {
-    id: "lucide-chart-line",
-    iconName: "chart-line",
-    set: "lucide",
-    name: "chart-line",
-    humanLabel: "chart line"
-  },
-  "chart-network": {
-    id: "lucide-chart-network",
-    iconName: "chart-network",
-    set: "lucide",
-    name: "chart-network",
-    humanLabel: "chart network"
-  },
+  "chart-gantt": { iconName: "chart-gantt", humanLabel: "chart gantt" },
+  "chart-line": { iconName: "chart-line", humanLabel: "chart line" },
+  "chart-network": { iconName: "chart-network", humanLabel: "chart network" },
   "chart-no-axes-column": {
-    id: "lucide-chart-no-axes-column",
     iconName: "chart-no-axes-column",
-    set: "lucide",
-    name: "chart-no-axes-column",
     humanLabel: "chart no axes column"
   },
   "chart-no-axes-column-decreasing": {
-    id: "lucide-chart-no-axes-column-decreasing",
     iconName: "chart-no-axes-column-decreasing",
-    set: "lucide",
-    name: "chart-no-axes-column-decreasing",
     humanLabel: "chart no axes column decreasing"
   },
   "chart-no-axes-column-increasing": {
-    id: "lucide-chart-no-axes-column-increasing",
     iconName: "chart-no-axes-column-increasing",
-    set: "lucide",
-    name: "chart-no-axes-column-increasing",
     humanLabel: "chart no axes column increasing"
   },
   "chart-no-axes-combined": {
-    id: "lucide-chart-no-axes-combined",
     iconName: "chart-no-axes-combined",
-    set: "lucide",
-    name: "chart-no-axes-combined",
     humanLabel: "chart no axes combined"
   },
   "chart-no-axes-gantt": {
-    id: "lucide-chart-no-axes-gantt",
     iconName: "chart-no-axes-gantt",
-    set: "lucide",
-    name: "chart-no-axes-gantt",
     humanLabel: "chart no axes gantt"
   },
-  "chart-pie": {
-    id: "lucide-chart-pie",
-    iconName: "chart-pie",
-    set: "lucide",
-    name: "chart-pie",
-    humanLabel: "chart pie"
-  },
-  "chart-scatter": {
-    id: "lucide-chart-scatter",
-    iconName: "chart-scatter",
-    set: "lucide",
-    name: "chart-scatter",
-    humanLabel: "chart scatter"
-  },
-  "chart-spline": {
-    id: "lucide-chart-spline",
-    iconName: "chart-spline",
-    set: "lucide",
-    name: "chart-spline",
-    humanLabel: "chart spline"
-  },
-  check: {
-    id: "lucide-check",
-    iconName: "check",
-    set: "lucide",
-    name: "check",
-    humanLabel: "check"
-  },
-  "check-check": {
-    id: "lucide-check-check",
-    iconName: "check-check",
-    set: "lucide",
-    name: "check-check",
-    humanLabel: "check check"
-  },
-  "check-line": {
-    id: "lucide-check-line",
-    iconName: "check-line",
-    set: "lucide",
-    name: "check-line",
-    humanLabel: "check line"
-  },
-  "chef-hat": {
-    id: "lucide-chef-hat",
-    iconName: "chef-hat",
-    set: "lucide",
-    name: "chef-hat",
-    humanLabel: "chef hat"
-  },
-  cherry: {
-    id: "lucide-cherry",
-    iconName: "cherry",
-    set: "lucide",
-    name: "cherry",
-    humanLabel: "cherry"
-  },
-  "chess-bishop": {
-    id: "lucide-chess-bishop",
-    iconName: "chess-bishop",
-    set: "lucide",
-    name: "chess-bishop",
-    humanLabel: "chess bishop"
-  },
-  "chess-king": {
-    id: "lucide-chess-king",
-    iconName: "chess-king",
-    set: "lucide",
-    name: "chess-king",
-    humanLabel: "chess king"
-  },
-  "chess-knight": {
-    id: "lucide-chess-knight",
-    iconName: "chess-knight",
-    set: "lucide",
-    name: "chess-knight",
-    humanLabel: "chess knight"
-  },
-  "chess-pawn": {
-    id: "lucide-chess-pawn",
-    iconName: "chess-pawn",
-    set: "lucide",
-    name: "chess-pawn",
-    humanLabel: "chess pawn"
-  },
-  "chess-queen": {
-    id: "lucide-chess-queen",
-    iconName: "chess-queen",
-    set: "lucide",
-    name: "chess-queen",
-    humanLabel: "chess queen"
-  },
-  "chess-rook": {
-    id: "lucide-chess-rook",
-    iconName: "chess-rook",
-    set: "lucide",
-    name: "chess-rook",
-    humanLabel: "chess rook"
-  },
-  "chevron-down": {
-    id: "lucide-chevron-down",
-    iconName: "chevron-down",
-    set: "lucide",
-    name: "chevron-down",
-    humanLabel: "chevron down"
-  },
-  "chevron-first": {
-    id: "lucide-chevron-first",
-    iconName: "chevron-first",
-    set: "lucide",
-    name: "chevron-first",
-    humanLabel: "chevron first"
-  },
-  "chevron-last": {
-    id: "lucide-chevron-last",
-    iconName: "chevron-last",
-    set: "lucide",
-    name: "chevron-last",
-    humanLabel: "chevron last"
-  },
-  "chevron-left": {
-    id: "lucide-chevron-left",
-    iconName: "chevron-left",
-    set: "lucide",
-    name: "chevron-left",
-    humanLabel: "chevron left"
-  },
-  "chevron-right": {
-    id: "lucide-chevron-right",
-    iconName: "chevron-right",
-    set: "lucide",
-    name: "chevron-right",
-    humanLabel: "chevron right"
-  },
-  "chevron-up": {
-    id: "lucide-chevron-up",
-    iconName: "chevron-up",
-    set: "lucide",
-    name: "chevron-up",
-    humanLabel: "chevron up"
-  },
-  "chevrons-down": {
-    id: "lucide-chevrons-down",
-    iconName: "chevrons-down",
-    set: "lucide",
-    name: "chevrons-down",
-    humanLabel: "chevrons down"
-  },
+  "chart-pie": { iconName: "chart-pie", humanLabel: "chart pie" },
+  "chart-scatter": { iconName: "chart-scatter", humanLabel: "chart scatter" },
+  "chart-spline": { iconName: "chart-spline", humanLabel: "chart spline" },
+  check: { iconName: "check", humanLabel: "check" },
+  "check-check": { iconName: "check-check", humanLabel: "check check" },
+  "check-line": { iconName: "check-line", humanLabel: "check line" },
+  "chef-hat": { iconName: "chef-hat", humanLabel: "chef hat" },
+  cherry: { iconName: "cherry", humanLabel: "cherry" },
+  "chess-bishop": { iconName: "chess-bishop", humanLabel: "chess bishop" },
+  "chess-king": { iconName: "chess-king", humanLabel: "chess king" },
+  "chess-knight": { iconName: "chess-knight", humanLabel: "chess knight" },
+  "chess-pawn": { iconName: "chess-pawn", humanLabel: "chess pawn" },
+  "chess-queen": { iconName: "chess-queen", humanLabel: "chess queen" },
+  "chess-rook": { iconName: "chess-rook", humanLabel: "chess rook" },
+  "chevron-down": { iconName: "chevron-down", humanLabel: "chevron down" },
+  "chevron-first": { iconName: "chevron-first", humanLabel: "chevron first" },
+  "chevron-last": { iconName: "chevron-last", humanLabel: "chevron last" },
+  "chevron-left": { iconName: "chevron-left", humanLabel: "chevron left" },
+  "chevron-right": { iconName: "chevron-right", humanLabel: "chevron right" },
+  "chevron-up": { iconName: "chevron-up", humanLabel: "chevron up" },
+  "chevrons-down": { iconName: "chevrons-down", humanLabel: "chevrons down" },
   "chevrons-down-up": {
-    id: "lucide-chevrons-down-up",
     iconName: "chevrons-down-up",
-    set: "lucide",
-    name: "chevrons-down-up",
     humanLabel: "chevrons down up"
   },
-  "chevrons-left": {
-    id: "lucide-chevrons-left",
-    iconName: "chevrons-left",
-    set: "lucide",
-    name: "chevrons-left",
-    humanLabel: "chevrons left"
-  },
+  "chevrons-left": { iconName: "chevrons-left", humanLabel: "chevrons left" },
   "chevrons-left-right": {
-    id: "lucide-chevrons-left-right",
     iconName: "chevrons-left-right",
-    set: "lucide",
-    name: "chevrons-left-right",
     humanLabel: "chevrons left right"
   },
   "chevrons-left-right-ellipsis": {
-    id: "lucide-chevrons-left-right-ellipsis",
     iconName: "chevrons-left-right-ellipsis",
-    set: "lucide",
-    name: "chevrons-left-right-ellipsis",
     humanLabel: "chevrons left right ellipsis"
   },
   "chevrons-right": {
-    id: "lucide-chevrons-right",
     iconName: "chevrons-right",
-    set: "lucide",
-    name: "chevrons-right",
     humanLabel: "chevrons right"
   },
   "chevrons-right-left": {
-    id: "lucide-chevrons-right-left",
     iconName: "chevrons-right-left",
-    set: "lucide",
-    name: "chevrons-right-left",
     humanLabel: "chevrons right left"
   },
-  "chevrons-up": {
-    id: "lucide-chevrons-up",
-    iconName: "chevrons-up",
-    set: "lucide",
-    name: "chevrons-up",
-    humanLabel: "chevrons up"
-  },
+  "chevrons-up": { iconName: "chevrons-up", humanLabel: "chevrons up" },
   "chevrons-up-down": {
-    id: "lucide-chevrons-up-down",
     iconName: "chevrons-up-down",
-    set: "lucide",
-    name: "chevrons-up-down",
     humanLabel: "chevrons up down"
   },
-  church: {
-    id: "lucide-church",
-    iconName: "church",
-    set: "lucide",
-    name: "church",
-    humanLabel: "church"
-  },
-  cigarette: {
-    id: "lucide-cigarette",
-    iconName: "cigarette",
-    set: "lucide",
-    name: "cigarette",
-    humanLabel: "cigarette"
-  },
-  "cigarette-off": {
-    id: "lucide-cigarette-off",
-    iconName: "cigarette-off",
-    set: "lucide",
-    name: "cigarette-off",
-    humanLabel: "cigarette off"
-  },
-  circle: {
-    id: "lucide-circle",
-    iconName: "circle",
-    set: "lucide",
-    name: "circle",
-    humanLabel: "circle"
-  },
-  "circle-alert": {
-    id: "lucide-circle-alert",
-    iconName: "circle-alert",
-    set: "lucide",
-    name: "circle-alert",
-    humanLabel: "circle alert"
-  },
+  church: { iconName: "church", humanLabel: "church" },
+  cigarette: { iconName: "cigarette", humanLabel: "cigarette" },
+  "cigarette-off": { iconName: "cigarette-off", humanLabel: "cigarette off" },
+  circle: { iconName: "circle", humanLabel: "circle" },
+  "circle-alert": { iconName: "circle-alert", humanLabel: "circle alert" },
   "circle-arrow-down": {
-    id: "lucide-circle-arrow-down",
     iconName: "circle-arrow-down",
-    set: "lucide",
-    name: "circle-arrow-down",
     humanLabel: "circle arrow down"
   },
   "circle-arrow-left": {
-    id: "lucide-circle-arrow-left",
     iconName: "circle-arrow-left",
-    set: "lucide",
-    name: "circle-arrow-left",
     humanLabel: "circle arrow left"
   },
   "circle-arrow-out-down-left": {
-    id: "lucide-circle-arrow-out-down-left",
     iconName: "circle-arrow-out-down-left",
-    set: "lucide",
-    name: "circle-arrow-out-down-left",
     humanLabel: "circle arrow out down left"
   },
   "circle-arrow-out-down-right": {
-    id: "lucide-circle-arrow-out-down-right",
     iconName: "circle-arrow-out-down-right",
-    set: "lucide",
-    name: "circle-arrow-out-down-right",
     humanLabel: "circle arrow out down right"
   },
   "circle-arrow-out-up-left": {
-    id: "lucide-circle-arrow-out-up-left",
     iconName: "circle-arrow-out-up-left",
-    set: "lucide",
-    name: "circle-arrow-out-up-left",
     humanLabel: "circle arrow out up left"
   },
   "circle-arrow-out-up-right": {
-    id: "lucide-circle-arrow-out-up-right",
     iconName: "circle-arrow-out-up-right",
-    set: "lucide",
-    name: "circle-arrow-out-up-right",
     humanLabel: "circle arrow out up right"
   },
   "circle-arrow-right": {
-    id: "lucide-circle-arrow-right",
     iconName: "circle-arrow-right",
-    set: "lucide",
-    name: "circle-arrow-right",
     humanLabel: "circle arrow right"
   },
   "circle-arrow-up": {
-    id: "lucide-circle-arrow-up",
     iconName: "circle-arrow-up",
-    set: "lucide",
-    name: "circle-arrow-up",
     humanLabel: "circle arrow up"
   },
-  "circle-check": {
-    id: "lucide-circle-check",
-    iconName: "circle-check",
-    set: "lucide",
-    name: "circle-check",
-    humanLabel: "circle check"
-  },
+  "circle-check": { iconName: "circle-check", humanLabel: "circle check" },
   "circle-check-big": {
-    id: "lucide-circle-check-big",
     iconName: "circle-check-big",
-    set: "lucide",
-    name: "circle-check-big",
     humanLabel: "circle check big"
   },
   "circle-chevron-down": {
-    id: "lucide-circle-chevron-down",
     iconName: "circle-chevron-down",
-    set: "lucide",
-    name: "circle-chevron-down",
     humanLabel: "circle chevron down"
   },
   "circle-chevron-left": {
-    id: "lucide-circle-chevron-left",
     iconName: "circle-chevron-left",
-    set: "lucide",
-    name: "circle-chevron-left",
     humanLabel: "circle chevron left"
   },
   "circle-chevron-right": {
-    id: "lucide-circle-chevron-right",
     iconName: "circle-chevron-right",
-    set: "lucide",
-    name: "circle-chevron-right",
     humanLabel: "circle chevron right"
   },
   "circle-chevron-up": {
-    id: "lucide-circle-chevron-up",
     iconName: "circle-chevron-up",
-    set: "lucide",
-    name: "circle-chevron-up",
     humanLabel: "circle chevron up"
   },
-  "circle-dashed": {
-    id: "lucide-circle-dashed",
-    iconName: "circle-dashed",
-    set: "lucide",
-    name: "circle-dashed",
-    humanLabel: "circle dashed"
-  },
-  "circle-divide": {
-    id: "lucide-circle-divide",
-    iconName: "circle-divide",
-    set: "lucide",
-    name: "circle-divide",
-    humanLabel: "circle divide"
-  },
+  "circle-dashed": { iconName: "circle-dashed", humanLabel: "circle dashed" },
+  "circle-divide": { iconName: "circle-divide", humanLabel: "circle divide" },
   "circle-dollar-sign": {
-    id: "lucide-circle-dollar-sign",
     iconName: "circle-dollar-sign",
-    set: "lucide",
-    name: "circle-dollar-sign",
     humanLabel: "circle dollar sign"
   },
-  "circle-dot": {
-    id: "lucide-circle-dot",
-    iconName: "circle-dot",
-    set: "lucide",
-    name: "circle-dot",
-    humanLabel: "circle dot"
-  },
+  "circle-dot": { iconName: "circle-dot", humanLabel: "circle dot" },
   "circle-dot-dashed": {
-    id: "lucide-circle-dot-dashed",
     iconName: "circle-dot-dashed",
-    set: "lucide",
-    name: "circle-dot-dashed",
     humanLabel: "circle dot dashed"
   },
   "circle-ellipsis": {
-    id: "lucide-circle-ellipsis",
     iconName: "circle-ellipsis",
-    set: "lucide",
-    name: "circle-ellipsis",
     humanLabel: "circle ellipsis"
   },
-  "circle-equal": {
-    id: "lucide-circle-equal",
-    iconName: "circle-equal",
-    set: "lucide",
-    name: "circle-equal",
-    humanLabel: "circle equal"
-  },
+  "circle-equal": { iconName: "circle-equal", humanLabel: "circle equal" },
   "circle-fading-arrow-up": {
-    id: "lucide-circle-fading-arrow-up",
     iconName: "circle-fading-arrow-up",
-    set: "lucide",
-    name: "circle-fading-arrow-up",
     humanLabel: "circle fading arrow up"
   },
   "circle-fading-plus": {
-    id: "lucide-circle-fading-plus",
     iconName: "circle-fading-plus",
-    set: "lucide",
-    name: "circle-fading-plus",
     humanLabel: "circle fading plus"
   },
-  "circle-gauge": {
-    id: "lucide-circle-gauge",
-    iconName: "circle-gauge",
-    set: "lucide",
-    name: "circle-gauge",
-    humanLabel: "circle gauge"
-  },
-  "circle-minus": {
-    id: "lucide-circle-minus",
-    iconName: "circle-minus",
-    set: "lucide",
-    name: "circle-minus",
-    humanLabel: "circle minus"
-  },
-  "circle-off": {
-    id: "lucide-circle-off",
-    iconName: "circle-off",
-    set: "lucide",
-    name: "circle-off",
-    humanLabel: "circle off"
-  },
+  "circle-gauge": { iconName: "circle-gauge", humanLabel: "circle gauge" },
+  "circle-minus": { iconName: "circle-minus", humanLabel: "circle minus" },
+  "circle-off": { iconName: "circle-off", humanLabel: "circle off" },
   "circle-parking": {
-    id: "lucide-circle-parking",
     iconName: "circle-parking",
-    set: "lucide",
-    name: "circle-parking",
     humanLabel: "circle parking"
   },
   "circle-parking-off": {
-    id: "lucide-circle-parking-off",
     iconName: "circle-parking-off",
-    set: "lucide",
-    name: "circle-parking-off",
     humanLabel: "circle parking off"
   },
-  "circle-pause": {
-    id: "lucide-circle-pause",
-    iconName: "circle-pause",
-    set: "lucide",
-    name: "circle-pause",
-    humanLabel: "circle pause"
-  },
+  "circle-pause": { iconName: "circle-pause", humanLabel: "circle pause" },
   "circle-percent": {
-    id: "lucide-circle-percent",
     iconName: "circle-percent",
-    set: "lucide",
-    name: "circle-percent",
     humanLabel: "circle percent"
   },
-  "circle-pile": {
-    id: "lucide-circle-pile",
-    iconName: "circle-pile",
-    set: "lucide",
-    name: "circle-pile",
-    humanLabel: "circle pile"
-  },
-  "circle-play": {
-    id: "lucide-circle-play",
-    iconName: "circle-play",
-    set: "lucide",
-    name: "circle-play",
-    humanLabel: "circle play"
-  },
-  "circle-plus": {
-    id: "lucide-circle-plus",
-    iconName: "circle-plus",
-    set: "lucide",
-    name: "circle-plus",
-    humanLabel: "circle plus"
-  },
+  "circle-pile": { iconName: "circle-pile", humanLabel: "circle pile" },
+  "circle-play": { iconName: "circle-play", humanLabel: "circle play" },
+  "circle-plus": { iconName: "circle-plus", humanLabel: "circle plus" },
   "circle-pound-sterling": {
-    id: "lucide-circle-pound-sterling",
     iconName: "circle-pound-sterling",
-    set: "lucide",
-    name: "circle-pound-sterling",
     humanLabel: "circle pound sterling"
   },
-  "circle-power": {
-    id: "lucide-circle-power",
-    iconName: "circle-power",
-    set: "lucide",
-    name: "circle-power",
-    humanLabel: "circle power"
-  },
+  "circle-power": { iconName: "circle-power", humanLabel: "circle power" },
   "circle-question-mark": {
-    id: "lucide-circle-question-mark",
     iconName: "circle-question-mark",
-    set: "lucide",
-    name: "circle-question-mark",
     humanLabel: "circle question mark"
   },
-  "circle-slash": {
-    id: "lucide-circle-slash",
-    iconName: "circle-slash",
-    set: "lucide",
-    name: "circle-slash",
-    humanLabel: "circle slash"
-  },
+  "circle-slash": { iconName: "circle-slash", humanLabel: "circle slash" },
   "circle-slash-2": {
-    id: "lucide-circle-slash-2",
     iconName: "circle-slash-2",
-    set: "lucide",
-    name: "circle-slash-2",
     humanLabel: "circle slash 2"
   },
-  "circle-small": {
-    id: "lucide-circle-small",
-    iconName: "circle-small",
-    set: "lucide",
-    name: "circle-small",
-    humanLabel: "circle small"
-  },
-  "circle-star": {
-    id: "lucide-circle-star",
-    iconName: "circle-star",
-    set: "lucide",
-    name: "circle-star",
-    humanLabel: "circle star"
-  },
-  "circle-stop": {
-    id: "lucide-circle-stop",
-    iconName: "circle-stop",
-    set: "lucide",
-    name: "circle-stop",
-    humanLabel: "circle stop"
-  },
-  "circle-user": {
-    id: "lucide-circle-user",
-    iconName: "circle-user",
-    set: "lucide",
-    name: "circle-user",
-    humanLabel: "circle user"
-  },
+  "circle-small": { iconName: "circle-small", humanLabel: "circle small" },
+  "circle-star": { iconName: "circle-star", humanLabel: "circle star" },
+  "circle-stop": { iconName: "circle-stop", humanLabel: "circle stop" },
+  "circle-user": { iconName: "circle-user", humanLabel: "circle user" },
   "circle-user-round": {
-    id: "lucide-circle-user-round",
     iconName: "circle-user-round",
-    set: "lucide",
-    name: "circle-user-round",
     humanLabel: "circle user round"
   },
-  "circle-x": {
-    id: "lucide-circle-x",
-    iconName: "circle-x",
-    set: "lucide",
-    name: "circle-x",
-    humanLabel: "circle x"
-  },
-  "circuit-board": {
-    id: "lucide-circuit-board",
-    iconName: "circuit-board",
-    set: "lucide",
-    name: "circuit-board",
-    humanLabel: "circuit board"
-  },
-  citrus: {
-    id: "lucide-citrus",
-    iconName: "citrus",
-    set: "lucide",
-    name: "citrus",
-    humanLabel: "citrus"
-  },
-  clapperboard: {
-    id: "lucide-clapperboard",
-    iconName: "clapperboard",
-    set: "lucide",
-    name: "clapperboard",
-    humanLabel: "clapperboard"
-  },
-  clipboard: {
-    id: "lucide-clipboard",
-    iconName: "clipboard",
-    set: "lucide",
-    name: "clipboard",
-    humanLabel: "clipboard"
-  },
+  "circle-x": { iconName: "circle-x", humanLabel: "circle x" },
+  "circuit-board": { iconName: "circuit-board", humanLabel: "circuit board" },
+  citrus: { iconName: "citrus", humanLabel: "citrus" },
+  clapperboard: { iconName: "clapperboard", humanLabel: "clapperboard" },
+  clipboard: { iconName: "clipboard", humanLabel: "clipboard" },
   "clipboard-check": {
-    id: "lucide-clipboard-check",
     iconName: "clipboard-check",
-    set: "lucide",
-    name: "clipboard-check",
     humanLabel: "clipboard check"
   },
   "clipboard-clock": {
-    id: "lucide-clipboard-clock",
     iconName: "clipboard-clock",
-    set: "lucide",
-    name: "clipboard-clock",
     humanLabel: "clipboard clock"
   },
   "clipboard-copy": {
-    id: "lucide-clipboard-copy",
     iconName: "clipboard-copy",
-    set: "lucide",
-    name: "clipboard-copy",
     humanLabel: "clipboard copy"
   },
   "clipboard-list": {
-    id: "lucide-clipboard-list",
     iconName: "clipboard-list",
-    set: "lucide",
-    name: "clipboard-list",
     humanLabel: "clipboard list"
   },
   "clipboard-minus": {
-    id: "lucide-clipboard-minus",
     iconName: "clipboard-minus",
-    set: "lucide",
-    name: "clipboard-minus",
     humanLabel: "clipboard minus"
   },
   "clipboard-paste": {
-    id: "lucide-clipboard-paste",
     iconName: "clipboard-paste",
-    set: "lucide",
-    name: "clipboard-paste",
     humanLabel: "clipboard paste"
   },
-  "clipboard-pen": {
-    id: "lucide-clipboard-pen",
-    iconName: "clipboard-pen",
-    set: "lucide",
-    name: "clipboard-pen",
-    humanLabel: "clipboard pen"
-  },
+  "clipboard-pen": { iconName: "clipboard-pen", humanLabel: "clipboard pen" },
   "clipboard-pen-line": {
-    id: "lucide-clipboard-pen-line",
     iconName: "clipboard-pen-line",
-    set: "lucide",
-    name: "clipboard-pen-line",
     humanLabel: "clipboard pen line"
   },
   "clipboard-plus": {
-    id: "lucide-clipboard-plus",
     iconName: "clipboard-plus",
-    set: "lucide",
-    name: "clipboard-plus",
     humanLabel: "clipboard plus"
   },
   "clipboard-type": {
-    id: "lucide-clipboard-type",
     iconName: "clipboard-type",
-    set: "lucide",
-    name: "clipboard-type",
     humanLabel: "clipboard type"
   },
-  "clipboard-x": {
-    id: "lucide-clipboard-x",
-    iconName: "clipboard-x",
-    set: "lucide",
-    name: "clipboard-x",
-    humanLabel: "clipboard x"
-  },
-  clock: {
-    id: "lucide-clock",
-    iconName: "clock",
-    set: "lucide",
-    name: "clock",
-    humanLabel: "clock"
-  },
-  "clock-1": {
-    id: "lucide-clock-1",
-    iconName: "clock-1",
-    set: "lucide",
-    name: "clock-1",
-    humanLabel: "clock 1"
-  },
-  "clock-10": {
-    id: "lucide-clock-10",
-    iconName: "clock-10",
-    set: "lucide",
-    name: "clock-10",
-    humanLabel: "clock 10"
-  },
-  "clock-11": {
-    id: "lucide-clock-11",
-    iconName: "clock-11",
-    set: "lucide",
-    name: "clock-11",
-    humanLabel: "clock 11"
-  },
-  "clock-12": {
-    id: "lucide-clock-12",
-    iconName: "clock-12",
-    set: "lucide",
-    name: "clock-12",
-    humanLabel: "clock 12"
-  },
-  "clock-2": {
-    id: "lucide-clock-2",
-    iconName: "clock-2",
-    set: "lucide",
-    name: "clock-2",
-    humanLabel: "clock 2"
-  },
-  "clock-3": {
-    id: "lucide-clock-3",
-    iconName: "clock-3",
-    set: "lucide",
-    name: "clock-3",
-    humanLabel: "clock 3"
-  },
-  "clock-4": {
-    id: "lucide-clock-4",
-    iconName: "clock-4",
-    set: "lucide",
-    name: "clock-4",
-    humanLabel: "clock 4"
-  },
-  "clock-5": {
-    id: "lucide-clock-5",
-    iconName: "clock-5",
-    set: "lucide",
-    name: "clock-5",
-    humanLabel: "clock 5"
-  },
-  "clock-6": {
-    id: "lucide-clock-6",
-    iconName: "clock-6",
-    set: "lucide",
-    name: "clock-6",
-    humanLabel: "clock 6"
-  },
-  "clock-7": {
-    id: "lucide-clock-7",
-    iconName: "clock-7",
-    set: "lucide",
-    name: "clock-7",
-    humanLabel: "clock 7"
-  },
-  "clock-8": {
-    id: "lucide-clock-8",
-    iconName: "clock-8",
-    set: "lucide",
-    name: "clock-8",
-    humanLabel: "clock 8"
-  },
-  "clock-9": {
-    id: "lucide-clock-9",
-    iconName: "clock-9",
-    set: "lucide",
-    name: "clock-9",
-    humanLabel: "clock 9"
-  },
-  "clock-alert": {
-    id: "lucide-clock-alert",
-    iconName: "clock-alert",
-    set: "lucide",
-    name: "clock-alert",
-    humanLabel: "clock alert"
-  },
+  "clipboard-x": { iconName: "clipboard-x", humanLabel: "clipboard x" },
+  clock: { iconName: "clock", humanLabel: "clock" },
+  "clock-1": { iconName: "clock-1", humanLabel: "clock 1" },
+  "clock-10": { iconName: "clock-10", humanLabel: "clock 10" },
+  "clock-11": { iconName: "clock-11", humanLabel: "clock 11" },
+  "clock-12": { iconName: "clock-12", humanLabel: "clock 12" },
+  "clock-2": { iconName: "clock-2", humanLabel: "clock 2" },
+  "clock-3": { iconName: "clock-3", humanLabel: "clock 3" },
+  "clock-4": { iconName: "clock-4", humanLabel: "clock 4" },
+  "clock-5": { iconName: "clock-5", humanLabel: "clock 5" },
+  "clock-6": { iconName: "clock-6", humanLabel: "clock 6" },
+  "clock-7": { iconName: "clock-7", humanLabel: "clock 7" },
+  "clock-8": { iconName: "clock-8", humanLabel: "clock 8" },
+  "clock-9": { iconName: "clock-9", humanLabel: "clock 9" },
+  "clock-alert": { iconName: "clock-alert", humanLabel: "clock alert" },
   "clock-arrow-down": {
-    id: "lucide-clock-arrow-down",
     iconName: "clock-arrow-down",
-    set: "lucide",
-    name: "clock-arrow-down",
     humanLabel: "clock arrow down"
   },
   "clock-arrow-up": {
-    id: "lucide-clock-arrow-up",
     iconName: "clock-arrow-up",
-    set: "lucide",
-    name: "clock-arrow-up",
     humanLabel: "clock arrow up"
   },
-  "clock-check": {
-    id: "lucide-clock-check",
-    iconName: "clock-check",
-    set: "lucide",
-    name: "clock-check",
-    humanLabel: "clock check"
-  },
-  "clock-fading": {
-    id: "lucide-clock-fading",
-    iconName: "clock-fading",
-    set: "lucide",
-    name: "clock-fading",
-    humanLabel: "clock fading"
-  },
-  "clock-plus": {
-    id: "lucide-clock-plus",
-    iconName: "clock-plus",
-    set: "lucide",
-    name: "clock-plus",
-    humanLabel: "clock plus"
-  },
+  "clock-check": { iconName: "clock-check", humanLabel: "clock check" },
+  "clock-fading": { iconName: "clock-fading", humanLabel: "clock fading" },
+  "clock-plus": { iconName: "clock-plus", humanLabel: "clock plus" },
   "closed-caption": {
-    id: "lucide-closed-caption",
     iconName: "closed-caption",
-    set: "lucide",
-    name: "closed-caption",
     humanLabel: "closed caption"
   },
-  cloud: {
-    id: "lucide-cloud",
-    iconName: "cloud",
-    set: "lucide",
-    name: "cloud",
-    humanLabel: "cloud"
-  },
-  "cloud-alert": {
-    id: "lucide-cloud-alert",
-    iconName: "cloud-alert",
-    set: "lucide",
-    name: "cloud-alert",
-    humanLabel: "cloud alert"
-  },
-  "cloud-backup": {
-    id: "lucide-cloud-backup",
-    iconName: "cloud-backup",
-    set: "lucide",
-    name: "cloud-backup",
-    humanLabel: "cloud backup"
-  },
-  "cloud-check": {
-    id: "lucide-cloud-check",
-    iconName: "cloud-check",
-    set: "lucide",
-    name: "cloud-check",
-    humanLabel: "cloud check"
-  },
-  "cloud-cog": {
-    id: "lucide-cloud-cog",
-    iconName: "cloud-cog",
-    set: "lucide",
-    name: "cloud-cog",
-    humanLabel: "cloud cog"
-  },
+  cloud: { iconName: "cloud", humanLabel: "cloud" },
+  "cloud-alert": { iconName: "cloud-alert", humanLabel: "cloud alert" },
+  "cloud-backup": { iconName: "cloud-backup", humanLabel: "cloud backup" },
+  "cloud-check": { iconName: "cloud-check", humanLabel: "cloud check" },
+  "cloud-cog": { iconName: "cloud-cog", humanLabel: "cloud cog" },
   "cloud-download": {
-    id: "lucide-cloud-download",
     iconName: "cloud-download",
-    set: "lucide",
-    name: "cloud-download",
     humanLabel: "cloud download"
   },
-  "cloud-drizzle": {
-    id: "lucide-cloud-drizzle",
-    iconName: "cloud-drizzle",
-    set: "lucide",
-    name: "cloud-drizzle",
-    humanLabel: "cloud drizzle"
-  },
-  "cloud-fog": {
-    id: "lucide-cloud-fog",
-    iconName: "cloud-fog",
-    set: "lucide",
-    name: "cloud-fog",
-    humanLabel: "cloud fog"
-  },
-  "cloud-hail": {
-    id: "lucide-cloud-hail",
-    iconName: "cloud-hail",
-    set: "lucide",
-    name: "cloud-hail",
-    humanLabel: "cloud hail"
-  },
+  "cloud-drizzle": { iconName: "cloud-drizzle", humanLabel: "cloud drizzle" },
+  "cloud-fog": { iconName: "cloud-fog", humanLabel: "cloud fog" },
+  "cloud-hail": { iconName: "cloud-hail", humanLabel: "cloud hail" },
   "cloud-lightning": {
-    id: "lucide-cloud-lightning",
     iconName: "cloud-lightning",
-    set: "lucide",
-    name: "cloud-lightning",
     humanLabel: "cloud lightning"
   },
-  "cloud-moon": {
-    id: "lucide-cloud-moon",
-    iconName: "cloud-moon",
-    set: "lucide",
-    name: "cloud-moon",
-    humanLabel: "cloud moon"
-  },
+  "cloud-moon": { iconName: "cloud-moon", humanLabel: "cloud moon" },
   "cloud-moon-rain": {
-    id: "lucide-cloud-moon-rain",
     iconName: "cloud-moon-rain",
-    set: "lucide",
-    name: "cloud-moon-rain",
     humanLabel: "cloud moon rain"
   },
-  "cloud-off": {
-    id: "lucide-cloud-off",
-    iconName: "cloud-off",
-    set: "lucide",
-    name: "cloud-off",
-    humanLabel: "cloud off"
-  },
-  "cloud-rain": {
-    id: "lucide-cloud-rain",
-    iconName: "cloud-rain",
-    set: "lucide",
-    name: "cloud-rain",
-    humanLabel: "cloud rain"
-  },
+  "cloud-off": { iconName: "cloud-off", humanLabel: "cloud off" },
+  "cloud-rain": { iconName: "cloud-rain", humanLabel: "cloud rain" },
   "cloud-rain-wind": {
-    id: "lucide-cloud-rain-wind",
     iconName: "cloud-rain-wind",
-    set: "lucide",
-    name: "cloud-rain-wind",
     humanLabel: "cloud rain wind"
   },
-  "cloud-snow": {
-    id: "lucide-cloud-snow",
-    iconName: "cloud-snow",
-    set: "lucide",
-    name: "cloud-snow",
-    humanLabel: "cloud snow"
-  },
-  "cloud-sun": {
-    id: "lucide-cloud-sun",
-    iconName: "cloud-sun",
-    set: "lucide",
-    name: "cloud-sun",
-    humanLabel: "cloud sun"
-  },
+  "cloud-snow": { iconName: "cloud-snow", humanLabel: "cloud snow" },
+  "cloud-sun": { iconName: "cloud-sun", humanLabel: "cloud sun" },
   "cloud-sun-rain": {
-    id: "lucide-cloud-sun-rain",
     iconName: "cloud-sun-rain",
-    set: "lucide",
-    name: "cloud-sun-rain",
     humanLabel: "cloud sun rain"
   },
-  "cloud-sync": {
-    id: "lucide-cloud-sync",
-    iconName: "cloud-sync",
-    set: "lucide",
-    name: "cloud-sync",
-    humanLabel: "cloud sync"
-  },
-  "cloud-upload": {
-    id: "lucide-cloud-upload",
-    iconName: "cloud-upload",
-    set: "lucide",
-    name: "cloud-upload",
-    humanLabel: "cloud upload"
-  },
-  cloudy: {
-    id: "lucide-cloudy",
-    iconName: "cloudy",
-    set: "lucide",
-    name: "cloudy",
-    humanLabel: "cloudy"
-  },
-  clover: {
-    id: "lucide-clover",
-    iconName: "clover",
-    set: "lucide",
-    name: "clover",
-    humanLabel: "clover"
-  },
-  club: {
-    id: "lucide-club",
-    iconName: "club",
-    set: "lucide",
-    name: "club",
-    humanLabel: "club"
-  },
-  code: {
-    id: "lucide-code",
-    iconName: "code",
-    set: "lucide",
-    name: "code",
-    humanLabel: "code"
-  },
-  "code-xml": {
-    id: "lucide-code-xml",
-    iconName: "code-xml",
-    set: "lucide",
-    name: "code-xml",
-    humanLabel: "code xml"
-  },
-  coffee: {
-    id: "lucide-coffee",
-    iconName: "coffee",
-    set: "lucide",
-    name: "coffee",
-    humanLabel: "coffee"
-  },
-  cog: {
-    id: "lucide-cog",
-    iconName: "cog",
-    set: "lucide",
-    name: "cog",
-    humanLabel: "cog"
-  },
-  coins: {
-    id: "lucide-coins",
-    iconName: "coins",
-    set: "lucide",
-    name: "coins",
-    humanLabel: "coins"
-  },
-  "columns-2": {
-    id: "lucide-columns-2",
-    iconName: "columns-2",
-    set: "lucide",
-    name: "columns-2",
-    humanLabel: "columns 2"
-  },
-  "columns-3": {
-    id: "lucide-columns-3",
-    iconName: "columns-3",
-    set: "lucide",
-    name: "columns-3",
-    humanLabel: "columns 3"
-  },
-  "columns-3-cog": {
-    id: "lucide-columns-3-cog",
-    iconName: "columns-3-cog",
-    set: "lucide",
-    name: "columns-3-cog",
-    humanLabel: "columns 3 cog"
-  },
-  "columns-4": {
-    id: "lucide-columns-4",
-    iconName: "columns-4",
-    set: "lucide",
-    name: "columns-4",
-    humanLabel: "columns 4"
-  },
-  combine: {
-    id: "lucide-combine",
-    iconName: "combine",
-    set: "lucide",
-    name: "combine",
-    humanLabel: "combine"
-  },
-  command: {
-    id: "lucide-command",
-    iconName: "command",
-    set: "lucide",
-    name: "command",
-    humanLabel: "command"
-  },
-  compass: {
-    id: "lucide-compass",
-    iconName: "compass",
-    set: "lucide",
-    name: "compass",
-    humanLabel: "compass"
-  },
-  component: {
-    id: "lucide-component",
-    iconName: "component",
-    set: "lucide",
-    name: "component",
-    humanLabel: "component"
-  },
-  computer: {
-    id: "lucide-computer",
-    iconName: "computer",
-    set: "lucide",
-    name: "computer",
-    humanLabel: "computer"
-  },
+  "cloud-sync": { iconName: "cloud-sync", humanLabel: "cloud sync" },
+  "cloud-upload": { iconName: "cloud-upload", humanLabel: "cloud upload" },
+  cloudy: { iconName: "cloudy", humanLabel: "cloudy" },
+  clover: { iconName: "clover", humanLabel: "clover" },
+  club: { iconName: "club", humanLabel: "club" },
+  code: { iconName: "code", humanLabel: "code" },
+  "code-xml": { iconName: "code-xml", humanLabel: "code xml" },
+  coffee: { iconName: "coffee", humanLabel: "coffee" },
+  cog: { iconName: "cog", humanLabel: "cog" },
+  coins: { iconName: "coins", humanLabel: "coins" },
+  "columns-2": { iconName: "columns-2", humanLabel: "columns 2" },
+  "columns-3": { iconName: "columns-3", humanLabel: "columns 3" },
+  "columns-3-cog": { iconName: "columns-3-cog", humanLabel: "columns 3 cog" },
+  "columns-4": { iconName: "columns-4", humanLabel: "columns 4" },
+  combine: { iconName: "combine", humanLabel: "combine" },
+  command: { iconName: "command", humanLabel: "command" },
+  compass: { iconName: "compass", humanLabel: "compass" },
+  component: { iconName: "component", humanLabel: "component" },
+  computer: { iconName: "computer", humanLabel: "computer" },
   "concierge-bell": {
-    id: "lucide-concierge-bell",
     iconName: "concierge-bell",
-    set: "lucide",
-    name: "concierge-bell",
     humanLabel: "concierge bell"
   },
-  cone: {
-    id: "lucide-cone",
-    iconName: "cone",
-    set: "lucide",
-    name: "cone",
-    humanLabel: "cone"
-  },
-  construction: {
-    id: "lucide-construction",
-    iconName: "construction",
-    set: "lucide",
-    name: "construction",
-    humanLabel: "construction"
-  },
-  contact: {
-    id: "lucide-contact",
-    iconName: "contact",
-    set: "lucide",
-    name: "contact",
-    humanLabel: "contact"
-  },
-  "contact-round": {
-    id: "lucide-contact-round",
-    iconName: "contact-round",
-    set: "lucide",
-    name: "contact-round",
-    humanLabel: "contact round"
-  },
-  container: {
-    id: "lucide-container",
-    iconName: "container",
-    set: "lucide",
-    name: "container",
-    humanLabel: "container"
-  },
-  contrast: {
-    id: "lucide-contrast",
-    iconName: "contrast",
-    set: "lucide",
-    name: "contrast",
-    humanLabel: "contrast"
-  },
-  cookie: {
-    id: "lucide-cookie",
-    iconName: "cookie",
-    set: "lucide",
-    name: "cookie",
-    humanLabel: "cookie"
-  },
-  "cooking-pot": {
-    id: "lucide-cooking-pot",
-    iconName: "cooking-pot",
-    set: "lucide",
-    name: "cooking-pot",
-    humanLabel: "cooking pot"
-  },
-  copy: {
-    id: "lucide-copy",
-    iconName: "copy",
-    set: "lucide",
-    name: "copy",
-    humanLabel: "copy"
-  },
-  "copy-check": {
-    id: "lucide-copy-check",
-    iconName: "copy-check",
-    set: "lucide",
-    name: "copy-check",
-    humanLabel: "copy check"
-  },
-  "copy-minus": {
-    id: "lucide-copy-minus",
-    iconName: "copy-minus",
-    set: "lucide",
-    name: "copy-minus",
-    humanLabel: "copy minus"
-  },
-  "copy-plus": {
-    id: "lucide-copy-plus",
-    iconName: "copy-plus",
-    set: "lucide",
-    name: "copy-plus",
-    humanLabel: "copy plus"
-  },
-  "copy-slash": {
-    id: "lucide-copy-slash",
-    iconName: "copy-slash",
-    set: "lucide",
-    name: "copy-slash",
-    humanLabel: "copy slash"
-  },
-  "copy-x": {
-    id: "lucide-copy-x",
-    iconName: "copy-x",
-    set: "lucide",
-    name: "copy-x",
-    humanLabel: "copy x"
-  },
-  copyleft: {
-    id: "lucide-copyleft",
-    iconName: "copyleft",
-    set: "lucide",
-    name: "copyleft",
-    humanLabel: "copyleft"
-  },
-  copyright: {
-    id: "lucide-copyright",
-    iconName: "copyright",
-    set: "lucide",
-    name: "copyright",
-    humanLabel: "copyright"
-  },
+  cone: { iconName: "cone", humanLabel: "cone" },
+  construction: { iconName: "construction", humanLabel: "construction" },
+  contact: { iconName: "contact", humanLabel: "contact" },
+  "contact-round": { iconName: "contact-round", humanLabel: "contact round" },
+  container: { iconName: "container", humanLabel: "container" },
+  contrast: { iconName: "contrast", humanLabel: "contrast" },
+  cookie: { iconName: "cookie", humanLabel: "cookie" },
+  "cooking-pot": { iconName: "cooking-pot", humanLabel: "cooking pot" },
+  copy: { iconName: "copy", humanLabel: "copy" },
+  "copy-check": { iconName: "copy-check", humanLabel: "copy check" },
+  "copy-minus": { iconName: "copy-minus", humanLabel: "copy minus" },
+  "copy-plus": { iconName: "copy-plus", humanLabel: "copy plus" },
+  "copy-slash": { iconName: "copy-slash", humanLabel: "copy slash" },
+  "copy-x": { iconName: "copy-x", humanLabel: "copy x" },
+  copyleft: { iconName: "copyleft", humanLabel: "copyleft" },
+  copyright: { iconName: "copyright", humanLabel: "copyright" },
   "corner-down-left": {
-    id: "lucide-corner-down-left",
     iconName: "corner-down-left",
-    set: "lucide",
-    name: "corner-down-left",
     humanLabel: "corner down left"
   },
   "corner-down-right": {
-    id: "lucide-corner-down-right",
     iconName: "corner-down-right",
-    set: "lucide",
-    name: "corner-down-right",
     humanLabel: "corner down right"
   },
   "corner-left-down": {
-    id: "lucide-corner-left-down",
     iconName: "corner-left-down",
-    set: "lucide",
-    name: "corner-left-down",
     humanLabel: "corner left down"
   },
   "corner-left-up": {
-    id: "lucide-corner-left-up",
     iconName: "corner-left-up",
-    set: "lucide",
-    name: "corner-left-up",
     humanLabel: "corner left up"
   },
   "corner-right-down": {
-    id: "lucide-corner-right-down",
     iconName: "corner-right-down",
-    set: "lucide",
-    name: "corner-right-down",
     humanLabel: "corner right down"
   },
   "corner-right-up": {
-    id: "lucide-corner-right-up",
     iconName: "corner-right-up",
-    set: "lucide",
-    name: "corner-right-up",
     humanLabel: "corner right up"
   },
   "corner-up-left": {
-    id: "lucide-corner-up-left",
     iconName: "corner-up-left",
-    set: "lucide",
-    name: "corner-up-left",
     humanLabel: "corner up left"
   },
   "corner-up-right": {
-    id: "lucide-corner-up-right",
     iconName: "corner-up-right",
-    set: "lucide",
-    name: "corner-up-right",
     humanLabel: "corner up right"
   },
-  cpu: {
-    id: "lucide-cpu",
-    iconName: "cpu",
-    set: "lucide",
-    name: "cpu",
-    humanLabel: "cpu"
-  },
+  cpu: { iconName: "cpu", humanLabel: "cpu" },
   "creative-commons": {
-    id: "lucide-creative-commons",
     iconName: "creative-commons",
-    set: "lucide",
-    name: "creative-commons",
     humanLabel: "creative commons"
   },
-  "credit-card": {
-    id: "lucide-credit-card",
-    iconName: "credit-card",
-    set: "lucide",
-    name: "credit-card",
-    humanLabel: "credit card"
-  },
-  croissant: {
-    id: "lucide-croissant",
-    iconName: "croissant",
-    set: "lucide",
-    name: "croissant",
-    humanLabel: "croissant"
-  },
-  crop: {
-    id: "lucide-crop",
-    iconName: "crop",
-    set: "lucide",
-    name: "crop",
-    humanLabel: "crop"
-  },
-  cross: {
-    id: "lucide-cross",
-    iconName: "cross",
-    set: "lucide",
-    name: "cross",
-    humanLabel: "cross"
-  },
-  crosshair: {
-    id: "lucide-crosshair",
-    iconName: "crosshair",
-    set: "lucide",
-    name: "crosshair",
-    humanLabel: "crosshair"
-  },
-  crown: {
-    id: "lucide-crown",
-    iconName: "crown",
-    set: "lucide",
-    name: "crown",
-    humanLabel: "crown"
-  },
-  cuboid: {
-    id: "lucide-cuboid",
-    iconName: "cuboid",
-    set: "lucide",
-    name: "cuboid",
-    humanLabel: "cuboid"
-  },
-  "cup-soda": {
-    id: "lucide-cup-soda",
-    iconName: "cup-soda",
-    set: "lucide",
-    name: "cup-soda",
-    humanLabel: "cup soda"
-  },
-  currency: {
-    id: "lucide-currency",
-    iconName: "currency",
-    set: "lucide",
-    name: "currency",
-    humanLabel: "currency"
-  },
-  cylinder: {
-    id: "lucide-cylinder",
-    iconName: "cylinder",
-    set: "lucide",
-    name: "cylinder",
-    humanLabel: "cylinder"
-  },
-  dam: {
-    id: "lucide-dam",
-    iconName: "dam",
-    set: "lucide",
-    name: "dam",
-    humanLabel: "dam"
-  },
-  database: {
-    id: "lucide-database",
-    iconName: "database",
-    set: "lucide",
-    name: "database",
-    humanLabel: "database"
-  },
+  "credit-card": { iconName: "credit-card", humanLabel: "credit card" },
+  croissant: { iconName: "croissant", humanLabel: "croissant" },
+  crop: { iconName: "crop", humanLabel: "crop" },
+  cross: { iconName: "cross", humanLabel: "cross" },
+  crosshair: { iconName: "crosshair", humanLabel: "crosshair" },
+  crown: { iconName: "crown", humanLabel: "crown" },
+  cuboid: { iconName: "cuboid", humanLabel: "cuboid" },
+  "cup-soda": { iconName: "cup-soda", humanLabel: "cup soda" },
+  currency: { iconName: "currency", humanLabel: "currency" },
+  cylinder: { iconName: "cylinder", humanLabel: "cylinder" },
+  dam: { iconName: "dam", humanLabel: "dam" },
+  database: { iconName: "database", humanLabel: "database" },
   "database-backup": {
-    id: "lucide-database-backup",
     iconName: "database-backup",
-    set: "lucide",
-    name: "database-backup",
     humanLabel: "database backup"
   },
   "database-search": {
-    id: "lucide-database-search",
     iconName: "database-search",
-    set: "lucide",
-    name: "database-search",
     humanLabel: "database search"
   },
-  "database-zap": {
-    id: "lucide-database-zap",
-    iconName: "database-zap",
-    set: "lucide",
-    name: "database-zap",
-    humanLabel: "database zap"
-  },
+  "database-zap": { iconName: "database-zap", humanLabel: "database zap" },
   "decimals-arrow-left": {
-    id: "lucide-decimals-arrow-left",
     iconName: "decimals-arrow-left",
-    set: "lucide",
-    name: "decimals-arrow-left",
     humanLabel: "decimals arrow left"
   },
   "decimals-arrow-right": {
-    id: "lucide-decimals-arrow-right",
     iconName: "decimals-arrow-right",
-    set: "lucide",
-    name: "decimals-arrow-right",
     humanLabel: "decimals arrow right"
   },
-  delete: {
-    id: "lucide-delete",
-    iconName: "delete",
-    set: "lucide",
-    name: "delete",
-    humanLabel: "delete"
-  },
-  dessert: {
-    id: "lucide-dessert",
-    iconName: "dessert",
-    set: "lucide",
-    name: "dessert",
-    humanLabel: "dessert"
-  },
-  diameter: {
-    id: "lucide-diameter",
-    iconName: "diameter",
-    set: "lucide",
-    name: "diameter",
-    humanLabel: "diameter"
-  },
-  diamond: {
-    id: "lucide-diamond",
-    iconName: "diamond",
-    set: "lucide",
-    name: "diamond",
-    humanLabel: "diamond"
-  },
-  "diamond-minus": {
-    id: "lucide-diamond-minus",
-    iconName: "diamond-minus",
-    set: "lucide",
-    name: "diamond-minus",
-    humanLabel: "diamond minus"
-  },
+  delete: { iconName: "delete", humanLabel: "delete" },
+  dessert: { iconName: "dessert", humanLabel: "dessert" },
+  diameter: { iconName: "diameter", humanLabel: "diameter" },
+  diamond: { iconName: "diamond", humanLabel: "diamond" },
+  "diamond-minus": { iconName: "diamond-minus", humanLabel: "diamond minus" },
   "diamond-percent": {
-    id: "lucide-diamond-percent",
     iconName: "diamond-percent",
-    set: "lucide",
-    name: "diamond-percent",
     humanLabel: "diamond percent"
   },
-  "diamond-plus": {
-    id: "lucide-diamond-plus",
-    iconName: "diamond-plus",
-    set: "lucide",
-    name: "diamond-plus",
-    humanLabel: "diamond plus"
-  },
-  "dice-1": {
-    id: "lucide-dice-1",
-    iconName: "dice-1",
-    set: "lucide",
-    name: "dice-1",
-    humanLabel: "dice 1"
-  },
-  "dice-2": {
-    id: "lucide-dice-2",
-    iconName: "dice-2",
-    set: "lucide",
-    name: "dice-2",
-    humanLabel: "dice 2"
-  },
-  "dice-3": {
-    id: "lucide-dice-3",
-    iconName: "dice-3",
-    set: "lucide",
-    name: "dice-3",
-    humanLabel: "dice 3"
-  },
-  "dice-4": {
-    id: "lucide-dice-4",
-    iconName: "dice-4",
-    set: "lucide",
-    name: "dice-4",
-    humanLabel: "dice 4"
-  },
-  "dice-5": {
-    id: "lucide-dice-5",
-    iconName: "dice-5",
-    set: "lucide",
-    name: "dice-5",
-    humanLabel: "dice 5"
-  },
-  "dice-6": {
-    id: "lucide-dice-6",
-    iconName: "dice-6",
-    set: "lucide",
-    name: "dice-6",
-    humanLabel: "dice 6"
-  },
-  dices: {
-    id: "lucide-dices",
-    iconName: "dices",
-    set: "lucide",
-    name: "dices",
-    humanLabel: "dices"
-  },
-  diff: {
-    id: "lucide-diff",
-    iconName: "diff",
-    set: "lucide",
-    name: "diff",
-    humanLabel: "diff"
-  },
-  disc: {
-    id: "lucide-disc",
-    iconName: "disc",
-    set: "lucide",
-    name: "disc",
-    humanLabel: "disc"
-  },
-  "disc-2": {
-    id: "lucide-disc-2",
-    iconName: "disc-2",
-    set: "lucide",
-    name: "disc-2",
-    humanLabel: "disc 2"
-  },
-  "disc-3": {
-    id: "lucide-disc-3",
-    iconName: "disc-3",
-    set: "lucide",
-    name: "disc-3",
-    humanLabel: "disc 3"
-  },
-  "disc-album": {
-    id: "lucide-disc-album",
-    iconName: "disc-album",
-    set: "lucide",
-    name: "disc-album",
-    humanLabel: "disc album"
-  },
-  divide: {
-    id: "lucide-divide",
-    iconName: "divide",
-    set: "lucide",
-    name: "divide",
-    humanLabel: "divide"
-  },
-  dna: {
-    id: "lucide-dna",
-    iconName: "dna",
-    set: "lucide",
-    name: "dna",
-    humanLabel: "dna"
-  },
-  "dna-off": {
-    id: "lucide-dna-off",
-    iconName: "dna-off",
-    set: "lucide",
-    name: "dna-off",
-    humanLabel: "dna off"
-  },
-  dock: {
-    id: "lucide-dock",
-    iconName: "dock",
-    set: "lucide",
-    name: "dock",
-    humanLabel: "dock"
-  },
-  dog: {
-    id: "lucide-dog",
-    iconName: "dog",
-    set: "lucide",
-    name: "dog",
-    humanLabel: "dog"
-  },
-  "dollar-sign": {
-    id: "lucide-dollar-sign",
-    iconName: "dollar-sign",
-    set: "lucide",
-    name: "dollar-sign",
-    humanLabel: "dollar sign"
-  },
-  donut: {
-    id: "lucide-donut",
-    iconName: "donut",
-    set: "lucide",
-    name: "donut",
-    humanLabel: "donut"
-  },
-  "door-closed": {
-    id: "lucide-door-closed",
-    iconName: "door-closed",
-    set: "lucide",
-    name: "door-closed",
-    humanLabel: "door closed"
-  },
+  "diamond-plus": { iconName: "diamond-plus", humanLabel: "diamond plus" },
+  "dice-1": { iconName: "dice-1", humanLabel: "dice 1" },
+  "dice-2": { iconName: "dice-2", humanLabel: "dice 2" },
+  "dice-3": { iconName: "dice-3", humanLabel: "dice 3" },
+  "dice-4": { iconName: "dice-4", humanLabel: "dice 4" },
+  "dice-5": { iconName: "dice-5", humanLabel: "dice 5" },
+  "dice-6": { iconName: "dice-6", humanLabel: "dice 6" },
+  dices: { iconName: "dices", humanLabel: "dices" },
+  diff: { iconName: "diff", humanLabel: "diff" },
+  disc: { iconName: "disc", humanLabel: "disc" },
+  "disc-2": { iconName: "disc-2", humanLabel: "disc 2" },
+  "disc-3": { iconName: "disc-3", humanLabel: "disc 3" },
+  "disc-album": { iconName: "disc-album", humanLabel: "disc album" },
+  divide: { iconName: "divide", humanLabel: "divide" },
+  dna: { iconName: "dna", humanLabel: "dna" },
+  "dna-off": { iconName: "dna-off", humanLabel: "dna off" },
+  dock: { iconName: "dock", humanLabel: "dock" },
+  dog: { iconName: "dog", humanLabel: "dog" },
+  "dollar-sign": { iconName: "dollar-sign", humanLabel: "dollar sign" },
+  donut: { iconName: "donut", humanLabel: "donut" },
+  "door-closed": { iconName: "door-closed", humanLabel: "door closed" },
   "door-closed-locked": {
-    id: "lucide-door-closed-locked",
     iconName: "door-closed-locked",
-    set: "lucide",
-    name: "door-closed-locked",
     humanLabel: "door closed locked"
   },
-  "door-open": {
-    id: "lucide-door-open",
-    iconName: "door-open",
-    set: "lucide",
-    name: "door-open",
-    humanLabel: "door open"
-  },
-  dot: {
-    id: "lucide-dot",
-    iconName: "dot",
-    set: "lucide",
-    name: "dot",
-    humanLabel: "dot"
-  },
-  download: {
-    id: "lucide-download",
-    iconName: "download",
-    set: "lucide",
-    name: "download",
-    humanLabel: "download"
-  },
+  "door-open": { iconName: "door-open", humanLabel: "door open" },
+  dot: { iconName: "dot", humanLabel: "dot" },
+  download: { iconName: "download", humanLabel: "download" },
   "drafting-compass": {
-    id: "lucide-drafting-compass",
     iconName: "drafting-compass",
-    set: "lucide",
-    name: "drafting-compass",
     humanLabel: "drafting compass"
   },
-  drama: {
-    id: "lucide-drama",
-    iconName: "drama",
-    set: "lucide",
-    name: "drama",
-    humanLabel: "drama"
-  },
-  drill: {
-    id: "lucide-drill",
-    iconName: "drill",
-    set: "lucide",
-    name: "drill",
-    humanLabel: "drill"
-  },
-  drone: {
-    id: "lucide-drone",
-    iconName: "drone",
-    set: "lucide",
-    name: "drone",
-    humanLabel: "drone"
-  },
-  droplet: {
-    id: "lucide-droplet",
-    iconName: "droplet",
-    set: "lucide",
-    name: "droplet",
-    humanLabel: "droplet"
-  },
-  "droplet-off": {
-    id: "lucide-droplet-off",
-    iconName: "droplet-off",
-    set: "lucide",
-    name: "droplet-off",
-    humanLabel: "droplet off"
-  },
-  droplets: {
-    id: "lucide-droplets",
-    iconName: "droplets",
-    set: "lucide",
-    name: "droplets",
-    humanLabel: "droplets"
-  },
-  drum: {
-    id: "lucide-drum",
-    iconName: "drum",
-    set: "lucide",
-    name: "drum",
-    humanLabel: "drum"
-  },
-  drumstick: {
-    id: "lucide-drumstick",
-    iconName: "drumstick",
-    set: "lucide",
-    name: "drumstick",
-    humanLabel: "drumstick"
-  },
-  dumbbell: {
-    id: "lucide-dumbbell",
-    iconName: "dumbbell",
-    set: "lucide",
-    name: "dumbbell",
-    humanLabel: "dumbbell"
-  },
-  ear: {
-    id: "lucide-ear",
-    iconName: "ear",
-    set: "lucide",
-    name: "ear",
-    humanLabel: "ear"
-  },
-  "ear-off": {
-    id: "lucide-ear-off",
-    iconName: "ear-off",
-    set: "lucide",
-    name: "ear-off",
-    humanLabel: "ear off"
-  },
-  earth: {
-    id: "lucide-earth",
-    iconName: "earth",
-    set: "lucide",
-    name: "earth",
-    humanLabel: "earth"
-  },
-  "earth-lock": {
-    id: "lucide-earth-lock",
-    iconName: "earth-lock",
-    set: "lucide",
-    name: "earth-lock",
-    humanLabel: "earth lock"
-  },
-  eclipse: {
-    id: "lucide-eclipse",
-    iconName: "eclipse",
-    set: "lucide",
-    name: "eclipse",
-    humanLabel: "eclipse"
-  },
-  egg: {
-    id: "lucide-egg",
-    iconName: "egg",
-    set: "lucide",
-    name: "egg",
-    humanLabel: "egg"
-  },
-  "egg-fried": {
-    id: "lucide-egg-fried",
-    iconName: "egg-fried",
-    set: "lucide",
-    name: "egg-fried",
-    humanLabel: "egg fried"
-  },
-  "egg-off": {
-    id: "lucide-egg-off",
-    iconName: "egg-off",
-    set: "lucide",
-    name: "egg-off",
-    humanLabel: "egg off"
-  },
-  ellipse: {
-    id: "lucide-ellipse",
-    iconName: "ellipse",
-    set: "lucide",
-    name: "ellipse",
-    humanLabel: "ellipse"
-  },
-  ellipsis: {
-    id: "lucide-ellipsis",
-    iconName: "ellipsis",
-    set: "lucide",
-    name: "ellipsis",
-    humanLabel: "ellipsis"
-  },
+  drama: { iconName: "drama", humanLabel: "drama" },
+  drill: { iconName: "drill", humanLabel: "drill" },
+  drone: { iconName: "drone", humanLabel: "drone" },
+  droplet: { iconName: "droplet", humanLabel: "droplet" },
+  "droplet-off": { iconName: "droplet-off", humanLabel: "droplet off" },
+  droplets: { iconName: "droplets", humanLabel: "droplets" },
+  drum: { iconName: "drum", humanLabel: "drum" },
+  drumstick: { iconName: "drumstick", humanLabel: "drumstick" },
+  dumbbell: { iconName: "dumbbell", humanLabel: "dumbbell" },
+  ear: { iconName: "ear", humanLabel: "ear" },
+  "ear-off": { iconName: "ear-off", humanLabel: "ear off" },
+  earth: { iconName: "earth", humanLabel: "earth" },
+  "earth-lock": { iconName: "earth-lock", humanLabel: "earth lock" },
+  eclipse: { iconName: "eclipse", humanLabel: "eclipse" },
+  egg: { iconName: "egg", humanLabel: "egg" },
+  "egg-fried": { iconName: "egg-fried", humanLabel: "egg fried" },
+  "egg-off": { iconName: "egg-off", humanLabel: "egg off" },
+  ellipse: { iconName: "ellipse", humanLabel: "ellipse" },
+  ellipsis: { iconName: "ellipsis", humanLabel: "ellipsis" },
   "ellipsis-vertical": {
-    id: "lucide-ellipsis-vertical",
     iconName: "ellipsis-vertical",
-    set: "lucide",
-    name: "ellipsis-vertical",
     humanLabel: "ellipsis vertical"
   },
-  equal: {
-    id: "lucide-equal",
-    iconName: "equal",
-    set: "lucide",
-    name: "equal",
-    humanLabel: "equal"
-  },
+  equal: { iconName: "equal", humanLabel: "equal" },
   "equal-approximately": {
-    id: "lucide-equal-approximately",
     iconName: "equal-approximately",
-    set: "lucide",
-    name: "equal-approximately",
     humanLabel: "equal approximately"
   },
-  "equal-not": {
-    id: "lucide-equal-not",
-    iconName: "equal-not",
-    set: "lucide",
-    name: "equal-not",
-    humanLabel: "equal not"
-  },
-  eraser: {
-    id: "lucide-eraser",
-    iconName: "eraser",
-    set: "lucide",
-    name: "eraser",
-    humanLabel: "eraser"
-  },
-  "ethernet-port": {
-    id: "lucide-ethernet-port",
-    iconName: "ethernet-port",
-    set: "lucide",
-    name: "ethernet-port",
-    humanLabel: "ethernet port"
-  },
-  euro: {
-    id: "lucide-euro",
-    iconName: "euro",
-    set: "lucide",
-    name: "euro",
-    humanLabel: "euro"
-  },
-  "ev-charger": {
-    id: "lucide-ev-charger",
-    iconName: "ev-charger",
-    set: "lucide",
-    name: "ev-charger",
-    humanLabel: "ev charger"
-  },
-  expand: {
-    id: "lucide-expand",
-    iconName: "expand",
-    set: "lucide",
-    name: "expand",
-    humanLabel: "expand"
-  },
-  "external-link": {
-    id: "lucide-external-link",
-    iconName: "external-link",
-    set: "lucide",
-    name: "external-link",
-    humanLabel: "external link"
-  },
-  eye: {
-    id: "lucide-eye",
-    iconName: "eye",
-    set: "lucide",
-    name: "eye",
-    humanLabel: "eye"
-  },
-  "eye-closed": {
-    id: "lucide-eye-closed",
-    iconName: "eye-closed",
-    set: "lucide",
-    name: "eye-closed",
-    humanLabel: "eye closed"
-  },
-  "eye-off": {
-    id: "lucide-eye-off",
-    iconName: "eye-off",
-    set: "lucide",
-    name: "eye-off",
-    humanLabel: "eye off"
-  },
-  factory: {
-    id: "lucide-factory",
-    iconName: "factory",
-    set: "lucide",
-    name: "factory",
-    humanLabel: "factory"
-  },
-  fan: {
-    id: "lucide-fan",
-    iconName: "fan",
-    set: "lucide",
-    name: "fan",
-    humanLabel: "fan"
-  },
-  "fast-forward": {
-    id: "lucide-fast-forward",
-    iconName: "fast-forward",
-    set: "lucide",
-    name: "fast-forward",
-    humanLabel: "fast forward"
-  },
-  feather: {
-    id: "lucide-feather",
-    iconName: "feather",
-    set: "lucide",
-    name: "feather",
-    humanLabel: "feather"
-  },
-  fence: {
-    id: "lucide-fence",
-    iconName: "fence",
-    set: "lucide",
-    name: "fence",
-    humanLabel: "fence"
-  },
-  "ferris-wheel": {
-    id: "lucide-ferris-wheel",
-    iconName: "ferris-wheel",
-    set: "lucide",
-    name: "ferris-wheel",
-    humanLabel: "ferris wheel"
-  },
-  file: {
-    id: "lucide-file",
-    iconName: "file",
-    set: "lucide",
-    name: "file",
-    humanLabel: "file"
-  },
-  "file-archive": {
-    id: "lucide-file-archive",
-    iconName: "file-archive",
-    set: "lucide",
-    name: "file-archive",
-    humanLabel: "file archive"
-  },
-  "file-axis-3d": {
-    id: "lucide-file-axis-3d",
-    iconName: "file-axis-3d",
-    set: "lucide",
-    name: "file-axis-3d",
-    humanLabel: "file axis 3d"
-  },
-  "file-badge": {
-    id: "lucide-file-badge",
-    iconName: "file-badge",
-    set: "lucide",
-    name: "file-badge",
-    humanLabel: "file badge"
-  },
-  "file-box": {
-    id: "lucide-file-box",
-    iconName: "file-box",
-    set: "lucide",
-    name: "file-box",
-    humanLabel: "file box"
-  },
-  "file-braces": {
-    id: "lucide-file-braces",
-    iconName: "file-braces",
-    set: "lucide",
-    name: "file-braces",
-    humanLabel: "file braces"
-  },
+  "equal-not": { iconName: "equal-not", humanLabel: "equal not" },
+  eraser: { iconName: "eraser", humanLabel: "eraser" },
+  "ethernet-port": { iconName: "ethernet-port", humanLabel: "ethernet port" },
+  euro: { iconName: "euro", humanLabel: "euro" },
+  "ev-charger": { iconName: "ev-charger", humanLabel: "ev charger" },
+  expand: { iconName: "expand", humanLabel: "expand" },
+  "external-link": { iconName: "external-link", humanLabel: "external link" },
+  eye: { iconName: "eye", humanLabel: "eye" },
+  "eye-closed": { iconName: "eye-closed", humanLabel: "eye closed" },
+  "eye-off": { iconName: "eye-off", humanLabel: "eye off" },
+  factory: { iconName: "factory", humanLabel: "factory" },
+  fan: { iconName: "fan", humanLabel: "fan" },
+  "fast-forward": { iconName: "fast-forward", humanLabel: "fast forward" },
+  feather: { iconName: "feather", humanLabel: "feather" },
+  fence: { iconName: "fence", humanLabel: "fence" },
+  "ferris-wheel": { iconName: "ferris-wheel", humanLabel: "ferris wheel" },
+  file: { iconName: "file", humanLabel: "file" },
+  "file-archive": { iconName: "file-archive", humanLabel: "file archive" },
+  "file-axis-3d": { iconName: "file-axis-3d", humanLabel: "file axis 3d" },
+  "file-badge": { iconName: "file-badge", humanLabel: "file badge" },
+  "file-box": { iconName: "file-box", humanLabel: "file box" },
+  "file-braces": { iconName: "file-braces", humanLabel: "file braces" },
   "file-braces-corner": {
-    id: "lucide-file-braces-corner",
     iconName: "file-braces-corner",
-    set: "lucide",
-    name: "file-braces-corner",
     humanLabel: "file braces corner"
   },
   "file-chart-column": {
-    id: "lucide-file-chart-column",
     iconName: "file-chart-column",
-    set: "lucide",
-    name: "file-chart-column",
     humanLabel: "file chart column"
   },
   "file-chart-column-increasing": {
-    id: "lucide-file-chart-column-increasing",
     iconName: "file-chart-column-increasing",
-    set: "lucide",
-    name: "file-chart-column-increasing",
     humanLabel: "file chart column increasing"
   },
   "file-chart-line": {
-    id: "lucide-file-chart-line",
     iconName: "file-chart-line",
-    set: "lucide",
-    name: "file-chart-line",
     humanLabel: "file chart line"
   },
   "file-chart-pie": {
-    id: "lucide-file-chart-pie",
     iconName: "file-chart-pie",
-    set: "lucide",
-    name: "file-chart-pie",
     humanLabel: "file chart pie"
   },
-  "file-check": {
-    id: "lucide-file-check",
-    iconName: "file-check",
-    set: "lucide",
-    name: "file-check",
-    humanLabel: "file check"
-  },
+  "file-check": { iconName: "file-check", humanLabel: "file check" },
   "file-check-corner": {
-    id: "lucide-file-check-corner",
     iconName: "file-check-corner",
-    set: "lucide",
-    name: "file-check-corner",
     humanLabel: "file check corner"
   },
-  "file-clock": {
-    id: "lucide-file-clock",
-    iconName: "file-clock",
-    set: "lucide",
-    name: "file-clock",
-    humanLabel: "file clock"
-  },
-  "file-code": {
-    id: "lucide-file-code",
-    iconName: "file-code",
-    set: "lucide",
-    name: "file-code",
-    humanLabel: "file code"
-  },
+  "file-clock": { iconName: "file-clock", humanLabel: "file clock" },
+  "file-code": { iconName: "file-code", humanLabel: "file code" },
   "file-code-corner": {
-    id: "lucide-file-code-corner",
     iconName: "file-code-corner",
-    set: "lucide",
-    name: "file-code-corner",
     humanLabel: "file code corner"
   },
-  "file-cog": {
-    id: "lucide-file-cog",
-    iconName: "file-cog",
-    set: "lucide",
-    name: "file-cog",
-    humanLabel: "file cog"
-  },
-  "file-diff": {
-    id: "lucide-file-diff",
-    iconName: "file-diff",
-    set: "lucide",
-    name: "file-diff",
-    humanLabel: "file diff"
-  },
-  "file-digit": {
-    id: "lucide-file-digit",
-    iconName: "file-digit",
-    set: "lucide",
-    name: "file-digit",
-    humanLabel: "file digit"
-  },
-  "file-down": {
-    id: "lucide-file-down",
-    iconName: "file-down",
-    set: "lucide",
-    name: "file-down",
-    humanLabel: "file down"
-  },
+  "file-cog": { iconName: "file-cog", humanLabel: "file cog" },
+  "file-diff": { iconName: "file-diff", humanLabel: "file diff" },
+  "file-digit": { iconName: "file-digit", humanLabel: "file digit" },
+  "file-down": { iconName: "file-down", humanLabel: "file down" },
   "file-exclamation-point": {
-    id: "lucide-file-exclamation-point",
     iconName: "file-exclamation-point",
-    set: "lucide",
-    name: "file-exclamation-point",
     humanLabel: "file exclamation point"
   },
   "file-headphone": {
-    id: "lucide-file-headphone",
     iconName: "file-headphone",
-    set: "lucide",
-    name: "file-headphone",
     humanLabel: "file headphone"
   },
-  "file-heart": {
-    id: "lucide-file-heart",
-    iconName: "file-heart",
-    set: "lucide",
-    name: "file-heart",
-    humanLabel: "file heart"
-  },
-  "file-image": {
-    id: "lucide-file-image",
-    iconName: "file-image",
-    set: "lucide",
-    name: "file-image",
-    humanLabel: "file image"
-  },
-  "file-input": {
-    id: "lucide-file-input",
-    iconName: "file-input",
-    set: "lucide",
-    name: "file-input",
-    humanLabel: "file input"
-  },
-  "file-key": {
-    id: "lucide-file-key",
-    iconName: "file-key",
-    set: "lucide",
-    name: "file-key",
-    humanLabel: "file key"
-  },
-  "file-lock": {
-    id: "lucide-file-lock",
-    iconName: "file-lock",
-    set: "lucide",
-    name: "file-lock",
-    humanLabel: "file lock"
-  },
-  "file-minus": {
-    id: "lucide-file-minus",
-    iconName: "file-minus",
-    set: "lucide",
-    name: "file-minus",
-    humanLabel: "file minus"
-  },
+  "file-heart": { iconName: "file-heart", humanLabel: "file heart" },
+  "file-image": { iconName: "file-image", humanLabel: "file image" },
+  "file-input": { iconName: "file-input", humanLabel: "file input" },
+  "file-key": { iconName: "file-key", humanLabel: "file key" },
+  "file-lock": { iconName: "file-lock", humanLabel: "file lock" },
+  "file-minus": { iconName: "file-minus", humanLabel: "file minus" },
   "file-minus-corner": {
-    id: "lucide-file-minus-corner",
     iconName: "file-minus-corner",
-    set: "lucide",
-    name: "file-minus-corner",
     humanLabel: "file minus corner"
   },
-  "file-music": {
-    id: "lucide-file-music",
-    iconName: "file-music",
-    set: "lucide",
-    name: "file-music",
-    humanLabel: "file music"
-  },
-  "file-output": {
-    id: "lucide-file-output",
-    iconName: "file-output",
-    set: "lucide",
-    name: "file-output",
-    humanLabel: "file output"
-  },
-  "file-pen": {
-    id: "lucide-file-pen",
-    iconName: "file-pen",
-    set: "lucide",
-    name: "file-pen",
-    humanLabel: "file pen"
-  },
-  "file-pen-line": {
-    id: "lucide-file-pen-line",
-    iconName: "file-pen-line",
-    set: "lucide",
-    name: "file-pen-line",
-    humanLabel: "file pen line"
-  },
-  "file-play": {
-    id: "lucide-file-play",
-    iconName: "file-play",
-    set: "lucide",
-    name: "file-play",
-    humanLabel: "file play"
-  },
-  "file-plus": {
-    id: "lucide-file-plus",
-    iconName: "file-plus",
-    set: "lucide",
-    name: "file-plus",
-    humanLabel: "file plus"
-  },
+  "file-music": { iconName: "file-music", humanLabel: "file music" },
+  "file-output": { iconName: "file-output", humanLabel: "file output" },
+  "file-pen": { iconName: "file-pen", humanLabel: "file pen" },
+  "file-pen-line": { iconName: "file-pen-line", humanLabel: "file pen line" },
+  "file-play": { iconName: "file-play", humanLabel: "file play" },
+  "file-plus": { iconName: "file-plus", humanLabel: "file plus" },
   "file-plus-corner": {
-    id: "lucide-file-plus-corner",
     iconName: "file-plus-corner",
-    set: "lucide",
-    name: "file-plus-corner",
     humanLabel: "file plus corner"
   },
   "file-question-mark": {
-    id: "lucide-file-question-mark",
     iconName: "file-question-mark",
-    set: "lucide",
-    name: "file-question-mark",
     humanLabel: "file question mark"
   },
-  "file-scan": {
-    id: "lucide-file-scan",
-    iconName: "file-scan",
-    set: "lucide",
-    name: "file-scan",
-    humanLabel: "file scan"
-  },
-  "file-search": {
-    id: "lucide-file-search",
-    iconName: "file-search",
-    set: "lucide",
-    name: "file-search",
-    humanLabel: "file search"
-  },
+  "file-scan": { iconName: "file-scan", humanLabel: "file scan" },
+  "file-search": { iconName: "file-search", humanLabel: "file search" },
   "file-search-corner": {
-    id: "lucide-file-search-corner",
     iconName: "file-search-corner",
-    set: "lucide",
-    name: "file-search-corner",
     humanLabel: "file search corner"
   },
-  "file-signal": {
-    id: "lucide-file-signal",
-    iconName: "file-signal",
-    set: "lucide",
-    name: "file-signal",
-    humanLabel: "file signal"
-  },
-  "file-sliders": {
-    id: "lucide-file-sliders",
-    iconName: "file-sliders",
-    set: "lucide",
-    name: "file-sliders",
-    humanLabel: "file sliders"
-  },
+  "file-signal": { iconName: "file-signal", humanLabel: "file signal" },
+  "file-sliders": { iconName: "file-sliders", humanLabel: "file sliders" },
   "file-spreadsheet": {
-    id: "lucide-file-spreadsheet",
     iconName: "file-spreadsheet",
-    set: "lucide",
-    name: "file-spreadsheet",
     humanLabel: "file spreadsheet"
   },
-  "file-stack": {
-    id: "lucide-file-stack",
-    iconName: "file-stack",
-    set: "lucide",
-    name: "file-stack",
-    humanLabel: "file stack"
-  },
-  "file-symlink": {
-    id: "lucide-file-symlink",
-    iconName: "file-symlink",
-    set: "lucide",
-    name: "file-symlink",
-    humanLabel: "file symlink"
-  },
-  "file-terminal": {
-    id: "lucide-file-terminal",
-    iconName: "file-terminal",
-    set: "lucide",
-    name: "file-terminal",
-    humanLabel: "file terminal"
-  },
-  "file-text": {
-    id: "lucide-file-text",
-    iconName: "file-text",
-    set: "lucide",
-    name: "file-text",
-    humanLabel: "file text"
-  },
-  "file-type": {
-    id: "lucide-file-type",
-    iconName: "file-type",
-    set: "lucide",
-    name: "file-type",
-    humanLabel: "file type"
-  },
+  "file-stack": { iconName: "file-stack", humanLabel: "file stack" },
+  "file-symlink": { iconName: "file-symlink", humanLabel: "file symlink" },
+  "file-terminal": { iconName: "file-terminal", humanLabel: "file terminal" },
+  "file-text": { iconName: "file-text", humanLabel: "file text" },
+  "file-type": { iconName: "file-type", humanLabel: "file type" },
   "file-type-corner": {
-    id: "lucide-file-type-corner",
     iconName: "file-type-corner",
-    set: "lucide",
-    name: "file-type-corner",
     humanLabel: "file type corner"
   },
-  "file-up": {
-    id: "lucide-file-up",
-    iconName: "file-up",
-    set: "lucide",
-    name: "file-up",
-    humanLabel: "file up"
-  },
-  "file-user": {
-    id: "lucide-file-user",
-    iconName: "file-user",
-    set: "lucide",
-    name: "file-user",
-    humanLabel: "file user"
-  },
+  "file-up": { iconName: "file-up", humanLabel: "file up" },
+  "file-user": { iconName: "file-user", humanLabel: "file user" },
   "file-video-camera": {
-    id: "lucide-file-video-camera",
     iconName: "file-video-camera",
-    set: "lucide",
-    name: "file-video-camera",
     humanLabel: "file video camera"
   },
-  "file-volume": {
-    id: "lucide-file-volume",
-    iconName: "file-volume",
-    set: "lucide",
-    name: "file-volume",
-    humanLabel: "file volume"
-  },
-  "file-x": {
-    id: "lucide-file-x",
-    iconName: "file-x",
-    set: "lucide",
-    name: "file-x",
-    humanLabel: "file x"
-  },
-  "file-x-corner": {
-    id: "lucide-file-x-corner",
-    iconName: "file-x-corner",
-    set: "lucide",
-    name: "file-x-corner",
-    humanLabel: "file x corner"
-  },
-  files: {
-    id: "lucide-files",
-    iconName: "files",
-    set: "lucide",
-    name: "files",
-    humanLabel: "files"
-  },
-  film: {
-    id: "lucide-film",
-    iconName: "film",
-    set: "lucide",
-    name: "film",
-    humanLabel: "film"
-  },
+  "file-volume": { iconName: "file-volume", humanLabel: "file volume" },
+  "file-x": { iconName: "file-x", humanLabel: "file x" },
+  "file-x-corner": { iconName: "file-x-corner", humanLabel: "file x corner" },
+  files: { iconName: "files", humanLabel: "files" },
+  film: { iconName: "film", humanLabel: "film" },
   "fingerprint-pattern": {
-    id: "lucide-fingerprint-pattern",
     iconName: "fingerprint-pattern",
-    set: "lucide",
-    name: "fingerprint-pattern",
     humanLabel: "fingerprint pattern"
   },
   "fire-extinguisher": {
-    id: "lucide-fire-extinguisher",
     iconName: "fire-extinguisher",
-    set: "lucide",
-    name: "fire-extinguisher",
     humanLabel: "fire extinguisher"
   },
-  fish: {
-    id: "lucide-fish",
-    iconName: "fish",
-    set: "lucide",
-    name: "fish",
-    humanLabel: "fish"
-  },
-  "fish-off": {
-    id: "lucide-fish-off",
-    iconName: "fish-off",
-    set: "lucide",
-    name: "fish-off",
-    humanLabel: "fish off"
-  },
-  "fish-symbol": {
-    id: "lucide-fish-symbol",
-    iconName: "fish-symbol",
-    set: "lucide",
-    name: "fish-symbol",
-    humanLabel: "fish symbol"
-  },
-  "fishing-hook": {
-    id: "lucide-fishing-hook",
-    iconName: "fishing-hook",
-    set: "lucide",
-    name: "fishing-hook",
-    humanLabel: "fishing hook"
-  },
-  "fishing-rod": {
-    id: "lucide-fishing-rod",
-    iconName: "fishing-rod",
-    set: "lucide",
-    name: "fishing-rod",
-    humanLabel: "fishing rod"
-  },
-  flag: {
-    id: "lucide-flag",
-    iconName: "flag",
-    set: "lucide",
-    name: "flag",
-    humanLabel: "flag"
-  },
-  "flag-off": {
-    id: "lucide-flag-off",
-    iconName: "flag-off",
-    set: "lucide",
-    name: "flag-off",
-    humanLabel: "flag off"
-  },
+  fish: { iconName: "fish", humanLabel: "fish" },
+  "fish-off": { iconName: "fish-off", humanLabel: "fish off" },
+  "fish-symbol": { iconName: "fish-symbol", humanLabel: "fish symbol" },
+  "fishing-hook": { iconName: "fishing-hook", humanLabel: "fishing hook" },
+  "fishing-rod": { iconName: "fishing-rod", humanLabel: "fishing rod" },
+  flag: { iconName: "flag", humanLabel: "flag" },
+  "flag-off": { iconName: "flag-off", humanLabel: "flag off" },
   "flag-triangle-left": {
-    id: "lucide-flag-triangle-left",
     iconName: "flag-triangle-left",
-    set: "lucide",
-    name: "flag-triangle-left",
     humanLabel: "flag triangle left"
   },
   "flag-triangle-right": {
-    id: "lucide-flag-triangle-right",
     iconName: "flag-triangle-right",
-    set: "lucide",
-    name: "flag-triangle-right",
     humanLabel: "flag triangle right"
   },
-  flame: {
-    id: "lucide-flame",
-    iconName: "flame",
-    set: "lucide",
-    name: "flame",
-    humanLabel: "flame"
-  },
+  flame: { iconName: "flame", humanLabel: "flame" },
   "flame-kindling": {
-    id: "lucide-flame-kindling",
     iconName: "flame-kindling",
-    set: "lucide",
-    name: "flame-kindling",
     humanLabel: "flame kindling"
   },
-  flashlight: {
-    id: "lucide-flashlight",
-    iconName: "flashlight",
-    set: "lucide",
-    name: "flashlight",
-    humanLabel: "flashlight"
-  },
+  flashlight: { iconName: "flashlight", humanLabel: "flashlight" },
   "flashlight-off": {
-    id: "lucide-flashlight-off",
     iconName: "flashlight-off",
-    set: "lucide",
-    name: "flashlight-off",
     humanLabel: "flashlight off"
   },
-  "flask-conical": {
-    id: "lucide-flask-conical",
-    iconName: "flask-conical",
-    set: "lucide",
-    name: "flask-conical",
-    humanLabel: "flask conical"
-  },
+  "flask-conical": { iconName: "flask-conical", humanLabel: "flask conical" },
   "flask-conical-off": {
-    id: "lucide-flask-conical-off",
     iconName: "flask-conical-off",
-    set: "lucide",
-    name: "flask-conical-off",
     humanLabel: "flask conical off"
   },
-  "flask-round": {
-    id: "lucide-flask-round",
-    iconName: "flask-round",
-    set: "lucide",
-    name: "flask-round",
-    humanLabel: "flask round"
-  },
+  "flask-round": { iconName: "flask-round", humanLabel: "flask round" },
   "flip-horizontal-2": {
-    id: "lucide-flip-horizontal-2",
     iconName: "flip-horizontal-2",
-    set: "lucide",
-    name: "flip-horizontal-2",
     humanLabel: "flip horizontal 2"
   },
   "flip-vertical-2": {
-    id: "lucide-flip-vertical-2",
     iconName: "flip-vertical-2",
-    set: "lucide",
-    name: "flip-vertical-2",
     humanLabel: "flip vertical 2"
   },
-  flower: {
-    id: "lucide-flower",
-    iconName: "flower",
-    set: "lucide",
-    name: "flower",
-    humanLabel: "flower"
-  },
-  "flower-2": {
-    id: "lucide-flower-2",
-    iconName: "flower-2",
-    set: "lucide",
-    name: "flower-2",
-    humanLabel: "flower 2"
-  },
-  focus: {
-    id: "lucide-focus",
-    iconName: "focus",
-    set: "lucide",
-    name: "focus",
-    humanLabel: "focus"
-  },
+  flower: { iconName: "flower", humanLabel: "flower" },
+  "flower-2": { iconName: "flower-2", humanLabel: "flower 2" },
+  focus: { iconName: "focus", humanLabel: "focus" },
   "fold-horizontal": {
-    id: "lucide-fold-horizontal",
     iconName: "fold-horizontal",
-    set: "lucide",
-    name: "fold-horizontal",
     humanLabel: "fold horizontal"
   },
-  "fold-vertical": {
-    id: "lucide-fold-vertical",
-    iconName: "fold-vertical",
-    set: "lucide",
-    name: "fold-vertical",
-    humanLabel: "fold vertical"
-  },
-  folder: {
-    id: "lucide-folder",
-    iconName: "folder",
-    set: "lucide",
-    name: "folder",
-    humanLabel: "folder"
-  },
+  "fold-vertical": { iconName: "fold-vertical", humanLabel: "fold vertical" },
+  folder: { iconName: "folder", humanLabel: "folder" },
   "folder-archive": {
-    id: "lucide-folder-archive",
     iconName: "folder-archive",
-    set: "lucide",
-    name: "folder-archive",
     humanLabel: "folder archive"
   },
   "folder-bookmark": {
-    id: "lucide-folder-bookmark",
     iconName: "folder-bookmark",
-    set: "lucide",
-    name: "folder-bookmark",
     humanLabel: "folder bookmark"
   },
-  "folder-check": {
-    id: "lucide-folder-check",
-    iconName: "folder-check",
-    set: "lucide",
-    name: "folder-check",
-    humanLabel: "folder check"
-  },
-  "folder-clock": {
-    id: "lucide-folder-clock",
-    iconName: "folder-clock",
-    set: "lucide",
-    name: "folder-clock",
-    humanLabel: "folder clock"
-  },
-  "folder-closed": {
-    id: "lucide-folder-closed",
-    iconName: "folder-closed",
-    set: "lucide",
-    name: "folder-closed",
-    humanLabel: "folder closed"
-  },
-  "folder-code": {
-    id: "lucide-folder-code",
-    iconName: "folder-code",
-    set: "lucide",
-    name: "folder-code",
-    humanLabel: "folder code"
-  },
-  "folder-cog": {
-    id: "lucide-folder-cog",
-    iconName: "folder-cog",
-    set: "lucide",
-    name: "folder-cog",
-    humanLabel: "folder cog"
-  },
-  "folder-dot": {
-    id: "lucide-folder-dot",
-    iconName: "folder-dot",
-    set: "lucide",
-    name: "folder-dot",
-    humanLabel: "folder dot"
-  },
-  "folder-down": {
-    id: "lucide-folder-down",
-    iconName: "folder-down",
-    set: "lucide",
-    name: "folder-down",
-    humanLabel: "folder down"
-  },
-  "folder-git": {
-    id: "lucide-folder-git",
-    iconName: "folder-git",
-    set: "lucide",
-    name: "folder-git",
-    humanLabel: "folder git"
-  },
-  "folder-git-2": {
-    id: "lucide-folder-git-2",
-    iconName: "folder-git-2",
-    set: "lucide",
-    name: "folder-git-2",
-    humanLabel: "folder git 2"
-  },
-  "folder-heart": {
-    id: "lucide-folder-heart",
-    iconName: "folder-heart",
-    set: "lucide",
-    name: "folder-heart",
-    humanLabel: "folder heart"
-  },
-  "folder-input": {
-    id: "lucide-folder-input",
-    iconName: "folder-input",
-    set: "lucide",
-    name: "folder-input",
-    humanLabel: "folder input"
-  },
-  "folder-kanban": {
-    id: "lucide-folder-kanban",
-    iconName: "folder-kanban",
-    set: "lucide",
-    name: "folder-kanban",
-    humanLabel: "folder kanban"
-  },
-  "folder-key": {
-    id: "lucide-folder-key",
-    iconName: "folder-key",
-    set: "lucide",
-    name: "folder-key",
-    humanLabel: "folder key"
-  },
-  "folder-lock": {
-    id: "lucide-folder-lock",
-    iconName: "folder-lock",
-    set: "lucide",
-    name: "folder-lock",
-    humanLabel: "folder lock"
-  },
-  "folder-minus": {
-    id: "lucide-folder-minus",
-    iconName: "folder-minus",
-    set: "lucide",
-    name: "folder-minus",
-    humanLabel: "folder minus"
-  },
-  "folder-open": {
-    id: "lucide-folder-open",
-    iconName: "folder-open",
-    set: "lucide",
-    name: "folder-open",
-    humanLabel: "folder open"
-  },
+  "folder-check": { iconName: "folder-check", humanLabel: "folder check" },
+  "folder-clock": { iconName: "folder-clock", humanLabel: "folder clock" },
+  "folder-closed": { iconName: "folder-closed", humanLabel: "folder closed" },
+  "folder-code": { iconName: "folder-code", humanLabel: "folder code" },
+  "folder-cog": { iconName: "folder-cog", humanLabel: "folder cog" },
+  "folder-dot": { iconName: "folder-dot", humanLabel: "folder dot" },
+  "folder-down": { iconName: "folder-down", humanLabel: "folder down" },
+  "folder-git": { iconName: "folder-git", humanLabel: "folder git" },
+  "folder-git-2": { iconName: "folder-git-2", humanLabel: "folder git 2" },
+  "folder-heart": { iconName: "folder-heart", humanLabel: "folder heart" },
+  "folder-input": { iconName: "folder-input", humanLabel: "folder input" },
+  "folder-kanban": { iconName: "folder-kanban", humanLabel: "folder kanban" },
+  "folder-key": { iconName: "folder-key", humanLabel: "folder key" },
+  "folder-lock": { iconName: "folder-lock", humanLabel: "folder lock" },
+  "folder-minus": { iconName: "folder-minus", humanLabel: "folder minus" },
+  "folder-open": { iconName: "folder-open", humanLabel: "folder open" },
   "folder-open-dot": {
-    id: "lucide-folder-open-dot",
     iconName: "folder-open-dot",
-    set: "lucide",
-    name: "folder-open-dot",
     humanLabel: "folder open dot"
   },
-  "folder-output": {
-    id: "lucide-folder-output",
-    iconName: "folder-output",
-    set: "lucide",
-    name: "folder-output",
-    humanLabel: "folder output"
-  },
-  "folder-pen": {
-    id: "lucide-folder-pen",
-    iconName: "folder-pen",
-    set: "lucide",
-    name: "folder-pen",
-    humanLabel: "folder pen"
-  },
-  "folder-plus": {
-    id: "lucide-folder-plus",
-    iconName: "folder-plus",
-    set: "lucide",
-    name: "folder-plus",
-    humanLabel: "folder plus"
-  },
-  "folder-root": {
-    id: "lucide-folder-root",
-    iconName: "folder-root",
-    set: "lucide",
-    name: "folder-root",
-    humanLabel: "folder root"
-  },
-  "folder-search": {
-    id: "lucide-folder-search",
-    iconName: "folder-search",
-    set: "lucide",
-    name: "folder-search",
-    humanLabel: "folder search"
-  },
+  "folder-output": { iconName: "folder-output", humanLabel: "folder output" },
+  "folder-pen": { iconName: "folder-pen", humanLabel: "folder pen" },
+  "folder-plus": { iconName: "folder-plus", humanLabel: "folder plus" },
+  "folder-root": { iconName: "folder-root", humanLabel: "folder root" },
+  "folder-search": { iconName: "folder-search", humanLabel: "folder search" },
   "folder-search-2": {
-    id: "lucide-folder-search-2",
     iconName: "folder-search-2",
-    set: "lucide",
-    name: "folder-search-2",
     humanLabel: "folder search 2"
   },
   "folder-symlink": {
-    id: "lucide-folder-symlink",
     iconName: "folder-symlink",
-    set: "lucide",
-    name: "folder-symlink",
     humanLabel: "folder symlink"
   },
-  "folder-sync": {
-    id: "lucide-folder-sync",
-    iconName: "folder-sync",
-    set: "lucide",
-    name: "folder-sync",
-    humanLabel: "folder sync"
-  },
-  "folder-tree": {
-    id: "lucide-folder-tree",
-    iconName: "folder-tree",
-    set: "lucide",
-    name: "folder-tree",
-    humanLabel: "folder tree"
-  },
-  "folder-up": {
-    id: "lucide-folder-up",
-    iconName: "folder-up",
-    set: "lucide",
-    name: "folder-up",
-    humanLabel: "folder up"
-  },
-  "folder-x": {
-    id: "lucide-folder-x",
-    iconName: "folder-x",
-    set: "lucide",
-    name: "folder-x",
-    humanLabel: "folder x"
-  },
-  folders: {
-    id: "lucide-folders",
-    iconName: "folders",
-    set: "lucide",
-    name: "folders",
-    humanLabel: "folders"
-  },
-  footprints: {
-    id: "lucide-footprints",
-    iconName: "footprints",
-    set: "lucide",
-    name: "footprints",
-    humanLabel: "footprints"
-  },
-  forklift: {
-    id: "lucide-forklift",
-    iconName: "forklift",
-    set: "lucide",
-    name: "forklift",
-    humanLabel: "forklift"
-  },
-  form: {
-    id: "lucide-form",
-    iconName: "form",
-    set: "lucide",
-    name: "form",
-    humanLabel: "form"
-  },
-  forward: {
-    id: "lucide-forward",
-    iconName: "forward",
-    set: "lucide",
-    name: "forward",
-    humanLabel: "forward"
-  },
-  frame: {
-    id: "lucide-frame",
-    iconName: "frame",
-    set: "lucide",
-    name: "frame",
-    humanLabel: "frame"
-  },
-  frown: {
-    id: "lucide-frown",
-    iconName: "frown",
-    set: "lucide",
-    name: "frown",
-    humanLabel: "frown"
-  },
-  fuel: {
-    id: "lucide-fuel",
-    iconName: "fuel",
-    set: "lucide",
-    name: "fuel",
-    humanLabel: "fuel"
-  },
-  fullscreen: {
-    id: "lucide-fullscreen",
-    iconName: "fullscreen",
-    set: "lucide",
-    name: "fullscreen",
-    humanLabel: "fullscreen"
-  },
-  funnel: {
-    id: "lucide-funnel",
-    iconName: "funnel",
-    set: "lucide",
-    name: "funnel",
-    humanLabel: "funnel"
-  },
-  "funnel-plus": {
-    id: "lucide-funnel-plus",
-    iconName: "funnel-plus",
-    set: "lucide",
-    name: "funnel-plus",
-    humanLabel: "funnel plus"
-  },
-  "funnel-x": {
-    id: "lucide-funnel-x",
-    iconName: "funnel-x",
-    set: "lucide",
-    name: "funnel-x",
-    humanLabel: "funnel x"
-  },
+  "folder-sync": { iconName: "folder-sync", humanLabel: "folder sync" },
+  "folder-tree": { iconName: "folder-tree", humanLabel: "folder tree" },
+  "folder-up": { iconName: "folder-up", humanLabel: "folder up" },
+  "folder-x": { iconName: "folder-x", humanLabel: "folder x" },
+  folders: { iconName: "folders", humanLabel: "folders" },
+  footprints: { iconName: "footprints", humanLabel: "footprints" },
+  forklift: { iconName: "forklift", humanLabel: "forklift" },
+  form: { iconName: "form", humanLabel: "form" },
+  forward: { iconName: "forward", humanLabel: "forward" },
+  frame: { iconName: "frame", humanLabel: "frame" },
+  frown: { iconName: "frown", humanLabel: "frown" },
+  fuel: { iconName: "fuel", humanLabel: "fuel" },
+  fullscreen: { iconName: "fullscreen", humanLabel: "fullscreen" },
+  funnel: { iconName: "funnel", humanLabel: "funnel" },
+  "funnel-plus": { iconName: "funnel-plus", humanLabel: "funnel plus" },
+  "funnel-x": { iconName: "funnel-x", humanLabel: "funnel x" },
   "gallery-horizontal": {
-    id: "lucide-gallery-horizontal",
     iconName: "gallery-horizontal",
-    set: "lucide",
-    name: "gallery-horizontal",
     humanLabel: "gallery horizontal"
   },
   "gallery-horizontal-end": {
-    id: "lucide-gallery-horizontal-end",
     iconName: "gallery-horizontal-end",
-    set: "lucide",
-    name: "gallery-horizontal-end",
     humanLabel: "gallery horizontal end"
   },
   "gallery-thumbnails": {
-    id: "lucide-gallery-thumbnails",
     iconName: "gallery-thumbnails",
-    set: "lucide",
-    name: "gallery-thumbnails",
     humanLabel: "gallery thumbnails"
   },
   "gallery-vertical": {
-    id: "lucide-gallery-vertical",
     iconName: "gallery-vertical",
-    set: "lucide",
-    name: "gallery-vertical",
     humanLabel: "gallery vertical"
   },
   "gallery-vertical-end": {
-    id: "lucide-gallery-vertical-end",
     iconName: "gallery-vertical-end",
-    set: "lucide",
-    name: "gallery-vertical-end",
     humanLabel: "gallery vertical end"
   },
-  gamepad: {
-    id: "lucide-gamepad",
-    iconName: "gamepad",
-    set: "lucide",
-    name: "gamepad",
-    humanLabel: "gamepad"
-  },
-  "gamepad-2": {
-    id: "lucide-gamepad-2",
-    iconName: "gamepad-2",
-    set: "lucide",
-    name: "gamepad-2",
-    humanLabel: "gamepad 2"
-  },
+  gamepad: { iconName: "gamepad", humanLabel: "gamepad" },
+  "gamepad-2": { iconName: "gamepad-2", humanLabel: "gamepad 2" },
   "gamepad-directional": {
-    id: "lucide-gamepad-directional",
     iconName: "gamepad-directional",
-    set: "lucide",
-    name: "gamepad-directional",
     humanLabel: "gamepad directional"
   },
-  gauge: {
-    id: "lucide-gauge",
-    iconName: "gauge",
-    set: "lucide",
-    name: "gauge",
-    humanLabel: "gauge"
-  },
-  gavel: {
-    id: "lucide-gavel",
-    iconName: "gavel",
-    set: "lucide",
-    name: "gavel",
-    humanLabel: "gavel"
-  },
-  gem: {
-    id: "lucide-gem",
-    iconName: "gem",
-    set: "lucide",
-    name: "gem",
-    humanLabel: "gem"
-  },
-  "georgian-lari": {
-    id: "lucide-georgian-lari",
-    iconName: "georgian-lari",
-    set: "lucide",
-    name: "georgian-lari",
-    humanLabel: "georgian lari"
-  },
-  ghost: {
-    id: "lucide-ghost",
-    iconName: "ghost",
-    set: "lucide",
-    name: "ghost",
-    humanLabel: "ghost"
-  },
-  gift: {
-    id: "lucide-gift",
-    iconName: "gift",
-    set: "lucide",
-    name: "gift",
-    humanLabel: "gift"
-  },
-  "git-branch": {
-    id: "lucide-git-branch",
-    iconName: "git-branch",
-    set: "lucide",
-    name: "git-branch",
-    humanLabel: "git branch"
-  },
+  gauge: { iconName: "gauge", humanLabel: "gauge" },
+  gavel: { iconName: "gavel", humanLabel: "gavel" },
+  gem: { iconName: "gem", humanLabel: "gem" },
+  "georgian-lari": { iconName: "georgian-lari", humanLabel: "georgian lari" },
+  ghost: { iconName: "ghost", humanLabel: "ghost" },
+  gift: { iconName: "gift", humanLabel: "gift" },
+  "git-branch": { iconName: "git-branch", humanLabel: "git branch" },
   "git-branch-minus": {
-    id: "lucide-git-branch-minus",
     iconName: "git-branch-minus",
-    set: "lucide",
-    name: "git-branch-minus",
     humanLabel: "git branch minus"
   },
   "git-branch-plus": {
-    id: "lucide-git-branch-plus",
     iconName: "git-branch-plus",
-    set: "lucide",
-    name: "git-branch-plus",
     humanLabel: "git branch plus"
   },
   "git-commit-horizontal": {
-    id: "lucide-git-commit-horizontal",
     iconName: "git-commit-horizontal",
-    set: "lucide",
-    name: "git-commit-horizontal",
     humanLabel: "git commit horizontal"
   },
   "git-commit-vertical": {
-    id: "lucide-git-commit-vertical",
     iconName: "git-commit-vertical",
-    set: "lucide",
-    name: "git-commit-vertical",
     humanLabel: "git commit vertical"
   },
-  "git-compare": {
-    id: "lucide-git-compare",
-    iconName: "git-compare",
-    set: "lucide",
-    name: "git-compare",
-    humanLabel: "git compare"
-  },
+  "git-compare": { iconName: "git-compare", humanLabel: "git compare" },
   "git-compare-arrows": {
-    id: "lucide-git-compare-arrows",
     iconName: "git-compare-arrows",
-    set: "lucide",
-    name: "git-compare-arrows",
     humanLabel: "git compare arrows"
   },
-  "git-fork": {
-    id: "lucide-git-fork",
-    iconName: "git-fork",
-    set: "lucide",
-    name: "git-fork",
-    humanLabel: "git fork"
-  },
-  "git-graph": {
-    id: "lucide-git-graph",
-    iconName: "git-graph",
-    set: "lucide",
-    name: "git-graph",
-    humanLabel: "git graph"
-  },
-  "git-merge": {
-    id: "lucide-git-merge",
-    iconName: "git-merge",
-    set: "lucide",
-    name: "git-merge",
-    humanLabel: "git merge"
-  },
+  "git-fork": { iconName: "git-fork", humanLabel: "git fork" },
+  "git-graph": { iconName: "git-graph", humanLabel: "git graph" },
+  "git-merge": { iconName: "git-merge", humanLabel: "git merge" },
   "git-merge-conflict": {
-    id: "lucide-git-merge-conflict",
     iconName: "git-merge-conflict",
-    set: "lucide",
-    name: "git-merge-conflict",
     humanLabel: "git merge conflict"
   },
   "git-pull-request": {
-    id: "lucide-git-pull-request",
     iconName: "git-pull-request",
-    set: "lucide",
-    name: "git-pull-request",
     humanLabel: "git pull request"
   },
   "git-pull-request-arrow": {
-    id: "lucide-git-pull-request-arrow",
     iconName: "git-pull-request-arrow",
-    set: "lucide",
-    name: "git-pull-request-arrow",
     humanLabel: "git pull request arrow"
   },
   "git-pull-request-closed": {
-    id: "lucide-git-pull-request-closed",
     iconName: "git-pull-request-closed",
-    set: "lucide",
-    name: "git-pull-request-closed",
     humanLabel: "git pull request closed"
   },
   "git-pull-request-create": {
-    id: "lucide-git-pull-request-create",
     iconName: "git-pull-request-create",
-    set: "lucide",
-    name: "git-pull-request-create",
     humanLabel: "git pull request create"
   },
   "git-pull-request-create-arrow": {
-    id: "lucide-git-pull-request-create-arrow",
     iconName: "git-pull-request-create-arrow",
-    set: "lucide",
-    name: "git-pull-request-create-arrow",
     humanLabel: "git pull request create arrow"
   },
   "git-pull-request-draft": {
-    id: "lucide-git-pull-request-draft",
     iconName: "git-pull-request-draft",
-    set: "lucide",
-    name: "git-pull-request-draft",
     humanLabel: "git pull request draft"
   },
-  "glass-water": {
-    id: "lucide-glass-water",
-    iconName: "glass-water",
-    set: "lucide",
-    name: "glass-water",
-    humanLabel: "glass water"
-  },
-  glasses: {
-    id: "lucide-glasses",
-    iconName: "glasses",
-    set: "lucide",
-    name: "glasses",
-    humanLabel: "glasses"
-  },
-  globe: {
-    id: "lucide-globe",
-    iconName: "globe",
-    set: "lucide",
-    name: "globe",
-    humanLabel: "globe"
-  },
-  "globe-lock": {
-    id: "lucide-globe-lock",
-    iconName: "globe-lock",
-    set: "lucide",
-    name: "globe-lock",
-    humanLabel: "globe lock"
-  },
-  "globe-off": {
-    id: "lucide-globe-off",
-    iconName: "globe-off",
-    set: "lucide",
-    name: "globe-off",
-    humanLabel: "globe off"
-  },
-  "globe-x": {
-    id: "lucide-globe-x",
-    iconName: "globe-x",
-    set: "lucide",
-    name: "globe-x",
-    humanLabel: "globe x"
-  },
-  goal: {
-    id: "lucide-goal",
-    iconName: "goal",
-    set: "lucide",
-    name: "goal",
-    humanLabel: "goal"
-  },
-  gpu: {
-    id: "lucide-gpu",
-    iconName: "gpu",
-    set: "lucide",
-    name: "gpu",
-    humanLabel: "gpu"
-  },
+  "glass-water": { iconName: "glass-water", humanLabel: "glass water" },
+  glasses: { iconName: "glasses", humanLabel: "glasses" },
+  globe: { iconName: "globe", humanLabel: "globe" },
+  "globe-lock": { iconName: "globe-lock", humanLabel: "globe lock" },
+  "globe-off": { iconName: "globe-off", humanLabel: "globe off" },
+  "globe-x": { iconName: "globe-x", humanLabel: "globe x" },
+  goal: { iconName: "goal", humanLabel: "goal" },
+  gpu: { iconName: "gpu", humanLabel: "gpu" },
   "graduation-cap": {
-    id: "lucide-graduation-cap",
     iconName: "graduation-cap",
-    set: "lucide",
-    name: "graduation-cap",
     humanLabel: "graduation cap"
   },
-  grape: {
-    id: "lucide-grape",
-    iconName: "grape",
-    set: "lucide",
-    name: "grape",
-    humanLabel: "grape"
-  },
-  "grid-2x2": {
-    id: "lucide-grid-2x2",
-    iconName: "grid-2x2",
-    set: "lucide",
-    name: "grid-2x2",
-    humanLabel: "grid 2x2"
-  },
+  grape: { iconName: "grape", humanLabel: "grape" },
+  "grid-2x2": { iconName: "grid-2x2", humanLabel: "grid 2x2" },
   "grid-2x2-check": {
-    id: "lucide-grid-2x2-check",
     iconName: "grid-2x2-check",
-    set: "lucide",
-    name: "grid-2x2-check",
     humanLabel: "grid 2x2 check"
   },
-  "grid-2x2-plus": {
-    id: "lucide-grid-2x2-plus",
-    iconName: "grid-2x2-plus",
-    set: "lucide",
-    name: "grid-2x2-plus",
-    humanLabel: "grid 2x2 plus"
-  },
-  "grid-2x2-x": {
-    id: "lucide-grid-2x2-x",
-    iconName: "grid-2x2-x",
-    set: "lucide",
-    name: "grid-2x2-x",
-    humanLabel: "grid 2x2 x"
-  },
-  "grid-3x2": {
-    id: "lucide-grid-3x2",
-    iconName: "grid-3x2",
-    set: "lucide",
-    name: "grid-3x2",
-    humanLabel: "grid 3x2"
-  },
-  "grid-3x3": {
-    id: "lucide-grid-3x3",
-    iconName: "grid-3x3",
-    set: "lucide",
-    name: "grid-3x3",
-    humanLabel: "grid 3x3"
-  },
-  grip: {
-    id: "lucide-grip",
-    iconName: "grip",
-    set: "lucide",
-    name: "grip",
-    humanLabel: "grip"
-  },
+  "grid-2x2-plus": { iconName: "grid-2x2-plus", humanLabel: "grid 2x2 plus" },
+  "grid-2x2-x": { iconName: "grid-2x2-x", humanLabel: "grid 2x2 x" },
+  "grid-3x2": { iconName: "grid-3x2", humanLabel: "grid 3x2" },
+  "grid-3x3": { iconName: "grid-3x3", humanLabel: "grid 3x3" },
+  grip: { iconName: "grip", humanLabel: "grip" },
   "grip-horizontal": {
-    id: "lucide-grip-horizontal",
     iconName: "grip-horizontal",
-    set: "lucide",
-    name: "grip-horizontal",
     humanLabel: "grip horizontal"
   },
-  "grip-vertical": {
-    id: "lucide-grip-vertical",
-    iconName: "grip-vertical",
-    set: "lucide",
-    name: "grip-vertical",
-    humanLabel: "grip vertical"
-  },
-  group: {
-    id: "lucide-group",
-    iconName: "group",
-    set: "lucide",
-    name: "group",
-    humanLabel: "group"
-  },
-  guitar: {
-    id: "lucide-guitar",
-    iconName: "guitar",
-    set: "lucide",
-    name: "guitar",
-    humanLabel: "guitar"
-  },
-  ham: {
-    id: "lucide-ham",
-    iconName: "ham",
-    set: "lucide",
-    name: "ham",
-    humanLabel: "ham"
-  },
-  hamburger: {
-    id: "lucide-hamburger",
-    iconName: "hamburger",
-    set: "lucide",
-    name: "hamburger",
-    humanLabel: "hamburger"
-  },
-  hammer: {
-    id: "lucide-hammer",
-    iconName: "hammer",
-    set: "lucide",
-    name: "hammer",
-    humanLabel: "hammer"
-  },
-  hand: {
-    id: "lucide-hand",
-    iconName: "hand",
-    set: "lucide",
-    name: "hand",
-    humanLabel: "hand"
-  },
-  "hand-coins": {
-    id: "lucide-hand-coins",
-    iconName: "hand-coins",
-    set: "lucide",
-    name: "hand-coins",
-    humanLabel: "hand coins"
-  },
-  "hand-fist": {
-    id: "lucide-hand-fist",
-    iconName: "hand-fist",
-    set: "lucide",
-    name: "hand-fist",
-    humanLabel: "hand fist"
-  },
-  "hand-grab": {
-    id: "lucide-hand-grab",
-    iconName: "hand-grab",
-    set: "lucide",
-    name: "hand-grab",
-    humanLabel: "hand grab"
-  },
-  "hand-heart": {
-    id: "lucide-hand-heart",
-    iconName: "hand-heart",
-    set: "lucide",
-    name: "hand-heart",
-    humanLabel: "hand heart"
-  },
-  "hand-helping": {
-    id: "lucide-hand-helping",
-    iconName: "hand-helping",
-    set: "lucide",
-    name: "hand-helping",
-    humanLabel: "hand helping"
-  },
-  "hand-metal": {
-    id: "lucide-hand-metal",
-    iconName: "hand-metal",
-    set: "lucide",
-    name: "hand-metal",
-    humanLabel: "hand metal"
-  },
-  "hand-platter": {
-    id: "lucide-hand-platter",
-    iconName: "hand-platter",
-    set: "lucide",
-    name: "hand-platter",
-    humanLabel: "hand platter"
-  },
-  handbag: {
-    id: "lucide-handbag",
-    iconName: "handbag",
-    set: "lucide",
-    name: "handbag",
-    humanLabel: "handbag"
-  },
-  handshake: {
-    id: "lucide-handshake",
-    iconName: "handshake",
-    set: "lucide",
-    name: "handshake",
-    humanLabel: "handshake"
-  },
-  "hard-drive": {
-    id: "lucide-hard-drive",
-    iconName: "hard-drive",
-    set: "lucide",
-    name: "hard-drive",
-    humanLabel: "hard drive"
-  },
+  "grip-vertical": { iconName: "grip-vertical", humanLabel: "grip vertical" },
+  group: { iconName: "group", humanLabel: "group" },
+  guitar: { iconName: "guitar", humanLabel: "guitar" },
+  ham: { iconName: "ham", humanLabel: "ham" },
+  hamburger: { iconName: "hamburger", humanLabel: "hamburger" },
+  hammer: { iconName: "hammer", humanLabel: "hammer" },
+  hand: { iconName: "hand", humanLabel: "hand" },
+  "hand-coins": { iconName: "hand-coins", humanLabel: "hand coins" },
+  "hand-fist": { iconName: "hand-fist", humanLabel: "hand fist" },
+  "hand-grab": { iconName: "hand-grab", humanLabel: "hand grab" },
+  "hand-heart": { iconName: "hand-heart", humanLabel: "hand heart" },
+  "hand-helping": { iconName: "hand-helping", humanLabel: "hand helping" },
+  "hand-metal": { iconName: "hand-metal", humanLabel: "hand metal" },
+  "hand-platter": { iconName: "hand-platter", humanLabel: "hand platter" },
+  handbag: { iconName: "handbag", humanLabel: "handbag" },
+  handshake: { iconName: "handshake", humanLabel: "handshake" },
+  "hard-drive": { iconName: "hard-drive", humanLabel: "hard drive" },
   "hard-drive-download": {
-    id: "lucide-hard-drive-download",
     iconName: "hard-drive-download",
-    set: "lucide",
-    name: "hard-drive-download",
     humanLabel: "hard drive download"
   },
   "hard-drive-upload": {
-    id: "lucide-hard-drive-upload",
     iconName: "hard-drive-upload",
-    set: "lucide",
-    name: "hard-drive-upload",
     humanLabel: "hard drive upload"
   },
-  "hard-hat": {
-    id: "lucide-hard-hat",
-    iconName: "hard-hat",
-    set: "lucide",
-    name: "hard-hat",
-    humanLabel: "hard hat"
-  },
-  hash: {
-    id: "lucide-hash",
-    iconName: "hash",
-    set: "lucide",
-    name: "hash",
-    humanLabel: "hash"
-  },
-  "hat-glasses": {
-    id: "lucide-hat-glasses",
-    iconName: "hat-glasses",
-    set: "lucide",
-    name: "hat-glasses",
-    humanLabel: "hat glasses"
-  },
-  haze: {
-    id: "lucide-haze",
-    iconName: "haze",
-    set: "lucide",
-    name: "haze",
-    humanLabel: "haze"
-  },
-  hd: {
-    id: "lucide-hd",
-    iconName: "hd",
-    set: "lucide",
-    name: "hd",
-    humanLabel: "hd"
-  },
-  "hdmi-port": {
-    id: "lucide-hdmi-port",
-    iconName: "hdmi-port",
-    set: "lucide",
-    name: "hdmi-port",
-    humanLabel: "hdmi port"
-  },
-  heading: {
-    id: "lucide-heading",
-    iconName: "heading",
-    set: "lucide",
-    name: "heading",
-    humanLabel: "heading"
-  },
-  "heading-1": {
-    id: "lucide-heading-1",
-    iconName: "heading-1",
-    set: "lucide",
-    name: "heading-1",
-    humanLabel: "heading 1"
-  },
-  "heading-2": {
-    id: "lucide-heading-2",
-    iconName: "heading-2",
-    set: "lucide",
-    name: "heading-2",
-    humanLabel: "heading 2"
-  },
-  "heading-3": {
-    id: "lucide-heading-3",
-    iconName: "heading-3",
-    set: "lucide",
-    name: "heading-3",
-    humanLabel: "heading 3"
-  },
-  "heading-4": {
-    id: "lucide-heading-4",
-    iconName: "heading-4",
-    set: "lucide",
-    name: "heading-4",
-    humanLabel: "heading 4"
-  },
-  "heading-5": {
-    id: "lucide-heading-5",
-    iconName: "heading-5",
-    set: "lucide",
-    name: "heading-5",
-    humanLabel: "heading 5"
-  },
-  "heading-6": {
-    id: "lucide-heading-6",
-    iconName: "heading-6",
-    set: "lucide",
-    name: "heading-6",
-    humanLabel: "heading 6"
-  },
-  "headphone-off": {
-    id: "lucide-headphone-off",
-    iconName: "headphone-off",
-    set: "lucide",
-    name: "headphone-off",
-    humanLabel: "headphone off"
-  },
-  headphones: {
-    id: "lucide-headphones",
-    iconName: "headphones",
-    set: "lucide",
-    name: "headphones",
-    humanLabel: "headphones"
-  },
-  headset: {
-    id: "lucide-headset",
-    iconName: "headset",
-    set: "lucide",
-    name: "headset",
-    humanLabel: "headset"
-  },
-  heart: {
-    id: "lucide-heart",
-    iconName: "heart",
-    set: "lucide",
-    name: "heart",
-    humanLabel: "heart"
-  },
-  "heart-crack": {
-    id: "lucide-heart-crack",
-    iconName: "heart-crack",
-    set: "lucide",
-    name: "heart-crack",
-    humanLabel: "heart crack"
-  },
+  "hard-hat": { iconName: "hard-hat", humanLabel: "hard hat" },
+  hash: { iconName: "hash", humanLabel: "hash" },
+  "hat-glasses": { iconName: "hat-glasses", humanLabel: "hat glasses" },
+  haze: { iconName: "haze", humanLabel: "haze" },
+  hd: { iconName: "hd", humanLabel: "hd" },
+  "hdmi-port": { iconName: "hdmi-port", humanLabel: "hdmi port" },
+  heading: { iconName: "heading", humanLabel: "heading" },
+  "heading-1": { iconName: "heading-1", humanLabel: "heading 1" },
+  "heading-2": { iconName: "heading-2", humanLabel: "heading 2" },
+  "heading-3": { iconName: "heading-3", humanLabel: "heading 3" },
+  "heading-4": { iconName: "heading-4", humanLabel: "heading 4" },
+  "heading-5": { iconName: "heading-5", humanLabel: "heading 5" },
+  "heading-6": { iconName: "heading-6", humanLabel: "heading 6" },
+  "headphone-off": { iconName: "headphone-off", humanLabel: "headphone off" },
+  headphones: { iconName: "headphones", humanLabel: "headphones" },
+  headset: { iconName: "headset", humanLabel: "headset" },
+  heart: { iconName: "heart", humanLabel: "heart" },
+  "heart-crack": { iconName: "heart-crack", humanLabel: "heart crack" },
   "heart-handshake": {
-    id: "lucide-heart-handshake",
     iconName: "heart-handshake",
-    set: "lucide",
-    name: "heart-handshake",
     humanLabel: "heart handshake"
   },
-  "heart-minus": {
-    id: "lucide-heart-minus",
-    iconName: "heart-minus",
-    set: "lucide",
-    name: "heart-minus",
-    humanLabel: "heart minus"
-  },
-  "heart-off": {
-    id: "lucide-heart-off",
-    iconName: "heart-off",
-    set: "lucide",
-    name: "heart-off",
-    humanLabel: "heart off"
-  },
-  "heart-plus": {
-    id: "lucide-heart-plus",
-    iconName: "heart-plus",
-    set: "lucide",
-    name: "heart-plus",
-    humanLabel: "heart plus"
-  },
-  "heart-pulse": {
-    id: "lucide-heart-pulse",
-    iconName: "heart-pulse",
-    set: "lucide",
-    name: "heart-pulse",
-    humanLabel: "heart pulse"
-  },
-  "heart-x": {
-    id: "lucide-heart-x",
-    iconName: "heart-x",
-    set: "lucide",
-    name: "heart-x",
-    humanLabel: "heart x"
-  },
-  heater: {
-    id: "lucide-heater",
-    iconName: "heater",
-    set: "lucide",
-    name: "heater",
-    humanLabel: "heater"
-  },
-  helicopter: {
-    id: "lucide-helicopter",
-    iconName: "helicopter",
-    set: "lucide",
-    name: "helicopter",
-    humanLabel: "helicopter"
-  },
-  hexagon: {
-    id: "lucide-hexagon",
-    iconName: "hexagon",
-    set: "lucide",
-    name: "hexagon",
-    humanLabel: "hexagon"
-  },
-  highlighter: {
-    id: "lucide-highlighter",
-    iconName: "highlighter",
-    set: "lucide",
-    name: "highlighter",
-    humanLabel: "highlighter"
-  },
-  history: {
-    id: "lucide-history",
-    iconName: "history",
-    set: "lucide",
-    name: "history",
-    humanLabel: "history"
-  },
-  hop: {
-    id: "lucide-hop",
-    iconName: "hop",
-    set: "lucide",
-    name: "hop",
-    humanLabel: "hop"
-  },
-  "hop-off": {
-    id: "lucide-hop-off",
-    iconName: "hop-off",
-    set: "lucide",
-    name: "hop-off",
-    humanLabel: "hop off"
-  },
-  hospital: {
-    id: "lucide-hospital",
-    iconName: "hospital",
-    set: "lucide",
-    name: "hospital",
-    humanLabel: "hospital"
-  },
-  hotel: {
-    id: "lucide-hotel",
-    iconName: "hotel",
-    set: "lucide",
-    name: "hotel",
-    humanLabel: "hotel"
-  },
-  hourglass: {
-    id: "lucide-hourglass",
-    iconName: "hourglass",
-    set: "lucide",
-    name: "hourglass",
-    humanLabel: "hourglass"
-  },
-  house: {
-    id: "lucide-house",
-    iconName: "house",
-    set: "lucide",
-    name: "house",
-    humanLabel: "house"
-  },
-  "house-heart": {
-    id: "lucide-house-heart",
-    iconName: "house-heart",
-    set: "lucide",
-    name: "house-heart",
-    humanLabel: "house heart"
-  },
-  "house-plug": {
-    id: "lucide-house-plug",
-    iconName: "house-plug",
-    set: "lucide",
-    name: "house-plug",
-    humanLabel: "house plug"
-  },
-  "house-plus": {
-    id: "lucide-house-plus",
-    iconName: "house-plus",
-    set: "lucide",
-    name: "house-plus",
-    humanLabel: "house plus"
-  },
-  "house-wifi": {
-    id: "lucide-house-wifi",
-    iconName: "house-wifi",
-    set: "lucide",
-    name: "house-wifi",
-    humanLabel: "house wifi"
-  },
+  "heart-minus": { iconName: "heart-minus", humanLabel: "heart minus" },
+  "heart-off": { iconName: "heart-off", humanLabel: "heart off" },
+  "heart-plus": { iconName: "heart-plus", humanLabel: "heart plus" },
+  "heart-pulse": { iconName: "heart-pulse", humanLabel: "heart pulse" },
+  "heart-x": { iconName: "heart-x", humanLabel: "heart x" },
+  heater: { iconName: "heater", humanLabel: "heater" },
+  helicopter: { iconName: "helicopter", humanLabel: "helicopter" },
+  hexagon: { iconName: "hexagon", humanLabel: "hexagon" },
+  highlighter: { iconName: "highlighter", humanLabel: "highlighter" },
+  history: { iconName: "history", humanLabel: "history" },
+  hop: { iconName: "hop", humanLabel: "hop" },
+  "hop-off": { iconName: "hop-off", humanLabel: "hop off" },
+  hospital: { iconName: "hospital", humanLabel: "hospital" },
+  hotel: { iconName: "hotel", humanLabel: "hotel" },
+  hourglass: { iconName: "hourglass", humanLabel: "hourglass" },
+  house: { iconName: "house", humanLabel: "house" },
+  "house-heart": { iconName: "house-heart", humanLabel: "house heart" },
+  "house-plug": { iconName: "house-plug", humanLabel: "house plug" },
+  "house-plus": { iconName: "house-plus", humanLabel: "house plus" },
+  "house-wifi": { iconName: "house-wifi", humanLabel: "house wifi" },
   "ice-cream-bowl": {
-    id: "lucide-ice-cream-bowl",
     iconName: "ice-cream-bowl",
-    set: "lucide",
-    name: "ice-cream-bowl",
     humanLabel: "ice cream bowl"
   },
   "ice-cream-cone": {
-    id: "lucide-ice-cream-cone",
     iconName: "ice-cream-cone",
-    set: "lucide",
-    name: "ice-cream-cone",
     humanLabel: "ice cream cone"
   },
-  "id-card": {
-    id: "lucide-id-card",
-    iconName: "id-card",
-    set: "lucide",
-    name: "id-card",
-    humanLabel: "id card"
-  },
+  "id-card": { iconName: "id-card", humanLabel: "id card" },
   "id-card-lanyard": {
-    id: "lucide-id-card-lanyard",
     iconName: "id-card-lanyard",
-    set: "lucide",
-    name: "id-card-lanyard",
     humanLabel: "id card lanyard"
   },
-  image: {
-    id: "lucide-image",
-    iconName: "image",
-    set: "lucide",
-    name: "image",
-    humanLabel: "image"
-  },
-  "image-down": {
-    id: "lucide-image-down",
-    iconName: "image-down",
-    set: "lucide",
-    name: "image-down",
-    humanLabel: "image down"
-  },
-  "image-minus": {
-    id: "lucide-image-minus",
-    iconName: "image-minus",
-    set: "lucide",
-    name: "image-minus",
-    humanLabel: "image minus"
-  },
-  "image-off": {
-    id: "lucide-image-off",
-    iconName: "image-off",
-    set: "lucide",
-    name: "image-off",
-    humanLabel: "image off"
-  },
-  "image-play": {
-    id: "lucide-image-play",
-    iconName: "image-play",
-    set: "lucide",
-    name: "image-play",
-    humanLabel: "image play"
-  },
-  "image-plus": {
-    id: "lucide-image-plus",
-    iconName: "image-plus",
-    set: "lucide",
-    name: "image-plus",
-    humanLabel: "image plus"
-  },
-  "image-up": {
-    id: "lucide-image-up",
-    iconName: "image-up",
-    set: "lucide",
-    name: "image-up",
-    humanLabel: "image up"
-  },
-  "image-upscale": {
-    id: "lucide-image-upscale",
-    iconName: "image-upscale",
-    set: "lucide",
-    name: "image-upscale",
-    humanLabel: "image upscale"
-  },
-  images: {
-    id: "lucide-images",
-    iconName: "images",
-    set: "lucide",
-    name: "images",
-    humanLabel: "images"
-  },
-  import: {
-    id: "lucide-import",
-    iconName: "import",
-    set: "lucide",
-    name: "import",
-    humanLabel: "import"
-  },
-  inbox: {
-    id: "lucide-inbox",
-    iconName: "inbox",
-    set: "lucide",
-    name: "inbox",
-    humanLabel: "inbox"
-  },
-  "indian-rupee": {
-    id: "lucide-indian-rupee",
-    iconName: "indian-rupee",
-    set: "lucide",
-    name: "indian-rupee",
-    humanLabel: "indian rupee"
-  },
-  infinity: {
-    id: "lucide-infinity",
-    iconName: "infinity",
-    set: "lucide",
-    name: "infinity",
-    humanLabel: "infinity"
-  },
-  info: {
-    id: "lucide-info",
-    iconName: "info",
-    set: "lucide",
-    name: "info",
-    humanLabel: "info"
-  },
+  image: { iconName: "image", humanLabel: "image" },
+  "image-down": { iconName: "image-down", humanLabel: "image down" },
+  "image-minus": { iconName: "image-minus", humanLabel: "image minus" },
+  "image-off": { iconName: "image-off", humanLabel: "image off" },
+  "image-play": { iconName: "image-play", humanLabel: "image play" },
+  "image-plus": { iconName: "image-plus", humanLabel: "image plus" },
+  "image-up": { iconName: "image-up", humanLabel: "image up" },
+  "image-upscale": { iconName: "image-upscale", humanLabel: "image upscale" },
+  images: { iconName: "images", humanLabel: "images" },
+  import: { iconName: "import", humanLabel: "import" },
+  inbox: { iconName: "inbox", humanLabel: "inbox" },
+  "indian-rupee": { iconName: "indian-rupee", humanLabel: "indian rupee" },
+  infinity: { iconName: "infinity", humanLabel: "infinity" },
+  info: { iconName: "info", humanLabel: "info" },
   "inspection-panel": {
-    id: "lucide-inspection-panel",
     iconName: "inspection-panel",
-    set: "lucide",
-    name: "inspection-panel",
     humanLabel: "inspection panel"
   },
-  italic: {
-    id: "lucide-italic",
-    iconName: "italic",
-    set: "lucide",
-    name: "italic",
-    humanLabel: "italic"
-  },
-  "iteration-ccw": {
-    id: "lucide-iteration-ccw",
-    iconName: "iteration-ccw",
-    set: "lucide",
-    name: "iteration-ccw",
-    humanLabel: "iteration ccw"
-  },
-  "iteration-cw": {
-    id: "lucide-iteration-cw",
-    iconName: "iteration-cw",
-    set: "lucide",
-    name: "iteration-cw",
-    humanLabel: "iteration cw"
-  },
-  "japanese-yen": {
-    id: "lucide-japanese-yen",
-    iconName: "japanese-yen",
-    set: "lucide",
-    name: "japanese-yen",
-    humanLabel: "japanese yen"
-  },
-  joystick: {
-    id: "lucide-joystick",
-    iconName: "joystick",
-    set: "lucide",
-    name: "joystick",
-    humanLabel: "joystick"
-  },
-  kanban: {
-    id: "lucide-kanban",
-    iconName: "kanban",
-    set: "lucide",
-    name: "kanban",
-    humanLabel: "kanban"
-  },
-  kayak: {
-    id: "lucide-kayak",
-    iconName: "kayak",
-    set: "lucide",
-    name: "kayak",
-    humanLabel: "kayak"
-  },
-  key: {
-    id: "lucide-key",
-    iconName: "key",
-    set: "lucide",
-    name: "key",
-    humanLabel: "key"
-  },
-  "key-round": {
-    id: "lucide-key-round",
-    iconName: "key-round",
-    set: "lucide",
-    name: "key-round",
-    humanLabel: "key round"
-  },
-  "key-square": {
-    id: "lucide-key-square",
-    iconName: "key-square",
-    set: "lucide",
-    name: "key-square",
-    humanLabel: "key square"
-  },
-  keyboard: {
-    id: "lucide-keyboard",
-    iconName: "keyboard",
-    set: "lucide",
-    name: "keyboard",
-    humanLabel: "keyboard"
-  },
+  italic: { iconName: "italic", humanLabel: "italic" },
+  "iteration-ccw": { iconName: "iteration-ccw", humanLabel: "iteration ccw" },
+  "iteration-cw": { iconName: "iteration-cw", humanLabel: "iteration cw" },
+  "japanese-yen": { iconName: "japanese-yen", humanLabel: "japanese yen" },
+  joystick: { iconName: "joystick", humanLabel: "joystick" },
+  kanban: { iconName: "kanban", humanLabel: "kanban" },
+  kayak: { iconName: "kayak", humanLabel: "kayak" },
+  key: { iconName: "key", humanLabel: "key" },
+  "key-round": { iconName: "key-round", humanLabel: "key round" },
+  "key-square": { iconName: "key-square", humanLabel: "key square" },
+  keyboard: { iconName: "keyboard", humanLabel: "keyboard" },
   "keyboard-music": {
-    id: "lucide-keyboard-music",
     iconName: "keyboard-music",
-    set: "lucide",
-    name: "keyboard-music",
     humanLabel: "keyboard music"
   },
-  "keyboard-off": {
-    id: "lucide-keyboard-off",
-    iconName: "keyboard-off",
-    set: "lucide",
-    name: "keyboard-off",
-    humanLabel: "keyboard off"
-  },
-  lamp: {
-    id: "lucide-lamp",
-    iconName: "lamp",
-    set: "lucide",
-    name: "lamp",
-    humanLabel: "lamp"
-  },
-  "lamp-ceiling": {
-    id: "lucide-lamp-ceiling",
-    iconName: "lamp-ceiling",
-    set: "lucide",
-    name: "lamp-ceiling",
-    humanLabel: "lamp ceiling"
-  },
-  "lamp-desk": {
-    id: "lucide-lamp-desk",
-    iconName: "lamp-desk",
-    set: "lucide",
-    name: "lamp-desk",
-    humanLabel: "lamp desk"
-  },
-  "lamp-floor": {
-    id: "lucide-lamp-floor",
-    iconName: "lamp-floor",
-    set: "lucide",
-    name: "lamp-floor",
-    humanLabel: "lamp floor"
-  },
+  "keyboard-off": { iconName: "keyboard-off", humanLabel: "keyboard off" },
+  lamp: { iconName: "lamp", humanLabel: "lamp" },
+  "lamp-ceiling": { iconName: "lamp-ceiling", humanLabel: "lamp ceiling" },
+  "lamp-desk": { iconName: "lamp-desk", humanLabel: "lamp desk" },
+  "lamp-floor": { iconName: "lamp-floor", humanLabel: "lamp floor" },
   "lamp-wall-down": {
-    id: "lucide-lamp-wall-down",
     iconName: "lamp-wall-down",
-    set: "lucide",
-    name: "lamp-wall-down",
     humanLabel: "lamp wall down"
   },
-  "lamp-wall-up": {
-    id: "lucide-lamp-wall-up",
-    iconName: "lamp-wall-up",
-    set: "lucide",
-    name: "lamp-wall-up",
-    humanLabel: "lamp wall up"
-  },
-  "land-plot": {
-    id: "lucide-land-plot",
-    iconName: "land-plot",
-    set: "lucide",
-    name: "land-plot",
-    humanLabel: "land plot"
-  },
-  landmark: {
-    id: "lucide-landmark",
-    iconName: "landmark",
-    set: "lucide",
-    name: "landmark",
-    humanLabel: "landmark"
-  },
-  languages: {
-    id: "lucide-languages",
-    iconName: "languages",
-    set: "lucide",
-    name: "languages",
-    humanLabel: "languages"
-  },
-  laptop: {
-    id: "lucide-laptop",
-    iconName: "laptop",
-    set: "lucide",
-    name: "laptop",
-    humanLabel: "laptop"
-  },
+  "lamp-wall-up": { iconName: "lamp-wall-up", humanLabel: "lamp wall up" },
+  "land-plot": { iconName: "land-plot", humanLabel: "land plot" },
+  landmark: { iconName: "landmark", humanLabel: "landmark" },
+  languages: { iconName: "languages", humanLabel: "languages" },
+  laptop: { iconName: "laptop", humanLabel: "laptop" },
   "laptop-minimal": {
-    id: "lucide-laptop-minimal",
     iconName: "laptop-minimal",
-    set: "lucide",
-    name: "laptop-minimal",
     humanLabel: "laptop minimal"
   },
   "laptop-minimal-check": {
-    id: "lucide-laptop-minimal-check",
     iconName: "laptop-minimal-check",
-    set: "lucide",
-    name: "laptop-minimal-check",
     humanLabel: "laptop minimal check"
   },
-  lasso: {
-    id: "lucide-lasso",
-    iconName: "lasso",
-    set: "lucide",
-    name: "lasso",
-    humanLabel: "lasso"
-  },
-  "lasso-select": {
-    id: "lucide-lasso-select",
-    iconName: "lasso-select",
-    set: "lucide",
-    name: "lasso-select",
-    humanLabel: "lasso select"
-  },
-  laugh: {
-    id: "lucide-laugh",
-    iconName: "laugh",
-    set: "lucide",
-    name: "laugh",
-    humanLabel: "laugh"
-  },
-  layers: {
-    id: "lucide-layers",
-    iconName: "layers",
-    set: "lucide",
-    name: "layers",
-    humanLabel: "layers"
-  },
-  "layers-2": {
-    id: "lucide-layers-2",
-    iconName: "layers-2",
-    set: "lucide",
-    name: "layers-2",
-    humanLabel: "layers 2"
-  },
-  "layers-minus": {
-    id: "lucide-layers-minus",
-    iconName: "layers-minus",
-    set: "lucide",
-    name: "layers-minus",
-    humanLabel: "layers minus"
-  },
-  "layers-plus": {
-    id: "lucide-layers-plus",
-    iconName: "layers-plus",
-    set: "lucide",
-    name: "layers-plus",
-    humanLabel: "layers plus"
-  },
+  lasso: { iconName: "lasso", humanLabel: "lasso" },
+  "lasso-select": { iconName: "lasso-select", humanLabel: "lasso select" },
+  laugh: { iconName: "laugh", humanLabel: "laugh" },
+  layers: { iconName: "layers", humanLabel: "layers" },
+  "layers-2": { iconName: "layers-2", humanLabel: "layers 2" },
+  "layers-minus": { iconName: "layers-minus", humanLabel: "layers minus" },
+  "layers-plus": { iconName: "layers-plus", humanLabel: "layers plus" },
   "layout-dashboard": {
-    id: "lucide-layout-dashboard",
     iconName: "layout-dashboard",
-    set: "lucide",
-    name: "layout-dashboard",
     humanLabel: "layout dashboard"
   },
-  "layout-grid": {
-    id: "lucide-layout-grid",
-    iconName: "layout-grid",
-    set: "lucide",
-    name: "layout-grid",
-    humanLabel: "layout grid"
-  },
-  "layout-list": {
-    id: "lucide-layout-list",
-    iconName: "layout-list",
-    set: "lucide",
-    name: "layout-list",
-    humanLabel: "layout list"
-  },
+  "layout-grid": { iconName: "layout-grid", humanLabel: "layout grid" },
+  "layout-list": { iconName: "layout-list", humanLabel: "layout list" },
   "layout-panel-left": {
-    id: "lucide-layout-panel-left",
     iconName: "layout-panel-left",
-    set: "lucide",
-    name: "layout-panel-left",
     humanLabel: "layout panel left"
   },
   "layout-panel-top": {
-    id: "lucide-layout-panel-top",
     iconName: "layout-panel-top",
-    set: "lucide",
-    name: "layout-panel-top",
     humanLabel: "layout panel top"
   },
   "layout-template": {
-    id: "lucide-layout-template",
     iconName: "layout-template",
-    set: "lucide",
-    name: "layout-template",
     humanLabel: "layout template"
   },
-  leaf: {
-    id: "lucide-leaf",
-    iconName: "leaf",
-    set: "lucide",
-    name: "leaf",
-    humanLabel: "leaf"
-  },
-  "leafy-green": {
-    id: "lucide-leafy-green",
-    iconName: "leafy-green",
-    set: "lucide",
-    name: "leafy-green",
-    humanLabel: "leafy green"
-  },
-  lectern: {
-    id: "lucide-lectern",
-    iconName: "lectern",
-    set: "lucide",
-    name: "lectern",
-    humanLabel: "lectern"
-  },
-  "lens-concave": {
-    id: "lucide-lens-concave",
-    iconName: "lens-concave",
-    set: "lucide",
-    name: "lens-concave",
-    humanLabel: "lens concave"
-  },
-  "lens-convex": {
-    id: "lucide-lens-convex",
-    iconName: "lens-convex",
-    set: "lucide",
-    name: "lens-convex",
-    humanLabel: "lens convex"
-  },
-  library: {
-    id: "lucide-library",
-    iconName: "library",
-    set: "lucide",
-    name: "library",
-    humanLabel: "library"
-  },
-  "library-big": {
-    id: "lucide-library-big",
-    iconName: "library-big",
-    set: "lucide",
-    name: "library-big",
-    humanLabel: "library big"
-  },
-  "life-buoy": {
-    id: "lucide-life-buoy",
-    iconName: "life-buoy",
-    set: "lucide",
-    name: "life-buoy",
-    humanLabel: "life buoy"
-  },
-  ligature: {
-    id: "lucide-ligature",
-    iconName: "ligature",
-    set: "lucide",
-    name: "ligature",
-    humanLabel: "ligature"
-  },
-  lightbulb: {
-    id: "lucide-lightbulb",
-    iconName: "lightbulb",
-    set: "lucide",
-    name: "lightbulb",
-    humanLabel: "lightbulb"
-  },
-  "lightbulb-off": {
-    id: "lucide-lightbulb-off",
-    iconName: "lightbulb-off",
-    set: "lucide",
-    name: "lightbulb-off",
-    humanLabel: "lightbulb off"
-  },
+  leaf: { iconName: "leaf", humanLabel: "leaf" },
+  "leafy-green": { iconName: "leafy-green", humanLabel: "leafy green" },
+  lectern: { iconName: "lectern", humanLabel: "lectern" },
+  "lens-concave": { iconName: "lens-concave", humanLabel: "lens concave" },
+  "lens-convex": { iconName: "lens-convex", humanLabel: "lens convex" },
+  library: { iconName: "library", humanLabel: "library" },
+  "library-big": { iconName: "library-big", humanLabel: "library big" },
+  "life-buoy": { iconName: "life-buoy", humanLabel: "life buoy" },
+  ligature: { iconName: "ligature", humanLabel: "ligature" },
+  lightbulb: { iconName: "lightbulb", humanLabel: "lightbulb" },
+  "lightbulb-off": { iconName: "lightbulb-off", humanLabel: "lightbulb off" },
   "line-dot-right-horizontal": {
-    id: "lucide-line-dot-right-horizontal",
     iconName: "line-dot-right-horizontal",
-    set: "lucide",
-    name: "line-dot-right-horizontal",
     humanLabel: "line dot right horizontal"
   },
-  "line-squiggle": {
-    id: "lucide-line-squiggle",
-    iconName: "line-squiggle",
-    set: "lucide",
-    name: "line-squiggle",
-    humanLabel: "line squiggle"
-  },
-  "line-style": {
-    id: "lucide-line-style",
-    iconName: "line-style",
-    set: "lucide",
-    name: "line-style",
-    humanLabel: "line style"
-  },
-  link: {
-    id: "lucide-link",
-    iconName: "link",
-    set: "lucide",
-    name: "link",
-    humanLabel: "link"
-  },
-  "link-2": {
-    id: "lucide-link-2",
-    iconName: "link-2",
-    set: "lucide",
-    name: "link-2",
-    humanLabel: "link 2"
-  },
-  "link-2-off": {
-    id: "lucide-link-2-off",
-    iconName: "link-2-off",
-    set: "lucide",
-    name: "link-2-off",
-    humanLabel: "link 2 off"
-  },
-  list: {
-    id: "lucide-list",
-    iconName: "list",
-    set: "lucide",
-    name: "list",
-    humanLabel: "list"
-  },
-  "list-check": {
-    id: "lucide-list-check",
-    iconName: "list-check",
-    set: "lucide",
-    name: "list-check",
-    humanLabel: "list check"
-  },
-  "list-checks": {
-    id: "lucide-list-checks",
-    iconName: "list-checks",
-    set: "lucide",
-    name: "list-checks",
-    humanLabel: "list checks"
-  },
+  "line-squiggle": { iconName: "line-squiggle", humanLabel: "line squiggle" },
+  "line-style": { iconName: "line-style", humanLabel: "line style" },
+  link: { iconName: "link", humanLabel: "link" },
+  "link-2": { iconName: "link-2", humanLabel: "link 2" },
+  "link-2-off": { iconName: "link-2-off", humanLabel: "link 2 off" },
+  list: { iconName: "list", humanLabel: "list" },
+  "list-check": { iconName: "list-check", humanLabel: "list check" },
+  "list-checks": { iconName: "list-checks", humanLabel: "list checks" },
   "list-chevrons-down-up": {
-    id: "lucide-list-chevrons-down-up",
     iconName: "list-chevrons-down-up",
-    set: "lucide",
-    name: "list-chevrons-down-up",
     humanLabel: "list chevrons down up"
   },
   "list-chevrons-up-down": {
-    id: "lucide-list-chevrons-up-down",
     iconName: "list-chevrons-up-down",
-    set: "lucide",
-    name: "list-chevrons-up-down",
     humanLabel: "list chevrons up down"
   },
-  "list-collapse": {
-    id: "lucide-list-collapse",
-    iconName: "list-collapse",
-    set: "lucide",
-    name: "list-collapse",
-    humanLabel: "list collapse"
-  },
-  "list-end": {
-    id: "lucide-list-end",
-    iconName: "list-end",
-    set: "lucide",
-    name: "list-end",
-    humanLabel: "list end"
-  },
-  "list-filter": {
-    id: "lucide-list-filter",
-    iconName: "list-filter",
-    set: "lucide",
-    name: "list-filter",
-    humanLabel: "list filter"
-  },
+  "list-collapse": { iconName: "list-collapse", humanLabel: "list collapse" },
+  "list-end": { iconName: "list-end", humanLabel: "list end" },
+  "list-filter": { iconName: "list-filter", humanLabel: "list filter" },
   "list-filter-plus": {
-    id: "lucide-list-filter-plus",
     iconName: "list-filter-plus",
-    set: "lucide",
-    name: "list-filter-plus",
     humanLabel: "list filter plus"
   },
   "list-indent-decrease": {
-    id: "lucide-list-indent-decrease",
     iconName: "list-indent-decrease",
-    set: "lucide",
-    name: "list-indent-decrease",
     humanLabel: "list indent decrease"
   },
   "list-indent-increase": {
-    id: "lucide-list-indent-increase",
     iconName: "list-indent-increase",
-    set: "lucide",
-    name: "list-indent-increase",
     humanLabel: "list indent increase"
   },
-  "list-minus": {
-    id: "lucide-list-minus",
-    iconName: "list-minus",
-    set: "lucide",
-    name: "list-minus",
-    humanLabel: "list minus"
-  },
-  "list-music": {
-    id: "lucide-list-music",
-    iconName: "list-music",
-    set: "lucide",
-    name: "list-music",
-    humanLabel: "list music"
-  },
-  "list-ordered": {
-    id: "lucide-list-ordered",
-    iconName: "list-ordered",
-    set: "lucide",
-    name: "list-ordered",
-    humanLabel: "list ordered"
-  },
-  "list-plus": {
-    id: "lucide-list-plus",
-    iconName: "list-plus",
-    set: "lucide",
-    name: "list-plus",
-    humanLabel: "list plus"
-  },
-  "list-restart": {
-    id: "lucide-list-restart",
-    iconName: "list-restart",
-    set: "lucide",
-    name: "list-restart",
-    humanLabel: "list restart"
-  },
-  "list-start": {
-    id: "lucide-list-start",
-    iconName: "list-start",
-    set: "lucide",
-    name: "list-start",
-    humanLabel: "list start"
-  },
-  "list-todo": {
-    id: "lucide-list-todo",
-    iconName: "list-todo",
-    set: "lucide",
-    name: "list-todo",
-    humanLabel: "list todo"
-  },
-  "list-tree": {
-    id: "lucide-list-tree",
-    iconName: "list-tree",
-    set: "lucide",
-    name: "list-tree",
-    humanLabel: "list tree"
-  },
-  "list-video": {
-    id: "lucide-list-video",
-    iconName: "list-video",
-    set: "lucide",
-    name: "list-video",
-    humanLabel: "list video"
-  },
-  "list-x": {
-    id: "lucide-list-x",
-    iconName: "list-x",
-    set: "lucide",
-    name: "list-x",
-    humanLabel: "list x"
-  },
-  loader: {
-    id: "lucide-loader",
-    iconName: "loader",
-    set: "lucide",
-    name: "loader",
-    humanLabel: "loader"
-  },
-  "loader-circle": {
-    id: "lucide-loader-circle",
-    iconName: "loader-circle",
-    set: "lucide",
-    name: "loader-circle",
-    humanLabel: "loader circle"
-  },
+  "list-minus": { iconName: "list-minus", humanLabel: "list minus" },
+  "list-music": { iconName: "list-music", humanLabel: "list music" },
+  "list-ordered": { iconName: "list-ordered", humanLabel: "list ordered" },
+  "list-plus": { iconName: "list-plus", humanLabel: "list plus" },
+  "list-restart": { iconName: "list-restart", humanLabel: "list restart" },
+  "list-start": { iconName: "list-start", humanLabel: "list start" },
+  "list-todo": { iconName: "list-todo", humanLabel: "list todo" },
+  "list-tree": { iconName: "list-tree", humanLabel: "list tree" },
+  "list-video": { iconName: "list-video", humanLabel: "list video" },
+  "list-x": { iconName: "list-x", humanLabel: "list x" },
+  loader: { iconName: "loader", humanLabel: "loader" },
+  "loader-circle": { iconName: "loader-circle", humanLabel: "loader circle" },
   "loader-pinwheel": {
-    id: "lucide-loader-pinwheel",
     iconName: "loader-pinwheel",
-    set: "lucide",
-    name: "loader-pinwheel",
     humanLabel: "loader pinwheel"
   },
-  locate: {
-    id: "lucide-locate",
-    iconName: "locate",
-    set: "lucide",
-    name: "locate",
-    humanLabel: "locate"
-  },
-  "locate-fixed": {
-    id: "lucide-locate-fixed",
-    iconName: "locate-fixed",
-    set: "lucide",
-    name: "locate-fixed",
-    humanLabel: "locate fixed"
-  },
-  "locate-off": {
-    id: "lucide-locate-off",
-    iconName: "locate-off",
-    set: "lucide",
-    name: "locate-off",
-    humanLabel: "locate off"
-  },
-  lock: {
-    id: "lucide-lock",
-    iconName: "lock",
-    set: "lucide",
-    name: "lock",
-    humanLabel: "lock"
-  },
-  "lock-keyhole": {
-    id: "lucide-lock-keyhole",
-    iconName: "lock-keyhole",
-    set: "lucide",
-    name: "lock-keyhole",
-    humanLabel: "lock keyhole"
-  },
+  locate: { iconName: "locate", humanLabel: "locate" },
+  "locate-fixed": { iconName: "locate-fixed", humanLabel: "locate fixed" },
+  "locate-off": { iconName: "locate-off", humanLabel: "locate off" },
+  lock: { iconName: "lock", humanLabel: "lock" },
+  "lock-keyhole": { iconName: "lock-keyhole", humanLabel: "lock keyhole" },
   "lock-keyhole-open": {
-    id: "lucide-lock-keyhole-open",
     iconName: "lock-keyhole-open",
-    set: "lucide",
-    name: "lock-keyhole-open",
     humanLabel: "lock keyhole open"
   },
-  "lock-open": {
-    id: "lucide-lock-open",
-    iconName: "lock-open",
-    set: "lucide",
-    name: "lock-open",
-    humanLabel: "lock open"
-  },
-  "log-in": {
-    id: "lucide-log-in",
-    iconName: "log-in",
-    set: "lucide",
-    name: "log-in",
-    humanLabel: "log in"
-  },
-  "log-out": {
-    id: "lucide-log-out",
-    iconName: "log-out",
-    set: "lucide",
-    name: "log-out",
-    humanLabel: "log out"
-  },
-  logs: {
-    id: "lucide-logs",
-    iconName: "logs",
-    set: "lucide",
-    name: "logs",
-    humanLabel: "logs"
-  },
-  lollipop: {
-    id: "lucide-lollipop",
-    iconName: "lollipop",
-    set: "lucide",
-    name: "lollipop",
-    humanLabel: "lollipop"
-  },
-  luggage: {
-    id: "lucide-luggage",
-    iconName: "luggage",
-    set: "lucide",
-    name: "luggage",
-    humanLabel: "luggage"
-  },
-  magnet: {
-    id: "lucide-magnet",
-    iconName: "magnet",
-    set: "lucide",
-    name: "magnet",
-    humanLabel: "magnet"
-  },
-  mail: {
-    id: "lucide-mail",
-    iconName: "mail",
-    set: "lucide",
-    name: "mail",
-    humanLabel: "mail"
-  },
-  "mail-check": {
-    id: "lucide-mail-check",
-    iconName: "mail-check",
-    set: "lucide",
-    name: "mail-check",
-    humanLabel: "mail check"
-  },
-  "mail-minus": {
-    id: "lucide-mail-minus",
-    iconName: "mail-minus",
-    set: "lucide",
-    name: "mail-minus",
-    humanLabel: "mail minus"
-  },
-  "mail-open": {
-    id: "lucide-mail-open",
-    iconName: "mail-open",
-    set: "lucide",
-    name: "mail-open",
-    humanLabel: "mail open"
-  },
-  "mail-plus": {
-    id: "lucide-mail-plus",
-    iconName: "mail-plus",
-    set: "lucide",
-    name: "mail-plus",
-    humanLabel: "mail plus"
-  },
+  "lock-open": { iconName: "lock-open", humanLabel: "lock open" },
+  "log-in": { iconName: "log-in", humanLabel: "log in" },
+  "log-out": { iconName: "log-out", humanLabel: "log out" },
+  logs: { iconName: "logs", humanLabel: "logs" },
+  lollipop: { iconName: "lollipop", humanLabel: "lollipop" },
+  luggage: { iconName: "luggage", humanLabel: "luggage" },
+  magnet: { iconName: "magnet", humanLabel: "magnet" },
+  mail: { iconName: "mail", humanLabel: "mail" },
+  "mail-check": { iconName: "mail-check", humanLabel: "mail check" },
+  "mail-minus": { iconName: "mail-minus", humanLabel: "mail minus" },
+  "mail-open": { iconName: "mail-open", humanLabel: "mail open" },
+  "mail-plus": { iconName: "mail-plus", humanLabel: "mail plus" },
   "mail-question-mark": {
-    id: "lucide-mail-question-mark",
     iconName: "mail-question-mark",
-    set: "lucide",
-    name: "mail-question-mark",
     humanLabel: "mail question mark"
   },
-  "mail-search": {
-    id: "lucide-mail-search",
-    iconName: "mail-search",
-    set: "lucide",
-    name: "mail-search",
-    humanLabel: "mail search"
-  },
-  "mail-warning": {
-    id: "lucide-mail-warning",
-    iconName: "mail-warning",
-    set: "lucide",
-    name: "mail-warning",
-    humanLabel: "mail warning"
-  },
-  "mail-x": {
-    id: "lucide-mail-x",
-    iconName: "mail-x",
-    set: "lucide",
-    name: "mail-x",
-    humanLabel: "mail x"
-  },
-  mailbox: {
-    id: "lucide-mailbox",
-    iconName: "mailbox",
-    set: "lucide",
-    name: "mailbox",
-    humanLabel: "mailbox"
-  },
-  mails: {
-    id: "lucide-mails",
-    iconName: "mails",
-    set: "lucide",
-    name: "mails",
-    humanLabel: "mails"
-  },
-  map: {
-    id: "lucide-map",
-    iconName: "map",
-    set: "lucide",
-    name: "map",
-    humanLabel: "map"
-  },
-  "map-minus": {
-    id: "lucide-map-minus",
-    iconName: "map-minus",
-    set: "lucide",
-    name: "map-minus",
-    humanLabel: "map minus"
-  },
-  "map-pin": {
-    id: "lucide-map-pin",
-    iconName: "map-pin",
-    set: "lucide",
-    name: "map-pin",
-    humanLabel: "map pin"
-  },
-  "map-pin-check": {
-    id: "lucide-map-pin-check",
-    iconName: "map-pin-check",
-    set: "lucide",
-    name: "map-pin-check",
-    humanLabel: "map pin check"
-  },
+  "mail-search": { iconName: "mail-search", humanLabel: "mail search" },
+  "mail-warning": { iconName: "mail-warning", humanLabel: "mail warning" },
+  "mail-x": { iconName: "mail-x", humanLabel: "mail x" },
+  mailbox: { iconName: "mailbox", humanLabel: "mailbox" },
+  mails: { iconName: "mails", humanLabel: "mails" },
+  map: { iconName: "map", humanLabel: "map" },
+  "map-minus": { iconName: "map-minus", humanLabel: "map minus" },
+  "map-pin": { iconName: "map-pin", humanLabel: "map pin" },
+  "map-pin-check": { iconName: "map-pin-check", humanLabel: "map pin check" },
   "map-pin-check-inside": {
-    id: "lucide-map-pin-check-inside",
     iconName: "map-pin-check-inside",
-    set: "lucide",
-    name: "map-pin-check-inside",
     humanLabel: "map pin check inside"
   },
-  "map-pin-house": {
-    id: "lucide-map-pin-house",
-    iconName: "map-pin-house",
-    set: "lucide",
-    name: "map-pin-house",
-    humanLabel: "map pin house"
-  },
-  "map-pin-minus": {
-    id: "lucide-map-pin-minus",
-    iconName: "map-pin-minus",
-    set: "lucide",
-    name: "map-pin-minus",
-    humanLabel: "map pin minus"
-  },
+  "map-pin-house": { iconName: "map-pin-house", humanLabel: "map pin house" },
+  "map-pin-minus": { iconName: "map-pin-minus", humanLabel: "map pin minus" },
   "map-pin-minus-inside": {
-    id: "lucide-map-pin-minus-inside",
     iconName: "map-pin-minus-inside",
-    set: "lucide",
-    name: "map-pin-minus-inside",
     humanLabel: "map pin minus inside"
   },
-  "map-pin-off": {
-    id: "lucide-map-pin-off",
-    iconName: "map-pin-off",
-    set: "lucide",
-    name: "map-pin-off",
-    humanLabel: "map pin off"
-  },
-  "map-pin-pen": {
-    id: "lucide-map-pin-pen",
-    iconName: "map-pin-pen",
-    set: "lucide",
-    name: "map-pin-pen",
-    humanLabel: "map pin pen"
-  },
-  "map-pin-plus": {
-    id: "lucide-map-pin-plus",
-    iconName: "map-pin-plus",
-    set: "lucide",
-    name: "map-pin-plus",
-    humanLabel: "map pin plus"
-  },
+  "map-pin-off": { iconName: "map-pin-off", humanLabel: "map pin off" },
+  "map-pin-pen": { iconName: "map-pin-pen", humanLabel: "map pin pen" },
+  "map-pin-plus": { iconName: "map-pin-plus", humanLabel: "map pin plus" },
   "map-pin-plus-inside": {
-    id: "lucide-map-pin-plus-inside",
     iconName: "map-pin-plus-inside",
-    set: "lucide",
-    name: "map-pin-plus-inside",
     humanLabel: "map pin plus inside"
   },
   "map-pin-search": {
-    id: "lucide-map-pin-search",
     iconName: "map-pin-search",
-    set: "lucide",
-    name: "map-pin-search",
     humanLabel: "map pin search"
   },
-  "map-pin-x": {
-    id: "lucide-map-pin-x",
-    iconName: "map-pin-x",
-    set: "lucide",
-    name: "map-pin-x",
-    humanLabel: "map pin x"
-  },
+  "map-pin-x": { iconName: "map-pin-x", humanLabel: "map pin x" },
   "map-pin-x-inside": {
-    id: "lucide-map-pin-x-inside",
     iconName: "map-pin-x-inside",
-    set: "lucide",
-    name: "map-pin-x-inside",
     humanLabel: "map pin x inside"
   },
-  "map-pinned": {
-    id: "lucide-map-pinned",
-    iconName: "map-pinned",
-    set: "lucide",
-    name: "map-pinned",
-    humanLabel: "map pinned"
-  },
-  "map-plus": {
-    id: "lucide-map-plus",
-    iconName: "map-plus",
-    set: "lucide",
-    name: "map-plus",
-    humanLabel: "map plus"
-  },
-  mars: {
-    id: "lucide-mars",
-    iconName: "mars",
-    set: "lucide",
-    name: "mars",
-    humanLabel: "mars"
-  },
-  "mars-stroke": {
-    id: "lucide-mars-stroke",
-    iconName: "mars-stroke",
-    set: "lucide",
-    name: "mars-stroke",
-    humanLabel: "mars stroke"
-  },
-  martini: {
-    id: "lucide-martini",
-    iconName: "martini",
-    set: "lucide",
-    name: "martini",
-    humanLabel: "martini"
-  },
-  maximize: {
-    id: "lucide-maximize",
-    iconName: "maximize",
-    set: "lucide",
-    name: "maximize",
-    humanLabel: "maximize"
-  },
-  "maximize-2": {
-    id: "lucide-maximize-2",
-    iconName: "maximize-2",
-    set: "lucide",
-    name: "maximize-2",
-    humanLabel: "maximize 2"
-  },
-  medal: {
-    id: "lucide-medal",
-    iconName: "medal",
-    set: "lucide",
-    name: "medal",
-    humanLabel: "medal"
-  },
-  megaphone: {
-    id: "lucide-megaphone",
-    iconName: "megaphone",
-    set: "lucide",
-    name: "megaphone",
-    humanLabel: "megaphone"
-  },
-  "megaphone-off": {
-    id: "lucide-megaphone-off",
-    iconName: "megaphone-off",
-    set: "lucide",
-    name: "megaphone-off",
-    humanLabel: "megaphone off"
-  },
-  meh: {
-    id: "lucide-meh",
-    iconName: "meh",
-    set: "lucide",
-    name: "meh",
-    humanLabel: "meh"
-  },
-  "memory-stick": {
-    id: "lucide-memory-stick",
-    iconName: "memory-stick",
-    set: "lucide",
-    name: "memory-stick",
-    humanLabel: "memory stick"
-  },
-  menu: {
-    id: "lucide-menu",
-    iconName: "menu",
-    set: "lucide",
-    name: "menu",
-    humanLabel: "menu"
-  },
-  merge: {
-    id: "lucide-merge",
-    iconName: "merge",
-    set: "lucide",
-    name: "merge",
-    humanLabel: "merge"
-  },
+  "map-pinned": { iconName: "map-pinned", humanLabel: "map pinned" },
+  "map-plus": { iconName: "map-plus", humanLabel: "map plus" },
+  mars: { iconName: "mars", humanLabel: "mars" },
+  "mars-stroke": { iconName: "mars-stroke", humanLabel: "mars stroke" },
+  martini: { iconName: "martini", humanLabel: "martini" },
+  maximize: { iconName: "maximize", humanLabel: "maximize" },
+  "maximize-2": { iconName: "maximize-2", humanLabel: "maximize 2" },
+  medal: { iconName: "medal", humanLabel: "medal" },
+  megaphone: { iconName: "megaphone", humanLabel: "megaphone" },
+  "megaphone-off": { iconName: "megaphone-off", humanLabel: "megaphone off" },
+  meh: { iconName: "meh", humanLabel: "meh" },
+  "memory-stick": { iconName: "memory-stick", humanLabel: "memory stick" },
+  menu: { iconName: "menu", humanLabel: "menu" },
+  merge: { iconName: "merge", humanLabel: "merge" },
   "message-circle": {
-    id: "lucide-message-circle",
     iconName: "message-circle",
-    set: "lucide",
-    name: "message-circle",
     humanLabel: "message circle"
   },
   "message-circle-check": {
-    id: "lucide-message-circle-check",
     iconName: "message-circle-check",
-    set: "lucide",
-    name: "message-circle-check",
     humanLabel: "message circle check"
   },
   "message-circle-code": {
-    id: "lucide-message-circle-code",
     iconName: "message-circle-code",
-    set: "lucide",
-    name: "message-circle-code",
     humanLabel: "message circle code"
   },
   "message-circle-dashed": {
-    id: "lucide-message-circle-dashed",
     iconName: "message-circle-dashed",
-    set: "lucide",
-    name: "message-circle-dashed",
     humanLabel: "message circle dashed"
   },
   "message-circle-heart": {
-    id: "lucide-message-circle-heart",
     iconName: "message-circle-heart",
-    set: "lucide",
-    name: "message-circle-heart",
     humanLabel: "message circle heart"
   },
   "message-circle-more": {
-    id: "lucide-message-circle-more",
     iconName: "message-circle-more",
-    set: "lucide",
-    name: "message-circle-more",
     humanLabel: "message circle more"
   },
   "message-circle-off": {
-    id: "lucide-message-circle-off",
     iconName: "message-circle-off",
-    set: "lucide",
-    name: "message-circle-off",
     humanLabel: "message circle off"
   },
   "message-circle-plus": {
-    id: "lucide-message-circle-plus",
     iconName: "message-circle-plus",
-    set: "lucide",
-    name: "message-circle-plus",
     humanLabel: "message circle plus"
   },
   "message-circle-question-mark": {
-    id: "lucide-message-circle-question-mark",
     iconName: "message-circle-question-mark",
-    set: "lucide",
-    name: "message-circle-question-mark",
     humanLabel: "message circle question mark"
   },
   "message-circle-reply": {
-    id: "lucide-message-circle-reply",
     iconName: "message-circle-reply",
-    set: "lucide",
-    name: "message-circle-reply",
     humanLabel: "message circle reply"
   },
   "message-circle-warning": {
-    id: "lucide-message-circle-warning",
     iconName: "message-circle-warning",
-    set: "lucide",
-    name: "message-circle-warning",
     humanLabel: "message circle warning"
   },
   "message-circle-x": {
-    id: "lucide-message-circle-x",
     iconName: "message-circle-x",
-    set: "lucide",
-    name: "message-circle-x",
     humanLabel: "message circle x"
   },
   "message-square": {
-    id: "lucide-message-square",
     iconName: "message-square",
-    set: "lucide",
-    name: "message-square",
     humanLabel: "message square"
   },
   "message-square-check": {
-    id: "lucide-message-square-check",
     iconName: "message-square-check",
-    set: "lucide",
-    name: "message-square-check",
     humanLabel: "message square check"
   },
   "message-square-code": {
-    id: "lucide-message-square-code",
     iconName: "message-square-code",
-    set: "lucide",
-    name: "message-square-code",
     humanLabel: "message square code"
   },
   "message-square-dashed": {
-    id: "lucide-message-square-dashed",
     iconName: "message-square-dashed",
-    set: "lucide",
-    name: "message-square-dashed",
     humanLabel: "message square dashed"
   },
   "message-square-diff": {
-    id: "lucide-message-square-diff",
     iconName: "message-square-diff",
-    set: "lucide",
-    name: "message-square-diff",
     humanLabel: "message square diff"
   },
   "message-square-dot": {
-    id: "lucide-message-square-dot",
     iconName: "message-square-dot",
-    set: "lucide",
-    name: "message-square-dot",
     humanLabel: "message square dot"
   },
   "message-square-heart": {
-    id: "lucide-message-square-heart",
     iconName: "message-square-heart",
-    set: "lucide",
-    name: "message-square-heart",
     humanLabel: "message square heart"
   },
   "message-square-lock": {
-    id: "lucide-message-square-lock",
     iconName: "message-square-lock",
-    set: "lucide",
-    name: "message-square-lock",
     humanLabel: "message square lock"
   },
   "message-square-more": {
-    id: "lucide-message-square-more",
     iconName: "message-square-more",
-    set: "lucide",
-    name: "message-square-more",
     humanLabel: "message square more"
   },
   "message-square-off": {
-    id: "lucide-message-square-off",
     iconName: "message-square-off",
-    set: "lucide",
-    name: "message-square-off",
     humanLabel: "message square off"
   },
   "message-square-plus": {
-    id: "lucide-message-square-plus",
     iconName: "message-square-plus",
-    set: "lucide",
-    name: "message-square-plus",
     humanLabel: "message square plus"
   },
   "message-square-quote": {
-    id: "lucide-message-square-quote",
     iconName: "message-square-quote",
-    set: "lucide",
-    name: "message-square-quote",
     humanLabel: "message square quote"
   },
   "message-square-reply": {
-    id: "lucide-message-square-reply",
     iconName: "message-square-reply",
-    set: "lucide",
-    name: "message-square-reply",
     humanLabel: "message square reply"
   },
   "message-square-share": {
-    id: "lucide-message-square-share",
     iconName: "message-square-share",
-    set: "lucide",
-    name: "message-square-share",
     humanLabel: "message square share"
   },
   "message-square-text": {
-    id: "lucide-message-square-text",
     iconName: "message-square-text",
-    set: "lucide",
-    name: "message-square-text",
     humanLabel: "message square text"
   },
   "message-square-warning": {
-    id: "lucide-message-square-warning",
     iconName: "message-square-warning",
-    set: "lucide",
-    name: "message-square-warning",
     humanLabel: "message square warning"
   },
   "message-square-x": {
-    id: "lucide-message-square-x",
     iconName: "message-square-x",
-    set: "lucide",
-    name: "message-square-x",
     humanLabel: "message square x"
   },
   "messages-square": {
-    id: "lucide-messages-square",
     iconName: "messages-square",
-    set: "lucide",
-    name: "messages-square",
     humanLabel: "messages square"
   },
-  metronome: {
-    id: "lucide-metronome",
-    iconName: "metronome",
-    set: "lucide",
-    name: "metronome",
-    humanLabel: "metronome"
-  },
-  mic: {
-    id: "lucide-mic",
-    iconName: "mic",
-    set: "lucide",
-    name: "mic",
-    humanLabel: "mic"
-  },
-  "mic-off": {
-    id: "lucide-mic-off",
-    iconName: "mic-off",
-    set: "lucide",
-    name: "mic-off",
-    humanLabel: "mic off"
-  },
-  "mic-vocal": {
-    id: "lucide-mic-vocal",
-    iconName: "mic-vocal",
-    set: "lucide",
-    name: "mic-vocal",
-    humanLabel: "mic vocal"
-  },
-  microchip: {
-    id: "lucide-microchip",
-    iconName: "microchip",
-    set: "lucide",
-    name: "microchip",
-    humanLabel: "microchip"
-  },
-  microscope: {
-    id: "lucide-microscope",
-    iconName: "microscope",
-    set: "lucide",
-    name: "microscope",
-    humanLabel: "microscope"
-  },
-  microwave: {
-    id: "lucide-microwave",
-    iconName: "microwave",
-    set: "lucide",
-    name: "microwave",
-    humanLabel: "microwave"
-  },
-  milestone: {
-    id: "lucide-milestone",
-    iconName: "milestone",
-    set: "lucide",
-    name: "milestone",
-    humanLabel: "milestone"
-  },
-  milk: {
-    id: "lucide-milk",
-    iconName: "milk",
-    set: "lucide",
-    name: "milk",
-    humanLabel: "milk"
-  },
-  "milk-off": {
-    id: "lucide-milk-off",
-    iconName: "milk-off",
-    set: "lucide",
-    name: "milk-off",
-    humanLabel: "milk off"
-  },
-  minimize: {
-    id: "lucide-minimize",
-    iconName: "minimize",
-    set: "lucide",
-    name: "minimize",
-    humanLabel: "minimize"
-  },
-  "minimize-2": {
-    id: "lucide-minimize-2",
-    iconName: "minimize-2",
-    set: "lucide",
-    name: "minimize-2",
-    humanLabel: "minimize 2"
-  },
-  minus: {
-    id: "lucide-minus",
-    iconName: "minus",
-    set: "lucide",
-    name: "minus",
-    humanLabel: "minus"
-  },
+  metronome: { iconName: "metronome", humanLabel: "metronome" },
+  mic: { iconName: "mic", humanLabel: "mic" },
+  "mic-off": { iconName: "mic-off", humanLabel: "mic off" },
+  "mic-vocal": { iconName: "mic-vocal", humanLabel: "mic vocal" },
+  microchip: { iconName: "microchip", humanLabel: "microchip" },
+  microscope: { iconName: "microscope", humanLabel: "microscope" },
+  microwave: { iconName: "microwave", humanLabel: "microwave" },
+  milestone: { iconName: "milestone", humanLabel: "milestone" },
+  milk: { iconName: "milk", humanLabel: "milk" },
+  "milk-off": { iconName: "milk-off", humanLabel: "milk off" },
+  minimize: { iconName: "minimize", humanLabel: "minimize" },
+  "minimize-2": { iconName: "minimize-2", humanLabel: "minimize 2" },
+  minus: { iconName: "minus", humanLabel: "minus" },
   "mirror-rectangular": {
-    id: "lucide-mirror-rectangular",
     iconName: "mirror-rectangular",
-    set: "lucide",
-    name: "mirror-rectangular",
     humanLabel: "mirror rectangular"
   },
-  "mirror-round": {
-    id: "lucide-mirror-round",
-    iconName: "mirror-round",
-    set: "lucide",
-    name: "mirror-round",
-    humanLabel: "mirror round"
-  },
-  monitor: {
-    id: "lucide-monitor",
-    iconName: "monitor",
-    set: "lucide",
-    name: "monitor",
-    humanLabel: "monitor"
-  },
-  "monitor-check": {
-    id: "lucide-monitor-check",
-    iconName: "monitor-check",
-    set: "lucide",
-    name: "monitor-check",
-    humanLabel: "monitor check"
-  },
-  "monitor-cloud": {
-    id: "lucide-monitor-cloud",
-    iconName: "monitor-cloud",
-    set: "lucide",
-    name: "monitor-cloud",
-    humanLabel: "monitor cloud"
-  },
-  "monitor-cog": {
-    id: "lucide-monitor-cog",
-    iconName: "monitor-cog",
-    set: "lucide",
-    name: "monitor-cog",
-    humanLabel: "monitor cog"
-  },
-  "monitor-dot": {
-    id: "lucide-monitor-dot",
-    iconName: "monitor-dot",
-    set: "lucide",
-    name: "monitor-dot",
-    humanLabel: "monitor dot"
-  },
-  "monitor-down": {
-    id: "lucide-monitor-down",
-    iconName: "monitor-down",
-    set: "lucide",
-    name: "monitor-down",
-    humanLabel: "monitor down"
-  },
-  "monitor-off": {
-    id: "lucide-monitor-off",
-    iconName: "monitor-off",
-    set: "lucide",
-    name: "monitor-off",
-    humanLabel: "monitor off"
-  },
-  "monitor-pause": {
-    id: "lucide-monitor-pause",
-    iconName: "monitor-pause",
-    set: "lucide",
-    name: "monitor-pause",
-    humanLabel: "monitor pause"
-  },
-  "monitor-play": {
-    id: "lucide-monitor-play",
-    iconName: "monitor-play",
-    set: "lucide",
-    name: "monitor-play",
-    humanLabel: "monitor play"
-  },
+  "mirror-round": { iconName: "mirror-round", humanLabel: "mirror round" },
+  monitor: { iconName: "monitor", humanLabel: "monitor" },
+  "monitor-check": { iconName: "monitor-check", humanLabel: "monitor check" },
+  "monitor-cloud": { iconName: "monitor-cloud", humanLabel: "monitor cloud" },
+  "monitor-cog": { iconName: "monitor-cog", humanLabel: "monitor cog" },
+  "monitor-dot": { iconName: "monitor-dot", humanLabel: "monitor dot" },
+  "monitor-down": { iconName: "monitor-down", humanLabel: "monitor down" },
+  "monitor-off": { iconName: "monitor-off", humanLabel: "monitor off" },
+  "monitor-pause": { iconName: "monitor-pause", humanLabel: "monitor pause" },
+  "monitor-play": { iconName: "monitor-play", humanLabel: "monitor play" },
   "monitor-smartphone": {
-    id: "lucide-monitor-smartphone",
     iconName: "monitor-smartphone",
-    set: "lucide",
-    name: "monitor-smartphone",
     humanLabel: "monitor smartphone"
   },
   "monitor-speaker": {
-    id: "lucide-monitor-speaker",
     iconName: "monitor-speaker",
-    set: "lucide",
-    name: "monitor-speaker",
     humanLabel: "monitor speaker"
   },
-  "monitor-stop": {
-    id: "lucide-monitor-stop",
-    iconName: "monitor-stop",
-    set: "lucide",
-    name: "monitor-stop",
-    humanLabel: "monitor stop"
-  },
-  "monitor-up": {
-    id: "lucide-monitor-up",
-    iconName: "monitor-up",
-    set: "lucide",
-    name: "monitor-up",
-    humanLabel: "monitor up"
-  },
-  "monitor-x": {
-    id: "lucide-monitor-x",
-    iconName: "monitor-x",
-    set: "lucide",
-    name: "monitor-x",
-    humanLabel: "monitor x"
-  },
-  moon: {
-    id: "lucide-moon",
-    iconName: "moon",
-    set: "lucide",
-    name: "moon",
-    humanLabel: "moon"
-  },
-  "moon-star": {
-    id: "lucide-moon-star",
-    iconName: "moon-star",
-    set: "lucide",
-    name: "moon-star",
-    humanLabel: "moon star"
-  },
-  motorbike: {
-    id: "lucide-motorbike",
-    iconName: "motorbike",
-    set: "lucide",
-    name: "motorbike",
-    humanLabel: "motorbike"
-  },
-  mountain: {
-    id: "lucide-mountain",
-    iconName: "mountain",
-    set: "lucide",
-    name: "mountain",
-    humanLabel: "mountain"
-  },
-  "mountain-snow": {
-    id: "lucide-mountain-snow",
-    iconName: "mountain-snow",
-    set: "lucide",
-    name: "mountain-snow",
-    humanLabel: "mountain snow"
-  },
-  mouse: {
-    id: "lucide-mouse",
-    iconName: "mouse",
-    set: "lucide",
-    name: "mouse",
-    humanLabel: "mouse"
-  },
-  "mouse-left": {
-    id: "lucide-mouse-left",
-    iconName: "mouse-left",
-    set: "lucide",
-    name: "mouse-left",
-    humanLabel: "mouse left"
-  },
-  "mouse-off": {
-    id: "lucide-mouse-off",
-    iconName: "mouse-off",
-    set: "lucide",
-    name: "mouse-off",
-    humanLabel: "mouse off"
-  },
-  "mouse-pointer": {
-    id: "lucide-mouse-pointer",
-    iconName: "mouse-pointer",
-    set: "lucide",
-    name: "mouse-pointer",
-    humanLabel: "mouse pointer"
-  },
+  "monitor-stop": { iconName: "monitor-stop", humanLabel: "monitor stop" },
+  "monitor-up": { iconName: "monitor-up", humanLabel: "monitor up" },
+  "monitor-x": { iconName: "monitor-x", humanLabel: "monitor x" },
+  moon: { iconName: "moon", humanLabel: "moon" },
+  "moon-star": { iconName: "moon-star", humanLabel: "moon star" },
+  motorbike: { iconName: "motorbike", humanLabel: "motorbike" },
+  mountain: { iconName: "mountain", humanLabel: "mountain" },
+  "mountain-snow": { iconName: "mountain-snow", humanLabel: "mountain snow" },
+  mouse: { iconName: "mouse", humanLabel: "mouse" },
+  "mouse-left": { iconName: "mouse-left", humanLabel: "mouse left" },
+  "mouse-off": { iconName: "mouse-off", humanLabel: "mouse off" },
+  "mouse-pointer": { iconName: "mouse-pointer", humanLabel: "mouse pointer" },
   "mouse-pointer-2": {
-    id: "lucide-mouse-pointer-2",
     iconName: "mouse-pointer-2",
-    set: "lucide",
-    name: "mouse-pointer-2",
     humanLabel: "mouse pointer 2"
   },
   "mouse-pointer-2-off": {
-    id: "lucide-mouse-pointer-2-off",
     iconName: "mouse-pointer-2-off",
-    set: "lucide",
-    name: "mouse-pointer-2-off",
     humanLabel: "mouse pointer 2 off"
   },
   "mouse-pointer-ban": {
-    id: "lucide-mouse-pointer-ban",
     iconName: "mouse-pointer-ban",
-    set: "lucide",
-    name: "mouse-pointer-ban",
     humanLabel: "mouse pointer ban"
   },
   "mouse-pointer-click": {
-    id: "lucide-mouse-pointer-click",
     iconName: "mouse-pointer-click",
-    set: "lucide",
-    name: "mouse-pointer-click",
     humanLabel: "mouse pointer click"
   },
-  "mouse-right": {
-    id: "lucide-mouse-right",
-    iconName: "mouse-right",
-    set: "lucide",
-    name: "mouse-right",
-    humanLabel: "mouse right"
-  },
-  move: {
-    id: "lucide-move",
-    iconName: "move",
-    set: "lucide",
-    name: "move",
-    humanLabel: "move"
-  },
-  "move-3d": {
-    id: "lucide-move-3d",
-    iconName: "move-3d",
-    set: "lucide",
-    name: "move-3d",
-    humanLabel: "move 3d"
-  },
-  "move-diagonal": {
-    id: "lucide-move-diagonal",
-    iconName: "move-diagonal",
-    set: "lucide",
-    name: "move-diagonal",
-    humanLabel: "move diagonal"
-  },
+  "mouse-right": { iconName: "mouse-right", humanLabel: "mouse right" },
+  move: { iconName: "move", humanLabel: "move" },
+  "move-3d": { iconName: "move-3d", humanLabel: "move 3d" },
+  "move-diagonal": { iconName: "move-diagonal", humanLabel: "move diagonal" },
   "move-diagonal-2": {
-    id: "lucide-move-diagonal-2",
     iconName: "move-diagonal-2",
-    set: "lucide",
-    name: "move-diagonal-2",
     humanLabel: "move diagonal 2"
   },
-  "move-down": {
-    id: "lucide-move-down",
-    iconName: "move-down",
-    set: "lucide",
-    name: "move-down",
-    humanLabel: "move down"
-  },
+  "move-down": { iconName: "move-down", humanLabel: "move down" },
   "move-down-left": {
-    id: "lucide-move-down-left",
     iconName: "move-down-left",
-    set: "lucide",
-    name: "move-down-left",
     humanLabel: "move down left"
   },
   "move-down-right": {
-    id: "lucide-move-down-right",
     iconName: "move-down-right",
-    set: "lucide",
-    name: "move-down-right",
     humanLabel: "move down right"
   },
   "move-horizontal": {
-    id: "lucide-move-horizontal",
     iconName: "move-horizontal",
-    set: "lucide",
-    name: "move-horizontal",
     humanLabel: "move horizontal"
   },
-  "move-left": {
-    id: "lucide-move-left",
-    iconName: "move-left",
-    set: "lucide",
-    name: "move-left",
-    humanLabel: "move left"
-  },
-  "move-right": {
-    id: "lucide-move-right",
-    iconName: "move-right",
-    set: "lucide",
-    name: "move-right",
-    humanLabel: "move right"
-  },
-  "move-up": {
-    id: "lucide-move-up",
-    iconName: "move-up",
-    set: "lucide",
-    name: "move-up",
-    humanLabel: "move up"
-  },
-  "move-up-left": {
-    id: "lucide-move-up-left",
-    iconName: "move-up-left",
-    set: "lucide",
-    name: "move-up-left",
-    humanLabel: "move up left"
-  },
-  "move-up-right": {
-    id: "lucide-move-up-right",
-    iconName: "move-up-right",
-    set: "lucide",
-    name: "move-up-right",
-    humanLabel: "move up right"
-  },
-  "move-vertical": {
-    id: "lucide-move-vertical",
-    iconName: "move-vertical",
-    set: "lucide",
-    name: "move-vertical",
-    humanLabel: "move vertical"
-  },
-  music: {
-    id: "lucide-music",
-    iconName: "music",
-    set: "lucide",
-    name: "music",
-    humanLabel: "music"
-  },
-  "music-2": {
-    id: "lucide-music-2",
-    iconName: "music-2",
-    set: "lucide",
-    name: "music-2",
-    humanLabel: "music 2"
-  },
-  "music-3": {
-    id: "lucide-music-3",
-    iconName: "music-3",
-    set: "lucide",
-    name: "music-3",
-    humanLabel: "music 3"
-  },
-  "music-4": {
-    id: "lucide-music-4",
-    iconName: "music-4",
-    set: "lucide",
-    name: "music-4",
-    humanLabel: "music 4"
-  },
-  navigation: {
-    id: "lucide-navigation",
-    iconName: "navigation",
-    set: "lucide",
-    name: "navigation",
-    humanLabel: "navigation"
-  },
-  "navigation-2": {
-    id: "lucide-navigation-2",
-    iconName: "navigation-2",
-    set: "lucide",
-    name: "navigation-2",
-    humanLabel: "navigation 2"
-  },
+  "move-left": { iconName: "move-left", humanLabel: "move left" },
+  "move-right": { iconName: "move-right", humanLabel: "move right" },
+  "move-up": { iconName: "move-up", humanLabel: "move up" },
+  "move-up-left": { iconName: "move-up-left", humanLabel: "move up left" },
+  "move-up-right": { iconName: "move-up-right", humanLabel: "move up right" },
+  "move-vertical": { iconName: "move-vertical", humanLabel: "move vertical" },
+  music: { iconName: "music", humanLabel: "music" },
+  "music-2": { iconName: "music-2", humanLabel: "music 2" },
+  "music-3": { iconName: "music-3", humanLabel: "music 3" },
+  "music-4": { iconName: "music-4", humanLabel: "music 4" },
+  navigation: { iconName: "navigation", humanLabel: "navigation" },
+  "navigation-2": { iconName: "navigation-2", humanLabel: "navigation 2" },
   "navigation-2-off": {
-    id: "lucide-navigation-2-off",
     iconName: "navigation-2-off",
-    set: "lucide",
-    name: "navigation-2-off",
     humanLabel: "navigation 2 off"
   },
   "navigation-off": {
-    id: "lucide-navigation-off",
     iconName: "navigation-off",
-    set: "lucide",
-    name: "navigation-off",
     humanLabel: "navigation off"
   },
-  network: {
-    id: "lucide-network",
-    iconName: "network",
-    set: "lucide",
-    name: "network",
-    humanLabel: "network"
-  },
-  newspaper: {
-    id: "lucide-newspaper",
-    iconName: "newspaper",
-    set: "lucide",
-    name: "newspaper",
-    humanLabel: "newspaper"
-  },
-  nfc: {
-    id: "lucide-nfc",
-    iconName: "nfc",
-    set: "lucide",
-    name: "nfc",
-    humanLabel: "nfc"
-  },
-  "non-binary": {
-    id: "lucide-non-binary",
-    iconName: "non-binary",
-    set: "lucide",
-    name: "non-binary",
-    humanLabel: "non binary"
-  },
-  notebook: {
-    id: "lucide-notebook",
-    iconName: "notebook",
-    set: "lucide",
-    name: "notebook",
-    humanLabel: "notebook"
-  },
-  "notebook-pen": {
-    id: "lucide-notebook-pen",
-    iconName: "notebook-pen",
-    set: "lucide",
-    name: "notebook-pen",
-    humanLabel: "notebook pen"
-  },
-  "notebook-tabs": {
-    id: "lucide-notebook-tabs",
-    iconName: "notebook-tabs",
-    set: "lucide",
-    name: "notebook-tabs",
-    humanLabel: "notebook tabs"
-  },
-  "notebook-text": {
-    id: "lucide-notebook-text",
-    iconName: "notebook-text",
-    set: "lucide",
-    name: "notebook-text",
-    humanLabel: "notebook text"
-  },
-  "notepad-text": {
-    id: "lucide-notepad-text",
-    iconName: "notepad-text",
-    set: "lucide",
-    name: "notepad-text",
-    humanLabel: "notepad text"
-  },
+  network: { iconName: "network", humanLabel: "network" },
+  newspaper: { iconName: "newspaper", humanLabel: "newspaper" },
+  nfc: { iconName: "nfc", humanLabel: "nfc" },
+  "non-binary": { iconName: "non-binary", humanLabel: "non binary" },
+  notebook: { iconName: "notebook", humanLabel: "notebook" },
+  "notebook-pen": { iconName: "notebook-pen", humanLabel: "notebook pen" },
+  "notebook-tabs": { iconName: "notebook-tabs", humanLabel: "notebook tabs" },
+  "notebook-text": { iconName: "notebook-text", humanLabel: "notebook text" },
+  "notepad-text": { iconName: "notepad-text", humanLabel: "notepad text" },
   "notepad-text-dashed": {
-    id: "lucide-notepad-text-dashed",
     iconName: "notepad-text-dashed",
-    set: "lucide",
-    name: "notepad-text-dashed",
     humanLabel: "notepad text dashed"
   },
-  nut: {
-    id: "lucide-nut",
-    iconName: "nut",
-    set: "lucide",
-    name: "nut",
-    humanLabel: "nut"
-  },
-  "nut-off": {
-    id: "lucide-nut-off",
-    iconName: "nut-off",
-    set: "lucide",
-    name: "nut-off",
-    humanLabel: "nut off"
-  },
-  octagon: {
-    id: "lucide-octagon",
-    iconName: "octagon",
-    set: "lucide",
-    name: "octagon",
-    humanLabel: "octagon"
-  },
-  "octagon-alert": {
-    id: "lucide-octagon-alert",
-    iconName: "octagon-alert",
-    set: "lucide",
-    name: "octagon-alert",
-    humanLabel: "octagon alert"
-  },
-  "octagon-minus": {
-    id: "lucide-octagon-minus",
-    iconName: "octagon-minus",
-    set: "lucide",
-    name: "octagon-minus",
-    humanLabel: "octagon minus"
-  },
-  "octagon-pause": {
-    id: "lucide-octagon-pause",
-    iconName: "octagon-pause",
-    set: "lucide",
-    name: "octagon-pause",
-    humanLabel: "octagon pause"
-  },
-  "octagon-x": {
-    id: "lucide-octagon-x",
-    iconName: "octagon-x",
-    set: "lucide",
-    name: "octagon-x",
-    humanLabel: "octagon x"
-  },
-  omega: {
-    id: "lucide-omega",
-    iconName: "omega",
-    set: "lucide",
-    name: "omega",
-    humanLabel: "omega"
-  },
-  option: {
-    id: "lucide-option",
-    iconName: "option",
-    set: "lucide",
-    name: "option",
-    humanLabel: "option"
-  },
-  orbit: {
-    id: "lucide-orbit",
-    iconName: "orbit",
-    set: "lucide",
-    name: "orbit",
-    humanLabel: "orbit"
-  },
-  origami: {
-    id: "lucide-origami",
-    iconName: "origami",
-    set: "lucide",
-    name: "origami",
-    humanLabel: "origami"
-  },
-  package: {
-    id: "lucide-package",
-    iconName: "package",
-    set: "lucide",
-    name: "package",
-    humanLabel: "package"
-  },
-  "package-2": {
-    id: "lucide-package-2",
-    iconName: "package-2",
-    set: "lucide",
-    name: "package-2",
-    humanLabel: "package 2"
-  },
-  "package-check": {
-    id: "lucide-package-check",
-    iconName: "package-check",
-    set: "lucide",
-    name: "package-check",
-    humanLabel: "package check"
-  },
-  "package-minus": {
-    id: "lucide-package-minus",
-    iconName: "package-minus",
-    set: "lucide",
-    name: "package-minus",
-    humanLabel: "package minus"
-  },
-  "package-open": {
-    id: "lucide-package-open",
-    iconName: "package-open",
-    set: "lucide",
-    name: "package-open",
-    humanLabel: "package open"
-  },
-  "package-plus": {
-    id: "lucide-package-plus",
-    iconName: "package-plus",
-    set: "lucide",
-    name: "package-plus",
-    humanLabel: "package plus"
-  },
+  nut: { iconName: "nut", humanLabel: "nut" },
+  "nut-off": { iconName: "nut-off", humanLabel: "nut off" },
+  octagon: { iconName: "octagon", humanLabel: "octagon" },
+  "octagon-alert": { iconName: "octagon-alert", humanLabel: "octagon alert" },
+  "octagon-minus": { iconName: "octagon-minus", humanLabel: "octagon minus" },
+  "octagon-pause": { iconName: "octagon-pause", humanLabel: "octagon pause" },
+  "octagon-x": { iconName: "octagon-x", humanLabel: "octagon x" },
+  omega: { iconName: "omega", humanLabel: "omega" },
+  option: { iconName: "option", humanLabel: "option" },
+  orbit: { iconName: "orbit", humanLabel: "orbit" },
+  origami: { iconName: "origami", humanLabel: "origami" },
+  package: { iconName: "package", humanLabel: "package" },
+  "package-2": { iconName: "package-2", humanLabel: "package 2" },
+  "package-check": { iconName: "package-check", humanLabel: "package check" },
+  "package-minus": { iconName: "package-minus", humanLabel: "package minus" },
+  "package-open": { iconName: "package-open", humanLabel: "package open" },
+  "package-plus": { iconName: "package-plus", humanLabel: "package plus" },
   "package-search": {
-    id: "lucide-package-search",
     iconName: "package-search",
-    set: "lucide",
-    name: "package-search",
     humanLabel: "package search"
   },
-  "package-x": {
-    id: "lucide-package-x",
-    iconName: "package-x",
-    set: "lucide",
-    name: "package-x",
-    humanLabel: "package x"
-  },
-  "paint-bucket": {
-    id: "lucide-paint-bucket",
-    iconName: "paint-bucket",
-    set: "lucide",
-    name: "paint-bucket",
-    humanLabel: "paint bucket"
-  },
-  "paint-roller": {
-    id: "lucide-paint-roller",
-    iconName: "paint-roller",
-    set: "lucide",
-    name: "paint-roller",
-    humanLabel: "paint roller"
-  },
-  paintbrush: {
-    id: "lucide-paintbrush",
-    iconName: "paintbrush",
-    set: "lucide",
-    name: "paintbrush",
-    humanLabel: "paintbrush"
-  },
+  "package-x": { iconName: "package-x", humanLabel: "package x" },
+  "paint-bucket": { iconName: "paint-bucket", humanLabel: "paint bucket" },
+  "paint-roller": { iconName: "paint-roller", humanLabel: "paint roller" },
+  paintbrush: { iconName: "paintbrush", humanLabel: "paintbrush" },
   "paintbrush-vertical": {
-    id: "lucide-paintbrush-vertical",
     iconName: "paintbrush-vertical",
-    set: "lucide",
-    name: "paintbrush-vertical",
     humanLabel: "paintbrush vertical"
   },
-  palette: {
-    id: "lucide-palette",
-    iconName: "palette",
-    set: "lucide",
-    name: "palette",
-    humanLabel: "palette"
-  },
-  panda: {
-    id: "lucide-panda",
-    iconName: "panda",
-    set: "lucide",
-    name: "panda",
-    humanLabel: "panda"
-  },
-  "panel-bottom": {
-    id: "lucide-panel-bottom",
-    iconName: "panel-bottom",
-    set: "lucide",
-    name: "panel-bottom",
-    humanLabel: "panel bottom"
-  },
+  palette: { iconName: "palette", humanLabel: "palette" },
+  panda: { iconName: "panda", humanLabel: "panda" },
+  "panel-bottom": { iconName: "panel-bottom", humanLabel: "panel bottom" },
   "panel-bottom-close": {
-    id: "lucide-panel-bottom-close",
     iconName: "panel-bottom-close",
-    set: "lucide",
-    name: "panel-bottom-close",
     humanLabel: "panel bottom close"
   },
   "panel-bottom-dashed": {
-    id: "lucide-panel-bottom-dashed",
     iconName: "panel-bottom-dashed",
-    set: "lucide",
-    name: "panel-bottom-dashed",
     humanLabel: "panel bottom dashed"
   },
   "panel-bottom-open": {
-    id: "lucide-panel-bottom-open",
     iconName: "panel-bottom-open",
-    set: "lucide",
-    name: "panel-bottom-open",
     humanLabel: "panel bottom open"
   },
-  "panel-left": {
-    id: "lucide-panel-left",
-    iconName: "panel-left",
-    set: "lucide",
-    name: "panel-left",
-    humanLabel: "panel left"
-  },
+  "panel-left": { iconName: "panel-left", humanLabel: "panel left" },
   "panel-left-close": {
-    id: "lucide-panel-left-close",
     iconName: "panel-left-close",
-    set: "lucide",
-    name: "panel-left-close",
     humanLabel: "panel left close"
   },
   "panel-left-dashed": {
-    id: "lucide-panel-left-dashed",
     iconName: "panel-left-dashed",
-    set: "lucide",
-    name: "panel-left-dashed",
     humanLabel: "panel left dashed"
   },
   "panel-left-open": {
-    id: "lucide-panel-left-open",
     iconName: "panel-left-open",
-    set: "lucide",
-    name: "panel-left-open",
     humanLabel: "panel left open"
   },
   "panel-left-right-dashed": {
-    id: "lucide-panel-left-right-dashed",
     iconName: "panel-left-right-dashed",
-    set: "lucide",
-    name: "panel-left-right-dashed",
     humanLabel: "panel left right dashed"
   },
-  "panel-right": {
-    id: "lucide-panel-right",
-    iconName: "panel-right",
-    set: "lucide",
-    name: "panel-right",
-    humanLabel: "panel right"
-  },
+  "panel-right": { iconName: "panel-right", humanLabel: "panel right" },
   "panel-right-close": {
-    id: "lucide-panel-right-close",
     iconName: "panel-right-close",
-    set: "lucide",
-    name: "panel-right-close",
     humanLabel: "panel right close"
   },
   "panel-right-dashed": {
-    id: "lucide-panel-right-dashed",
     iconName: "panel-right-dashed",
-    set: "lucide",
-    name: "panel-right-dashed",
     humanLabel: "panel right dashed"
   },
   "panel-right-open": {
-    id: "lucide-panel-right-open",
     iconName: "panel-right-open",
-    set: "lucide",
-    name: "panel-right-open",
     humanLabel: "panel right open"
   },
-  "panel-top": {
-    id: "lucide-panel-top",
-    iconName: "panel-top",
-    set: "lucide",
-    name: "panel-top",
-    humanLabel: "panel top"
-  },
+  "panel-top": { iconName: "panel-top", humanLabel: "panel top" },
   "panel-top-bottom-dashed": {
-    id: "lucide-panel-top-bottom-dashed",
     iconName: "panel-top-bottom-dashed",
-    set: "lucide",
-    name: "panel-top-bottom-dashed",
     humanLabel: "panel top bottom dashed"
   },
   "panel-top-close": {
-    id: "lucide-panel-top-close",
     iconName: "panel-top-close",
-    set: "lucide",
-    name: "panel-top-close",
     humanLabel: "panel top close"
   },
   "panel-top-dashed": {
-    id: "lucide-panel-top-dashed",
     iconName: "panel-top-dashed",
-    set: "lucide",
-    name: "panel-top-dashed",
     humanLabel: "panel top dashed"
   },
   "panel-top-open": {
-    id: "lucide-panel-top-open",
     iconName: "panel-top-open",
-    set: "lucide",
-    name: "panel-top-open",
     humanLabel: "panel top open"
   },
   "panels-left-bottom": {
-    id: "lucide-panels-left-bottom",
     iconName: "panels-left-bottom",
-    set: "lucide",
-    name: "panels-left-bottom",
     humanLabel: "panels left bottom"
   },
   "panels-right-bottom": {
-    id: "lucide-panels-right-bottom",
     iconName: "panels-right-bottom",
-    set: "lucide",
-    name: "panels-right-bottom",
     humanLabel: "panels right bottom"
   },
   "panels-top-left": {
-    id: "lucide-panels-top-left",
     iconName: "panels-top-left",
-    set: "lucide",
-    name: "panels-top-left",
     humanLabel: "panels top left"
   },
-  paperclip: {
-    id: "lucide-paperclip",
-    iconName: "paperclip",
-    set: "lucide",
-    name: "paperclip",
-    humanLabel: "paperclip"
-  },
-  parentheses: {
-    id: "lucide-parentheses",
-    iconName: "parentheses",
-    set: "lucide",
-    name: "parentheses",
-    humanLabel: "parentheses"
-  },
-  "parking-meter": {
-    id: "lucide-parking-meter",
-    iconName: "parking-meter",
-    set: "lucide",
-    name: "parking-meter",
-    humanLabel: "parking meter"
-  },
-  "party-popper": {
-    id: "lucide-party-popper",
-    iconName: "party-popper",
-    set: "lucide",
-    name: "party-popper",
-    humanLabel: "party popper"
-  },
-  pause: {
-    id: "lucide-pause",
-    iconName: "pause",
-    set: "lucide",
-    name: "pause",
-    humanLabel: "pause"
-  },
-  "paw-print": {
-    id: "lucide-paw-print",
-    iconName: "paw-print",
-    set: "lucide",
-    name: "paw-print",
-    humanLabel: "paw print"
-  },
-  "pc-case": {
-    id: "lucide-pc-case",
-    iconName: "pc-case",
-    set: "lucide",
-    name: "pc-case",
-    humanLabel: "pc case"
-  },
-  pen: {
-    id: "lucide-pen",
-    iconName: "pen",
-    set: "lucide",
-    name: "pen",
-    humanLabel: "pen"
-  },
-  "pen-line": {
-    id: "lucide-pen-line",
-    iconName: "pen-line",
-    set: "lucide",
-    name: "pen-line",
-    humanLabel: "pen line"
-  },
-  "pen-off": {
-    id: "lucide-pen-off",
-    iconName: "pen-off",
-    set: "lucide",
-    name: "pen-off",
-    humanLabel: "pen off"
-  },
-  "pen-tool": {
-    id: "lucide-pen-tool",
-    iconName: "pen-tool",
-    set: "lucide",
-    name: "pen-tool",
-    humanLabel: "pen tool"
-  },
-  pencil: {
-    id: "lucide-pencil",
-    iconName: "pencil",
-    set: "lucide",
-    name: "pencil",
-    humanLabel: "pencil"
-  },
-  "pencil-line": {
-    id: "lucide-pencil-line",
-    iconName: "pencil-line",
-    set: "lucide",
-    name: "pencil-line",
-    humanLabel: "pencil line"
-  },
-  "pencil-off": {
-    id: "lucide-pencil-off",
-    iconName: "pencil-off",
-    set: "lucide",
-    name: "pencil-off",
-    humanLabel: "pencil off"
-  },
-  "pencil-ruler": {
-    id: "lucide-pencil-ruler",
-    iconName: "pencil-ruler",
-    set: "lucide",
-    name: "pencil-ruler",
-    humanLabel: "pencil ruler"
-  },
-  pentagon: {
-    id: "lucide-pentagon",
-    iconName: "pentagon",
-    set: "lucide",
-    name: "pentagon",
-    humanLabel: "pentagon"
-  },
-  percent: {
-    id: "lucide-percent",
-    iconName: "percent",
-    set: "lucide",
-    name: "percent",
-    humanLabel: "percent"
-  },
+  paperclip: { iconName: "paperclip", humanLabel: "paperclip" },
+  parentheses: { iconName: "parentheses", humanLabel: "parentheses" },
+  "parking-meter": { iconName: "parking-meter", humanLabel: "parking meter" },
+  "party-popper": { iconName: "party-popper", humanLabel: "party popper" },
+  pause: { iconName: "pause", humanLabel: "pause" },
+  "paw-print": { iconName: "paw-print", humanLabel: "paw print" },
+  "pc-case": { iconName: "pc-case", humanLabel: "pc case" },
+  pen: { iconName: "pen", humanLabel: "pen" },
+  "pen-line": { iconName: "pen-line", humanLabel: "pen line" },
+  "pen-off": { iconName: "pen-off", humanLabel: "pen off" },
+  "pen-tool": { iconName: "pen-tool", humanLabel: "pen tool" },
+  pencil: { iconName: "pencil", humanLabel: "pencil" },
+  "pencil-line": { iconName: "pencil-line", humanLabel: "pencil line" },
+  "pencil-off": { iconName: "pencil-off", humanLabel: "pencil off" },
+  "pencil-ruler": { iconName: "pencil-ruler", humanLabel: "pencil ruler" },
+  pentagon: { iconName: "pentagon", humanLabel: "pentagon" },
+  percent: { iconName: "percent", humanLabel: "percent" },
   "person-standing": {
-    id: "lucide-person-standing",
     iconName: "person-standing",
-    set: "lucide",
-    name: "person-standing",
     humanLabel: "person standing"
   },
   "philippine-peso": {
-    id: "lucide-philippine-peso",
     iconName: "philippine-peso",
-    set: "lucide",
-    name: "philippine-peso",
     humanLabel: "philippine peso"
   },
-  phone: {
-    id: "lucide-phone",
-    iconName: "phone",
-    set: "lucide",
-    name: "phone",
-    humanLabel: "phone"
-  },
-  "phone-call": {
-    id: "lucide-phone-call",
-    iconName: "phone-call",
-    set: "lucide",
-    name: "phone-call",
-    humanLabel: "phone call"
-  },
+  phone: { iconName: "phone", humanLabel: "phone" },
+  "phone-call": { iconName: "phone-call", humanLabel: "phone call" },
   "phone-forwarded": {
-    id: "lucide-phone-forwarded",
     iconName: "phone-forwarded",
-    set: "lucide",
-    name: "phone-forwarded",
     humanLabel: "phone forwarded"
   },
   "phone-incoming": {
-    id: "lucide-phone-incoming",
     iconName: "phone-incoming",
-    set: "lucide",
-    name: "phone-incoming",
     humanLabel: "phone incoming"
   },
-  "phone-missed": {
-    id: "lucide-phone-missed",
-    iconName: "phone-missed",
-    set: "lucide",
-    name: "phone-missed",
-    humanLabel: "phone missed"
-  },
-  "phone-off": {
-    id: "lucide-phone-off",
-    iconName: "phone-off",
-    set: "lucide",
-    name: "phone-off",
-    humanLabel: "phone off"
-  },
+  "phone-missed": { iconName: "phone-missed", humanLabel: "phone missed" },
+  "phone-off": { iconName: "phone-off", humanLabel: "phone off" },
   "phone-outgoing": {
-    id: "lucide-phone-outgoing",
     iconName: "phone-outgoing",
-    set: "lucide",
-    name: "phone-outgoing",
     humanLabel: "phone outgoing"
   },
-  pi: {
-    id: "lucide-pi",
-    iconName: "pi",
-    set: "lucide",
-    name: "pi",
-    humanLabel: "pi"
-  },
-  piano: {
-    id: "lucide-piano",
-    iconName: "piano",
-    set: "lucide",
-    name: "piano",
-    humanLabel: "piano"
-  },
-  pickaxe: {
-    id: "lucide-pickaxe",
-    iconName: "pickaxe",
-    set: "lucide",
-    name: "pickaxe",
-    humanLabel: "pickaxe"
-  },
+  pi: { iconName: "pi", humanLabel: "pi" },
+  piano: { iconName: "piano", humanLabel: "piano" },
+  pickaxe: { iconName: "pickaxe", humanLabel: "pickaxe" },
   "picture-in-picture": {
-    id: "lucide-picture-in-picture",
     iconName: "picture-in-picture",
-    set: "lucide",
-    name: "picture-in-picture",
     humanLabel: "picture in picture"
   },
   "picture-in-picture-2": {
-    id: "lucide-picture-in-picture-2",
     iconName: "picture-in-picture-2",
-    set: "lucide",
-    name: "picture-in-picture-2",
     humanLabel: "picture in picture 2"
   },
-  "piggy-bank": {
-    id: "lucide-piggy-bank",
-    iconName: "piggy-bank",
-    set: "lucide",
-    name: "piggy-bank",
-    humanLabel: "piggy bank"
-  },
-  pilcrow: {
-    id: "lucide-pilcrow",
-    iconName: "pilcrow",
-    set: "lucide",
-    name: "pilcrow",
-    humanLabel: "pilcrow"
-  },
-  "pilcrow-left": {
-    id: "lucide-pilcrow-left",
-    iconName: "pilcrow-left",
-    set: "lucide",
-    name: "pilcrow-left",
-    humanLabel: "pilcrow left"
-  },
-  "pilcrow-right": {
-    id: "lucide-pilcrow-right",
-    iconName: "pilcrow-right",
-    set: "lucide",
-    name: "pilcrow-right",
-    humanLabel: "pilcrow right"
-  },
-  pill: {
-    id: "lucide-pill",
-    iconName: "pill",
-    set: "lucide",
-    name: "pill",
-    humanLabel: "pill"
-  },
-  "pill-bottle": {
-    id: "lucide-pill-bottle",
-    iconName: "pill-bottle",
-    set: "lucide",
-    name: "pill-bottle",
-    humanLabel: "pill bottle"
-  },
-  pin: {
-    id: "lucide-pin",
-    iconName: "pin",
-    set: "lucide",
-    name: "pin",
-    humanLabel: "pin"
-  },
-  "pin-off": {
-    id: "lucide-pin-off",
-    iconName: "pin-off",
-    set: "lucide",
-    name: "pin-off",
-    humanLabel: "pin off"
-  },
-  pipette: {
-    id: "lucide-pipette",
-    iconName: "pipette",
-    set: "lucide",
-    name: "pipette",
-    humanLabel: "pipette"
-  },
-  pizza: {
-    id: "lucide-pizza",
-    iconName: "pizza",
-    set: "lucide",
-    name: "pizza",
-    humanLabel: "pizza"
-  },
-  plane: {
-    id: "lucide-plane",
-    iconName: "plane",
-    set: "lucide",
-    name: "plane",
-    humanLabel: "plane"
-  },
-  "plane-landing": {
-    id: "lucide-plane-landing",
-    iconName: "plane-landing",
-    set: "lucide",
-    name: "plane-landing",
-    humanLabel: "plane landing"
-  },
-  "plane-takeoff": {
-    id: "lucide-plane-takeoff",
-    iconName: "plane-takeoff",
-    set: "lucide",
-    name: "plane-takeoff",
-    humanLabel: "plane takeoff"
-  },
-  play: {
-    id: "lucide-play",
-    iconName: "play",
-    set: "lucide",
-    name: "play",
-    humanLabel: "play"
-  },
-  plug: {
-    id: "lucide-plug",
-    iconName: "plug",
-    set: "lucide",
-    name: "plug",
-    humanLabel: "plug"
-  },
-  "plug-2": {
-    id: "lucide-plug-2",
-    iconName: "plug-2",
-    set: "lucide",
-    name: "plug-2",
-    humanLabel: "plug 2"
-  },
-  "plug-zap": {
-    id: "lucide-plug-zap",
-    iconName: "plug-zap",
-    set: "lucide",
-    name: "plug-zap",
-    humanLabel: "plug zap"
-  },
-  plus: {
-    id: "lucide-plus",
-    iconName: "plus",
-    set: "lucide",
-    name: "plus",
-    humanLabel: "plus"
-  },
-  "pocket-knife": {
-    id: "lucide-pocket-knife",
-    iconName: "pocket-knife",
-    set: "lucide",
-    name: "pocket-knife",
-    humanLabel: "pocket knife"
-  },
-  podcast: {
-    id: "lucide-podcast",
-    iconName: "podcast",
-    set: "lucide",
-    name: "podcast",
-    humanLabel: "podcast"
-  },
-  pointer: {
-    id: "lucide-pointer",
-    iconName: "pointer",
-    set: "lucide",
-    name: "pointer",
-    humanLabel: "pointer"
-  },
-  "pointer-off": {
-    id: "lucide-pointer-off",
-    iconName: "pointer-off",
-    set: "lucide",
-    name: "pointer-off",
-    humanLabel: "pointer off"
-  },
-  popcorn: {
-    id: "lucide-popcorn",
-    iconName: "popcorn",
-    set: "lucide",
-    name: "popcorn",
-    humanLabel: "popcorn"
-  },
-  popsicle: {
-    id: "lucide-popsicle",
-    iconName: "popsicle",
-    set: "lucide",
-    name: "popsicle",
-    humanLabel: "popsicle"
-  },
+  "piggy-bank": { iconName: "piggy-bank", humanLabel: "piggy bank" },
+  pilcrow: { iconName: "pilcrow", humanLabel: "pilcrow" },
+  "pilcrow-left": { iconName: "pilcrow-left", humanLabel: "pilcrow left" },
+  "pilcrow-right": { iconName: "pilcrow-right", humanLabel: "pilcrow right" },
+  pill: { iconName: "pill", humanLabel: "pill" },
+  "pill-bottle": { iconName: "pill-bottle", humanLabel: "pill bottle" },
+  pin: { iconName: "pin", humanLabel: "pin" },
+  "pin-off": { iconName: "pin-off", humanLabel: "pin off" },
+  pipette: { iconName: "pipette", humanLabel: "pipette" },
+  pizza: { iconName: "pizza", humanLabel: "pizza" },
+  plane: { iconName: "plane", humanLabel: "plane" },
+  "plane-landing": { iconName: "plane-landing", humanLabel: "plane landing" },
+  "plane-takeoff": { iconName: "plane-takeoff", humanLabel: "plane takeoff" },
+  play: { iconName: "play", humanLabel: "play" },
+  plug: { iconName: "plug", humanLabel: "plug" },
+  "plug-2": { iconName: "plug-2", humanLabel: "plug 2" },
+  "plug-zap": { iconName: "plug-zap", humanLabel: "plug zap" },
+  plus: { iconName: "plus", humanLabel: "plus" },
+  "pocket-knife": { iconName: "pocket-knife", humanLabel: "pocket knife" },
+  podcast: { iconName: "podcast", humanLabel: "podcast" },
+  pointer: { iconName: "pointer", humanLabel: "pointer" },
+  "pointer-off": { iconName: "pointer-off", humanLabel: "pointer off" },
+  popcorn: { iconName: "popcorn", humanLabel: "popcorn" },
+  popsicle: { iconName: "popsicle", humanLabel: "popsicle" },
   "pound-sterling": {
-    id: "lucide-pound-sterling",
     iconName: "pound-sterling",
-    set: "lucide",
-    name: "pound-sterling",
     humanLabel: "pound sterling"
   },
-  power: {
-    id: "lucide-power",
-    iconName: "power",
-    set: "lucide",
-    name: "power",
-    humanLabel: "power"
-  },
-  "power-off": {
-    id: "lucide-power-off",
-    iconName: "power-off",
-    set: "lucide",
-    name: "power-off",
-    humanLabel: "power off"
-  },
-  presentation: {
-    id: "lucide-presentation",
-    iconName: "presentation",
-    set: "lucide",
-    name: "presentation",
-    humanLabel: "presentation"
-  },
-  printer: {
-    id: "lucide-printer",
-    iconName: "printer",
-    set: "lucide",
-    name: "printer",
-    humanLabel: "printer"
-  },
-  "printer-check": {
-    id: "lucide-printer-check",
-    iconName: "printer-check",
-    set: "lucide",
-    name: "printer-check",
-    humanLabel: "printer check"
-  },
-  "printer-x": {
-    id: "lucide-printer-x",
-    iconName: "printer-x",
-    set: "lucide",
-    name: "printer-x",
-    humanLabel: "printer x"
-  },
-  projector: {
-    id: "lucide-projector",
-    iconName: "projector",
-    set: "lucide",
-    name: "projector",
-    humanLabel: "projector"
-  },
-  proportions: {
-    id: "lucide-proportions",
-    iconName: "proportions",
-    set: "lucide",
-    name: "proportions",
-    humanLabel: "proportions"
-  },
-  puzzle: {
-    id: "lucide-puzzle",
-    iconName: "puzzle",
-    set: "lucide",
-    name: "puzzle",
-    humanLabel: "puzzle"
-  },
-  pyramid: {
-    id: "lucide-pyramid",
-    iconName: "pyramid",
-    set: "lucide",
-    name: "pyramid",
-    humanLabel: "pyramid"
-  },
-  "qr-code": {
-    id: "lucide-qr-code",
-    iconName: "qr-code",
-    set: "lucide",
-    name: "qr-code",
-    humanLabel: "qr code"
-  },
-  quote: {
-    id: "lucide-quote",
-    iconName: "quote",
-    set: "lucide",
-    name: "quote",
-    humanLabel: "quote"
-  },
-  rabbit: {
-    id: "lucide-rabbit",
-    iconName: "rabbit",
-    set: "lucide",
-    name: "rabbit",
-    humanLabel: "rabbit"
-  },
-  radar: {
-    id: "lucide-radar",
-    iconName: "radar",
-    set: "lucide",
-    name: "radar",
-    humanLabel: "radar"
-  },
-  radiation: {
-    id: "lucide-radiation",
-    iconName: "radiation",
-    set: "lucide",
-    name: "radiation",
-    humanLabel: "radiation"
-  },
-  radical: {
-    id: "lucide-radical",
-    iconName: "radical",
-    set: "lucide",
-    name: "radical",
-    humanLabel: "radical"
-  },
-  radio: {
-    id: "lucide-radio",
-    iconName: "radio",
-    set: "lucide",
-    name: "radio",
-    humanLabel: "radio"
-  },
-  "radio-off": {
-    id: "lucide-radio-off",
-    iconName: "radio-off",
-    set: "lucide",
-    name: "radio-off",
-    humanLabel: "radio off"
-  },
+  power: { iconName: "power", humanLabel: "power" },
+  "power-off": { iconName: "power-off", humanLabel: "power off" },
+  presentation: { iconName: "presentation", humanLabel: "presentation" },
+  printer: { iconName: "printer", humanLabel: "printer" },
+  "printer-check": { iconName: "printer-check", humanLabel: "printer check" },
+  "printer-x": { iconName: "printer-x", humanLabel: "printer x" },
+  projector: { iconName: "projector", humanLabel: "projector" },
+  proportions: { iconName: "proportions", humanLabel: "proportions" },
+  puzzle: { iconName: "puzzle", humanLabel: "puzzle" },
+  pyramid: { iconName: "pyramid", humanLabel: "pyramid" },
+  "qr-code": { iconName: "qr-code", humanLabel: "qr code" },
+  quote: { iconName: "quote", humanLabel: "quote" },
+  rabbit: { iconName: "rabbit", humanLabel: "rabbit" },
+  radar: { iconName: "radar", humanLabel: "radar" },
+  radiation: { iconName: "radiation", humanLabel: "radiation" },
+  radical: { iconName: "radical", humanLabel: "radical" },
+  radio: { iconName: "radio", humanLabel: "radio" },
+  "radio-off": { iconName: "radio-off", humanLabel: "radio off" },
   "radio-receiver": {
-    id: "lucide-radio-receiver",
     iconName: "radio-receiver",
-    set: "lucide",
-    name: "radio-receiver",
     humanLabel: "radio receiver"
   },
-  "radio-tower": {
-    id: "lucide-radio-tower",
-    iconName: "radio-tower",
-    set: "lucide",
-    name: "radio-tower",
-    humanLabel: "radio tower"
-  },
-  radius: {
-    id: "lucide-radius",
-    iconName: "radius",
-    set: "lucide",
-    name: "radius",
-    humanLabel: "radius"
-  },
-  rainbow: {
-    id: "lucide-rainbow",
-    iconName: "rainbow",
-    set: "lucide",
-    name: "rainbow",
-    humanLabel: "rainbow"
-  },
-  rat: {
-    id: "lucide-rat",
-    iconName: "rat",
-    set: "lucide",
-    name: "rat",
-    humanLabel: "rat"
-  },
-  ratio: {
-    id: "lucide-ratio",
-    iconName: "ratio",
-    set: "lucide",
-    name: "ratio",
-    humanLabel: "ratio"
-  },
-  receipt: {
-    id: "lucide-receipt",
-    iconName: "receipt",
-    set: "lucide",
-    name: "receipt",
-    humanLabel: "receipt"
-  },
-  "receipt-cent": {
-    id: "lucide-receipt-cent",
-    iconName: "receipt-cent",
-    set: "lucide",
-    name: "receipt-cent",
-    humanLabel: "receipt cent"
-  },
-  "receipt-euro": {
-    id: "lucide-receipt-euro",
-    iconName: "receipt-euro",
-    set: "lucide",
-    name: "receipt-euro",
-    humanLabel: "receipt euro"
-  },
+  "radio-tower": { iconName: "radio-tower", humanLabel: "radio tower" },
+  radius: { iconName: "radius", humanLabel: "radius" },
+  rainbow: { iconName: "rainbow", humanLabel: "rainbow" },
+  rat: { iconName: "rat", humanLabel: "rat" },
+  ratio: { iconName: "ratio", humanLabel: "ratio" },
+  receipt: { iconName: "receipt", humanLabel: "receipt" },
+  "receipt-cent": { iconName: "receipt-cent", humanLabel: "receipt cent" },
+  "receipt-euro": { iconName: "receipt-euro", humanLabel: "receipt euro" },
   "receipt-indian-rupee": {
-    id: "lucide-receipt-indian-rupee",
     iconName: "receipt-indian-rupee",
-    set: "lucide",
-    name: "receipt-indian-rupee",
     humanLabel: "receipt indian rupee"
   },
   "receipt-japanese-yen": {
-    id: "lucide-receipt-japanese-yen",
     iconName: "receipt-japanese-yen",
-    set: "lucide",
-    name: "receipt-japanese-yen",
     humanLabel: "receipt japanese yen"
   },
   "receipt-pound-sterling": {
-    id: "lucide-receipt-pound-sterling",
     iconName: "receipt-pound-sterling",
-    set: "lucide",
-    name: "receipt-pound-sterling",
     humanLabel: "receipt pound sterling"
   },
   "receipt-russian-ruble": {
-    id: "lucide-receipt-russian-ruble",
     iconName: "receipt-russian-ruble",
-    set: "lucide",
-    name: "receipt-russian-ruble",
     humanLabel: "receipt russian ruble"
   },
   "receipt-swiss-franc": {
-    id: "lucide-receipt-swiss-franc",
     iconName: "receipt-swiss-franc",
-    set: "lucide",
-    name: "receipt-swiss-franc",
     humanLabel: "receipt swiss franc"
   },
-  "receipt-text": {
-    id: "lucide-receipt-text",
-    iconName: "receipt-text",
-    set: "lucide",
-    name: "receipt-text",
-    humanLabel: "receipt text"
-  },
+  "receipt-text": { iconName: "receipt-text", humanLabel: "receipt text" },
   "receipt-turkish-lira": {
-    id: "lucide-receipt-turkish-lira",
     iconName: "receipt-turkish-lira",
-    set: "lucide",
-    name: "receipt-turkish-lira",
     humanLabel: "receipt turkish lira"
   },
   "rectangle-circle": {
-    id: "lucide-rectangle-circle",
     iconName: "rectangle-circle",
-    set: "lucide",
-    name: "rectangle-circle",
     humanLabel: "rectangle circle"
   },
   "rectangle-ellipsis": {
-    id: "lucide-rectangle-ellipsis",
     iconName: "rectangle-ellipsis",
-    set: "lucide",
-    name: "rectangle-ellipsis",
     humanLabel: "rectangle ellipsis"
   },
   "rectangle-goggles": {
-    id: "lucide-rectangle-goggles",
     iconName: "rectangle-goggles",
-    set: "lucide",
-    name: "rectangle-goggles",
     humanLabel: "rectangle goggles"
   },
   "rectangle-horizontal": {
-    id: "lucide-rectangle-horizontal",
     iconName: "rectangle-horizontal",
-    set: "lucide",
-    name: "rectangle-horizontal",
     humanLabel: "rectangle horizontal"
   },
   "rectangle-vertical": {
-    id: "lucide-rectangle-vertical",
     iconName: "rectangle-vertical",
-    set: "lucide",
-    name: "rectangle-vertical",
     humanLabel: "rectangle vertical"
   },
-  recycle: {
-    id: "lucide-recycle",
-    iconName: "recycle",
-    set: "lucide",
-    name: "recycle",
-    humanLabel: "recycle"
-  },
-  redo: {
-    id: "lucide-redo",
-    iconName: "redo",
-    set: "lucide",
-    name: "redo",
-    humanLabel: "redo"
-  },
-  "redo-2": {
-    id: "lucide-redo-2",
-    iconName: "redo-2",
-    set: "lucide",
-    name: "redo-2",
-    humanLabel: "redo 2"
-  },
-  "redo-dot": {
-    id: "lucide-redo-dot",
-    iconName: "redo-dot",
-    set: "lucide",
-    name: "redo-dot",
-    humanLabel: "redo dot"
-  },
-  "refresh-ccw": {
-    id: "lucide-refresh-ccw",
-    iconName: "refresh-ccw",
-    set: "lucide",
-    name: "refresh-ccw",
-    humanLabel: "refresh ccw"
-  },
+  recycle: { iconName: "recycle", humanLabel: "recycle" },
+  redo: { iconName: "redo", humanLabel: "redo" },
+  "redo-2": { iconName: "redo-2", humanLabel: "redo 2" },
+  "redo-dot": { iconName: "redo-dot", humanLabel: "redo dot" },
+  "refresh-ccw": { iconName: "refresh-ccw", humanLabel: "refresh ccw" },
   "refresh-ccw-dot": {
-    id: "lucide-refresh-ccw-dot",
     iconName: "refresh-ccw-dot",
-    set: "lucide",
-    name: "refresh-ccw-dot",
     humanLabel: "refresh ccw dot"
   },
-  "refresh-cw": {
-    id: "lucide-refresh-cw",
-    iconName: "refresh-cw",
-    set: "lucide",
-    name: "refresh-cw",
-    humanLabel: "refresh cw"
-  },
+  "refresh-cw": { iconName: "refresh-cw", humanLabel: "refresh cw" },
   "refresh-cw-off": {
-    id: "lucide-refresh-cw-off",
     iconName: "refresh-cw-off",
-    set: "lucide",
-    name: "refresh-cw-off",
     humanLabel: "refresh cw off"
   },
-  refrigerator: {
-    id: "lucide-refrigerator",
-    iconName: "refrigerator",
-    set: "lucide",
-    name: "refrigerator",
-    humanLabel: "refrigerator"
-  },
-  regex: {
-    id: "lucide-regex",
-    iconName: "regex",
-    set: "lucide",
-    name: "regex",
-    humanLabel: "regex"
-  },
+  refrigerator: { iconName: "refrigerator", humanLabel: "refrigerator" },
+  regex: { iconName: "regex", humanLabel: "regex" },
   "remove-formatting": {
-    id: "lucide-remove-formatting",
     iconName: "remove-formatting",
-    set: "lucide",
-    name: "remove-formatting",
     humanLabel: "remove formatting"
   },
-  repeat: {
-    id: "lucide-repeat",
-    iconName: "repeat",
-    set: "lucide",
-    name: "repeat",
-    humanLabel: "repeat"
-  },
-  "repeat-1": {
-    id: "lucide-repeat-1",
-    iconName: "repeat-1",
-    set: "lucide",
-    name: "repeat-1",
-    humanLabel: "repeat 1"
-  },
-  "repeat-2": {
-    id: "lucide-repeat-2",
-    iconName: "repeat-2",
-    set: "lucide",
-    name: "repeat-2",
-    humanLabel: "repeat 2"
-  },
-  replace: {
-    id: "lucide-replace",
-    iconName: "replace",
-    set: "lucide",
-    name: "replace",
-    humanLabel: "replace"
-  },
-  "replace-all": {
-    id: "lucide-replace-all",
-    iconName: "replace-all",
-    set: "lucide",
-    name: "replace-all",
-    humanLabel: "replace all"
-  },
-  reply: {
-    id: "lucide-reply",
-    iconName: "reply",
-    set: "lucide",
-    name: "reply",
-    humanLabel: "reply"
-  },
-  "reply-all": {
-    id: "lucide-reply-all",
-    iconName: "reply-all",
-    set: "lucide",
-    name: "reply-all",
-    humanLabel: "reply all"
-  },
-  rewind: {
-    id: "lucide-rewind",
-    iconName: "rewind",
-    set: "lucide",
-    name: "rewind",
-    humanLabel: "rewind"
-  },
-  ribbon: {
-    id: "lucide-ribbon",
-    iconName: "ribbon",
-    set: "lucide",
-    name: "ribbon",
-    humanLabel: "ribbon"
-  },
-  road: {
-    id: "lucide-road",
-    iconName: "road",
-    set: "lucide",
-    name: "road",
-    humanLabel: "road"
-  },
-  rocket: {
-    id: "lucide-rocket",
-    iconName: "rocket",
-    set: "lucide",
-    name: "rocket",
-    humanLabel: "rocket"
-  },
-  "rocking-chair": {
-    id: "lucide-rocking-chair",
-    iconName: "rocking-chair",
-    set: "lucide",
-    name: "rocking-chair",
-    humanLabel: "rocking chair"
-  },
+  repeat: { iconName: "repeat", humanLabel: "repeat" },
+  "repeat-1": { iconName: "repeat-1", humanLabel: "repeat 1" },
+  "repeat-2": { iconName: "repeat-2", humanLabel: "repeat 2" },
+  replace: { iconName: "replace", humanLabel: "replace" },
+  "replace-all": { iconName: "replace-all", humanLabel: "replace all" },
+  reply: { iconName: "reply", humanLabel: "reply" },
+  "reply-all": { iconName: "reply-all", humanLabel: "reply all" },
+  rewind: { iconName: "rewind", humanLabel: "rewind" },
+  ribbon: { iconName: "ribbon", humanLabel: "ribbon" },
+  road: { iconName: "road", humanLabel: "road" },
+  rocket: { iconName: "rocket", humanLabel: "rocket" },
+  "rocking-chair": { iconName: "rocking-chair", humanLabel: "rocking chair" },
   "roller-coaster": {
-    id: "lucide-roller-coaster",
     iconName: "roller-coaster",
-    set: "lucide",
-    name: "roller-coaster",
     humanLabel: "roller coaster"
   },
-  rose: {
-    id: "lucide-rose",
-    iconName: "rose",
-    set: "lucide",
-    name: "rose",
-    humanLabel: "rose"
-  },
-  "rotate-3d": {
-    id: "lucide-rotate-3d",
-    iconName: "rotate-3d",
-    set: "lucide",
-    name: "rotate-3d",
-    humanLabel: "rotate 3d"
-  },
-  "rotate-ccw": {
-    id: "lucide-rotate-ccw",
-    iconName: "rotate-ccw",
-    set: "lucide",
-    name: "rotate-ccw",
-    humanLabel: "rotate ccw"
-  },
+  rose: { iconName: "rose", humanLabel: "rose" },
+  "rotate-3d": { iconName: "rotate-3d", humanLabel: "rotate 3d" },
+  "rotate-ccw": { iconName: "rotate-ccw", humanLabel: "rotate ccw" },
   "rotate-ccw-key": {
-    id: "lucide-rotate-ccw-key",
     iconName: "rotate-ccw-key",
-    set: "lucide",
-    name: "rotate-ccw-key",
     humanLabel: "rotate ccw key"
   },
   "rotate-ccw-square": {
-    id: "lucide-rotate-ccw-square",
     iconName: "rotate-ccw-square",
-    set: "lucide",
-    name: "rotate-ccw-square",
     humanLabel: "rotate ccw square"
   },
-  "rotate-cw": {
-    id: "lucide-rotate-cw",
-    iconName: "rotate-cw",
-    set: "lucide",
-    name: "rotate-cw",
-    humanLabel: "rotate cw"
-  },
+  "rotate-cw": { iconName: "rotate-cw", humanLabel: "rotate cw" },
   "rotate-cw-square": {
-    id: "lucide-rotate-cw-square",
     iconName: "rotate-cw-square",
-    set: "lucide",
-    name: "rotate-cw-square",
     humanLabel: "rotate cw square"
   },
-  route: {
-    id: "lucide-route",
-    iconName: "route",
-    set: "lucide",
-    name: "route",
-    humanLabel: "route"
-  },
-  "route-off": {
-    id: "lucide-route-off",
-    iconName: "route-off",
-    set: "lucide",
-    name: "route-off",
-    humanLabel: "route off"
-  },
-  router: {
-    id: "lucide-router",
-    iconName: "router",
-    set: "lucide",
-    name: "router",
-    humanLabel: "router"
-  },
-  "rows-2": {
-    id: "lucide-rows-2",
-    iconName: "rows-2",
-    set: "lucide",
-    name: "rows-2",
-    humanLabel: "rows 2"
-  },
-  "rows-3": {
-    id: "lucide-rows-3",
-    iconName: "rows-3",
-    set: "lucide",
-    name: "rows-3",
-    humanLabel: "rows 3"
-  },
-  "rows-4": {
-    id: "lucide-rows-4",
-    iconName: "rows-4",
-    set: "lucide",
-    name: "rows-4",
-    humanLabel: "rows 4"
-  },
-  rss: {
-    id: "lucide-rss",
-    iconName: "rss",
-    set: "lucide",
-    name: "rss",
-    humanLabel: "rss"
-  },
-  ruler: {
-    id: "lucide-ruler",
-    iconName: "ruler",
-    set: "lucide",
-    name: "ruler",
-    humanLabel: "ruler"
-  },
+  route: { iconName: "route", humanLabel: "route" },
+  "route-off": { iconName: "route-off", humanLabel: "route off" },
+  router: { iconName: "router", humanLabel: "router" },
+  "rows-2": { iconName: "rows-2", humanLabel: "rows 2" },
+  "rows-3": { iconName: "rows-3", humanLabel: "rows 3" },
+  "rows-4": { iconName: "rows-4", humanLabel: "rows 4" },
+  rss: { iconName: "rss", humanLabel: "rss" },
+  ruler: { iconName: "ruler", humanLabel: "ruler" },
   "ruler-dimension-line": {
-    id: "lucide-ruler-dimension-line",
     iconName: "ruler-dimension-line",
-    set: "lucide",
-    name: "ruler-dimension-line",
     humanLabel: "ruler dimension line"
   },
-  "russian-ruble": {
-    id: "lucide-russian-ruble",
-    iconName: "russian-ruble",
-    set: "lucide",
-    name: "russian-ruble",
-    humanLabel: "russian ruble"
-  },
-  sailboat: {
-    id: "lucide-sailboat",
-    iconName: "sailboat",
-    set: "lucide",
-    name: "sailboat",
-    humanLabel: "sailboat"
-  },
-  salad: {
-    id: "lucide-salad",
-    iconName: "salad",
-    set: "lucide",
-    name: "salad",
-    humanLabel: "salad"
-  },
-  sandwich: {
-    id: "lucide-sandwich",
-    iconName: "sandwich",
-    set: "lucide",
-    name: "sandwich",
-    humanLabel: "sandwich"
-  },
-  satellite: {
-    id: "lucide-satellite",
-    iconName: "satellite",
-    set: "lucide",
-    name: "satellite",
-    humanLabel: "satellite"
-  },
+  "russian-ruble": { iconName: "russian-ruble", humanLabel: "russian ruble" },
+  sailboat: { iconName: "sailboat", humanLabel: "sailboat" },
+  salad: { iconName: "salad", humanLabel: "salad" },
+  sandwich: { iconName: "sandwich", humanLabel: "sandwich" },
+  satellite: { iconName: "satellite", humanLabel: "satellite" },
   "satellite-dish": {
-    id: "lucide-satellite-dish",
     iconName: "satellite-dish",
-    set: "lucide",
-    name: "satellite-dish",
     humanLabel: "satellite dish"
   },
-  "saudi-riyal": {
-    id: "lucide-saudi-riyal",
-    iconName: "saudi-riyal",
-    set: "lucide",
-    name: "saudi-riyal",
-    humanLabel: "saudi riyal"
-  },
-  save: {
-    id: "lucide-save",
-    iconName: "save",
-    set: "lucide",
-    name: "save",
-    humanLabel: "save"
-  },
-  "save-all": {
-    id: "lucide-save-all",
-    iconName: "save-all",
-    set: "lucide",
-    name: "save-all",
-    humanLabel: "save all"
-  },
-  "save-off": {
-    id: "lucide-save-off",
-    iconName: "save-off",
-    set: "lucide",
-    name: "save-off",
-    humanLabel: "save off"
-  },
-  scale: {
-    id: "lucide-scale",
-    iconName: "scale",
-    set: "lucide",
-    name: "scale",
-    humanLabel: "scale"
-  },
-  "scale-3d": {
-    id: "lucide-scale-3d",
-    iconName: "scale-3d",
-    set: "lucide",
-    name: "scale-3d",
-    humanLabel: "scale 3d"
-  },
-  scaling: {
-    id: "lucide-scaling",
-    iconName: "scaling",
-    set: "lucide",
-    name: "scaling",
-    humanLabel: "scaling"
-  },
-  scan: {
-    id: "lucide-scan",
-    iconName: "scan",
-    set: "lucide",
-    name: "scan",
-    humanLabel: "scan"
-  },
-  "scan-barcode": {
-    id: "lucide-scan-barcode",
-    iconName: "scan-barcode",
-    set: "lucide",
-    name: "scan-barcode",
-    humanLabel: "scan barcode"
-  },
-  "scan-eye": {
-    id: "lucide-scan-eye",
-    iconName: "scan-eye",
-    set: "lucide",
-    name: "scan-eye",
-    humanLabel: "scan eye"
-  },
-  "scan-face": {
-    id: "lucide-scan-face",
-    iconName: "scan-face",
-    set: "lucide",
-    name: "scan-face",
-    humanLabel: "scan face"
-  },
-  "scan-heart": {
-    id: "lucide-scan-heart",
-    iconName: "scan-heart",
-    set: "lucide",
-    name: "scan-heart",
-    humanLabel: "scan heart"
-  },
-  "scan-line": {
-    id: "lucide-scan-line",
-    iconName: "scan-line",
-    set: "lucide",
-    name: "scan-line",
-    humanLabel: "scan line"
-  },
-  "scan-qr-code": {
-    id: "lucide-scan-qr-code",
-    iconName: "scan-qr-code",
-    set: "lucide",
-    name: "scan-qr-code",
-    humanLabel: "scan qr code"
-  },
-  "scan-search": {
-    id: "lucide-scan-search",
-    iconName: "scan-search",
-    set: "lucide",
-    name: "scan-search",
-    humanLabel: "scan search"
-  },
-  "scan-text": {
-    id: "lucide-scan-text",
-    iconName: "scan-text",
-    set: "lucide",
-    name: "scan-text",
-    humanLabel: "scan text"
-  },
-  school: {
-    id: "lucide-school",
-    iconName: "school",
-    set: "lucide",
-    name: "school",
-    humanLabel: "school"
-  },
-  scissors: {
-    id: "lucide-scissors",
-    iconName: "scissors",
-    set: "lucide",
-    name: "scissors",
-    humanLabel: "scissors"
-  },
+  "saudi-riyal": { iconName: "saudi-riyal", humanLabel: "saudi riyal" },
+  save: { iconName: "save", humanLabel: "save" },
+  "save-all": { iconName: "save-all", humanLabel: "save all" },
+  "save-off": { iconName: "save-off", humanLabel: "save off" },
+  scale: { iconName: "scale", humanLabel: "scale" },
+  "scale-3d": { iconName: "scale-3d", humanLabel: "scale 3d" },
+  scaling: { iconName: "scaling", humanLabel: "scaling" },
+  scan: { iconName: "scan", humanLabel: "scan" },
+  "scan-barcode": { iconName: "scan-barcode", humanLabel: "scan barcode" },
+  "scan-eye": { iconName: "scan-eye", humanLabel: "scan eye" },
+  "scan-face": { iconName: "scan-face", humanLabel: "scan face" },
+  "scan-heart": { iconName: "scan-heart", humanLabel: "scan heart" },
+  "scan-line": { iconName: "scan-line", humanLabel: "scan line" },
+  "scan-qr-code": { iconName: "scan-qr-code", humanLabel: "scan qr code" },
+  "scan-search": { iconName: "scan-search", humanLabel: "scan search" },
+  "scan-text": { iconName: "scan-text", humanLabel: "scan text" },
+  school: { iconName: "school", humanLabel: "school" },
+  scissors: { iconName: "scissors", humanLabel: "scissors" },
   "scissors-line-dashed": {
-    id: "lucide-scissors-line-dashed",
     iconName: "scissors-line-dashed",
-    set: "lucide",
-    name: "scissors-line-dashed",
     humanLabel: "scissors line dashed"
   },
-  scooter: {
-    id: "lucide-scooter",
-    iconName: "scooter",
-    set: "lucide",
-    name: "scooter",
-    humanLabel: "scooter"
-  },
-  "screen-share": {
-    id: "lucide-screen-share",
-    iconName: "screen-share",
-    set: "lucide",
-    name: "screen-share",
-    humanLabel: "screen share"
-  },
+  scooter: { iconName: "scooter", humanLabel: "scooter" },
+  "screen-share": { iconName: "screen-share", humanLabel: "screen share" },
   "screen-share-off": {
-    id: "lucide-screen-share-off",
     iconName: "screen-share-off",
-    set: "lucide",
-    name: "screen-share-off",
     humanLabel: "screen share off"
   },
-  scroll: {
-    id: "lucide-scroll",
-    iconName: "scroll",
-    set: "lucide",
-    name: "scroll",
-    humanLabel: "scroll"
-  },
-  "scroll-text": {
-    id: "lucide-scroll-text",
-    iconName: "scroll-text",
-    set: "lucide",
-    name: "scroll-text",
-    humanLabel: "scroll text"
-  },
-  search: {
-    id: "lucide-search",
-    iconName: "search",
-    set: "lucide",
-    name: "search",
-    humanLabel: "search"
-  },
-  "search-alert": {
-    id: "lucide-search-alert",
-    iconName: "search-alert",
-    set: "lucide",
-    name: "search-alert",
-    humanLabel: "search alert"
-  },
-  "search-check": {
-    id: "lucide-search-check",
-    iconName: "search-check",
-    set: "lucide",
-    name: "search-check",
-    humanLabel: "search check"
-  },
-  "search-code": {
-    id: "lucide-search-code",
-    iconName: "search-code",
-    set: "lucide",
-    name: "search-code",
-    humanLabel: "search code"
-  },
-  "search-slash": {
-    id: "lucide-search-slash",
-    iconName: "search-slash",
-    set: "lucide",
-    name: "search-slash",
-    humanLabel: "search slash"
-  },
-  "search-x": {
-    id: "lucide-search-x",
-    iconName: "search-x",
-    set: "lucide",
-    name: "search-x",
-    humanLabel: "search x"
-  },
-  section: {
-    id: "lucide-section",
-    iconName: "section",
-    set: "lucide",
-    name: "section",
-    humanLabel: "section"
-  },
-  send: {
-    id: "lucide-send",
-    iconName: "send",
-    set: "lucide",
-    name: "send",
-    humanLabel: "send"
-  },
+  scroll: { iconName: "scroll", humanLabel: "scroll" },
+  "scroll-text": { iconName: "scroll-text", humanLabel: "scroll text" },
+  search: { iconName: "search", humanLabel: "search" },
+  "search-alert": { iconName: "search-alert", humanLabel: "search alert" },
+  "search-check": { iconName: "search-check", humanLabel: "search check" },
+  "search-code": { iconName: "search-code", humanLabel: "search code" },
+  "search-slash": { iconName: "search-slash", humanLabel: "search slash" },
+  "search-x": { iconName: "search-x", humanLabel: "search x" },
+  section: { iconName: "section", humanLabel: "section" },
+  send: { iconName: "send", humanLabel: "send" },
   "send-horizontal": {
-    id: "lucide-send-horizontal",
     iconName: "send-horizontal",
-    set: "lucide",
-    name: "send-horizontal",
     humanLabel: "send horizontal"
   },
-  "send-to-back": {
-    id: "lucide-send-to-back",
-    iconName: "send-to-back",
-    set: "lucide",
-    name: "send-to-back",
-    humanLabel: "send to back"
-  },
+  "send-to-back": { iconName: "send-to-back", humanLabel: "send to back" },
   "separator-horizontal": {
-    id: "lucide-separator-horizontal",
     iconName: "separator-horizontal",
-    set: "lucide",
-    name: "separator-horizontal",
     humanLabel: "separator horizontal"
   },
   "separator-vertical": {
-    id: "lucide-separator-vertical",
     iconName: "separator-vertical",
-    set: "lucide",
-    name: "separator-vertical",
     humanLabel: "separator vertical"
   },
-  server: {
-    id: "lucide-server",
-    iconName: "server",
-    set: "lucide",
-    name: "server",
-    humanLabel: "server"
-  },
-  "server-cog": {
-    id: "lucide-server-cog",
-    iconName: "server-cog",
-    set: "lucide",
-    name: "server-cog",
-    humanLabel: "server cog"
-  },
-  "server-crash": {
-    id: "lucide-server-crash",
-    iconName: "server-crash",
-    set: "lucide",
-    name: "server-crash",
-    humanLabel: "server crash"
-  },
-  "server-off": {
-    id: "lucide-server-off",
-    iconName: "server-off",
-    set: "lucide",
-    name: "server-off",
-    humanLabel: "server off"
-  },
-  settings: {
-    id: "lucide-settings",
-    iconName: "settings",
-    set: "lucide",
-    name: "settings",
-    humanLabel: "settings"
-  },
-  "settings-2": {
-    id: "lucide-settings-2",
-    iconName: "settings-2",
-    set: "lucide",
-    name: "settings-2",
-    humanLabel: "settings 2"
-  },
-  shapes: {
-    id: "lucide-shapes",
-    iconName: "shapes",
-    set: "lucide",
-    name: "shapes",
-    humanLabel: "shapes"
-  },
-  share: {
-    id: "lucide-share",
-    iconName: "share",
-    set: "lucide",
-    name: "share",
-    humanLabel: "share"
-  },
-  "share-2": {
-    id: "lucide-share-2",
-    iconName: "share-2",
-    set: "lucide",
-    name: "share-2",
-    humanLabel: "share 2"
-  },
-  sheet: {
-    id: "lucide-sheet",
-    iconName: "sheet",
-    set: "lucide",
-    name: "sheet",
-    humanLabel: "sheet"
-  },
-  shell: {
-    id: "lucide-shell",
-    iconName: "shell",
-    set: "lucide",
-    name: "shell",
-    humanLabel: "shell"
-  },
-  "shelving-unit": {
-    id: "lucide-shelving-unit",
-    iconName: "shelving-unit",
-    set: "lucide",
-    name: "shelving-unit",
-    humanLabel: "shelving unit"
-  },
-  shield: {
-    id: "lucide-shield",
-    iconName: "shield",
-    set: "lucide",
-    name: "shield",
-    humanLabel: "shield"
-  },
-  "shield-alert": {
-    id: "lucide-shield-alert",
-    iconName: "shield-alert",
-    set: "lucide",
-    name: "shield-alert",
-    humanLabel: "shield alert"
-  },
-  "shield-ban": {
-    id: "lucide-shield-ban",
-    iconName: "shield-ban",
-    set: "lucide",
-    name: "shield-ban",
-    humanLabel: "shield ban"
-  },
-  "shield-check": {
-    id: "lucide-shield-check",
-    iconName: "shield-check",
-    set: "lucide",
-    name: "shield-check",
-    humanLabel: "shield check"
-  },
-  "shield-cog": {
-    id: "lucide-shield-cog",
-    iconName: "shield-cog",
-    set: "lucide",
-    name: "shield-cog",
-    humanLabel: "shield cog"
-  },
+  server: { iconName: "server", humanLabel: "server" },
+  "server-cog": { iconName: "server-cog", humanLabel: "server cog" },
+  "server-crash": { iconName: "server-crash", humanLabel: "server crash" },
+  "server-off": { iconName: "server-off", humanLabel: "server off" },
+  settings: { iconName: "settings", humanLabel: "settings" },
+  "settings-2": { iconName: "settings-2", humanLabel: "settings 2" },
+  shapes: { iconName: "shapes", humanLabel: "shapes" },
+  share: { iconName: "share", humanLabel: "share" },
+  "share-2": { iconName: "share-2", humanLabel: "share 2" },
+  sheet: { iconName: "sheet", humanLabel: "sheet" },
+  shell: { iconName: "shell", humanLabel: "shell" },
+  "shelving-unit": { iconName: "shelving-unit", humanLabel: "shelving unit" },
+  shield: { iconName: "shield", humanLabel: "shield" },
+  "shield-alert": { iconName: "shield-alert", humanLabel: "shield alert" },
+  "shield-ban": { iconName: "shield-ban", humanLabel: "shield ban" },
+  "shield-check": { iconName: "shield-check", humanLabel: "shield check" },
+  "shield-cog": { iconName: "shield-cog", humanLabel: "shield cog" },
   "shield-cog-corner": {
-    id: "lucide-shield-cog-corner",
     iconName: "shield-cog-corner",
-    set: "lucide",
-    name: "shield-cog-corner",
     humanLabel: "shield cog corner"
   },
   "shield-ellipsis": {
-    id: "lucide-shield-ellipsis",
     iconName: "shield-ellipsis",
-    set: "lucide",
-    name: "shield-ellipsis",
     humanLabel: "shield ellipsis"
   },
-  "shield-half": {
-    id: "lucide-shield-half",
-    iconName: "shield-half",
-    set: "lucide",
-    name: "shield-half",
-    humanLabel: "shield half"
-  },
-  "shield-minus": {
-    id: "lucide-shield-minus",
-    iconName: "shield-minus",
-    set: "lucide",
-    name: "shield-minus",
-    humanLabel: "shield minus"
-  },
-  "shield-off": {
-    id: "lucide-shield-off",
-    iconName: "shield-off",
-    set: "lucide",
-    name: "shield-off",
-    humanLabel: "shield off"
-  },
-  "shield-plus": {
-    id: "lucide-shield-plus",
-    iconName: "shield-plus",
-    set: "lucide",
-    name: "shield-plus",
-    humanLabel: "shield plus"
-  },
+  "shield-half": { iconName: "shield-half", humanLabel: "shield half" },
+  "shield-minus": { iconName: "shield-minus", humanLabel: "shield minus" },
+  "shield-off": { iconName: "shield-off", humanLabel: "shield off" },
+  "shield-plus": { iconName: "shield-plus", humanLabel: "shield plus" },
   "shield-question-mark": {
-    id: "lucide-shield-question-mark",
     iconName: "shield-question-mark",
-    set: "lucide",
-    name: "shield-question-mark",
     humanLabel: "shield question mark"
   },
-  "shield-user": {
-    id: "lucide-shield-user",
-    iconName: "shield-user",
-    set: "lucide",
-    name: "shield-user",
-    humanLabel: "shield user"
-  },
-  "shield-x": {
-    id: "lucide-shield-x",
-    iconName: "shield-x",
-    set: "lucide",
-    name: "shield-x",
-    humanLabel: "shield x"
-  },
-  ship: {
-    id: "lucide-ship",
-    iconName: "ship",
-    set: "lucide",
-    name: "ship",
-    humanLabel: "ship"
-  },
-  "ship-wheel": {
-    id: "lucide-ship-wheel",
-    iconName: "ship-wheel",
-    set: "lucide",
-    name: "ship-wheel",
-    humanLabel: "ship wheel"
-  },
-  shirt: {
-    id: "lucide-shirt",
-    iconName: "shirt",
-    set: "lucide",
-    name: "shirt",
-    humanLabel: "shirt"
-  },
-  "shopping-bag": {
-    id: "lucide-shopping-bag",
-    iconName: "shopping-bag",
-    set: "lucide",
-    name: "shopping-bag",
-    humanLabel: "shopping bag"
-  },
+  "shield-user": { iconName: "shield-user", humanLabel: "shield user" },
+  "shield-x": { iconName: "shield-x", humanLabel: "shield x" },
+  ship: { iconName: "ship", humanLabel: "ship" },
+  "ship-wheel": { iconName: "ship-wheel", humanLabel: "ship wheel" },
+  shirt: { iconName: "shirt", humanLabel: "shirt" },
+  "shopping-bag": { iconName: "shopping-bag", humanLabel: "shopping bag" },
   "shopping-basket": {
-    id: "lucide-shopping-basket",
     iconName: "shopping-basket",
-    set: "lucide",
-    name: "shopping-basket",
     humanLabel: "shopping basket"
   },
-  "shopping-cart": {
-    id: "lucide-shopping-cart",
-    iconName: "shopping-cart",
-    set: "lucide",
-    name: "shopping-cart",
-    humanLabel: "shopping cart"
-  },
-  shovel: {
-    id: "lucide-shovel",
-    iconName: "shovel",
-    set: "lucide",
-    name: "shovel",
-    humanLabel: "shovel"
-  },
-  "shower-head": {
-    id: "lucide-shower-head",
-    iconName: "shower-head",
-    set: "lucide",
-    name: "shower-head",
-    humanLabel: "shower head"
-  },
-  shredder: {
-    id: "lucide-shredder",
-    iconName: "shredder",
-    set: "lucide",
-    name: "shredder",
-    humanLabel: "shredder"
-  },
-  shrimp: {
-    id: "lucide-shrimp",
-    iconName: "shrimp",
-    set: "lucide",
-    name: "shrimp",
-    humanLabel: "shrimp"
-  },
-  shrink: {
-    id: "lucide-shrink",
-    iconName: "shrink",
-    set: "lucide",
-    name: "shrink",
-    humanLabel: "shrink"
-  },
-  shrub: {
-    id: "lucide-shrub",
-    iconName: "shrub",
-    set: "lucide",
-    name: "shrub",
-    humanLabel: "shrub"
-  },
-  shuffle: {
-    id: "lucide-shuffle",
-    iconName: "shuffle",
-    set: "lucide",
-    name: "shuffle",
-    humanLabel: "shuffle"
-  },
-  sigma: {
-    id: "lucide-sigma",
-    iconName: "sigma",
-    set: "lucide",
-    name: "sigma",
-    humanLabel: "sigma"
-  },
-  signal: {
-    id: "lucide-signal",
-    iconName: "signal",
-    set: "lucide",
-    name: "signal",
-    humanLabel: "signal"
-  },
-  "signal-high": {
-    id: "lucide-signal-high",
-    iconName: "signal-high",
-    set: "lucide",
-    name: "signal-high",
-    humanLabel: "signal high"
-  },
-  "signal-low": {
-    id: "lucide-signal-low",
-    iconName: "signal-low",
-    set: "lucide",
-    name: "signal-low",
-    humanLabel: "signal low"
-  },
-  "signal-medium": {
-    id: "lucide-signal-medium",
-    iconName: "signal-medium",
-    set: "lucide",
-    name: "signal-medium",
-    humanLabel: "signal medium"
-  },
-  "signal-zero": {
-    id: "lucide-signal-zero",
-    iconName: "signal-zero",
-    set: "lucide",
-    name: "signal-zero",
-    humanLabel: "signal zero"
-  },
-  signature: {
-    id: "lucide-signature",
-    iconName: "signature",
-    set: "lucide",
-    name: "signature",
-    humanLabel: "signature"
-  },
-  signpost: {
-    id: "lucide-signpost",
-    iconName: "signpost",
-    set: "lucide",
-    name: "signpost",
-    humanLabel: "signpost"
-  },
-  "signpost-big": {
-    id: "lucide-signpost-big",
-    iconName: "signpost-big",
-    set: "lucide",
-    name: "signpost-big",
-    humanLabel: "signpost big"
-  },
-  siren: {
-    id: "lucide-siren",
-    iconName: "siren",
-    set: "lucide",
-    name: "siren",
-    humanLabel: "siren"
-  },
-  "skip-back": {
-    id: "lucide-skip-back",
-    iconName: "skip-back",
-    set: "lucide",
-    name: "skip-back",
-    humanLabel: "skip back"
-  },
-  "skip-forward": {
-    id: "lucide-skip-forward",
-    iconName: "skip-forward",
-    set: "lucide",
-    name: "skip-forward",
-    humanLabel: "skip forward"
-  },
-  skull: {
-    id: "lucide-skull",
-    iconName: "skull",
-    set: "lucide",
-    name: "skull",
-    humanLabel: "skull"
-  },
-  slash: {
-    id: "lucide-slash",
-    iconName: "slash",
-    set: "lucide",
-    name: "slash",
-    humanLabel: "slash"
-  },
-  slice: {
-    id: "lucide-slice",
-    iconName: "slice",
-    set: "lucide",
-    name: "slice",
-    humanLabel: "slice"
-  },
+  "shopping-cart": { iconName: "shopping-cart", humanLabel: "shopping cart" },
+  shovel: { iconName: "shovel", humanLabel: "shovel" },
+  "shower-head": { iconName: "shower-head", humanLabel: "shower head" },
+  shredder: { iconName: "shredder", humanLabel: "shredder" },
+  shrimp: { iconName: "shrimp", humanLabel: "shrimp" },
+  shrink: { iconName: "shrink", humanLabel: "shrink" },
+  shrub: { iconName: "shrub", humanLabel: "shrub" },
+  shuffle: { iconName: "shuffle", humanLabel: "shuffle" },
+  sigma: { iconName: "sigma", humanLabel: "sigma" },
+  signal: { iconName: "signal", humanLabel: "signal" },
+  "signal-high": { iconName: "signal-high", humanLabel: "signal high" },
+  "signal-low": { iconName: "signal-low", humanLabel: "signal low" },
+  "signal-medium": { iconName: "signal-medium", humanLabel: "signal medium" },
+  "signal-zero": { iconName: "signal-zero", humanLabel: "signal zero" },
+  signature: { iconName: "signature", humanLabel: "signature" },
+  signpost: { iconName: "signpost", humanLabel: "signpost" },
+  "signpost-big": { iconName: "signpost-big", humanLabel: "signpost big" },
+  siren: { iconName: "siren", humanLabel: "siren" },
+  "skip-back": { iconName: "skip-back", humanLabel: "skip back" },
+  "skip-forward": { iconName: "skip-forward", humanLabel: "skip forward" },
+  skull: { iconName: "skull", humanLabel: "skull" },
+  slash: { iconName: "slash", humanLabel: "slash" },
+  slice: { iconName: "slice", humanLabel: "slice" },
   "sliders-horizontal": {
-    id: "lucide-sliders-horizontal",
     iconName: "sliders-horizontal",
-    set: "lucide",
-    name: "sliders-horizontal",
     humanLabel: "sliders horizontal"
   },
   "sliders-vertical": {
-    id: "lucide-sliders-vertical",
     iconName: "sliders-vertical",
-    set: "lucide",
-    name: "sliders-vertical",
     humanLabel: "sliders vertical"
   },
-  smartphone: {
-    id: "lucide-smartphone",
-    iconName: "smartphone",
-    set: "lucide",
-    name: "smartphone",
-    humanLabel: "smartphone"
-  },
+  smartphone: { iconName: "smartphone", humanLabel: "smartphone" },
   "smartphone-charging": {
-    id: "lucide-smartphone-charging",
     iconName: "smartphone-charging",
-    set: "lucide",
-    name: "smartphone-charging",
     humanLabel: "smartphone charging"
   },
   "smartphone-nfc": {
-    id: "lucide-smartphone-nfc",
     iconName: "smartphone-nfc",
-    set: "lucide",
-    name: "smartphone-nfc",
     humanLabel: "smartphone nfc"
   },
-  smile: {
-    id: "lucide-smile",
-    iconName: "smile",
-    set: "lucide",
-    name: "smile",
-    humanLabel: "smile"
-  },
-  "smile-plus": {
-    id: "lucide-smile-plus",
-    iconName: "smile-plus",
-    set: "lucide",
-    name: "smile-plus",
-    humanLabel: "smile plus"
-  },
-  snail: {
-    id: "lucide-snail",
-    iconName: "snail",
-    set: "lucide",
-    name: "snail",
-    humanLabel: "snail"
-  },
-  snowflake: {
-    id: "lucide-snowflake",
-    iconName: "snowflake",
-    set: "lucide",
-    name: "snowflake",
-    humanLabel: "snowflake"
-  },
+  smile: { iconName: "smile", humanLabel: "smile" },
+  "smile-plus": { iconName: "smile-plus", humanLabel: "smile plus" },
+  snail: { iconName: "snail", humanLabel: "snail" },
+  snowflake: { iconName: "snowflake", humanLabel: "snowflake" },
   "soap-dispenser-droplet": {
-    id: "lucide-soap-dispenser-droplet",
     iconName: "soap-dispenser-droplet",
-    set: "lucide",
-    name: "soap-dispenser-droplet",
     humanLabel: "soap dispenser droplet"
   },
-  sofa: {
-    id: "lucide-sofa",
-    iconName: "sofa",
-    set: "lucide",
-    name: "sofa",
-    humanLabel: "sofa"
-  },
-  "solar-panel": {
-    id: "lucide-solar-panel",
-    iconName: "solar-panel",
-    set: "lucide",
-    name: "solar-panel",
-    humanLabel: "solar panel"
-  },
-  soup: {
-    id: "lucide-soup",
-    iconName: "soup",
-    set: "lucide",
-    name: "soup",
-    humanLabel: "soup"
-  },
-  space: {
-    id: "lucide-space",
-    iconName: "space",
-    set: "lucide",
-    name: "space",
-    humanLabel: "space"
-  },
-  spade: {
-    id: "lucide-spade",
-    iconName: "spade",
-    set: "lucide",
-    name: "spade",
-    humanLabel: "spade"
-  },
-  sparkle: {
-    id: "lucide-sparkle",
-    iconName: "sparkle",
-    set: "lucide",
-    name: "sparkle",
-    humanLabel: "sparkle"
-  },
-  sparkles: {
-    id: "lucide-sparkles",
-    iconName: "sparkles",
-    set: "lucide",
-    name: "sparkles",
-    humanLabel: "sparkles"
-  },
-  speaker: {
-    id: "lucide-speaker",
-    iconName: "speaker",
-    set: "lucide",
-    name: "speaker",
-    humanLabel: "speaker"
-  },
-  speech: {
-    id: "lucide-speech",
-    iconName: "speech",
-    set: "lucide",
-    name: "speech",
-    humanLabel: "speech"
-  },
-  "spell-check": {
-    id: "lucide-spell-check",
-    iconName: "spell-check",
-    set: "lucide",
-    name: "spell-check",
-    humanLabel: "spell check"
-  },
-  "spell-check-2": {
-    id: "lucide-spell-check-2",
-    iconName: "spell-check-2",
-    set: "lucide",
-    name: "spell-check-2",
-    humanLabel: "spell check 2"
-  },
-  spline: {
-    id: "lucide-spline",
-    iconName: "spline",
-    set: "lucide",
-    name: "spline",
-    humanLabel: "spline"
-  },
+  sofa: { iconName: "sofa", humanLabel: "sofa" },
+  "solar-panel": { iconName: "solar-panel", humanLabel: "solar panel" },
+  soup: { iconName: "soup", humanLabel: "soup" },
+  space: { iconName: "space", humanLabel: "space" },
+  spade: { iconName: "spade", humanLabel: "spade" },
+  sparkle: { iconName: "sparkle", humanLabel: "sparkle" },
+  sparkles: { iconName: "sparkles", humanLabel: "sparkles" },
+  speaker: { iconName: "speaker", humanLabel: "speaker" },
+  speech: { iconName: "speech", humanLabel: "speech" },
+  "spell-check": { iconName: "spell-check", humanLabel: "spell check" },
+  "spell-check-2": { iconName: "spell-check-2", humanLabel: "spell check 2" },
+  spline: { iconName: "spline", humanLabel: "spline" },
   "spline-pointer": {
-    id: "lucide-spline-pointer",
     iconName: "spline-pointer",
-    set: "lucide",
-    name: "spline-pointer",
     humanLabel: "spline pointer"
   },
-  split: {
-    id: "lucide-split",
-    iconName: "split",
-    set: "lucide",
-    name: "split",
-    humanLabel: "split"
-  },
-  spool: {
-    id: "lucide-spool",
-    iconName: "spool",
-    set: "lucide",
-    name: "spool",
-    humanLabel: "spool"
-  },
-  "sport-shoe": {
-    id: "lucide-sport-shoe",
-    iconName: "sport-shoe",
-    set: "lucide",
-    name: "sport-shoe",
-    humanLabel: "sport shoe"
-  },
-  spotlight: {
-    id: "lucide-spotlight",
-    iconName: "spotlight",
-    set: "lucide",
-    name: "spotlight",
-    humanLabel: "spotlight"
-  },
-  "spray-can": {
-    id: "lucide-spray-can",
-    iconName: "spray-can",
-    set: "lucide",
-    name: "spray-can",
-    humanLabel: "spray can"
-  },
-  sprout: {
-    id: "lucide-sprout",
-    iconName: "sprout",
-    set: "lucide",
-    name: "sprout",
-    humanLabel: "sprout"
-  },
-  square: {
-    id: "lucide-square",
-    iconName: "square",
-    set: "lucide",
-    name: "square",
-    humanLabel: "square"
-  },
+  split: { iconName: "split", humanLabel: "split" },
+  spool: { iconName: "spool", humanLabel: "spool" },
+  "sport-shoe": { iconName: "sport-shoe", humanLabel: "sport shoe" },
+  spotlight: { iconName: "spotlight", humanLabel: "spotlight" },
+  "spray-can": { iconName: "spray-can", humanLabel: "spray can" },
+  sprout: { iconName: "sprout", humanLabel: "sprout" },
+  square: { iconName: "square", humanLabel: "square" },
   "square-activity": {
-    id: "lucide-square-activity",
     iconName: "square-activity",
-    set: "lucide",
-    name: "square-activity",
     humanLabel: "square activity"
   },
   "square-arrow-down": {
-    id: "lucide-square-arrow-down",
     iconName: "square-arrow-down",
-    set: "lucide",
-    name: "square-arrow-down",
     humanLabel: "square arrow down"
   },
   "square-arrow-down-left": {
-    id: "lucide-square-arrow-down-left",
     iconName: "square-arrow-down-left",
-    set: "lucide",
-    name: "square-arrow-down-left",
     humanLabel: "square arrow down left"
   },
   "square-arrow-down-right": {
-    id: "lucide-square-arrow-down-right",
     iconName: "square-arrow-down-right",
-    set: "lucide",
-    name: "square-arrow-down-right",
     humanLabel: "square arrow down right"
   },
   "square-arrow-left": {
-    id: "lucide-square-arrow-left",
     iconName: "square-arrow-left",
-    set: "lucide",
-    name: "square-arrow-left",
     humanLabel: "square arrow left"
   },
   "square-arrow-out-down-left": {
-    id: "lucide-square-arrow-out-down-left",
     iconName: "square-arrow-out-down-left",
-    set: "lucide",
-    name: "square-arrow-out-down-left",
     humanLabel: "square arrow out down left"
   },
   "square-arrow-out-down-right": {
-    id: "lucide-square-arrow-out-down-right",
     iconName: "square-arrow-out-down-right",
-    set: "lucide",
-    name: "square-arrow-out-down-right",
     humanLabel: "square arrow out down right"
   },
   "square-arrow-out-up-left": {
-    id: "lucide-square-arrow-out-up-left",
     iconName: "square-arrow-out-up-left",
-    set: "lucide",
-    name: "square-arrow-out-up-left",
     humanLabel: "square arrow out up left"
   },
   "square-arrow-out-up-right": {
-    id: "lucide-square-arrow-out-up-right",
     iconName: "square-arrow-out-up-right",
-    set: "lucide",
-    name: "square-arrow-out-up-right",
     humanLabel: "square arrow out up right"
   },
   "square-arrow-right": {
-    id: "lucide-square-arrow-right",
     iconName: "square-arrow-right",
-    set: "lucide",
-    name: "square-arrow-right",
     humanLabel: "square arrow right"
   },
   "square-arrow-right-enter": {
-    id: "lucide-square-arrow-right-enter",
     iconName: "square-arrow-right-enter",
-    set: "lucide",
-    name: "square-arrow-right-enter",
     humanLabel: "square arrow right enter"
   },
   "square-arrow-right-exit": {
-    id: "lucide-square-arrow-right-exit",
     iconName: "square-arrow-right-exit",
-    set: "lucide",
-    name: "square-arrow-right-exit",
     humanLabel: "square arrow right exit"
   },
   "square-arrow-up": {
-    id: "lucide-square-arrow-up",
     iconName: "square-arrow-up",
-    set: "lucide",
-    name: "square-arrow-up",
     humanLabel: "square arrow up"
   },
   "square-arrow-up-left": {
-    id: "lucide-square-arrow-up-left",
     iconName: "square-arrow-up-left",
-    set: "lucide",
-    name: "square-arrow-up-left",
     humanLabel: "square arrow up left"
   },
   "square-arrow-up-right": {
-    id: "lucide-square-arrow-up-right",
     iconName: "square-arrow-up-right",
-    set: "lucide",
-    name: "square-arrow-up-right",
     humanLabel: "square arrow up right"
   },
   "square-asterisk": {
-    id: "lucide-square-asterisk",
     iconName: "square-asterisk",
-    set: "lucide",
-    name: "square-asterisk",
     humanLabel: "square asterisk"
   },
   "square-bottom-dashed-scissors": {
-    id: "lucide-square-bottom-dashed-scissors",
     iconName: "square-bottom-dashed-scissors",
-    set: "lucide",
-    name: "square-bottom-dashed-scissors",
     humanLabel: "square bottom dashed scissors"
   },
   "square-centerline-dashed-horizontal": {
-    id: "lucide-square-centerline-dashed-horizontal",
     iconName: "square-centerline-dashed-horizontal",
-    set: "lucide",
-    name: "square-centerline-dashed-horizontal",
     humanLabel: "square centerline dashed horizontal"
   },
   "square-centerline-dashed-vertical": {
-    id: "lucide-square-centerline-dashed-vertical",
     iconName: "square-centerline-dashed-vertical",
-    set: "lucide",
-    name: "square-centerline-dashed-vertical",
     humanLabel: "square centerline dashed vertical"
   },
   "square-chart-gantt": {
-    id: "lucide-square-chart-gantt",
     iconName: "square-chart-gantt",
-    set: "lucide",
-    name: "square-chart-gantt",
     humanLabel: "square chart gantt"
   },
-  "square-check": {
-    id: "lucide-square-check",
-    iconName: "square-check",
-    set: "lucide",
-    name: "square-check",
-    humanLabel: "square check"
-  },
+  "square-check": { iconName: "square-check", humanLabel: "square check" },
   "square-check-big": {
-    id: "lucide-square-check-big",
     iconName: "square-check-big",
-    set: "lucide",
-    name: "square-check-big",
     humanLabel: "square check big"
   },
   "square-chevron-down": {
-    id: "lucide-square-chevron-down",
     iconName: "square-chevron-down",
-    set: "lucide",
-    name: "square-chevron-down",
     humanLabel: "square chevron down"
   },
   "square-chevron-left": {
-    id: "lucide-square-chevron-left",
     iconName: "square-chevron-left",
-    set: "lucide",
-    name: "square-chevron-left",
     humanLabel: "square chevron left"
   },
   "square-chevron-right": {
-    id: "lucide-square-chevron-right",
     iconName: "square-chevron-right",
-    set: "lucide",
-    name: "square-chevron-right",
     humanLabel: "square chevron right"
   },
   "square-chevron-up": {
-    id: "lucide-square-chevron-up",
     iconName: "square-chevron-up",
-    set: "lucide",
-    name: "square-chevron-up",
     humanLabel: "square chevron up"
   },
-  "square-code": {
-    id: "lucide-square-code",
-    iconName: "square-code",
-    set: "lucide",
-    name: "square-code",
-    humanLabel: "square code"
-  },
-  "square-dashed": {
-    id: "lucide-square-dashed",
-    iconName: "square-dashed",
-    set: "lucide",
-    name: "square-dashed",
-    humanLabel: "square dashed"
-  },
+  "square-code": { iconName: "square-code", humanLabel: "square code" },
+  "square-dashed": { iconName: "square-dashed", humanLabel: "square dashed" },
   "square-dashed-bottom": {
-    id: "lucide-square-dashed-bottom",
     iconName: "square-dashed-bottom",
-    set: "lucide",
-    name: "square-dashed-bottom",
     humanLabel: "square dashed bottom"
   },
   "square-dashed-bottom-code": {
-    id: "lucide-square-dashed-bottom-code",
     iconName: "square-dashed-bottom-code",
-    set: "lucide",
-    name: "square-dashed-bottom-code",
     humanLabel: "square dashed bottom code"
   },
   "square-dashed-kanban": {
-    id: "lucide-square-dashed-kanban",
     iconName: "square-dashed-kanban",
-    set: "lucide",
-    name: "square-dashed-kanban",
     humanLabel: "square dashed kanban"
   },
   "square-dashed-mouse-pointer": {
-    id: "lucide-square-dashed-mouse-pointer",
     iconName: "square-dashed-mouse-pointer",
-    set: "lucide",
-    name: "square-dashed-mouse-pointer",
     humanLabel: "square dashed mouse pointer"
   },
   "square-dashed-text": {
-    id: "lucide-square-dashed-text",
     iconName: "square-dashed-text",
-    set: "lucide",
-    name: "square-dashed-text",
     humanLabel: "square dashed text"
   },
   "square-dashed-top-solid": {
-    id: "lucide-square-dashed-top-solid",
     iconName: "square-dashed-top-solid",
-    set: "lucide",
-    name: "square-dashed-top-solid",
     humanLabel: "square dashed top solid"
   },
-  "square-divide": {
-    id: "lucide-square-divide",
-    iconName: "square-divide",
-    set: "lucide",
-    name: "square-divide",
-    humanLabel: "square divide"
-  },
-  "square-dot": {
-    id: "lucide-square-dot",
-    iconName: "square-dot",
-    set: "lucide",
-    name: "square-dot",
-    humanLabel: "square dot"
-  },
-  "square-equal": {
-    id: "lucide-square-equal",
-    iconName: "square-equal",
-    set: "lucide",
-    name: "square-equal",
-    humanLabel: "square equal"
-  },
+  "square-divide": { iconName: "square-divide", humanLabel: "square divide" },
+  "square-dot": { iconName: "square-dot", humanLabel: "square dot" },
+  "square-equal": { iconName: "square-equal", humanLabel: "square equal" },
   "square-function": {
-    id: "lucide-square-function",
     iconName: "square-function",
-    set: "lucide",
-    name: "square-function",
     humanLabel: "square function"
   },
-  "square-kanban": {
-    id: "lucide-square-kanban",
-    iconName: "square-kanban",
-    set: "lucide",
-    name: "square-kanban",
-    humanLabel: "square kanban"
-  },
+  "square-kanban": { iconName: "square-kanban", humanLabel: "square kanban" },
   "square-library": {
-    id: "lucide-square-library",
     iconName: "square-library",
-    set: "lucide",
-    name: "square-library",
     humanLabel: "square library"
   },
-  "square-m": {
-    id: "lucide-square-m",
-    iconName: "square-m",
-    set: "lucide",
-    name: "square-m",
-    humanLabel: "square m"
-  },
-  "square-menu": {
-    id: "lucide-square-menu",
-    iconName: "square-menu",
-    set: "lucide",
-    name: "square-menu",
-    humanLabel: "square menu"
-  },
-  "square-minus": {
-    id: "lucide-square-minus",
-    iconName: "square-minus",
-    set: "lucide",
-    name: "square-minus",
-    humanLabel: "square minus"
-  },
+  "square-m": { iconName: "square-m", humanLabel: "square m" },
+  "square-menu": { iconName: "square-menu", humanLabel: "square menu" },
+  "square-minus": { iconName: "square-minus", humanLabel: "square minus" },
   "square-mouse-pointer": {
-    id: "lucide-square-mouse-pointer",
     iconName: "square-mouse-pointer",
-    set: "lucide",
-    name: "square-mouse-pointer",
     humanLabel: "square mouse pointer"
   },
   "square-parking": {
-    id: "lucide-square-parking",
     iconName: "square-parking",
-    set: "lucide",
-    name: "square-parking",
     humanLabel: "square parking"
   },
   "square-parking-off": {
-    id: "lucide-square-parking-off",
     iconName: "square-parking-off",
-    set: "lucide",
-    name: "square-parking-off",
     humanLabel: "square parking off"
   },
-  "square-pause": {
-    id: "lucide-square-pause",
-    iconName: "square-pause",
-    set: "lucide",
-    name: "square-pause",
-    humanLabel: "square pause"
-  },
-  "square-pen": {
-    id: "lucide-square-pen",
-    iconName: "square-pen",
-    set: "lucide",
-    name: "square-pen",
-    humanLabel: "square pen"
-  },
+  "square-pause": { iconName: "square-pause", humanLabel: "square pause" },
+  "square-pen": { iconName: "square-pen", humanLabel: "square pen" },
   "square-percent": {
-    id: "lucide-square-percent",
     iconName: "square-percent",
-    set: "lucide",
-    name: "square-percent",
     humanLabel: "square percent"
   },
-  "square-pi": {
-    id: "lucide-square-pi",
-    iconName: "square-pi",
-    set: "lucide",
-    name: "square-pi",
-    humanLabel: "square pi"
-  },
+  "square-pi": { iconName: "square-pi", humanLabel: "square pi" },
   "square-pilcrow": {
-    id: "lucide-square-pilcrow",
     iconName: "square-pilcrow",
-    set: "lucide",
-    name: "square-pilcrow",
     humanLabel: "square pilcrow"
   },
-  "square-play": {
-    id: "lucide-square-play",
-    iconName: "square-play",
-    set: "lucide",
-    name: "square-play",
-    humanLabel: "square play"
-  },
-  "square-plus": {
-    id: "lucide-square-plus",
-    iconName: "square-plus",
-    set: "lucide",
-    name: "square-plus",
-    humanLabel: "square plus"
-  },
-  "square-power": {
-    id: "lucide-square-power",
-    iconName: "square-power",
-    set: "lucide",
-    name: "square-power",
-    humanLabel: "square power"
-  },
+  "square-play": { iconName: "square-play", humanLabel: "square play" },
+  "square-plus": { iconName: "square-plus", humanLabel: "square plus" },
+  "square-power": { iconName: "square-power", humanLabel: "square power" },
   "square-radical": {
-    id: "lucide-square-radical",
     iconName: "square-radical",
-    set: "lucide",
-    name: "square-radical",
     humanLabel: "square radical"
   },
   "square-round-corner": {
-    id: "lucide-square-round-corner",
     iconName: "square-round-corner",
-    set: "lucide",
-    name: "square-round-corner",
     humanLabel: "square round corner"
   },
   "square-scissors": {
-    id: "lucide-square-scissors",
     iconName: "square-scissors",
-    set: "lucide",
-    name: "square-scissors",
     humanLabel: "square scissors"
   },
-  "square-sigma": {
-    id: "lucide-square-sigma",
-    iconName: "square-sigma",
-    set: "lucide",
-    name: "square-sigma",
-    humanLabel: "square sigma"
-  },
-  "square-slash": {
-    id: "lucide-square-slash",
-    iconName: "square-slash",
-    set: "lucide",
-    name: "square-slash",
-    humanLabel: "square slash"
-  },
+  "square-sigma": { iconName: "square-sigma", humanLabel: "square sigma" },
+  "square-slash": { iconName: "square-slash", humanLabel: "square slash" },
   "square-split-horizontal": {
-    id: "lucide-square-split-horizontal",
     iconName: "square-split-horizontal",
-    set: "lucide",
-    name: "square-split-horizontal",
     humanLabel: "square split horizontal"
   },
   "square-split-vertical": {
-    id: "lucide-square-split-vertical",
     iconName: "square-split-vertical",
-    set: "lucide",
-    name: "square-split-vertical",
     humanLabel: "square split vertical"
   },
-  "square-square": {
-    id: "lucide-square-square",
-    iconName: "square-square",
-    set: "lucide",
-    name: "square-square",
-    humanLabel: "square square"
-  },
-  "square-stack": {
-    id: "lucide-square-stack",
-    iconName: "square-stack",
-    set: "lucide",
-    name: "square-stack",
-    humanLabel: "square stack"
-  },
-  "square-star": {
-    id: "lucide-square-star",
-    iconName: "square-star",
-    set: "lucide",
-    name: "square-star",
-    humanLabel: "square star"
-  },
-  "square-stop": {
-    id: "lucide-square-stop",
-    iconName: "square-stop",
-    set: "lucide",
-    name: "square-stop",
-    humanLabel: "square stop"
-  },
+  "square-square": { iconName: "square-square", humanLabel: "square square" },
+  "square-stack": { iconName: "square-stack", humanLabel: "square stack" },
+  "square-star": { iconName: "square-star", humanLabel: "square star" },
+  "square-stop": { iconName: "square-stop", humanLabel: "square stop" },
   "square-terminal": {
-    id: "lucide-square-terminal",
     iconName: "square-terminal",
-    set: "lucide",
-    name: "square-terminal",
     humanLabel: "square terminal"
   },
-  "square-user": {
-    id: "lucide-square-user",
-    iconName: "square-user",
-    set: "lucide",
-    name: "square-user",
-    humanLabel: "square user"
-  },
+  "square-user": { iconName: "square-user", humanLabel: "square user" },
   "square-user-round": {
-    id: "lucide-square-user-round",
     iconName: "square-user-round",
-    set: "lucide",
-    name: "square-user-round",
     humanLabel: "square user round"
   },
-  "square-x": {
-    id: "lucide-square-x",
-    iconName: "square-x",
-    set: "lucide",
-    name: "square-x",
-    humanLabel: "square x"
-  },
+  "square-x": { iconName: "square-x", humanLabel: "square x" },
   "squares-exclude": {
-    id: "lucide-squares-exclude",
     iconName: "squares-exclude",
-    set: "lucide",
-    name: "squares-exclude",
     humanLabel: "squares exclude"
   },
   "squares-intersect": {
-    id: "lucide-squares-intersect",
     iconName: "squares-intersect",
-    set: "lucide",
-    name: "squares-intersect",
     humanLabel: "squares intersect"
   },
   "squares-subtract": {
-    id: "lucide-squares-subtract",
     iconName: "squares-subtract",
-    set: "lucide",
-    name: "squares-subtract",
     humanLabel: "squares subtract"
   },
-  "squares-unite": {
-    id: "lucide-squares-unite",
-    iconName: "squares-unite",
-    set: "lucide",
-    name: "squares-unite",
-    humanLabel: "squares unite"
-  },
-  squircle: {
-    id: "lucide-squircle",
-    iconName: "squircle",
-    set: "lucide",
-    name: "squircle",
-    humanLabel: "squircle"
-  },
+  "squares-unite": { iconName: "squares-unite", humanLabel: "squares unite" },
+  squircle: { iconName: "squircle", humanLabel: "squircle" },
   "squircle-dashed": {
-    id: "lucide-squircle-dashed",
     iconName: "squircle-dashed",
-    set: "lucide",
-    name: "squircle-dashed",
     humanLabel: "squircle dashed"
   },
-  squirrel: {
-    id: "lucide-squirrel",
-    iconName: "squirrel",
-    set: "lucide",
-    name: "squirrel",
-    humanLabel: "squirrel"
-  },
-  stamp: {
-    id: "lucide-stamp",
-    iconName: "stamp",
-    set: "lucide",
-    name: "stamp",
-    humanLabel: "stamp"
-  },
-  star: {
-    id: "lucide-star",
-    iconName: "star",
-    set: "lucide",
-    name: "star",
-    humanLabel: "star"
-  },
-  "star-half": {
-    id: "lucide-star-half",
-    iconName: "star-half",
-    set: "lucide",
-    name: "star-half",
-    humanLabel: "star half"
-  },
-  "star-off": {
-    id: "lucide-star-off",
-    iconName: "star-off",
-    set: "lucide",
-    name: "star-off",
-    humanLabel: "star off"
-  },
-  "step-back": {
-    id: "lucide-step-back",
-    iconName: "step-back",
-    set: "lucide",
-    name: "step-back",
-    humanLabel: "step back"
-  },
-  "step-forward": {
-    id: "lucide-step-forward",
-    iconName: "step-forward",
-    set: "lucide",
-    name: "step-forward",
-    humanLabel: "step forward"
-  },
-  stethoscope: {
-    id: "lucide-stethoscope",
-    iconName: "stethoscope",
-    set: "lucide",
-    name: "stethoscope",
-    humanLabel: "stethoscope"
-  },
-  sticker: {
-    id: "lucide-sticker",
-    iconName: "sticker",
-    set: "lucide",
-    name: "sticker",
-    humanLabel: "sticker"
-  },
-  "sticky-note": {
-    id: "lucide-sticky-note",
-    iconName: "sticky-note",
-    set: "lucide",
-    name: "sticky-note",
-    humanLabel: "sticky note"
-  },
-  stone: {
-    id: "lucide-stone",
-    iconName: "stone",
-    set: "lucide",
-    name: "stone",
-    humanLabel: "stone"
-  },
-  store: {
-    id: "lucide-store",
-    iconName: "store",
-    set: "lucide",
-    name: "store",
-    humanLabel: "store"
-  },
+  squirrel: { iconName: "squirrel", humanLabel: "squirrel" },
+  stamp: { iconName: "stamp", humanLabel: "stamp" },
+  star: { iconName: "star", humanLabel: "star" },
+  "star-half": { iconName: "star-half", humanLabel: "star half" },
+  "star-off": { iconName: "star-off", humanLabel: "star off" },
+  "step-back": { iconName: "step-back", humanLabel: "step back" },
+  "step-forward": { iconName: "step-forward", humanLabel: "step forward" },
+  stethoscope: { iconName: "stethoscope", humanLabel: "stethoscope" },
+  sticker: { iconName: "sticker", humanLabel: "sticker" },
+  "sticky-note": { iconName: "sticky-note", humanLabel: "sticky note" },
+  stone: { iconName: "stone", humanLabel: "stone" },
+  store: { iconName: "store", humanLabel: "store" },
   "stretch-horizontal": {
-    id: "lucide-stretch-horizontal",
     iconName: "stretch-horizontal",
-    set: "lucide",
-    name: "stretch-horizontal",
     humanLabel: "stretch horizontal"
   },
   "stretch-vertical": {
-    id: "lucide-stretch-vertical",
     iconName: "stretch-vertical",
-    set: "lucide",
-    name: "stretch-vertical",
     humanLabel: "stretch vertical"
   },
-  strikethrough: {
-    id: "lucide-strikethrough",
-    iconName: "strikethrough",
-    set: "lucide",
-    name: "strikethrough",
-    humanLabel: "strikethrough"
-  },
-  subscript: {
-    id: "lucide-subscript",
-    iconName: "subscript",
-    set: "lucide",
-    name: "subscript",
-    humanLabel: "subscript"
-  },
-  sun: {
-    id: "lucide-sun",
-    iconName: "sun",
-    set: "lucide",
-    name: "sun",
-    humanLabel: "sun"
-  },
-  "sun-dim": {
-    id: "lucide-sun-dim",
-    iconName: "sun-dim",
-    set: "lucide",
-    name: "sun-dim",
-    humanLabel: "sun dim"
-  },
-  "sun-medium": {
-    id: "lucide-sun-medium",
-    iconName: "sun-medium",
-    set: "lucide",
-    name: "sun-medium",
-    humanLabel: "sun medium"
-  },
-  "sun-moon": {
-    id: "lucide-sun-moon",
-    iconName: "sun-moon",
-    set: "lucide",
-    name: "sun-moon",
-    humanLabel: "sun moon"
-  },
-  "sun-snow": {
-    id: "lucide-sun-snow",
-    iconName: "sun-snow",
-    set: "lucide",
-    name: "sun-snow",
-    humanLabel: "sun snow"
-  },
-  sunrise: {
-    id: "lucide-sunrise",
-    iconName: "sunrise",
-    set: "lucide",
-    name: "sunrise",
-    humanLabel: "sunrise"
-  },
-  sunset: {
-    id: "lucide-sunset",
-    iconName: "sunset",
-    set: "lucide",
-    name: "sunset",
-    humanLabel: "sunset"
-  },
-  superscript: {
-    id: "lucide-superscript",
-    iconName: "superscript",
-    set: "lucide",
-    name: "superscript",
-    humanLabel: "superscript"
-  },
-  "swatch-book": {
-    id: "lucide-swatch-book",
-    iconName: "swatch-book",
-    set: "lucide",
-    name: "swatch-book",
-    humanLabel: "swatch book"
-  },
-  "swiss-franc": {
-    id: "lucide-swiss-franc",
-    iconName: "swiss-franc",
-    set: "lucide",
-    name: "swiss-franc",
-    humanLabel: "swiss franc"
-  },
-  "switch-camera": {
-    id: "lucide-switch-camera",
-    iconName: "switch-camera",
-    set: "lucide",
-    name: "switch-camera",
-    humanLabel: "switch camera"
-  },
-  sword: {
-    id: "lucide-sword",
-    iconName: "sword",
-    set: "lucide",
-    name: "sword",
-    humanLabel: "sword"
-  },
-  swords: {
-    id: "lucide-swords",
-    iconName: "swords",
-    set: "lucide",
-    name: "swords",
-    humanLabel: "swords"
-  },
-  syringe: {
-    id: "lucide-syringe",
-    iconName: "syringe",
-    set: "lucide",
-    name: "syringe",
-    humanLabel: "syringe"
-  },
-  table: {
-    id: "lucide-table",
-    iconName: "table",
-    set: "lucide",
-    name: "table",
-    humanLabel: "table"
-  },
-  "table-2": {
-    id: "lucide-table-2",
-    iconName: "table-2",
-    set: "lucide",
-    name: "table-2",
-    humanLabel: "table 2"
-  },
+  strikethrough: { iconName: "strikethrough", humanLabel: "strikethrough" },
+  subscript: { iconName: "subscript", humanLabel: "subscript" },
+  sun: { iconName: "sun", humanLabel: "sun" },
+  "sun-dim": { iconName: "sun-dim", humanLabel: "sun dim" },
+  "sun-medium": { iconName: "sun-medium", humanLabel: "sun medium" },
+  "sun-moon": { iconName: "sun-moon", humanLabel: "sun moon" },
+  "sun-snow": { iconName: "sun-snow", humanLabel: "sun snow" },
+  sunrise: { iconName: "sunrise", humanLabel: "sunrise" },
+  sunset: { iconName: "sunset", humanLabel: "sunset" },
+  superscript: { iconName: "superscript", humanLabel: "superscript" },
+  "swatch-book": { iconName: "swatch-book", humanLabel: "swatch book" },
+  "swiss-franc": { iconName: "swiss-franc", humanLabel: "swiss franc" },
+  "switch-camera": { iconName: "switch-camera", humanLabel: "switch camera" },
+  sword: { iconName: "sword", humanLabel: "sword" },
+  swords: { iconName: "swords", humanLabel: "swords" },
+  syringe: { iconName: "syringe", humanLabel: "syringe" },
+  table: { iconName: "table", humanLabel: "table" },
+  "table-2": { iconName: "table-2", humanLabel: "table 2" },
   "table-cells-merge": {
-    id: "lucide-table-cells-merge",
     iconName: "table-cells-merge",
-    set: "lucide",
-    name: "table-cells-merge",
     humanLabel: "table cells merge"
   },
   "table-cells-split": {
-    id: "lucide-table-cells-split",
     iconName: "table-cells-split",
-    set: "lucide",
-    name: "table-cells-split",
     humanLabel: "table cells split"
   },
   "table-columns-split": {
-    id: "lucide-table-columns-split",
     iconName: "table-columns-split",
-    set: "lucide",
-    name: "table-columns-split",
     humanLabel: "table columns split"
   },
   "table-of-contents": {
-    id: "lucide-table-of-contents",
     iconName: "table-of-contents",
-    set: "lucide",
-    name: "table-of-contents",
     humanLabel: "table of contents"
   },
   "table-properties": {
-    id: "lucide-table-properties",
     iconName: "table-properties",
-    set: "lucide",
-    name: "table-properties",
     humanLabel: "table properties"
   },
   "table-rows-split": {
-    id: "lucide-table-rows-split",
     iconName: "table-rows-split",
-    set: "lucide",
-    name: "table-rows-split",
     humanLabel: "table rows split"
   },
-  tablet: {
-    id: "lucide-tablet",
-    iconName: "tablet",
-    set: "lucide",
-    name: "tablet",
-    humanLabel: "tablet"
-  },
+  tablet: { iconName: "tablet", humanLabel: "tablet" },
   "tablet-smartphone": {
-    id: "lucide-tablet-smartphone",
     iconName: "tablet-smartphone",
-    set: "lucide",
-    name: "tablet-smartphone",
     humanLabel: "tablet smartphone"
   },
-  tablets: {
-    id: "lucide-tablets",
-    iconName: "tablets",
-    set: "lucide",
-    name: "tablets",
-    humanLabel: "tablets"
-  },
-  tag: {
-    id: "lucide-tag",
-    iconName: "tag",
-    set: "lucide",
-    name: "tag",
-    humanLabel: "tag"
-  },
-  tags: {
-    id: "lucide-tags",
-    iconName: "tags",
-    set: "lucide",
-    name: "tags",
-    humanLabel: "tags"
-  },
-  "tally-1": {
-    id: "lucide-tally-1",
-    iconName: "tally-1",
-    set: "lucide",
-    name: "tally-1",
-    humanLabel: "tally 1"
-  },
-  "tally-2": {
-    id: "lucide-tally-2",
-    iconName: "tally-2",
-    set: "lucide",
-    name: "tally-2",
-    humanLabel: "tally 2"
-  },
-  "tally-3": {
-    id: "lucide-tally-3",
-    iconName: "tally-3",
-    set: "lucide",
-    name: "tally-3",
-    humanLabel: "tally 3"
-  },
-  "tally-4": {
-    id: "lucide-tally-4",
-    iconName: "tally-4",
-    set: "lucide",
-    name: "tally-4",
-    humanLabel: "tally 4"
-  },
-  "tally-5": {
-    id: "lucide-tally-5",
-    iconName: "tally-5",
-    set: "lucide",
-    name: "tally-5",
-    humanLabel: "tally 5"
-  },
-  tangent: {
-    id: "lucide-tangent",
-    iconName: "tangent",
-    set: "lucide",
-    name: "tangent",
-    humanLabel: "tangent"
-  },
-  target: {
-    id: "lucide-target",
-    iconName: "target",
-    set: "lucide",
-    name: "target",
-    humanLabel: "target"
-  },
-  telescope: {
-    id: "lucide-telescope",
-    iconName: "telescope",
-    set: "lucide",
-    name: "telescope",
-    humanLabel: "telescope"
-  },
-  tent: {
-    id: "lucide-tent",
-    iconName: "tent",
-    set: "lucide",
-    name: "tent",
-    humanLabel: "tent"
-  },
-  "tent-tree": {
-    id: "lucide-tent-tree",
-    iconName: "tent-tree",
-    set: "lucide",
-    name: "tent-tree",
-    humanLabel: "tent tree"
-  },
-  terminal: {
-    id: "lucide-terminal",
-    iconName: "terminal",
-    set: "lucide",
-    name: "terminal",
-    humanLabel: "terminal"
-  },
-  "test-tube": {
-    id: "lucide-test-tube",
-    iconName: "test-tube",
-    set: "lucide",
-    name: "test-tube",
-    humanLabel: "test tube"
-  },
+  tablets: { iconName: "tablets", humanLabel: "tablets" },
+  tag: { iconName: "tag", humanLabel: "tag" },
+  tags: { iconName: "tags", humanLabel: "tags" },
+  "tally-1": { iconName: "tally-1", humanLabel: "tally 1" },
+  "tally-2": { iconName: "tally-2", humanLabel: "tally 2" },
+  "tally-3": { iconName: "tally-3", humanLabel: "tally 3" },
+  "tally-4": { iconName: "tally-4", humanLabel: "tally 4" },
+  "tally-5": { iconName: "tally-5", humanLabel: "tally 5" },
+  tangent: { iconName: "tangent", humanLabel: "tangent" },
+  target: { iconName: "target", humanLabel: "target" },
+  telescope: { iconName: "telescope", humanLabel: "telescope" },
+  tent: { iconName: "tent", humanLabel: "tent" },
+  "tent-tree": { iconName: "tent-tree", humanLabel: "tent tree" },
+  terminal: { iconName: "terminal", humanLabel: "terminal" },
+  "test-tube": { iconName: "test-tube", humanLabel: "test tube" },
   "test-tube-diagonal": {
-    id: "lucide-test-tube-diagonal",
     iconName: "test-tube-diagonal",
-    set: "lucide",
-    name: "test-tube-diagonal",
     humanLabel: "test tube diagonal"
   },
-  "test-tubes": {
-    id: "lucide-test-tubes",
-    iconName: "test-tubes",
-    set: "lucide",
-    name: "test-tubes",
-    humanLabel: "test tubes"
-  },
+  "test-tubes": { iconName: "test-tubes", humanLabel: "test tubes" },
   "text-align-center": {
-    id: "lucide-text-align-center",
     iconName: "text-align-center",
-    set: "lucide",
-    name: "text-align-center",
     humanLabel: "text align center"
   },
   "text-align-end": {
-    id: "lucide-text-align-end",
     iconName: "text-align-end",
-    set: "lucide",
-    name: "text-align-end",
     humanLabel: "text align end"
   },
   "text-align-justify": {
-    id: "lucide-text-align-justify",
     iconName: "text-align-justify",
-    set: "lucide",
-    name: "text-align-justify",
     humanLabel: "text align justify"
   },
   "text-align-start": {
-    id: "lucide-text-align-start",
     iconName: "text-align-start",
-    set: "lucide",
-    name: "text-align-start",
     humanLabel: "text align start"
   },
-  "text-cursor": {
-    id: "lucide-text-cursor",
-    iconName: "text-cursor",
-    set: "lucide",
-    name: "text-cursor",
-    humanLabel: "text cursor"
-  },
+  "text-cursor": { iconName: "text-cursor", humanLabel: "text cursor" },
   "text-cursor-input": {
-    id: "lucide-text-cursor-input",
     iconName: "text-cursor-input",
-    set: "lucide",
-    name: "text-cursor-input",
     humanLabel: "text cursor input"
   },
-  "text-initial": {
-    id: "lucide-text-initial",
-    iconName: "text-initial",
-    set: "lucide",
-    name: "text-initial",
-    humanLabel: "text initial"
-  },
-  "text-quote": {
-    id: "lucide-text-quote",
-    iconName: "text-quote",
-    set: "lucide",
-    name: "text-quote",
-    humanLabel: "text quote"
-  },
-  "text-search": {
-    id: "lucide-text-search",
-    iconName: "text-search",
-    set: "lucide",
-    name: "text-search",
-    humanLabel: "text search"
-  },
-  "text-wrap": {
-    id: "lucide-text-wrap",
-    iconName: "text-wrap",
-    set: "lucide",
-    name: "text-wrap",
-    humanLabel: "text wrap"
-  },
-  theater: {
-    id: "lucide-theater",
-    iconName: "theater",
-    set: "lucide",
-    name: "theater",
-    humanLabel: "theater"
-  },
-  thermometer: {
-    id: "lucide-thermometer",
-    iconName: "thermometer",
-    set: "lucide",
-    name: "thermometer",
-    humanLabel: "thermometer"
-  },
+  "text-initial": { iconName: "text-initial", humanLabel: "text initial" },
+  "text-quote": { iconName: "text-quote", humanLabel: "text quote" },
+  "text-search": { iconName: "text-search", humanLabel: "text search" },
+  "text-wrap": { iconName: "text-wrap", humanLabel: "text wrap" },
+  theater: { iconName: "theater", humanLabel: "theater" },
+  thermometer: { iconName: "thermometer", humanLabel: "thermometer" },
   "thermometer-snowflake": {
-    id: "lucide-thermometer-snowflake",
     iconName: "thermometer-snowflake",
-    set: "lucide",
-    name: "thermometer-snowflake",
     humanLabel: "thermometer snowflake"
   },
   "thermometer-sun": {
-    id: "lucide-thermometer-sun",
     iconName: "thermometer-sun",
-    set: "lucide",
-    name: "thermometer-sun",
     humanLabel: "thermometer sun"
   },
-  "thumbs-down": {
-    id: "lucide-thumbs-down",
-    iconName: "thumbs-down",
-    set: "lucide",
-    name: "thumbs-down",
-    humanLabel: "thumbs down"
-  },
-  "thumbs-up": {
-    id: "lucide-thumbs-up",
-    iconName: "thumbs-up",
-    set: "lucide",
-    name: "thumbs-up",
-    humanLabel: "thumbs up"
-  },
-  ticket: {
-    id: "lucide-ticket",
-    iconName: "ticket",
-    set: "lucide",
-    name: "ticket",
-    humanLabel: "ticket"
-  },
-  "ticket-check": {
-    id: "lucide-ticket-check",
-    iconName: "ticket-check",
-    set: "lucide",
-    name: "ticket-check",
-    humanLabel: "ticket check"
-  },
-  "ticket-minus": {
-    id: "lucide-ticket-minus",
-    iconName: "ticket-minus",
-    set: "lucide",
-    name: "ticket-minus",
-    humanLabel: "ticket minus"
-  },
+  "thumbs-down": { iconName: "thumbs-down", humanLabel: "thumbs down" },
+  "thumbs-up": { iconName: "thumbs-up", humanLabel: "thumbs up" },
+  ticket: { iconName: "ticket", humanLabel: "ticket" },
+  "ticket-check": { iconName: "ticket-check", humanLabel: "ticket check" },
+  "ticket-minus": { iconName: "ticket-minus", humanLabel: "ticket minus" },
   "ticket-percent": {
-    id: "lucide-ticket-percent",
     iconName: "ticket-percent",
-    set: "lucide",
-    name: "ticket-percent",
     humanLabel: "ticket percent"
   },
-  "ticket-plus": {
-    id: "lucide-ticket-plus",
-    iconName: "ticket-plus",
-    set: "lucide",
-    name: "ticket-plus",
-    humanLabel: "ticket plus"
-  },
-  "ticket-slash": {
-    id: "lucide-ticket-slash",
-    iconName: "ticket-slash",
-    set: "lucide",
-    name: "ticket-slash",
-    humanLabel: "ticket slash"
-  },
-  "ticket-x": {
-    id: "lucide-ticket-x",
-    iconName: "ticket-x",
-    set: "lucide",
-    name: "ticket-x",
-    humanLabel: "ticket x"
-  },
-  tickets: {
-    id: "lucide-tickets",
-    iconName: "tickets",
-    set: "lucide",
-    name: "tickets",
-    humanLabel: "tickets"
-  },
-  "tickets-plane": {
-    id: "lucide-tickets-plane",
-    iconName: "tickets-plane",
-    set: "lucide",
-    name: "tickets-plane",
-    humanLabel: "tickets plane"
-  },
-  timeline: {
-    id: "lucide-timeline",
-    iconName: "timeline",
-    set: "lucide",
-    name: "timeline",
-    humanLabel: "timeline"
-  },
-  timer: {
-    id: "lucide-timer",
-    iconName: "timer",
-    set: "lucide",
-    name: "timer",
-    humanLabel: "timer"
-  },
-  "timer-off": {
-    id: "lucide-timer-off",
-    iconName: "timer-off",
-    set: "lucide",
-    name: "timer-off",
-    humanLabel: "timer off"
-  },
-  "timer-reset": {
-    id: "lucide-timer-reset",
-    iconName: "timer-reset",
-    set: "lucide",
-    name: "timer-reset",
-    humanLabel: "timer reset"
-  },
-  "toggle-left": {
-    id: "lucide-toggle-left",
-    iconName: "toggle-left",
-    set: "lucide",
-    name: "toggle-left",
-    humanLabel: "toggle left"
-  },
-  "toggle-right": {
-    id: "lucide-toggle-right",
-    iconName: "toggle-right",
-    set: "lucide",
-    name: "toggle-right",
-    humanLabel: "toggle right"
-  },
-  toilet: {
-    id: "lucide-toilet",
-    iconName: "toilet",
-    set: "lucide",
-    name: "toilet",
-    humanLabel: "toilet"
-  },
-  "tool-case": {
-    id: "lucide-tool-case",
-    iconName: "tool-case",
-    set: "lucide",
-    name: "tool-case",
-    humanLabel: "tool case"
-  },
-  toolbox: {
-    id: "lucide-toolbox",
-    iconName: "toolbox",
-    set: "lucide",
-    name: "toolbox",
-    humanLabel: "toolbox"
-  },
-  tornado: {
-    id: "lucide-tornado",
-    iconName: "tornado",
-    set: "lucide",
-    name: "tornado",
-    humanLabel: "tornado"
-  },
-  torus: {
-    id: "lucide-torus",
-    iconName: "torus",
-    set: "lucide",
-    name: "torus",
-    humanLabel: "torus"
-  },
-  touchpad: {
-    id: "lucide-touchpad",
-    iconName: "touchpad",
-    set: "lucide",
-    name: "touchpad",
-    humanLabel: "touchpad"
-  },
-  "touchpad-off": {
-    id: "lucide-touchpad-off",
-    iconName: "touchpad-off",
-    set: "lucide",
-    name: "touchpad-off",
-    humanLabel: "touchpad off"
-  },
-  "towel-rack": {
-    id: "lucide-towel-rack",
-    iconName: "towel-rack",
-    set: "lucide",
-    name: "towel-rack",
-    humanLabel: "towel rack"
-  },
-  "tower-control": {
-    id: "lucide-tower-control",
-    iconName: "tower-control",
-    set: "lucide",
-    name: "tower-control",
-    humanLabel: "tower control"
-  },
-  "toy-brick": {
-    id: "lucide-toy-brick",
-    iconName: "toy-brick",
-    set: "lucide",
-    name: "toy-brick",
-    humanLabel: "toy brick"
-  },
-  tractor: {
-    id: "lucide-tractor",
-    iconName: "tractor",
-    set: "lucide",
-    name: "tractor",
-    humanLabel: "tractor"
-  },
-  "traffic-cone": {
-    id: "lucide-traffic-cone",
-    iconName: "traffic-cone",
-    set: "lucide",
-    name: "traffic-cone",
-    humanLabel: "traffic cone"
-  },
-  "train-front": {
-    id: "lucide-train-front",
-    iconName: "train-front",
-    set: "lucide",
-    name: "train-front",
-    humanLabel: "train front"
-  },
+  "ticket-plus": { iconName: "ticket-plus", humanLabel: "ticket plus" },
+  "ticket-slash": { iconName: "ticket-slash", humanLabel: "ticket slash" },
+  "ticket-x": { iconName: "ticket-x", humanLabel: "ticket x" },
+  tickets: { iconName: "tickets", humanLabel: "tickets" },
+  "tickets-plane": { iconName: "tickets-plane", humanLabel: "tickets plane" },
+  timeline: { iconName: "timeline", humanLabel: "timeline" },
+  timer: { iconName: "timer", humanLabel: "timer" },
+  "timer-off": { iconName: "timer-off", humanLabel: "timer off" },
+  "timer-reset": { iconName: "timer-reset", humanLabel: "timer reset" },
+  "toggle-left": { iconName: "toggle-left", humanLabel: "toggle left" },
+  "toggle-right": { iconName: "toggle-right", humanLabel: "toggle right" },
+  toilet: { iconName: "toilet", humanLabel: "toilet" },
+  "tool-case": { iconName: "tool-case", humanLabel: "tool case" },
+  toolbox: { iconName: "toolbox", humanLabel: "toolbox" },
+  tornado: { iconName: "tornado", humanLabel: "tornado" },
+  torus: { iconName: "torus", humanLabel: "torus" },
+  touchpad: { iconName: "touchpad", humanLabel: "touchpad" },
+  "touchpad-off": { iconName: "touchpad-off", humanLabel: "touchpad off" },
+  "towel-rack": { iconName: "towel-rack", humanLabel: "towel rack" },
+  "tower-control": { iconName: "tower-control", humanLabel: "tower control" },
+  "toy-brick": { iconName: "toy-brick", humanLabel: "toy brick" },
+  tractor: { iconName: "tractor", humanLabel: "tractor" },
+  "traffic-cone": { iconName: "traffic-cone", humanLabel: "traffic cone" },
+  "train-front": { iconName: "train-front", humanLabel: "train front" },
   "train-front-tunnel": {
-    id: "lucide-train-front-tunnel",
     iconName: "train-front-tunnel",
-    set: "lucide",
-    name: "train-front-tunnel",
     humanLabel: "train front tunnel"
   },
-  "train-track": {
-    id: "lucide-train-track",
-    iconName: "train-track",
-    set: "lucide",
-    name: "train-track",
-    humanLabel: "train track"
-  },
-  "tram-front": {
-    id: "lucide-tram-front",
-    iconName: "tram-front",
-    set: "lucide",
-    name: "tram-front",
-    humanLabel: "tram front"
-  },
-  transgender: {
-    id: "lucide-transgender",
-    iconName: "transgender",
-    set: "lucide",
-    name: "transgender",
-    humanLabel: "transgender"
-  },
-  trash: {
-    id: "lucide-trash",
-    iconName: "trash",
-    set: "lucide",
-    name: "trash",
-    humanLabel: "trash"
-  },
-  "trash-2": {
-    id: "lucide-trash-2",
-    iconName: "trash-2",
-    set: "lucide",
-    name: "trash-2",
-    humanLabel: "trash 2"
-  },
+  "train-track": { iconName: "train-track", humanLabel: "train track" },
+  "tram-front": { iconName: "tram-front", humanLabel: "tram front" },
+  transgender: { iconName: "transgender", humanLabel: "transgender" },
+  trash: { iconName: "trash", humanLabel: "trash" },
+  "trash-2": { iconName: "trash-2", humanLabel: "trash 2" },
   "tree-deciduous": {
-    id: "lucide-tree-deciduous",
     iconName: "tree-deciduous",
-    set: "lucide",
-    name: "tree-deciduous",
     humanLabel: "tree deciduous"
   },
-  "tree-palm": {
-    id: "lucide-tree-palm",
-    iconName: "tree-palm",
-    set: "lucide",
-    name: "tree-palm",
-    humanLabel: "tree palm"
-  },
-  "tree-pine": {
-    id: "lucide-tree-pine",
-    iconName: "tree-pine",
-    set: "lucide",
-    name: "tree-pine",
-    humanLabel: "tree pine"
-  },
-  trees: {
-    id: "lucide-trees",
-    iconName: "trees",
-    set: "lucide",
-    name: "trees",
-    humanLabel: "trees"
-  },
-  "trending-down": {
-    id: "lucide-trending-down",
-    iconName: "trending-down",
-    set: "lucide",
-    name: "trending-down",
-    humanLabel: "trending down"
-  },
-  "trending-up": {
-    id: "lucide-trending-up",
-    iconName: "trending-up",
-    set: "lucide",
-    name: "trending-up",
-    humanLabel: "trending up"
-  },
+  "tree-palm": { iconName: "tree-palm", humanLabel: "tree palm" },
+  "tree-pine": { iconName: "tree-pine", humanLabel: "tree pine" },
+  trees: { iconName: "trees", humanLabel: "trees" },
+  "trending-down": { iconName: "trending-down", humanLabel: "trending down" },
+  "trending-up": { iconName: "trending-up", humanLabel: "trending up" },
   "trending-up-down": {
-    id: "lucide-trending-up-down",
     iconName: "trending-up-down",
-    set: "lucide",
-    name: "trending-up-down",
     humanLabel: "trending up down"
   },
-  triangle: {
-    id: "lucide-triangle",
-    iconName: "triangle",
-    set: "lucide",
-    name: "triangle",
-    humanLabel: "triangle"
-  },
+  triangle: { iconName: "triangle", humanLabel: "triangle" },
   "triangle-alert": {
-    id: "lucide-triangle-alert",
     iconName: "triangle-alert",
-    set: "lucide",
-    name: "triangle-alert",
     humanLabel: "triangle alert"
   },
   "triangle-dashed": {
-    id: "lucide-triangle-dashed",
     iconName: "triangle-dashed",
-    set: "lucide",
-    name: "triangle-dashed",
     humanLabel: "triangle dashed"
   },
   "triangle-right": {
-    id: "lucide-triangle-right",
     iconName: "triangle-right",
-    set: "lucide",
-    name: "triangle-right",
     humanLabel: "triangle right"
   },
-  trophy: {
-    id: "lucide-trophy",
-    iconName: "trophy",
-    set: "lucide",
-    name: "trophy",
-    humanLabel: "trophy"
-  },
-  truck: {
-    id: "lucide-truck",
-    iconName: "truck",
-    set: "lucide",
-    name: "truck",
-    humanLabel: "truck"
-  },
+  trophy: { iconName: "trophy", humanLabel: "trophy" },
+  truck: { iconName: "truck", humanLabel: "truck" },
   "truck-electric": {
-    id: "lucide-truck-electric",
     iconName: "truck-electric",
-    set: "lucide",
-    name: "truck-electric",
     humanLabel: "truck electric"
   },
-  "turkish-lira": {
-    id: "lucide-turkish-lira",
-    iconName: "turkish-lira",
-    set: "lucide",
-    name: "turkish-lira",
-    humanLabel: "turkish lira"
-  },
-  turntable: {
-    id: "lucide-turntable",
-    iconName: "turntable",
-    set: "lucide",
-    name: "turntable",
-    humanLabel: "turntable"
-  },
-  turtle: {
-    id: "lucide-turtle",
-    iconName: "turtle",
-    set: "lucide",
-    name: "turtle",
-    humanLabel: "turtle"
-  },
-  tv: {
-    id: "lucide-tv",
-    iconName: "tv",
-    set: "lucide",
-    name: "tv",
-    humanLabel: "tv"
-  },
-  "tv-minimal": {
-    id: "lucide-tv-minimal",
-    iconName: "tv-minimal",
-    set: "lucide",
-    name: "tv-minimal",
-    humanLabel: "tv minimal"
-  },
+  "turkish-lira": { iconName: "turkish-lira", humanLabel: "turkish lira" },
+  turntable: { iconName: "turntable", humanLabel: "turntable" },
+  turtle: { iconName: "turtle", humanLabel: "turtle" },
+  tv: { iconName: "tv", humanLabel: "tv" },
+  "tv-minimal": { iconName: "tv-minimal", humanLabel: "tv minimal" },
   "tv-minimal-play": {
-    id: "lucide-tv-minimal-play",
     iconName: "tv-minimal-play",
-    set: "lucide",
-    name: "tv-minimal-play",
     humanLabel: "tv minimal play"
   },
-  type: {
-    id: "lucide-type",
-    iconName: "type",
-    set: "lucide",
-    name: "type",
-    humanLabel: "type"
-  },
-  "type-outline": {
-    id: "lucide-type-outline",
-    iconName: "type-outline",
-    set: "lucide",
-    name: "type-outline",
-    humanLabel: "type outline"
-  },
-  umbrella: {
-    id: "lucide-umbrella",
-    iconName: "umbrella",
-    set: "lucide",
-    name: "umbrella",
-    humanLabel: "umbrella"
-  },
-  "umbrella-off": {
-    id: "lucide-umbrella-off",
-    iconName: "umbrella-off",
-    set: "lucide",
-    name: "umbrella-off",
-    humanLabel: "umbrella off"
-  },
-  underline: {
-    id: "lucide-underline",
-    iconName: "underline",
-    set: "lucide",
-    name: "underline",
-    humanLabel: "underline"
-  },
-  undo: {
-    id: "lucide-undo",
-    iconName: "undo",
-    set: "lucide",
-    name: "undo",
-    humanLabel: "undo"
-  },
-  "undo-2": {
-    id: "lucide-undo-2",
-    iconName: "undo-2",
-    set: "lucide",
-    name: "undo-2",
-    humanLabel: "undo 2"
-  },
-  "undo-dot": {
-    id: "lucide-undo-dot",
-    iconName: "undo-dot",
-    set: "lucide",
-    name: "undo-dot",
-    humanLabel: "undo dot"
-  },
+  type: { iconName: "type", humanLabel: "type" },
+  "type-outline": { iconName: "type-outline", humanLabel: "type outline" },
+  umbrella: { iconName: "umbrella", humanLabel: "umbrella" },
+  "umbrella-off": { iconName: "umbrella-off", humanLabel: "umbrella off" },
+  underline: { iconName: "underline", humanLabel: "underline" },
+  undo: { iconName: "undo", humanLabel: "undo" },
+  "undo-2": { iconName: "undo-2", humanLabel: "undo 2" },
+  "undo-dot": { iconName: "undo-dot", humanLabel: "undo dot" },
   "unfold-horizontal": {
-    id: "lucide-unfold-horizontal",
     iconName: "unfold-horizontal",
-    set: "lucide",
-    name: "unfold-horizontal",
     humanLabel: "unfold horizontal"
   },
   "unfold-vertical": {
-    id: "lucide-unfold-vertical",
     iconName: "unfold-vertical",
-    set: "lucide",
-    name: "unfold-vertical",
     humanLabel: "unfold vertical"
   },
-  ungroup: {
-    id: "lucide-ungroup",
-    iconName: "ungroup",
-    set: "lucide",
-    name: "ungroup",
-    humanLabel: "ungroup"
-  },
-  university: {
-    id: "lucide-university",
-    iconName: "university",
-    set: "lucide",
-    name: "university",
-    humanLabel: "university"
-  },
-  unlink: {
-    id: "lucide-unlink",
-    iconName: "unlink",
-    set: "lucide",
-    name: "unlink",
-    humanLabel: "unlink"
-  },
-  "unlink-2": {
-    id: "lucide-unlink-2",
-    iconName: "unlink-2",
-    set: "lucide",
-    name: "unlink-2",
-    humanLabel: "unlink 2"
-  },
-  unplug: {
-    id: "lucide-unplug",
-    iconName: "unplug",
-    set: "lucide",
-    name: "unplug",
-    humanLabel: "unplug"
-  },
-  upload: {
-    id: "lucide-upload",
-    iconName: "upload",
-    set: "lucide",
-    name: "upload",
-    humanLabel: "upload"
-  },
-  usb: {
-    id: "lucide-usb",
-    iconName: "usb",
-    set: "lucide",
-    name: "usb",
-    humanLabel: "usb"
-  },
-  user: {
-    id: "lucide-user",
-    iconName: "user",
-    set: "lucide",
-    name: "user",
-    humanLabel: "user"
-  },
-  "user-check": {
-    id: "lucide-user-check",
-    iconName: "user-check",
-    set: "lucide",
-    name: "user-check",
-    humanLabel: "user check"
-  },
-  "user-cog": {
-    id: "lucide-user-cog",
-    iconName: "user-cog",
-    set: "lucide",
-    name: "user-cog",
-    humanLabel: "user cog"
-  },
-  "user-key": {
-    id: "lucide-user-key",
-    iconName: "user-key",
-    set: "lucide",
-    name: "user-key",
-    humanLabel: "user key"
-  },
-  "user-lock": {
-    id: "lucide-user-lock",
-    iconName: "user-lock",
-    set: "lucide",
-    name: "user-lock",
-    humanLabel: "user lock"
-  },
-  "user-minus": {
-    id: "lucide-user-minus",
-    iconName: "user-minus",
-    set: "lucide",
-    name: "user-minus",
-    humanLabel: "user minus"
-  },
-  "user-pen": {
-    id: "lucide-user-pen",
-    iconName: "user-pen",
-    set: "lucide",
-    name: "user-pen",
-    humanLabel: "user pen"
-  },
-  "user-plus": {
-    id: "lucide-user-plus",
-    iconName: "user-plus",
-    set: "lucide",
-    name: "user-plus",
-    humanLabel: "user plus"
-  },
-  "user-round": {
-    id: "lucide-user-round",
-    iconName: "user-round",
-    set: "lucide",
-    name: "user-round",
-    humanLabel: "user round"
-  },
+  ungroup: { iconName: "ungroup", humanLabel: "ungroup" },
+  university: { iconName: "university", humanLabel: "university" },
+  unlink: { iconName: "unlink", humanLabel: "unlink" },
+  "unlink-2": { iconName: "unlink-2", humanLabel: "unlink 2" },
+  unplug: { iconName: "unplug", humanLabel: "unplug" },
+  upload: { iconName: "upload", humanLabel: "upload" },
+  usb: { iconName: "usb", humanLabel: "usb" },
+  user: { iconName: "user", humanLabel: "user" },
+  "user-check": { iconName: "user-check", humanLabel: "user check" },
+  "user-cog": { iconName: "user-cog", humanLabel: "user cog" },
+  "user-key": { iconName: "user-key", humanLabel: "user key" },
+  "user-lock": { iconName: "user-lock", humanLabel: "user lock" },
+  "user-minus": { iconName: "user-minus", humanLabel: "user minus" },
+  "user-pen": { iconName: "user-pen", humanLabel: "user pen" },
+  "user-plus": { iconName: "user-plus", humanLabel: "user plus" },
+  "user-round": { iconName: "user-round", humanLabel: "user round" },
   "user-round-check": {
-    id: "lucide-user-round-check",
     iconName: "user-round-check",
-    set: "lucide",
-    name: "user-round-check",
     humanLabel: "user round check"
   },
   "user-round-cog": {
-    id: "lucide-user-round-cog",
     iconName: "user-round-cog",
-    set: "lucide",
-    name: "user-round-cog",
     humanLabel: "user round cog"
   },
   "user-round-key": {
-    id: "lucide-user-round-key",
     iconName: "user-round-key",
-    set: "lucide",
-    name: "user-round-key",
     humanLabel: "user round key"
   },
   "user-round-minus": {
-    id: "lucide-user-round-minus",
     iconName: "user-round-minus",
-    set: "lucide",
-    name: "user-round-minus",
     humanLabel: "user round minus"
   },
   "user-round-pen": {
-    id: "lucide-user-round-pen",
     iconName: "user-round-pen",
-    set: "lucide",
-    name: "user-round-pen",
     humanLabel: "user round pen"
   },
   "user-round-plus": {
-    id: "lucide-user-round-plus",
     iconName: "user-round-plus",
-    set: "lucide",
-    name: "user-round-plus",
     humanLabel: "user round plus"
   },
   "user-round-search": {
-    id: "lucide-user-round-search",
     iconName: "user-round-search",
-    set: "lucide",
-    name: "user-round-search",
     humanLabel: "user round search"
   },
-  "user-round-x": {
-    id: "lucide-user-round-x",
-    iconName: "user-round-x",
-    set: "lucide",
-    name: "user-round-x",
-    humanLabel: "user round x"
-  },
-  "user-search": {
-    id: "lucide-user-search",
-    iconName: "user-search",
-    set: "lucide",
-    name: "user-search",
-    humanLabel: "user search"
-  },
-  "user-star": {
-    id: "lucide-user-star",
-    iconName: "user-star",
-    set: "lucide",
-    name: "user-star",
-    humanLabel: "user star"
-  },
-  "user-x": {
-    id: "lucide-user-x",
-    iconName: "user-x",
-    set: "lucide",
-    name: "user-x",
-    humanLabel: "user x"
-  },
-  users: {
-    id: "lucide-users",
-    iconName: "users",
-    set: "lucide",
-    name: "users",
-    humanLabel: "users"
-  },
-  "users-round": {
-    id: "lucide-users-round",
-    iconName: "users-round",
-    set: "lucide",
-    name: "users-round",
-    humanLabel: "users round"
-  },
-  utensils: {
-    id: "lucide-utensils",
-    iconName: "utensils",
-    set: "lucide",
-    name: "utensils",
-    humanLabel: "utensils"
-  },
+  "user-round-x": { iconName: "user-round-x", humanLabel: "user round x" },
+  "user-search": { iconName: "user-search", humanLabel: "user search" },
+  "user-star": { iconName: "user-star", humanLabel: "user star" },
+  "user-x": { iconName: "user-x", humanLabel: "user x" },
+  users: { iconName: "users", humanLabel: "users" },
+  "users-round": { iconName: "users-round", humanLabel: "users round" },
+  utensils: { iconName: "utensils", humanLabel: "utensils" },
   "utensils-crossed": {
-    id: "lucide-utensils-crossed",
     iconName: "utensils-crossed",
-    set: "lucide",
-    name: "utensils-crossed",
     humanLabel: "utensils crossed"
   },
-  "utility-pole": {
-    id: "lucide-utility-pole",
-    iconName: "utility-pole",
-    set: "lucide",
-    name: "utility-pole",
-    humanLabel: "utility pole"
-  },
-  van: {
-    id: "lucide-van",
-    iconName: "van",
-    set: "lucide",
-    name: "van",
-    humanLabel: "van"
-  },
-  variable: {
-    id: "lucide-variable",
-    iconName: "variable",
-    set: "lucide",
-    name: "variable",
-    humanLabel: "variable"
-  },
-  vault: {
-    id: "lucide-vault",
-    iconName: "vault",
-    set: "lucide",
-    name: "vault",
-    humanLabel: "vault"
-  },
-  "vector-square": {
-    id: "lucide-vector-square",
-    iconName: "vector-square",
-    set: "lucide",
-    name: "vector-square",
-    humanLabel: "vector square"
-  },
-  vegan: {
-    id: "lucide-vegan",
-    iconName: "vegan",
-    set: "lucide",
-    name: "vegan",
-    humanLabel: "vegan"
-  },
-  "venetian-mask": {
-    id: "lucide-venetian-mask",
-    iconName: "venetian-mask",
-    set: "lucide",
-    name: "venetian-mask",
-    humanLabel: "venetian mask"
-  },
-  venus: {
-    id: "lucide-venus",
-    iconName: "venus",
-    set: "lucide",
-    name: "venus",
-    humanLabel: "venus"
-  },
+  "utility-pole": { iconName: "utility-pole", humanLabel: "utility pole" },
+  van: { iconName: "van", humanLabel: "van" },
+  variable: { iconName: "variable", humanLabel: "variable" },
+  vault: { iconName: "vault", humanLabel: "vault" },
+  "vector-square": { iconName: "vector-square", humanLabel: "vector square" },
+  vegan: { iconName: "vegan", humanLabel: "vegan" },
+  "venetian-mask": { iconName: "venetian-mask", humanLabel: "venetian mask" },
+  venus: { iconName: "venus", humanLabel: "venus" },
   "venus-and-mars": {
-    id: "lucide-venus-and-mars",
     iconName: "venus-and-mars",
-    set: "lucide",
-    name: "venus-and-mars",
     humanLabel: "venus and mars"
   },
-  vibrate: {
-    id: "lucide-vibrate",
-    iconName: "vibrate",
-    set: "lucide",
-    name: "vibrate",
-    humanLabel: "vibrate"
-  },
-  "vibrate-off": {
-    id: "lucide-vibrate-off",
-    iconName: "vibrate-off",
-    set: "lucide",
-    name: "vibrate-off",
-    humanLabel: "vibrate off"
-  },
-  video: {
-    id: "lucide-video",
-    iconName: "video",
-    set: "lucide",
-    name: "video",
-    humanLabel: "video"
-  },
-  "video-off": {
-    id: "lucide-video-off",
-    iconName: "video-off",
-    set: "lucide",
-    name: "video-off",
-    humanLabel: "video off"
-  },
-  videotape: {
-    id: "lucide-videotape",
-    iconName: "videotape",
-    set: "lucide",
-    name: "videotape",
-    humanLabel: "videotape"
-  },
-  view: {
-    id: "lucide-view",
-    iconName: "view",
-    set: "lucide",
-    name: "view",
-    humanLabel: "view"
-  },
-  voicemail: {
-    id: "lucide-voicemail",
-    iconName: "voicemail",
-    set: "lucide",
-    name: "voicemail",
-    humanLabel: "voicemail"
-  },
-  volleyball: {
-    id: "lucide-volleyball",
-    iconName: "volleyball",
-    set: "lucide",
-    name: "volleyball",
-    humanLabel: "volleyball"
-  },
-  volume: {
-    id: "lucide-volume",
-    iconName: "volume",
-    set: "lucide",
-    name: "volume",
-    humanLabel: "volume"
-  },
-  "volume-1": {
-    id: "lucide-volume-1",
-    iconName: "volume-1",
-    set: "lucide",
-    name: "volume-1",
-    humanLabel: "volume 1"
-  },
-  "volume-2": {
-    id: "lucide-volume-2",
-    iconName: "volume-2",
-    set: "lucide",
-    name: "volume-2",
-    humanLabel: "volume 2"
-  },
-  "volume-off": {
-    id: "lucide-volume-off",
-    iconName: "volume-off",
-    set: "lucide",
-    name: "volume-off",
-    humanLabel: "volume off"
-  },
-  "volume-x": {
-    id: "lucide-volume-x",
-    iconName: "volume-x",
-    set: "lucide",
-    name: "volume-x",
-    humanLabel: "volume x"
-  },
-  vote: {
-    id: "lucide-vote",
-    iconName: "vote",
-    set: "lucide",
-    name: "vote",
-    humanLabel: "vote"
-  },
-  wallet: {
-    id: "lucide-wallet",
-    iconName: "wallet",
-    set: "lucide",
-    name: "wallet",
-    humanLabel: "wallet"
-  },
-  "wallet-cards": {
-    id: "lucide-wallet-cards",
-    iconName: "wallet-cards",
-    set: "lucide",
-    name: "wallet-cards",
-    humanLabel: "wallet cards"
-  },
+  vibrate: { iconName: "vibrate", humanLabel: "vibrate" },
+  "vibrate-off": { iconName: "vibrate-off", humanLabel: "vibrate off" },
+  video: { iconName: "video", humanLabel: "video" },
+  "video-off": { iconName: "video-off", humanLabel: "video off" },
+  videotape: { iconName: "videotape", humanLabel: "videotape" },
+  view: { iconName: "view", humanLabel: "view" },
+  voicemail: { iconName: "voicemail", humanLabel: "voicemail" },
+  volleyball: { iconName: "volleyball", humanLabel: "volleyball" },
+  volume: { iconName: "volume", humanLabel: "volume" },
+  "volume-1": { iconName: "volume-1", humanLabel: "volume 1" },
+  "volume-2": { iconName: "volume-2", humanLabel: "volume 2" },
+  "volume-off": { iconName: "volume-off", humanLabel: "volume off" },
+  "volume-x": { iconName: "volume-x", humanLabel: "volume x" },
+  vote: { iconName: "vote", humanLabel: "vote" },
+  wallet: { iconName: "wallet", humanLabel: "wallet" },
+  "wallet-cards": { iconName: "wallet-cards", humanLabel: "wallet cards" },
   "wallet-minimal": {
-    id: "lucide-wallet-minimal",
     iconName: "wallet-minimal",
-    set: "lucide",
-    name: "wallet-minimal",
     humanLabel: "wallet minimal"
   },
-  wallpaper: {
-    id: "lucide-wallpaper",
-    iconName: "wallpaper",
-    set: "lucide",
-    name: "wallpaper",
-    humanLabel: "wallpaper"
-  },
-  wand: {
-    id: "lucide-wand",
-    iconName: "wand",
-    set: "lucide",
-    name: "wand",
-    humanLabel: "wand"
-  },
-  "wand-sparkles": {
-    id: "lucide-wand-sparkles",
-    iconName: "wand-sparkles",
-    set: "lucide",
-    name: "wand-sparkles",
-    humanLabel: "wand sparkles"
-  },
-  warehouse: {
-    id: "lucide-warehouse",
-    iconName: "warehouse",
-    set: "lucide",
-    name: "warehouse",
-    humanLabel: "warehouse"
-  },
+  wallpaper: { iconName: "wallpaper", humanLabel: "wallpaper" },
+  wand: { iconName: "wand", humanLabel: "wand" },
+  "wand-sparkles": { iconName: "wand-sparkles", humanLabel: "wand sparkles" },
+  warehouse: { iconName: "warehouse", humanLabel: "warehouse" },
   "washing-machine": {
-    id: "lucide-washing-machine",
     iconName: "washing-machine",
-    set: "lucide",
-    name: "washing-machine",
     humanLabel: "washing machine"
   },
-  watch: {
-    id: "lucide-watch",
-    iconName: "watch",
-    set: "lucide",
-    name: "watch",
-    humanLabel: "watch"
-  },
-  waves: {
-    id: "lucide-waves",
-    iconName: "waves",
-    set: "lucide",
-    name: "waves",
-    humanLabel: "waves"
-  },
+  watch: { iconName: "watch", humanLabel: "watch" },
+  waves: { iconName: "waves", humanLabel: "waves" },
   "waves-arrow-down": {
-    id: "lucide-waves-arrow-down",
     iconName: "waves-arrow-down",
-    set: "lucide",
-    name: "waves-arrow-down",
     humanLabel: "waves arrow down"
   },
   "waves-arrow-up": {
-    id: "lucide-waves-arrow-up",
     iconName: "waves-arrow-up",
-    set: "lucide",
-    name: "waves-arrow-up",
     humanLabel: "waves arrow up"
   },
-  "waves-ladder": {
-    id: "lucide-waves-ladder",
-    iconName: "waves-ladder",
-    set: "lucide",
-    name: "waves-ladder",
-    humanLabel: "waves ladder"
-  },
-  waypoints: {
-    id: "lucide-waypoints",
-    iconName: "waypoints",
-    set: "lucide",
-    name: "waypoints",
-    humanLabel: "waypoints"
-  },
-  webcam: {
-    id: "lucide-webcam",
-    iconName: "webcam",
-    set: "lucide",
-    name: "webcam",
-    humanLabel: "webcam"
-  },
-  webhook: {
-    id: "lucide-webhook",
-    iconName: "webhook",
-    set: "lucide",
-    name: "webhook",
-    humanLabel: "webhook"
-  },
-  "webhook-off": {
-    id: "lucide-webhook-off",
-    iconName: "webhook-off",
-    set: "lucide",
-    name: "webhook-off",
-    humanLabel: "webhook off"
-  },
-  weight: {
-    id: "lucide-weight",
-    iconName: "weight",
-    set: "lucide",
-    name: "weight",
-    humanLabel: "weight"
-  },
-  "weight-tilde": {
-    id: "lucide-weight-tilde",
-    iconName: "weight-tilde",
-    set: "lucide",
-    name: "weight-tilde",
-    humanLabel: "weight tilde"
-  },
-  wheat: {
-    id: "lucide-wheat",
-    iconName: "wheat",
-    set: "lucide",
-    name: "wheat",
-    humanLabel: "wheat"
-  },
-  "wheat-off": {
-    id: "lucide-wheat-off",
-    iconName: "wheat-off",
-    set: "lucide",
-    name: "wheat-off",
-    humanLabel: "wheat off"
-  },
-  "whole-word": {
-    id: "lucide-whole-word",
-    iconName: "whole-word",
-    set: "lucide",
-    name: "whole-word",
-    humanLabel: "whole word"
-  },
-  wifi: {
-    id: "lucide-wifi",
-    iconName: "wifi",
-    set: "lucide",
-    name: "wifi",
-    humanLabel: "wifi"
-  },
-  "wifi-cog": {
-    id: "lucide-wifi-cog",
-    iconName: "wifi-cog",
-    set: "lucide",
-    name: "wifi-cog",
-    humanLabel: "wifi cog"
-  },
-  "wifi-high": {
-    id: "lucide-wifi-high",
-    iconName: "wifi-high",
-    set: "lucide",
-    name: "wifi-high",
-    humanLabel: "wifi high"
-  },
-  "wifi-low": {
-    id: "lucide-wifi-low",
-    iconName: "wifi-low",
-    set: "lucide",
-    name: "wifi-low",
-    humanLabel: "wifi low"
-  },
-  "wifi-off": {
-    id: "lucide-wifi-off",
-    iconName: "wifi-off",
-    set: "lucide",
-    name: "wifi-off",
-    humanLabel: "wifi off"
-  },
-  "wifi-pen": {
-    id: "lucide-wifi-pen",
-    iconName: "wifi-pen",
-    set: "lucide",
-    name: "wifi-pen",
-    humanLabel: "wifi pen"
-  },
-  "wifi-sync": {
-    id: "lucide-wifi-sync",
-    iconName: "wifi-sync",
-    set: "lucide",
-    name: "wifi-sync",
-    humanLabel: "wifi sync"
-  },
-  "wifi-zero": {
-    id: "lucide-wifi-zero",
-    iconName: "wifi-zero",
-    set: "lucide",
-    name: "wifi-zero",
-    humanLabel: "wifi zero"
-  },
-  wind: {
-    id: "lucide-wind",
-    iconName: "wind",
-    set: "lucide",
-    name: "wind",
-    humanLabel: "wind"
-  },
+  "waves-ladder": { iconName: "waves-ladder", humanLabel: "waves ladder" },
+  waypoints: { iconName: "waypoints", humanLabel: "waypoints" },
+  webcam: { iconName: "webcam", humanLabel: "webcam" },
+  webhook: { iconName: "webhook", humanLabel: "webhook" },
+  "webhook-off": { iconName: "webhook-off", humanLabel: "webhook off" },
+  weight: { iconName: "weight", humanLabel: "weight" },
+  "weight-tilde": { iconName: "weight-tilde", humanLabel: "weight tilde" },
+  wheat: { iconName: "wheat", humanLabel: "wheat" },
+  "wheat-off": { iconName: "wheat-off", humanLabel: "wheat off" },
+  "whole-word": { iconName: "whole-word", humanLabel: "whole word" },
+  wifi: { iconName: "wifi", humanLabel: "wifi" },
+  "wifi-cog": { iconName: "wifi-cog", humanLabel: "wifi cog" },
+  "wifi-high": { iconName: "wifi-high", humanLabel: "wifi high" },
+  "wifi-low": { iconName: "wifi-low", humanLabel: "wifi low" },
+  "wifi-off": { iconName: "wifi-off", humanLabel: "wifi off" },
+  "wifi-pen": { iconName: "wifi-pen", humanLabel: "wifi pen" },
+  "wifi-sync": { iconName: "wifi-sync", humanLabel: "wifi sync" },
+  "wifi-zero": { iconName: "wifi-zero", humanLabel: "wifi zero" },
+  wind: { iconName: "wind", humanLabel: "wind" },
   "wind-arrow-down": {
-    id: "lucide-wind-arrow-down",
     iconName: "wind-arrow-down",
-    set: "lucide",
-    name: "wind-arrow-down",
     humanLabel: "wind arrow down"
   },
-  wine: {
-    id: "lucide-wine",
-    iconName: "wine",
-    set: "lucide",
-    name: "wine",
-    humanLabel: "wine"
-  },
-  "wine-off": {
-    id: "lucide-wine-off",
-    iconName: "wine-off",
-    set: "lucide",
-    name: "wine-off",
-    humanLabel: "wine off"
-  },
-  workflow: {
-    id: "lucide-workflow",
-    iconName: "workflow",
-    set: "lucide",
-    name: "workflow",
-    humanLabel: "workflow"
-  },
-  worm: {
-    id: "lucide-worm",
-    iconName: "worm",
-    set: "lucide",
-    name: "worm",
-    humanLabel: "worm"
-  },
-  wrench: {
-    id: "lucide-wrench",
-    iconName: "wrench",
-    set: "lucide",
-    name: "wrench",
-    humanLabel: "wrench"
-  },
-  x: {
-    id: "lucide-x",
-    iconName: "x",
-    set: "lucide",
-    name: "x",
-    humanLabel: "x"
-  },
-  "x-line-top": {
-    id: "lucide-x-line-top",
-    iconName: "x-line-top",
-    set: "lucide",
-    name: "x-line-top",
-    humanLabel: "x line top"
-  },
-  zap: {
-    id: "lucide-zap",
-    iconName: "zap",
-    set: "lucide",
-    name: "zap",
-    humanLabel: "zap"
-  },
-  "zap-off": {
-    id: "lucide-zap-off",
-    iconName: "zap-off",
-    set: "lucide",
-    name: "zap-off",
-    humanLabel: "zap off"
-  },
+  wine: { iconName: "wine", humanLabel: "wine" },
+  "wine-off": { iconName: "wine-off", humanLabel: "wine off" },
+  workflow: { iconName: "workflow", humanLabel: "workflow" },
+  worm: { iconName: "worm", humanLabel: "worm" },
+  wrench: { iconName: "wrench", humanLabel: "wrench" },
+  x: { iconName: "x", humanLabel: "x" },
+  "x-line-top": { iconName: "x-line-top", humanLabel: "x line top" },
+  zap: { iconName: "zap", humanLabel: "zap" },
+  "zap-off": { iconName: "zap-off", humanLabel: "zap off" },
   "zodiac-aquarius": {
-    id: "lucide-zodiac-aquarius",
     iconName: "zodiac-aquarius",
-    set: "lucide",
-    name: "zodiac-aquarius",
     humanLabel: "zodiac aquarius"
   },
-  "zodiac-aries": {
-    id: "lucide-zodiac-aries",
-    iconName: "zodiac-aries",
-    set: "lucide",
-    name: "zodiac-aries",
-    humanLabel: "zodiac aries"
-  },
-  "zodiac-cancer": {
-    id: "lucide-zodiac-cancer",
-    iconName: "zodiac-cancer",
-    set: "lucide",
-    name: "zodiac-cancer",
-    humanLabel: "zodiac cancer"
-  },
+  "zodiac-aries": { iconName: "zodiac-aries", humanLabel: "zodiac aries" },
+  "zodiac-cancer": { iconName: "zodiac-cancer", humanLabel: "zodiac cancer" },
   "zodiac-capricorn": {
-    id: "lucide-zodiac-capricorn",
     iconName: "zodiac-capricorn",
-    set: "lucide",
-    name: "zodiac-capricorn",
     humanLabel: "zodiac capricorn"
   },
-  "zodiac-gemini": {
-    id: "lucide-zodiac-gemini",
-    iconName: "zodiac-gemini",
-    set: "lucide",
-    name: "zodiac-gemini",
-    humanLabel: "zodiac gemini"
-  },
-  "zodiac-leo": {
-    id: "lucide-zodiac-leo",
-    iconName: "zodiac-leo",
-    set: "lucide",
-    name: "zodiac-leo",
-    humanLabel: "zodiac leo"
-  },
-  "zodiac-libra": {
-    id: "lucide-zodiac-libra",
-    iconName: "zodiac-libra",
-    set: "lucide",
-    name: "zodiac-libra",
-    humanLabel: "zodiac libra"
-  },
+  "zodiac-gemini": { iconName: "zodiac-gemini", humanLabel: "zodiac gemini" },
+  "zodiac-leo": { iconName: "zodiac-leo", humanLabel: "zodiac leo" },
+  "zodiac-libra": { iconName: "zodiac-libra", humanLabel: "zodiac libra" },
   "zodiac-ophiuchus": {
-    id: "lucide-zodiac-ophiuchus",
     iconName: "zodiac-ophiuchus",
-    set: "lucide",
-    name: "zodiac-ophiuchus",
     humanLabel: "zodiac ophiuchus"
   },
-  "zodiac-pisces": {
-    id: "lucide-zodiac-pisces",
-    iconName: "zodiac-pisces",
-    set: "lucide",
-    name: "zodiac-pisces",
-    humanLabel: "zodiac pisces"
-  },
+  "zodiac-pisces": { iconName: "zodiac-pisces", humanLabel: "zodiac pisces" },
   "zodiac-sagittarius": {
-    id: "lucide-zodiac-sagittarius",
     iconName: "zodiac-sagittarius",
-    set: "lucide",
-    name: "zodiac-sagittarius",
     humanLabel: "zodiac sagittarius"
   },
   "zodiac-scorpio": {
-    id: "lucide-zodiac-scorpio",
     iconName: "zodiac-scorpio",
-    set: "lucide",
-    name: "zodiac-scorpio",
     humanLabel: "zodiac scorpio"
   },
-  "zodiac-taurus": {
-    id: "lucide-zodiac-taurus",
-    iconName: "zodiac-taurus",
-    set: "lucide",
-    name: "zodiac-taurus",
-    humanLabel: "zodiac taurus"
-  },
-  "zodiac-virgo": {
-    id: "lucide-zodiac-virgo",
-    iconName: "zodiac-virgo",
-    set: "lucide",
-    name: "zodiac-virgo",
-    humanLabel: "zodiac virgo"
-  },
-  "zoom-in": {
-    id: "lucide-zoom-in",
-    iconName: "zoom-in",
-    set: "lucide",
-    name: "zoom-in",
-    humanLabel: "zoom in"
-  },
-  "zoom-out": {
-    id: "lucide-zoom-out",
-    iconName: "zoom-out",
-    set: "lucide",
-    name: "zoom-out",
-    humanLabel: "zoom out"
-  }
+  "zodiac-taurus": { iconName: "zodiac-taurus", humanLabel: "zodiac taurus" },
+  "zodiac-virgo": { iconName: "zodiac-virgo", humanLabel: "zodiac virgo" },
+  "zoom-in": { iconName: "zoom-in", humanLabel: "zoom in" },
+  "zoom-out": { iconName: "zoom-out", humanLabel: "zoom out" }
 });
 
-export const ICONS = Object.freeze(Object.values(ICONS_BY_NAME));
+const ICONS = Object.freeze(Object.values(ICONS_BY_NAME));
 
-export function filterIcons(entries, searchTerm) {
-  if (!Array.isArray(entries)) return [];
+export function filterIcons(searchTerm) {
   const term = (searchTerm || "").trim().toLowerCase();
-  if (!term) return entries;
-  return entries.filter(
+  if (!term) return ICONS;
+  return ICONS.filter(
     (entry) =>
       entry.iconName.toLowerCase().includes(term) ||
       entry.humanLabel.toLowerCase().includes(term)

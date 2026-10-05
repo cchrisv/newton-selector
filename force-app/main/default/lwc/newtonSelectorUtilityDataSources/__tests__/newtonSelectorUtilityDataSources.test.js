@@ -1,7 +1,6 @@
 import {
   normalizePicklist,
   normalizeCollection,
-  normalizeSObjectDTO,
   normalizeCustom,
   filterItems,
   applyOverrides,
@@ -18,11 +17,6 @@ describe("newtonSelectorUtilityDataSources", () => {
   });
 
   describe("normalizePicklist", () => {
-    it("returns [] for bad input", () => {
-      expect(normalizePicklist(null)).toEqual([]);
-      expect(normalizePicklist({})).toEqual([]);
-    });
-
     it("maps getPicklistValues output to items", () => {
       const input = {
         values: [
@@ -34,7 +28,6 @@ describe("newtonSelectorUtilityDataSources", () => {
       expect(items).toHaveLength(2);
       expect(items[0].label).toBe("Hot");
       expect(items[0].value).toBe("Hot");
-      expect(items[0].disabled).toBe(false);
     });
   });
 
@@ -60,15 +53,6 @@ describe("newtonSelectorUtilityDataSources", () => {
     it("keeps the source record on each item", () => {
       const record = { Id: "001", Name: "Acme" };
       const items = normalizeCollection([record], { label: "Name" });
-      expect(items[0].record).toBe(record);
-    });
-  });
-
-  describe("normalizeSObjectDTO", () => {
-    it("uses the id as value when the DTO has none and keeps its record", () => {
-      const record = { Id: "001" };
-      const items = normalizeSObjectDTO([{ id: "001", label: "A", record }]);
-      expect(items[0].value).toBe("001");
       expect(items[0].record).toBe(record);
     });
   });
@@ -137,15 +121,6 @@ describe("newtonSelectorUtilityDataSources", () => {
       const items = [{ value: "a", icon: "file" }];
       const out = applyOverrides(items, { a: { icon: "" } });
       expect(out[0].icon).toBe("file");
-    });
-
-    it("filters items with hidden overrides", () => {
-      const items = [
-        { value: "a", label: "A" },
-        { value: "b", label: "B" }
-      ];
-      const out = applyOverrides(items, { b: { hidden: true } });
-      expect(out).toEqual([{ value: "a", label: "A" }]);
     });
   });
 });

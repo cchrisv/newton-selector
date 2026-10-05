@@ -102,32 +102,30 @@
             variant="label-hidden"
             active-label="Required"
             inactive-label="Optional"
-            checked={_config.required}
+            checked={config.required}
             data-key="required"
             ontoggle={handleToggleChange}
           ></c-newton-selector-flow-cpe-toggle>
         </span>
         <lightning-helptext
           class="newton-card__help"
-          content="Users can't continue until they pick an option. An error message, if you set one, replaces every message this selector shows, including the minimum and maximum selection messages."
+          content="Users can't continue until they pick an option. While Required is on, an error message, if you set one, replaces every message this selector shows, including the minimum and maximum selection messages."
         ></lightning-helptext>
       </header>
-      <template lwc:if={_config.required}>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
-        >
-          <c-newton-selector-flow-cpe-resource-selector
-            name="customErrorMessage"
-            label="Error message (optional)"
-            value={_config.customErrorMessage}
-            builder-context={builderContext}
-            automatic-output-variables={automaticOutputVariables}
-            builder-context-filter-type="String"
-            allow-hard-code-reference
-            onvaluechanged={handleErrorMessageChange}
-          ></c-newton-selector-flow-cpe-resource-selector>
-        </div>
-      </template>
+      <div
+        class="slds-card__body slds-card__body_inner newton-studio__field-block"
+      >
+        <c-newton-selector-flow-cpe-resource-selector
+          name="customErrorMessage"
+          label="Error message (optional)"
+          value={config.customErrorMessage}
+          builder-context={builderContext}
+          automatic-output-variables={automaticOutputVariables}
+          builder-context-filter-type="String"
+          allow-hard-code-reference
+          onvaluechanged={handleErrorMessageChange}
+        ></c-newton-selector-flow-cpe-resource-selector>
+      </div>
     </article>
 
     <!-- CARD · Auto-advance -->
@@ -159,7 +157,7 @@
               variant="label-hidden"
               active-label="On"
               inactive-label="Off"
-              checked={_config.autoAdvance}
+              checked={config.autoAdvance}
               data-key="autoAdvance"
               ontoggle={handleToggleChange}
             ></c-newton-selector-flow-cpe-toggle>
@@ -196,25 +194,25 @@
             variant="label-hidden"
             active-label="On"
             inactive-label="Off"
-            checked={_config.includeNoneOption}
+            checked={config.includeNoneOption}
             data-key="includeNoneOption"
             ontoggle={handleToggleChange}
           ></c-newton-selector-flow-cpe-toggle>
         </span>
       </header>
-      <template lwc:if={_config.includeNoneOption}>
+      <template lwc:if={config.includeNoneOption}>
         <div
           class="slds-card__body slds-card__body_inner newton-studio__field-block"
         >
           <lightning-input
             type="text"
             label="None option label"
-            value={_config.noneOptionLabel}
+            value={config.noneOptionLabel}
             placeholder="--None--"
             onchange={handleNoneOptionLabelChange}
           ></lightning-input>
-          <div class="newton-studio__field" aria-label="None option position">
-            <p class="newton-studio__field-label">Position</p>
+          <div class="slds-form-element">
+            <span class="slds-form-element__label">Position</span>
             <div
               class="newton-studio__selectorgroup"
               role="radiogroup"
@@ -267,7 +265,7 @@
             variant="label-hidden"
             active-label="On"
             inactive-label="Off"
-            checked={_config.manualInput.enabled}
+            checked={config.manualInput.enabled}
             ontoggle={handleManualInputToggle}
           ></c-newton-selector-flow-cpe-toggle>
         </span>
@@ -276,14 +274,14 @@
           content="Adds an option users can type into, such as Other. The flow receives the typed text as the selector's value."
         ></lightning-helptext>
       </header>
-      <template lwc:if={_config.manualInput.enabled}>
+      <template lwc:if={config.manualInput.enabled}>
         <div
           class="slds-card__body slds-card__body_inner newton-studio__field-block"
         >
           <lightning-input
             type="text"
             label="Manual option label"
-            value={_config.manualInput.label}
+            value={config.manualInput.label}
             placeholder="Other"
             onchange={handleManualInputLabelChange}
           ></lightning-input>
@@ -291,7 +289,7 @@
             <lightning-input
               type="number"
               label="Minimum characters"
-              value={_config.manualInput.minLength}
+              value={config.manualInput.minLength}
               min="0"
               onchange={handleManualInputMinLengthChange}
             ></lightning-input>
@@ -299,7 +297,7 @@
               type="number"
               label="Maximum characters"
               placeholder="Unlimited"
-              value={_config.manualInput.maxLength}
+              value={config.manualInput.maxLength}
               min="1"
               onchange={handleManualInputMaxLengthChange}
             ></lightning-input>
@@ -307,6 +305,48 @@
         </div>
       </template>
     </article>
+
+    <!-- CARD · Select all -->
+    <template lwc:if={isMultiSelect}>
+      <article class="slds-card newton-studio__card">
+        <header
+          class="slds-card__header newton-card__head newton-card__head_with-action"
+        >
+          <span class="newton-card__glyph" aria-hidden="true">
+            <c-newton-selector-icon
+              name="list-checks"
+              size="small"
+              alternative-text=""
+            ></c-newton-selector-icon>
+          </span>
+          <div class="newton-card__headings">
+            <h3 class="slds-card__header-title slds-text-heading_small">
+              Select all
+            </h3>
+            <p
+              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+            >
+              Add Select all and Clear all buttons above the options.
+            </p>
+          </div>
+          <span class="newton-card__action">
+            <c-newton-selector-flow-cpe-toggle
+              label="Select all and Clear all buttons"
+              variant="label-hidden"
+              active-label="On"
+              inactive-label="Off"
+              checked={config.showSelectAll}
+              data-key="showSelectAll"
+              ontoggle={handleToggleChange}
+            ></c-newton-selector-flow-cpe-toggle>
+          </span>
+          <lightning-helptext
+            class="newton-card__help"
+            content="Select all picks the options that match the current search, up to Maximum selections. The buttons don't show in the preview."
+          ></lightning-helptext>
+        </header>
+      </article>
+    </template>
 
     <!-- CARD · Search -->
     <article class="slds-card newton-studio__card">
@@ -336,7 +376,7 @@
             variant="label-hidden"
             active-label="On"
             inactive-label="Off"
-            checked={_config.enableSearch}
+            checked={config.enableSearch}
             data-key="enableSearch"
             ontoggle={handleToggleChange}
           ></c-newton-selector-flow-cpe-toggle>

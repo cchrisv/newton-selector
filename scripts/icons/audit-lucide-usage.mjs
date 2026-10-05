@@ -133,7 +133,7 @@ for (const file of walk(lwcRoot)) {
   }
 }
 
-// Field-type icon maps: every value must be a Lucide icon name.
+// The CPE field-type icon map: every value must be a Lucide icon name.
 const typeIconMaps = [
   {
     file: path.join(
@@ -144,19 +144,6 @@ const typeIconMaps = [
     label: "TYPE_ICON_MAP",
     body: /export\s+const\s+TYPE_ICON_MAP\s*=\s*(?:Object\.freeze\(\s*)?\{([\s\S]*?)\}/,
     entry: /\b\w+\s*:\s*["']([^"']*)["']/g
-  },
-  {
-    file: path.join(
-      root,
-      "force-app",
-      "main",
-      "default",
-      "classes",
-      "NewtonSelectorFlowCpeDescribeService.cls"
-    ),
-    label: "field-type icon map",
-    body: /Map<String,\s*String>\s+\w*ICON\w*\s*=\s*new\s+Map<String,\s*String>\s*\{([\s\S]*?)\}\s*;/i,
-    entry: /'[^']*'\s*=>\s*'([^']*)'/g
   }
 ];
 

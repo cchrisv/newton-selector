@@ -23,7 +23,7 @@ Above the choices you may see:
 
 If a **search** box is shown, type to narrow the list. The search looks at each option's name, its short description and its help text, ignoring upper and lower case. Clearing the box brings everything back.
 
-When a "Select all" button is shown on a multi-select, it selects only the options that match your search, and skips disabled ones. A "Clear all" button removes all selections.
+When a "Select all" button is shown on a multi-select, it adds the options that match your search to what you already picked and stops at the maximum. A "Clear all" button removes all selections, including None.
 
 ## "None" and "Other"
 
@@ -32,32 +32,36 @@ When a "Select all" button is shown on a multi-select, it selects only the optio
 
 ## How each layout works
 
-| Layout           | How you use it                                                                                                                                                                                                                      |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Grid**         | Tiles in rows. Click a tile.                                                                                                                                                                                                        |
-| **List**         | One option per row. Click a row.                                                                                                                                                                                                    |
-| **Horizontal**   | One scrolling row. Swipe or scroll sideways, and tiles snap into place.                                                                                                                                                             |
-| **Dropdown**     | A compact box. Click it (or press Enter or Space while it is focused) to open the list. Pick an option. Press Escape to close. In multi-select it stays open and shows a summary such as "a, b +2 more".                            |
-| **Radio**        | Cards with a round marker (one choice) or a square checkmark (several).                                                                                                                                                             |
-| **Columns**      | Two panels, **Available cards** and **Selected cards**. Click a card to move it across, or drag and drop it. In single mode, a new pick replaces the old one.                                                                       |
-| **Dual listbox** | Two panels, **Available** and **Chosen**. Click rows to highlight them, then use the four buttons: **Move selected to chosen**, **Move all to chosen**, **Remove selected** and **Remove all**. On narrow screens the panels stack. |
+| Layout           | How you use it                                                                                                                                                                                                                                                                                                                     |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Grid**         | Tiles in rows. Click a tile.                                                                                                                                                                                                                                                                                                       |
+| **List**         | One option per row. Click a row.                                                                                                                                                                                                                                                                                                   |
+| **Horizontal**   | One scrolling row. Swipe or scroll sideways, and tiles snap into place.                                                                                                                                                                                                                                                            |
+| **Dropdown**     | A compact box. Click it (or press Enter or Space while it is focused) to open the list. Pick an option. Press Escape to close. Escape or choosing an option returns focus to the box. In multi-select the list stays open while you pick, and the box shows a summary such as "a, b +2 more".                                      |
+| **Radio**        | Cards with a round marker (one choice) or a square checkmark (several).                                                                                                                                                                                                                                                            |
+| **Columns**      | Two panels, **Available cards** and **Selected cards**. Click a card to move it across, or drag and drop it. In single mode, a new pick replaces the old one, and clicking the selected card does nothing.                                                                                                                         |
+| **Dual listbox** | Two panels, **Available** and **Chosen**. Click a row to highlight it (Shift-click extends the highlight; on a single-choice screen one row is highlighted at a time), then use the four buttons: **Move selected to chosen**, **Move all to chosen**, **Remove selected** and **Remove all**. On narrow screens the panels stack. |
 
 ## Using a keyboard
 
-Each tile is a real radio button or checkbox underneath, so the usual browser keys work: **Tab** to reach an option and **Space** to select it. In the Dropdown layout, **Enter** or **Space** opens the list, **Up** and **Down** arrows move between options, **Home** and **End** jump to the first and last, **Enter** or **Space** chooses the highlighted option, and **Escape** closes the list. Screen readers announce the group as a radio group (one choice) or a group of checkboxes (several), read out help text with each option, and announce loading and error states.
+Each tile is a real radio button or checkbox underneath, so the usual browser keys work: **Tab** to reach an option and **Space** to select it. When the screen moves on by itself after a choice, the arrow keys still move between options without moving on; press **Space** or **Enter** on the one you want. In the Dropdown layout, **Enter** or **Space** opens the list, **Up** and **Down** arrows move between options, **Home** and **End** jump to the first and last, **Enter** or **Space** chooses the highlighted option, and **Escape** closes the list. In the Dual listbox layout, **Tab** into a list, use **Up**, **Down**, **Home** and **End** to move, **Space** to highlight a row and **Shift+Up** or **Shift+Down** to extend the highlight, then Tab to the buttons. Each move is announced to screen readers.
+
+Screen readers announce the question label as the name of the group, read out help text with each option, announce the length hint of the "Other" text box, and announce loading and error states.
 
 ## When something goes wrong
 
-| What you see                                                   | What it means and what to do                                                                                    |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Gray placeholder cards and "Loading options"                   | The choices are loading. Wait a moment.                                                                         |
-| "No options available." (or similar)                           | There is nothing to choose from right now. Tell your admin if you expected options.                             |
-| A red message with a **Try again** button                      | The choices could not be loaded. Click **Try again**. If it keeps failing, send the message text to your admin. |
-| "Please make a selection."                                     | The question is required. Pick an option and click Next again.                                                  |
-| "Please select at least N option(s)." / "...no more than N..." | The screen needs a different number of choices. Adjust and click Next again.                                    |
-| "Enter at least N character(s)." / "Enter no more than N..."   | Your "Other" text is too short or too long.                                                                     |
-| "Enter a value for the manual option."                         | You picked "Other" but left the text box empty.                                                                 |
-| Your admin may show their own message instead of the above     | Admins can replace all of these messages with one custom message.                                               |
+| What you see                                                   | What it means and what to do                                                                                                 |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Gray placeholder cards                                         | The choices are loading. Wait a moment. Screen readers announce "Loading options".                                           |
+| "No options available." (or similar)                           | There is nothing to choose from right now. Tell your admin if you expected options.                                          |
+| A red message with a **Try again** button                      | The choices could not be loaded from the org. Click **Try again**. If it keeps failing, send the message text to your admin. |
+| A red message with no button                                   | The choices could not be loaded. Send the message text to your admin.                                                        |
+| "This selector's saved configuration can't be read"            | The screen is set up wrong. Contact your admin and send them the message.                                                    |
+| "Please make a selection."                                     | The question is required. Pick an option and click Next again.                                                               |
+| "Please select at least N option(s)." / "...no more than N..." | The screen needs a different number of choices. Adjust and click Next again.                                                 |
+| "Enter at least N character(s)." / "Enter no more than N..."   | Your "Other" text is too short or too long.                                                                                  |
+| "Enter a value for the manual option."                         | You picked "Other" but left the text box empty.                                                                              |
+| Your admin may show their own message instead of the above     | On a required question, admins can replace all of these messages with one custom message.                                    |
 
 If an option you expect is missing, you may not have permission to see that record or field. Selectors only show what your Salesforce access allows.
 

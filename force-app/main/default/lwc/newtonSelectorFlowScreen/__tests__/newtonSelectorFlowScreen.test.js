@@ -1,36 +1,13 @@
 import { createElement } from "lwc";
 import NewtonSelectorFlowScreen from "c/newtonSelectorFlowScreen";
 
-// Jest resolves Custom Labels to their names; give the default labels these
-// tests check their English text.
+// Jest resolves Custom Labels to their names; give the unreadable-config label
+// a value with its placeholder.
 jest.mock(
-  "@salesforce/label/c.Newton_Selector_ErrorStateDefault",
-  () => ({ default: "Could not load options." }),
+  "@salesforce/label/c.Newton_Selector_ConfigUnreadable",
+  () => ({ default: "The saved configuration can't be read ({0})." }),
   { virtual: true }
 );
-jest.mock(
-  "@salesforce/label/c.Newton_Selector_ManualOptionDefault",
-  () => ({ default: "Other" }),
-  { virtual: true }
-);
-
-function mount(configOverrides = {}) {
-  const config = {
-    dataSource: "custom",
-    layout: "grid",
-    selectionMode: "single",
-    autoAdvance: false,
-    label: "Choose one",
-    custom: { items: [{ label: "A", value: "a" }] },
-    ...configOverrides
-  };
-  const el = createElement("c-newton-selector-flow-screen", {
-    is: NewtonSelectorFlowScreen
-  });
-  el.selectorConfigJson = JSON.stringify(config);
-  document.body.appendChild(el);
-  return el;
-}
 
 describe("c-newton-selector-flow-screen", () => {
   afterEach(() => {
@@ -38,11 +15,18 @@ describe("c-newton-selector-flow-screen", () => {
       document.body.removeChild(document.body.firstChild);
   });
 
-  it("shows the error state with the configured message on malformed JSON", async () => {
+  it("shows the parse error without a Try again button on malformed JSON", async () => {
+    const malformed = "{ not valid";
+    let parseError;
+    try {
+      JSON.parse(malformed);
+    } catch (e) {
+      parseError = e.message;
+    }
     const el = createElement("c-newton-selector-flow-screen", {
       is: NewtonSelectorFlowScreen
     });
-    el.selectorConfigJson = "{ not valid";
+    el.selectorConfigJson = malformed;
     document.body.appendChild(el);
     await Promise.resolve();
     const dataSelector = el.shadowRoot.querySelector(
@@ -50,60 +34,9 @@ describe("c-newton-selector-flow-screen", () => {
     );
     const alert = dataSelector.shadowRoot.querySelector('[role="alert"]');
     expect(alert).not.toBeNull();
-    expect(alert.textContent).toContain("Could not load options.");
-  });
-
-  it("deep-merges partial saved config with shared runtime defaults", async () => {
-    const el = mount({
-      dataSource: "collection",
-      collection: {
-        fieldMap: { label: "Name" }
-      },
-      gridConfig: {
-        badge: { variant: "brand" }
-      }
-    });
-    el.sourceRecords = [{ Id: "001xx000003DGbY", Name: "Acme" }];
-    await Promise.resolve();
-
-    const dataSelector = el.shadowRoot.querySelector(
-      "c-newton-selector-data-selector"
+    expect(alert.textContent).toContain(
+      `The saved configuration can't be read (${parseError}).`
     );
-    expect(dataSelector.collectionConfig.records).toHaveLength(1);
-    expect(dataSelector.collectionConfig.fieldMap).toEqual(
-      expect.objectContaining({
-        label: "Name",
-        value: "",
-        sublabel: "",
-        icon: "",
-        badge: "",
-        helpText: ""
-      })
-    );
-    expect(dataSelector.appearance.badgeVariant).toBe("brand");
-    expect(dataSelector.appearance.badgePosition).toBe("bottom-inline");
-    expect(dataSelector.manualInputLabel).toBe("Other");
-  });
-
-  it("selectionCount is 0 when single-select is cleared", async () => {
-    const el = mount({ selectionMode: "single" });
-    await Promise.resolve();
-    const dataSelector = el.shadowRoot.querySelector(
-      "c-newton-selector-data-selector"
-    );
-    dataSelector.dispatchEvent(
-      new CustomEvent("valuechange", {
-        detail: {
-          value: "",
-          values: [],
-          record: null,
-          records: [],
-          label: "",
-          labels: []
-        },
-        bubbles: true
-      })
-    );
-    expect(el.selectionCount).toBe(0);
+    expect(alert.querySelector(".newton-state__retry")).toBeNull();
   });
 });

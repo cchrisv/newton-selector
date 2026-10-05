@@ -3,19 +3,9 @@
   inline-size: 100%;
 }
 
-.newton-selector-flow-cpe-resource-selector__value-input {
-  display: block;
-  inline-size: 100%;
-}
-
 [data-id="resultBox"] {
   position: relative;
   overflow: visible;
-}
-
-.newton-selector-flow-cpe-resource-selector__combobox {
-  --newton-selector-combobox-dropdown-max-height: 22rem;
-  --newton-selector-combobox-dropdown-padding: 0;
 }
 
 /* The selected-resource trigger is the SLDS standard input (.slds-input owns
@@ -71,6 +61,10 @@
   margin-inline-start: auto;
 }
 
+.newton-selector-flow-cpe-resource-selector__back {
+  padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-1, 0.25rem) 0;
+}
+
 /* Back and drill-in chevrons point along the reading direction, so they
    mirror in RTL. */
 .newton-selector-flow-cpe-resource-selector__icon-button
@@ -89,11 +83,7 @@
 }
 
 .newton-selector-flow-cpe-resource-selector__option-body {
-  min-width: 0;
-}
-
-.newton-selector-flow-cpe-resource-selector__dropdown {
-  margin: 0;
+  min-inline-size: 0;
 }
 
 .newton-selector-flow-cpe-resource-selector__listbox {
@@ -117,8 +107,13 @@
   background: var(--slds-g-color-neutral-base-100, #ffffff);
 }
 
-.newton-selector-flow-cpe-resource-selector__dropdown
-  .newton-selector-flow-cpe-resource-selector__option:hover {
+.newton-selector-flow-cpe-resource-selector__option:hover {
+  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+/* The option the arrow keys reached (aria-activedescendant). */
+.newton-selector-flow-cpe-resource-selector__option_active {
+  border-color: var(--slds-g-color-brand-base-50, #0176d3);
   background: var(--slds-g-color-neutral-base-95, #f3f3f3);
 }
 
@@ -131,12 +126,5 @@
   font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
   font-weight: var(--slds-g-font-weight-7, 700);
   letter-spacing: 0.04em;
-}
-
-.custom-text-transform_uppercase {
   text-transform: uppercase;
-}
-
-.custom-width-full {
-  inline-size: 100%;
 }

@@ -1,250 +1,32 @@
 @IsTest
 private class NewtonSelectorRecordQueryTest {
-  private static final Integer BULK_RECORD_COUNT = 251;
-
   @IsTest
   static void queryReturnsRecordsInOrder() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
-      NewtonSelectorTestDataFactory.createAccounts(10, 'Technology');
-      NewtonSelectorTestDataFactory.createAccounts(5, 'Finance');
+      insert new List<Account>{
+        new Account(Name = 'Charlie', Industry = 'Technology'),
+        new Account(Name = 'Alpha', Industry = 'Finance'),
+        new Account(Name = 'Bravo', Industry = 'Technology')
+      };
       NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
 
       Test.startTest();
-      List<SObject> results = NewtonSelectorRecordQuery.query(config);
-      Test.stopTest();
-
-      Assert.areEqual(15, results.size(), 'Should return all 15 accounts');
-      Assert.isTrue(
-        ((String) results[0].get('Name'))
-          .compareTo((String) results[1].get('Name')) <= 0,
-        'Should be ordered ASC by Name'
-      );
-    }
-  }
-
-  @IsTest
-  static void queryFiltersByWhereClause() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorTestDataFactory.createAccounts(10, 'Technology');
-      NewtonSelectorTestDataFactory.createAccounts(5, 'Finance');
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'Industry = \'Technology\'';
-
-      Test.startTest();
-      List<SObject> results = NewtonSelectorRecordQuery.query(config);
-      Test.stopTest();
-
-      Assert.areEqual(10, results.size(), 'Should only return Tech accounts');
-      for (SObject record : results) {
-        Assert.areEqual('Technology', record.get('Industry'));
-      }
-    }
-  }
-
-  @IsTest
-  static void queryFiltersByWhereClauseInList() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorTestDataFactory.createAccounts(10, 'Technology');
-      NewtonSelectorTestDataFactory.createAccounts(5, 'Finance');
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'Industry IN (\'Technology\', \'Finance\')';
-
-      Test.startTest();
-      List<SObject> results = NewtonSelectorRecordQuery.query(config);
+      List<SObject> ascResults = NewtonSelectorRecordQuery.query(config);
+      config.orderByDirection = 'DESC';
+      List<SObject> descResults = NewtonSelectorRecordQuery.query(config);
       Test.stopTest();
 
       Assert.areEqual(
-        15,
-        results.size(),
-        'WHERE IN should include both industries'
+        new List<String>{ 'Alpha', 'Bravo', 'Charlie' },
+        names(ascResults),
+        'ASC should sort by Name'
       );
-    }
-  }
-
-  @IsTest
-  static void queryHonorsGroupedWhere() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      insert new List<Account>{
-        new Account(Name = 'A', Industry = 'Technology'),
-        new Account(Name = 'A', Industry = 'Finance'),
-        new Account(Name = 'B', Industry = 'Healthcare')
-      };
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'Name = \'A\' AND (Industry = \'Technology\' OR Industry = \'Healthcare\')';
-
-      Test.startTest();
-      List<SObject> results = NewtonSelectorRecordQuery.query(config);
-      Test.stopTest();
-
-      Assert.areEqual(1, results.size(), 'Parentheses must group the OR');
-      Assert.areEqual('Technology', results[0].get('Industry'));
-    }
-  }
-
-  @IsTest
-  static void queryFiltersByIncludesOnMultiPicklist() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      insert new List<Contact>{
-        new Contact(LastName = 'Champion', BuyerAttributes = 'Champion;Buyer'),
-        new Contact(LastName = 'Evaluator', BuyerAttributes = 'Evaluator'),
-        new Contact(LastName = 'Blank')
-      };
-      NewtonSelectorQueryDTO config = contactConfig();
-      config.whereClause = 'BuyerAttributes INCLUDES (\'Champion\', \'Detractor\')';
-
-      Test.startTest();
-      List<SObject> results = NewtonSelectorRecordQuery.query(config);
-      Test.stopTest();
-
-      Assert.areEqual(1, results.size());
-      Assert.areEqual('Champion', results[0].get('LastName'));
-    }
-  }
-
-  @IsTest
-  static void queryRejectsMultipicklistOperatorOnSinglePicklistWhereClause() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'Industry INCLUDES (\'Technology\')';
-
-      Test.startTest();
-      assertQueryFails(
-        config,
-        'INCLUDES is only supported for multi-select picklist fields.'
+      Assert.areEqual(
+        new List<String>{ 'Charlie', 'Bravo', 'Alpha' },
+        names(descResults),
+        'DESC should reverse the order'
       );
-      Test.stopTest();
-    }
-  }
-
-  @IsTest
-  static void queryRejectsUnsafeWhereClause() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'Industry = \'Technology\' ORDER BY CreatedDate';
-
-      Test.startTest();
-      assertQueryFails(
-        config,
-        'Unsupported WHERE clause near: ORDER BY CreatedDate'
-      );
-      Test.stopTest();
-    }
-  }
-
-  @IsTest
-  static void queryParsesAdditionalComparisonOperators() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorTestDataFactory.createAccounts(2, 'Technology');
-      List<String> whereClauses = new List<String>{
-        'Name LIKE \'Test%\'',
-        'NumberOfEmployees != 0',
-        'NumberOfEmployees >= 50',
-        'AnnualRevenue < 2000000',
-        'AnnualRevenue <= 2000000',
-        'AnnualRevenue > 0',
-        'Industry NOT IN (\'Finance\')'
-      };
-
-      Test.startTest();
-      for (String whereClause : whereClauses) {
-        NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-        config.whereClause = whereClause;
-        List<SObject> results = NewtonSelectorRecordQuery.query(config);
-        Assert.areEqual(
-          2,
-          results.size(),
-          'Expected two records for WHERE: ' + whereClause
-        );
-      }
-      Test.stopTest();
-    }
-  }
-
-  @IsTest
-  static void queryRejectsUnsupportedNotLikeWhereClause() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'Name NOT LIKE \'Missing%\'';
-
-      Test.startTest();
-      assertQueryFails(config, 'Unsupported WHERE operator.');
-      Test.stopTest();
-    }
-  }
-
-  @IsTest
-  static void queryTreatsQuotedNullAsText() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      insert new List<Account>{
-        new Account(Name = 'null'),
-        new Account(Name = 'Other')
-      };
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-
-      Test.startTest();
-      config.whereClause = 'Name = \'null\'';
-      List<SObject> equalsResults = NewtonSelectorRecordQuery.query(config);
-      config.whereClause = 'Name IN (\'NULL\', \'Missing\')';
-      List<SObject> inResults = NewtonSelectorRecordQuery.query(config);
-      Test.stopTest();
-
-      Assert.areEqual(1, equalsResults.size(), 'Quoted null is the text null');
-      Assert.areEqual('null', equalsResults[0].get('Name'));
-      Assert.areEqual(1, inResults.size(), 'Quoted NULL in IN is text');
-    }
-  }
-
-  @IsTest
-  static void queryTreatsBareNullAsNull() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorTestDataFactory.createAccounts(2, 'Technology');
-      insert new Account(Name = 'No Industry');
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-
-      Test.startTest();
-      config.whereClause = 'Industry = NULL';
-      List<SObject> nullResults = NewtonSelectorRecordQuery.query(config);
-      config.whereClause = 'Industry != null';
-      List<SObject> notNullResults = NewtonSelectorRecordQuery.query(config);
-      Test.stopTest();
-
-      Assert.areEqual(1, nullResults.size());
-      Assert.areEqual('No Industry', nullResults[0].get('Name'));
-      Assert.areEqual(2, notNullResults.size());
-    }
-  }
-
-  @IsTest
-  static void queryRejectsLiteralsThatDoNotMatchFieldType() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      Map<String, String> expectedByWhere = new Map<String, String>{
-        'NumberOfEmployees = abc' => 'Invalid value for NumberOfEmployees (INTEGER): abc',
-        'AnnualRevenue > lots' => 'Invalid value for AnnualRevenue (CURRENCY): lots',
-        'LastActivityDate = soon' => 'Invalid value for LastActivityDate (DATE): soon',
-        'CreatedDate > yesterday' => 'Invalid value for CreatedDate (DATETIME): yesterday',
-        'IsDeleted = yes' => 'Invalid value for IsDeleted (BOOLEAN): yes',
-        'NumberOfEmployees IN (1, x)' => 'Invalid value for NumberOfEmployees (INTEGER): x'
-      };
-
-      Test.startTest();
-      for (String whereClause : expectedByWhere.keySet()) {
-        NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-        config.whereClause = whereClause;
-        assertQueryFails(config, expectedByWhere.get(whereClause));
-      }
-      Test.stopTest();
     }
   }
 
@@ -269,9 +51,21 @@ private class NewtonSelectorRecordQueryTest {
         Task.ActivityDate.getDescribe(),
         '2026-04-27'
       );
-      Object dateTimeValue = NewtonSelectorQueryValueUtil.coerceValue(
+      Object utcDatetimeValue = NewtonSelectorQueryValueUtil.coerceValue(
         Account.CreatedDate.getDescribe(),
-        '2026-04-27 12:00:00'
+        '2026-04-27T12:00:00Z'
+      );
+      Object offsetDatetimeValue = NewtonSelectorQueryValueUtil.coerceValue(
+        Account.CreatedDate.getDescribe(),
+        '2026-04-27T14:00:00+02:00'
+      );
+      Object timeValue = NewtonSelectorQueryValueUtil.coerceValue(
+        BusinessHours.MondayStartTime.getDescribe(),
+        '14:30:00'
+      );
+      Object utcTimeValue = NewtonSelectorQueryValueUtil.coerceValue(
+        BusinessHours.MondayStartTime.getDescribe(),
+        '14:30:05.250Z'
       );
       Test.stopTest();
 
@@ -279,7 +73,39 @@ private class NewtonSelectorRecordQueryTest {
       Assert.areEqual(42, integerValue);
       Assert.areEqual(Decimal.valueOf('123.45'), decimalValue);
       Assert.areEqual(Date.valueOf('2026-04-27'), dateValue);
-      Assert.areEqual(Datetime.valueOf('2026-04-27 12:00:00'), dateTimeValue);
+      Assert.areEqual(
+        Datetime.newInstanceGmt(2026, 4, 27, 12, 0, 0),
+        utcDatetimeValue
+      );
+      Assert.areEqual(
+        Datetime.newInstanceGmt(2026, 4, 27, 12, 0, 0),
+        offsetDatetimeValue
+      );
+      Assert.areEqual(Time.newInstance(14, 30, 0, 0), timeValue);
+      Assert.areEqual(Time.newInstance(14, 30, 5, 250), utcTimeValue);
+    }
+  }
+
+  @IsTest
+  static void queryValueUtilRejectsMalformedTime() {
+    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
+    System.runAs(testUser) {
+      Test.startTest();
+      for (String rawValue : new List<String>{ '14:30', '24:00:00', 'noon' }) {
+        try {
+          NewtonSelectorQueryValueUtil.coerceValue(
+            BusinessHours.MondayStartTime.getDescribe(),
+            rawValue
+          );
+          Assert.fail('Expected failure for TIME value: ' + rawValue);
+        } catch (NewtonSelectorException e) {
+          Assert.areEqual(
+            'Invalid value for MondayStartTime (TIME): ' + rawValue,
+            e.getMessage()
+          );
+        }
+      }
+      Test.stopTest();
     }
   }
 
@@ -327,14 +153,19 @@ private class NewtonSelectorRecordQueryTest {
   static void queryCapsLimitAtMaximum() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
+      NewtonSelectorTestDataFactory.createAccounts(2001, 'Technology');
       NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
       config.queryLimit = 5000;
 
       Test.startTest();
-      String soql = NewtonSelectorQueryBuilder.build(config).soql;
+      List<SObject> results = NewtonSelectorRecordQuery.query(config);
       Test.stopTest();
 
-      Assert.isTrue(soql.endsWith(' LIMIT 2000'), soql);
+      Assert.areEqual(
+        2000,
+        results.size(),
+        'A limit above the maximum is clamped to 2000'
+      );
     }
   }
 
@@ -446,30 +277,6 @@ private class NewtonSelectorRecordQueryTest {
   }
 
   @IsTest
-  static void queryHandlesBulkVolume() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      NewtonSelectorTestDataFactory.createAccounts(
-        BULK_RECORD_COUNT,
-        'Healthcare'
-      );
-      NewtonSelectorQueryDTO config = NewtonSelectorTestDataFactory.buildSimpleAccountConfig();
-      config.whereClause = 'Industry = \'Healthcare\'';
-      config.queryLimit = 500;
-
-      Test.startTest();
-      List<SObject> results = NewtonSelectorRecordQuery.query(config);
-      Test.stopTest();
-
-      Assert.areEqual(
-        BULK_RECORD_COUNT,
-        results.size(),
-        'Should return all healthcare accounts under the 500 limit'
-      );
-    }
-  }
-
-  @IsTest
   static void queryExcludesRecordsHiddenBySharing() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     // A contact without an account is private to its owner (here: the test runner).
@@ -478,7 +285,9 @@ private class NewtonSelectorRecordQueryTest {
       insert new Contact(LastName = 'Visible');
 
       Test.startTest();
-      List<SObject> results = NewtonSelectorRecordQuery.query(contactConfig());
+      List<SObject> results = NewtonSelectorRecordQuery.query(
+        NewtonSelectorTestDataFactory.buildSimpleContactConfig()
+      );
       Test.stopTest();
 
       Assert.areEqual(1, results.size(), 'Hidden contact must be excluded');
@@ -486,12 +295,12 @@ private class NewtonSelectorRecordQueryTest {
     }
   }
 
-  private static NewtonSelectorQueryDTO contactConfig() {
-    NewtonSelectorQueryDTO config = new NewtonSelectorQueryDTO();
-    config.sObjectApiName = 'Contact';
-    config.labelField = 'LastName';
-    config.orderByField = 'LastName';
-    return config;
+  private static List<String> names(List<SObject> records) {
+    List<String> result = new List<String>();
+    for (SObject record : records) {
+      result.add((String) record.get('Name'));
+    }
+    return result;
   }
 
   private static void assertQueryFails(

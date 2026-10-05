@@ -7,7 +7,6 @@ import clearAll from "@salesforce/label/c.Newton_Selector_ClearAll";
 import noItems from "@salesforce/label/c.Newton_Selector_NoItems";
 import searchOptions from "@salesforce/label/c.Newton_Selector_SearchOptions";
 import filterPicklistOptions from "@salesforce/label/c.Newton_Selector_FilterPicklistOptions";
-import picklistOptions from "@salesforce/label/c.Newton_Selector_PicklistOptions";
 import noOptionsToDisplay from "@salesforce/label/c.Newton_Selector_NoOptionsToDisplay";
 import filterAvailable from "@salesforce/label/c.Newton_Selector_FilterAvailable";
 import filterAvailableOptions from "@salesforce/label/c.Newton_Selector_FilterAvailableOptions";
@@ -30,6 +29,7 @@ import noAvailableCards from "@salesforce/label/c.Newton_Selector_NoAvailableCar
 import noAvailableOptions from "@salesforce/label/c.Newton_Selector_NoAvailableOptions";
 import dropSelectedCardsHere from "@salesforce/label/c.Newton_Selector_DropSelectedCardsHere";
 import moveChoicesHere from "@salesforce/label/c.Newton_Selector_MoveChoicesHere";
+import movedTo from "@salesforce/label/c.Newton_Selector_MovedTo";
 import moreSelected from "@salesforce/label/c.Newton_Selector_MoreSelected";
 import chooseAnOption from "@salesforce/label/c.Newton_Selector_ChooseAnOption";
 import characterRange from "@salesforce/label/c.Newton_Selector_CharacterRange";
@@ -51,7 +51,6 @@ const LABELS = {
   noItems,
   searchOptions,
   filterPicklistOptions,
-  picklistOptions,
   noOptionsToDisplay,
   filterAvailable,
   filterAvailableOptions,
@@ -59,7 +58,9 @@ const LABELS = {
   moveSelectedToChosen,
   moveAllToChosen,
   removeSelected,
-  removeAll
+  removeAll,
+  availableOptions,
+  chosenOptions
 };
 
 const MODE_MULTI = "multi";
@@ -73,6 +74,8 @@ const VARIANT_RADIO = "radio";
 
 const DROPZONE_AVAILABLE = "available";
 const DROPZONE_SELECTED = "selected";
+
+const MAX_FIXED_COLUMNS = 6;
 
 // Group properties handed to every choice tile unchanged.
 const TILE_STYLE_PROPS = [
@@ -131,71 +134,73 @@ export default class NewtonSelectorGroup extends LightningElement {
   @api items = [];
   @api variant = VARIANT_GRID;
   @api selectionMode = "single";
-  @api minSelections = 0;
   @api maxSelections;
   @api showSelectAll = false;
   @api enableSearch = false;
   @api previewMode = false;
+  // The selector's question label. It names the Dropdown combobox, because
+  // the visible legend lives in the parent's shadow tree.
+  @api fieldLabel;
 
   // Layout knobs. Card styling lives in newtonSelectorChoiceTile; this group
-  // only composes cards into layouts and converts SLDS spacing tokens.
-  @api gridMinWidth = "7.5rem";
-  @api gapHorizontal = "2";
-  @api gapVertical = "2";
-  @api marginTop = "";
-  @api marginRight = "";
-  @api marginBottom = "";
-  @api marginLeft = "";
+  // only composes cards into layouts and converts SLDS spacing tokens. The
+  // data selector always supplies every layout and tile property.
+  @api gridMinWidth;
+  @api gapHorizontal;
+  @api gapVertical;
+  @api marginTop;
+  @api marginRight;
+  @api marginBottom;
+  @api marginLeft;
   // An empty padding token keeps the tile's size-based padding.
-  @api paddingTop = "";
-  @api paddingRight = "";
-  @api paddingBottom = "";
-  @api paddingLeft = "";
+  @api paddingTop;
+  @api paddingRight;
+  @api paddingBottom;
+  @api paddingLeft;
   // Fixed column count (1-6) for the grid layout; anything else auto-fills.
   @api columns;
 
   // Choice tile styling (see TILE_STYLE_PROPS).
-  @api size = "small";
-  @api iconSize = "auto";
-  @api aspectRatio = "1:1";
-  @api badgePosition = "bottom-inline";
-  @api badgeVariant = "neutral";
-  @api badgeShape = "pill";
-  @api badgeVariantHex = "";
-  @api selectionIndicator = "frame";
-  @api elevation = "outlined";
-  @api pattern = "none";
-  @api patternTone = "neutral";
-  @api patternHoverTone = "neutral";
-  @api patternSelectedTone = "brand";
-  @api patternDisabledTone = "neutral";
-  @api patternToneHex = "";
-  @api patternHoverToneHex = "";
-  @api patternSelectedToneHex = "";
-  @api patternDisabledToneHex = "";
-  @api cornerStyle = "none";
-  @api cornerTone = "neutral";
-  @api cornerToneHex = "";
-  @api surfaceStyle = "solid";
-  @api surfaceTone = "neutral";
-  @api surfaceHoverTone = "neutral";
-  @api surfaceSelectedTone = "brand";
-  @api surfaceDisabledTone = "neutral";
-  @api surfaceToneHex = "";
-  @api surfaceHoverToneHex = "";
-  @api surfaceSelectedToneHex = "";
-  @api surfaceDisabledToneHex = "";
-  @api iconDecor = "square";
-  @api iconStyle = "soft";
-  @api iconShading = "flat";
-  @api iconTone = "brand";
-  @api iconToneHex = "";
+  @api size;
+  @api iconSize;
+  @api aspectRatio;
+  @api badgePosition;
+  @api badgeVariant;
+  @api badgeShape;
+  @api badgeVariantHex;
+  @api selectionIndicator;
+  @api elevation;
+  @api pattern;
+  @api patternTone;
+  @api patternHoverTone;
+  @api patternSelectedTone;
+  @api patternDisabledTone;
+  @api patternToneHex;
+  @api patternHoverToneHex;
+  @api patternSelectedToneHex;
+  @api patternDisabledToneHex;
+  @api cornerStyle;
+  @api cornerTone;
+  @api cornerToneHex;
+  @api surfaceStyle;
+  @api surfaceTone;
+  @api surfaceHoverTone;
+  @api surfaceSelectedTone;
+  @api surfaceDisabledTone;
+  @api surfaceToneHex;
+  @api surfaceHoverToneHex;
+  @api surfaceSelectedToneHex;
+  @api surfaceDisabledToneHex;
+  @api iconDecor;
+  @api iconStyle;
+  @api iconShading;
+  @api iconTone;
+  @api iconToneHex;
   @api iconGlyphTone;
-  @api iconGlyphToneHex = "";
+  @api iconGlyphToneHex;
   @api showIcons;
   @api showBadges;
 
-  @api allowManualInput = false;
   @api manualInputLabel;
   @api manualInputMinLength = 0;
   @api manualInputMaxLength;
@@ -205,11 +210,21 @@ export default class NewtonSelectorGroup extends LightningElement {
   _manualInputValue = "";
   _searchTerm = "";
   _dragOverZone = "";
+  // Dual listbox: the rows highlighted for the next move, the row holding
+  // each panel's Tab stop, the row a Shift-click or Shift-arrow extends the
+  // highlight from, the row to focus after a move, and the move announcement.
   _dualAvailableValues = [];
   _dualSelectedValues = [];
+  _dualAvailableFocus = null;
+  _dualSelectedFocus = null;
+  _dualAnchor = null;
+  _dualPendingFocus = null;
+  _dualAnnouncement = "";
   _picklistOpen = false;
   _activeIndex = -1;
-  _dragValue = "";
+  // The Dropdown option last scrolled into view, so a render scrolls only
+  // when the active option changes.
+  _scrolledIndex = -1;
   _groupName = `newton-group-${++GROUP_COUNTER}`;
   labels = LABELS;
 
@@ -218,7 +233,7 @@ export default class NewtonSelectorGroup extends LightningElement {
     return this._selectedValues;
   }
   set selectedValues(v) {
-    this._selectedValues = Array.isArray(v) ? v : [];
+    this._selectedValues = v;
   }
 
   // The None option's value is "", so "None picked" cannot be told apart from
@@ -236,12 +251,28 @@ export default class NewtonSelectorGroup extends LightningElement {
     return this._manualInputValue;
   }
   set manualInputValue(v) {
-    this._manualInputValue = v === undefined || v === null ? "" : String(v);
+    this._manualInputValue = v;
   }
 
   render() {
     VIEWS.set(this, this.buildView());
     return template;
+  }
+
+  renderedCallback() {
+    if (this._picklistOpen && this._activeIndex !== this._scrolledIndex) {
+      this._scrolledIndex = this._activeIndex;
+      this.template
+        .querySelector(".newton-picklist__option_active")
+        ?.scrollIntoView({ block: "nearest" });
+    }
+    if (!this._dualPendingFocus) return;
+    const { zone, value } = this._dualPendingFocus;
+    this._dualPendingFocus = null;
+    // The moved row is missing when the Available search hides it.
+    [...this.template.querySelectorAll(`[role="option"][data-zone="${zone}"]`)]
+      .find((row) => row.dataset.value === value)
+      ?.focus();
   }
 
   buildView() {
@@ -257,27 +288,30 @@ export default class NewtonSelectorGroup extends LightningElement {
     const maxReached = this.maxReached(this._selectedValues.length);
 
     if (this.isTransferLayout) {
-      const availableActive = new Set(this._dualAvailableValues);
-      const selectedActive = new Set(this._dualSelectedValues);
+      const availableRows = this.filteredItems
+        .filter((item) => !selected.has(item.value))
+        .map((item) => this.decorateCardItem(item, false, maxReached));
+      const selectedRows = this.selectedItemsInOrder().map((item) =>
+        this.decorateCardItem(item, true, false)
+      );
+      if (!this.isDualListbox) {
+        return {
+          tileProps,
+          transferAvailableItems: availableRows,
+          transferSelectedItems: selectedRows
+        };
+      }
       return {
         tileProps,
-        transferAvailableItems: this.filteredItems
-          .filter((item) => !selected.has(item.value))
-          .map((item) =>
-            this.decorateCardItem(
-              item,
-              false,
-              maxReached,
-              availableActive.has(item.value)
-            )
-          ),
-        transferSelectedItems: this.selectedItemsInOrder().map((item) =>
-          this.decorateCardItem(
-            item,
-            true,
-            false,
-            selectedActive.has(item.value)
-          )
+        transferAvailableItems: this.decorateDualRows(
+          availableRows,
+          this._dualAvailableValues,
+          this._dualAvailableFocus
+        ),
+        transferSelectedItems: this.decorateDualRows(
+          selectedRows,
+          this._dualSelectedValues,
+          this._dualSelectedFocus
         )
       };
     }
@@ -304,27 +338,16 @@ export default class NewtonSelectorGroup extends LightningElement {
     if (this.isPicklist) {
       return {
         tileProps,
-        picklistItems: cards.map((item, index) => {
-          const active = index === this._activeIndex;
-          return {
-            ...item,
-            title: item.label,
-            subtitle: item.sublabel || "",
-            _optionId: `${this._groupName}-option-${index}`,
-            _ariaSelected: String(item._selected),
-            _ariaDisabled: String(item._disabled),
-            _class: [
-              "slds-listbox__item",
-              "newton-picklist__item",
-              item._selected ? "newton-picklist__item_selected" : ""
-            ]
-              .filter(Boolean)
-              .join(" "),
-            _optionClass: active
-              ? "slds-listbox__option newton-picklist__option newton-picklist__option_active slds-has-focus"
-              : "slds-listbox__option newton-picklist__option"
-          };
-        })
+        picklistItems: cards.map((item, index) => ({
+          ...item,
+          _optionId: `${this._groupName}-option-${index}`,
+          _ariaSelected: String(item._selected),
+          _ariaDisabled: String(item._disabled),
+          _optionClass:
+            index === this._activeIndex
+              ? "newton-picklist__option newton-picklist__option_active"
+              : "newton-picklist__option"
+        }))
       };
     }
     return { tileProps, cards };
@@ -378,9 +401,8 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   get filteredItems() {
-    const base = Array.isArray(this.items) ? this.items : [];
-    if (!this.enableSearch || !this._searchTerm) return base;
-    return filterItems(base, this._searchTerm);
+    if (!this.enableSearch || !this._searchTerm) return this.items;
+    return filterItems(this.items, this._searchTerm);
   }
 
   get selectedValueSet() {
@@ -418,12 +440,14 @@ export default class NewtonSelectorGroup extends LightningElement {
     return this.isColumns ? selectedCards : chosen;
   }
 
+  // Only Columns names its panels: in the Dual listbox the listbox inside
+  // carries the name, so a named panel would repeat it as a second landmark.
   get availablePanelAriaLabel() {
-    return this.isColumns ? availableCardColumn : availableOptions;
+    return this.isColumns ? availableCardColumn : null;
   }
 
   get selectedPanelAriaLabel() {
-    return this.isColumns ? selectedCardColumn : chosenOptions;
+    return this.isColumns ? selectedCardColumn : null;
   }
 
   get availableLabelId() {
@@ -442,25 +466,35 @@ export default class NewtonSelectorGroup extends LightningElement {
     return this.isColumns ? dropSelectedCardsHere : moveChoicesHere;
   }
 
-  decorateCardItem(item, isSelected, maxReached, active = false) {
+  decorateCardItem(item, isSelected, maxReached) {
     const isNone = item.value === "";
-    const isManual = item.value === MANUAL_INPUT_VALUE;
-    const disabled =
-      Boolean(item.disabled) || (!isNone && maxReached && !isSelected);
+    const disabled = !isNone && maxReached && !isSelected;
     return {
       ...item,
       _selected: isSelected,
       _disabled: disabled,
-      _draggable: this.isColumns && !disabled && !isNone && !isManual,
-      _class: [
-        "newton-transfer__item",
-        active ? "newton-transfer__item_active" : "",
-        disabled ? "newton-transfer__item_disabled" : "",
-        this.isColumns ? "newton-transfer__item_draggable" : ""
-      ]
-        .filter(Boolean)
-        .join(" ")
+      _draggable:
+        this.isColumns &&
+        !disabled &&
+        !isNone &&
+        item.value !== MANUAL_INPUT_VALUE
     };
+  }
+
+  // A Dual listbox row is an option whose tile shows the "highlighted for
+  // move" state. One row per panel holds the Tab stop.
+  decorateDualRows(rows, highlighted, focusValue) {
+    const marked = new Set(highlighted);
+    const tabStop = rows.some((row) => row.value === focusValue)
+      ? focusValue
+      : rows[0]?.value;
+    return rows.map((row) => ({
+      ...row,
+      _selected: marked.has(row.value),
+      _ariaSelected: String(marked.has(row.value)),
+      _ariaDisabled: String(row._disabled),
+      _tabindex: row.value === tabStop ? "0" : "-1"
+    }));
   }
 
   maxReached(selectedCount) {
@@ -488,22 +522,22 @@ export default class NewtonSelectorGroup extends LightningElement {
     );
   }
 
-  get groupRole() {
-    return this.isMulti ? "group" : "radiogroup";
+  get fixedColumns() {
+    const cols = Number(this.columns);
+    return Number.isInteger(cols) && cols >= 1 && cols <= MAX_FIXED_COLUMNS
+      ? cols
+      : null;
   }
 
   get groupClass() {
-    return `newton-group newton-group_${this.variant}`;
+    const base = `newton-group newton-group_${this.variant}`;
+    return this.fixedColumns ? `${base} newton-group_fixed-cols` : base;
   }
 
   get transferClass() {
-    return [
-      "newton-transfer",
-      `newton-transfer_${this.variant}`,
-      this.isDualListbox ? "newton-transfer_has-controls" : ""
-    ]
-      .filter(Boolean)
-      .join(" ");
+    return this.isDualListbox
+      ? "slds-dueling-list newton-transfer newton-transfer_dualListbox newton-transfer_has-controls"
+      : `newton-transfer newton-transfer_${this.variant}`;
   }
 
   get availablePanelClass() {
@@ -542,9 +576,8 @@ export default class NewtonSelectorGroup extends LightningElement {
     if (this.paddingLeft) {
       parts.push(`--newton-tile-pad-l: ${tokenToCss(this.paddingLeft)}`);
     }
-    const cols = Number(this.columns);
-    if (Number.isInteger(cols) && cols >= 1 && cols <= 6) {
-      parts.push(`--newton-group-cols: ${cols}`);
+    if (this.fixedColumns) {
+      parts.push(`--newton-group-cols: ${this.fixedColumns}`);
     }
     return parts.join("; ");
   }
@@ -571,7 +604,9 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   get selectedPicklistIcon() {
-    return this.isPicklistSingle ? this.selectedPicklistItem?.icon || "" : "";
+    return this.isPicklistSingle && this.showIcons !== false
+      ? this.selectedPicklistItem?.icon || ""
+      : "";
   }
 
   get picklistAriaMultiselectable() {
@@ -585,12 +620,6 @@ export default class NewtonSelectorGroup extends LightningElement {
     const visible = labels.slice(0, 2).join(", ");
     const extra = labels.length - 2;
     return extra > 0 ? formatLabel(moreSelected, visible, extra) : visible;
-  }
-
-  get picklistClass() {
-    return this._picklistOpen
-      ? "newton-picklist newton-picklist_open"
-      : "newton-picklist";
   }
 
   get picklistComboboxClass() {
@@ -643,8 +672,12 @@ export default class NewtonSelectorGroup extends LightningElement {
     return this.picklistInputValue;
   }
 
+  // A combobox takes no name from its content, so the current value names it
+  // only when the selector has no label.
   get picklistAriaLabel() {
-    return this.picklistInputTitle || this.picklistPlaceholder;
+    return (
+      this.fieldLabel || this.picklistInputTitle || this.picklistPlaceholder
+    );
   }
 
   get picklistExpanded() {
@@ -670,6 +703,24 @@ export default class NewtonSelectorGroup extends LightningElement {
     if (min > 0) return formatLabel(manualInputMin, min);
     if (max) return formatLabel(manualInputMax, max);
     return "";
+  }
+
+  get manualInputDescribedBy() {
+    return this.manualInputHelpText ? "manual-input-help" : null;
+  }
+
+  // --- Dual listbox (SLDS dueling picklist) ---
+
+  get dualMultiselectable() {
+    return String(this.isMulti);
+  }
+
+  get isAvailableEmpty() {
+    return !this.hasAvailableItems;
+  }
+
+  get isSelectedEmpty() {
+    return !this.hasSelectedItems;
   }
 
   get dualAddDisabled() {
@@ -699,39 +750,31 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   handleCardSelect(event) {
-    const value = event.detail?.value;
-    if (value === undefined || value === null) return;
-
+    const { value, fromArrowKey } = event.detail;
     const changed = this.isMulti
       ? this.toggleMulti(value)
       : this.selectSingle(value);
-    if (changed && !this.previewMode) this.fireChange();
+    if (changed && !this.previewMode) this.fireChange(fromArrowKey);
+  }
+
+  // A click on the selected tile (single mode) re-sends the selection, so
+  // auto-advance can act on a default or on a pick made before Back.
+  handleCardRepick() {
+    if (!this.previewMode) this.fireChange();
   }
 
   handleAvailableCardSelect(event) {
     event.stopPropagation();
-    const value = event.detail?.value;
-    if (value === undefined || value === null) return;
-    if (this.isDualListbox) {
-      this.toggleDualBuffer("_dualAvailableValues", value);
-      this._dualSelectedValues = [];
-      return;
-    }
+    const { value, fromArrowKey } = event.detail;
     const changed = this.addValue(value);
-    if (changed && !this.previewMode) this.fireChange();
+    if (changed && !this.previewMode) this.fireChange(fromArrowKey);
   }
 
   handleSelectedCardSelect(event) {
     event.stopPropagation();
-    const value = event.detail?.value;
-    if (value === undefined || value === null) return;
-    if (this.isDualListbox) {
-      this.toggleDualBuffer("_dualSelectedValues", value);
-      this._dualAvailableValues = [];
-      return;
-    }
+    const { value, fromArrowKey } = event.detail;
     const changed = this.removeValue(value);
-    if (changed && !this.previewMode) this.fireChange();
+    if (changed && !this.previewMode) this.fireChange(fromArrowKey);
   }
 
   handlePicklistToggle() {
@@ -751,6 +794,7 @@ export default class NewtonSelectorGroup extends LightningElement {
       if (this._picklistOpen) {
         event.stopPropagation();
         this.closePicklist();
+        this.refs.trigger.focus();
       }
       return;
     }
@@ -785,7 +829,7 @@ export default class NewtonSelectorGroup extends LightningElement {
     }
   }
 
-  // Keeps focus on the trigger while an option is clicked.
+  // Keeps focus on the trigger or search field while an option is clicked.
   handlePicklistOptionMouseDown(event) {
     event.preventDefault();
   }
@@ -808,59 +852,175 @@ export default class NewtonSelectorGroup extends LightningElement {
   closePicklist() {
     this._picklistOpen = false;
     this._activeIndex = -1;
+    this._scrolledIndex = -1;
   }
 
   applyPicklistValue(value) {
-    const item = this.findItem(value);
-    if (!item || item.disabled) return;
     const changed = this.isMulti
       ? this.toggleMulti(value)
-      : this.selectSingle(value);
-    if (!this.isMulti) this.closePicklist();
+      : this.pickSingle(value);
+    if (!this.isMulti) {
+      this.closePicklist();
+      this.refs.trigger.focus();
+    }
     if (changed && !this.previewMode) this.fireChange();
   }
 
-  toggleDualBuffer(property, value) {
-    const item = this.findItem(value);
-    if (!item || item.disabled) return;
-    const current = new Set(this[property]);
-    if (current.has(value)) {
-      current.delete(value);
+  // Click toggles a row's highlight; Shift-click extends it from the anchor.
+  handleDualOptionClick(event) {
+    const { zone, value } = event.currentTarget.dataset;
+    this.setDualFocus(zone, value);
+    if (event.shiftKey && this.isMulti) {
+      this.extendDualHighlight(zone, value);
     } else {
-      current.add(value);
+      this.toggleDualHighlight(zone, value);
     }
-    this[property] = [...current];
+  }
+
+  // Arrow keys, Home and End move focus; Shift extends the highlight to the
+  // focused row; Space toggles the focused row.
+  handleDualKeydown(event) {
+    const { key } = event;
+    const zone = event.currentTarget.dataset.zone;
+    const rows = this.dualRows(zone);
+    const index = rows.findIndex(
+      (row) => row.value === event.target.dataset.value
+    );
+    if (index < 0) return;
+    if (key === " ") {
+      event.preventDefault();
+      this.toggleDualHighlight(zone, rows[index].value);
+      return;
+    }
+    let next;
+    if (key === "ArrowDown") {
+      next = Math.min(index + 1, rows.length - 1);
+    } else if (key === "ArrowUp") {
+      next = Math.max(index - 1, 0);
+    } else if (key === "Home") {
+      next = 0;
+    } else if (key === "End") {
+      next = rows.length - 1;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    const { value } = rows[next];
+    this.setDualFocus(zone, value);
+    event.currentTarget.querySelectorAll('[role="option"]')[next].focus();
+    if (event.shiftKey && this.isMulti) this.extendDualHighlight(zone, value);
+  }
+
+  dualRows(zone) {
+    return zone === DROPZONE_AVAILABLE
+      ? this.transferAvailableItems
+      : this.transferSelectedItems;
+  }
+
+  setDualFocus(zone, value) {
+    if (zone === DROPZONE_AVAILABLE) {
+      this._dualAvailableFocus = value;
+    } else {
+      this._dualSelectedFocus = value;
+    }
+  }
+
+  // Highlighting rows in one panel clears the other panel's highlight.
+  setDualHighlight(zone, values) {
+    if (zone === DROPZONE_AVAILABLE) {
+      this._dualAvailableValues = values;
+      this._dualSelectedValues = [];
+    } else {
+      this._dualSelectedValues = values;
+      this._dualAvailableValues = [];
+    }
+  }
+
+  // A single-select Dual listbox highlights one row at a time.
+  toggleDualHighlight(zone, value) {
+    const row = this.dualRows(zone).find((item) => item.value === value);
+    if (row._disabled) return;
+    const current =
+      zone === DROPZONE_AVAILABLE
+        ? this._dualAvailableValues
+        : this._dualSelectedValues;
+    const marked = current.includes(value);
+    let next;
+    if (!this.isMulti) {
+      next = marked ? [] : [value];
+    } else {
+      next = marked
+        ? current.filter((item) => item !== value)
+        : [...current, value];
+    }
+    this._dualAnchor = value;
+    this.setDualHighlight(zone, next);
+  }
+
+  extendDualHighlight(zone, value) {
+    const rows = this.dualRows(zone);
+    const to = rows.findIndex((row) => row.value === value);
+    const anchor = rows.findIndex((row) => row.value === this._dualAnchor);
+    const from = anchor < 0 ? to : anchor;
+    if (anchor < 0) this._dualAnchor = value;
+    this.setDualHighlight(
+      zone,
+      rows
+        .slice(Math.min(from, to), Math.max(from, to) + 1)
+        .filter((row) => !row._disabled)
+        .map((row) => row.value)
+    );
   }
 
   handleDualAdd() {
-    const changed = this.addValues(this._dualAvailableValues);
-    this._dualAvailableValues = [];
-    if (changed && !this.previewMode) this.fireChange();
+    this.moveDual(this._dualAvailableValues, true);
   }
 
   handleDualRemove() {
-    const changed = this.removeValues(this._dualSelectedValues);
-    this._dualSelectedValues = [];
-    if (changed && !this.previewMode) this.fireChange();
+    this.moveDual(this._dualSelectedValues, false);
   }
 
   handleDualAddAll() {
-    const values = this.transferAvailableItems
-      .filter(
-        (item) =>
-          !item._disabled &&
-          item.value !== "" &&
-          item.value !== MANUAL_INPUT_VALUE
-      )
-      .map((item) => item.value);
-    const changed = this.addValues(values);
-    this._dualAvailableValues = [];
-    if (changed && !this.previewMode) this.fireChange();
+    this.moveDual(
+      this.transferAvailableItems
+        .filter(
+          (item) =>
+            !item._disabled &&
+            item.value !== "" &&
+            item.value !== MANUAL_INPUT_VALUE
+        )
+        .map((item) => item.value),
+      true
+    );
   }
 
   handleDualRemoveAll() {
-    const changed = this.removeValues([...this._selectedValues]);
+    this.moveDual(
+      this.transferSelectedItems.map((item) => item.value),
+      false
+    );
+  }
+
+  // Moves rows between the panels, announces what moved and puts focus on
+  // the first moved row in its new panel.
+  moveDual(values, toChosen) {
+    const changed = toChosen
+      ? this.addValues(values)
+      : this.removeValues(values);
+    this._dualAvailableValues = [];
     this._dualSelectedValues = [];
+    const selected = this.selectedValueSet;
+    const moved = values.filter((value) => selected.has(value) === toChosen);
+    if (moved.length) {
+      const zone = toChosen ? DROPZONE_SELECTED : DROPZONE_AVAILABLE;
+      this._dualAnnouncement = formatLabel(
+        movedTo,
+        moved.map((value) => this.findItem(value).label).join(", "),
+        toChosen ? chosenOptions : availableOptions
+      );
+      this.setDualFocus(zone, moved[0]);
+      this._dualPendingFocus = { zone, value: moved[0] };
+    }
     if (changed && !this.previewMode) this.fireChange();
   }
 
@@ -880,34 +1040,20 @@ export default class NewtonSelectorGroup extends LightningElement {
       this._noneActive = true;
       return changed;
     }
-    if (value === MANUAL_INPUT_VALUE) {
-      if (!this.isMulti) {
-        return this.setSelectedValues([MANUAL_INPUT_VALUE]);
-      }
-      if (
-        this.hasMaxSelections &&
-        this._selectedValues.length >= Number(this.maxSelections)
-      ) {
-        return false;
-      }
-      return this.setSelectedValues([...this._selectedValues, value]);
-    }
-    const item = this.findItem(value);
-    if (!item || item.disabled || this.isSelected(value)) return false;
-    if (!this.isMulti) {
-      return this.setSelectedValues([value]);
-    }
-    if (
-      this.hasMaxSelections &&
-      this._selectedValues.length >= Number(this.maxSelections)
-    ) {
-      return false;
-    }
+    if (!this.findItem(value) || this.isSelected(value)) return false;
+    if (!this.isMulti) return this.setSelectedValues([value]);
+    if (this.maxReached(this._selectedValues.length)) return false;
     return this.setSelectedValues([...this._selectedValues, value]);
   }
 
   selectSingle(value) {
     return value === "" ? this.addValue("") : this.setSelectedValues([value]);
+  }
+
+  // Picking the selected Dropdown option again re-sends the selection, so
+  // auto-advance can act on a default or on a pick made before Back.
+  pickSingle(value) {
+    return this.selectSingle(value) || (value !== "" && this.isSelected(value));
   }
 
   addValues(values) {
@@ -921,8 +1067,11 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   removeValue(value) {
-    const item = this.findItem(value);
-    if (!this.isSelected(value) || item?.disabled) return false;
+    if (!this.isSelected(value)) return false;
+    if (value === "") {
+      this._noneActive = false;
+      return true;
+    }
     return this.setSelectedValues(
       this._selectedValues.filter((current) => current !== value)
     );
@@ -943,98 +1092,87 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   isSelected(value) {
-    return this._selectedValues.includes(value);
+    return value === ""
+      ? this._noneActive
+      : this._selectedValues.includes(value);
   }
 
   findItem(value) {
-    const source = Array.isArray(this.items) ? this.items : [];
-    return source.find((item) => item.value === value);
+    return this.items.find((item) => item.value === value);
   }
 
   handleDragStart(event) {
-    const value = event.currentTarget?.dataset?.value;
-    if (!value || !this.isColumns) return;
-    this._dragValue = value;
-    if (event.dataTransfer) {
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", value);
-    }
+    const value = event.currentTarget.dataset.value;
+    if (!value) return;
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", value);
   }
 
   handleDragOver(event) {
     if (!this.isColumns) return;
     event.preventDefault();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = "move";
-    }
-    this._dragOverZone = event.currentTarget?.dataset?.zone || "";
+    event.dataTransfer.dropEffect = "move";
+    this._dragOverZone = event.currentTarget.dataset.zone;
   }
 
   handleDragLeave(event) {
-    if (event.currentTarget?.contains(event.relatedTarget)) return;
+    if (event.currentTarget.contains(event.relatedTarget)) return;
     this._dragOverZone = "";
   }
 
   handleDrop(event) {
     if (!this.isColumns) return;
     event.preventDefault();
-    const zone = event.currentTarget?.dataset?.zone;
-    const value =
-      event.dataTransfer?.getData("text/plain") || this._dragValue || "";
-    this._dragValue = "";
+    const zone = event.currentTarget.dataset.zone;
+    const value = event.dataTransfer.getData("text/plain");
     this._dragOverZone = "";
     if (!value) return;
 
     const changed =
       zone === DROPZONE_SELECTED
         ? this.addValue(value)
-        : zone === DROPZONE_AVAILABLE
-          ? this.removeValue(value)
-          : false;
+        : this.removeValue(value);
     if (changed && !this.previewMode) this.fireChange();
   }
 
+  // Adds the options the search shows to what is already picked, up to the
+  // maximum. None and Other are never part of "all".
   handleSelectAll() {
-    const allValues = this.filteredItems
-      .filter(
-        (item) =>
-          !item.disabled &&
-          item.value !== "" &&
-          item.value !== MANUAL_INPUT_VALUE
-      )
-      .map((item) => item.value);
-    const nextValues = this.hasMaxSelections
-      ? allValues.slice(0, Number(this.maxSelections))
-      : allValues;
-    const changed = this.setSelectedValues(nextValues);
+    const changed = this.addValues(
+      this.filteredItems
+        .map((item) => item.value)
+        .filter((value) => value !== "" && value !== MANUAL_INPUT_VALUE)
+    );
     this._dualAvailableValues = [];
     this._dualSelectedValues = [];
     if (changed && !this.previewMode) this.fireChange();
   }
 
   handleClearAll() {
-    const changed = this.setSelectedValues([]);
+    const changed = this.removeValue("") || this.setSelectedValues([]);
     this._dualAvailableValues = [];
     this._dualSelectedValues = [];
     if (changed && !this.previewMode) this.fireChange();
   }
 
   selectedItemsInOrder() {
-    const source = Array.isArray(this.items) ? this.items : [];
-    const byValue = new Map(source.map((item) => [item.value, item]));
+    if (this._noneActive) return [this.findItem("")].filter(Boolean);
+    const byValue = new Map(this.items.map((item) => [item.value, item]));
     return this._selectedValues
       .map((value) => byValue.get(value))
       .filter(Boolean);
   }
 
-  fireChange() {
+  // `fromArrowKey` is true when the change came from arrowing through the
+  // radio tiles, which must not auto-advance the screen.
+  fireChange(fromArrowKey = false) {
     this.dispatchEvent(
       new CustomEvent("selectionchange", {
         detail: {
           values: [...this._selectedValues],
-          items: this.selectedItemsInOrder(),
           noneSelected: this._noneActive,
-          manualValue: this._manualInputValue
+          manualValue: this._manualInputValue,
+          fromArrowKey
         },
         bubbles: true,
         composed: false

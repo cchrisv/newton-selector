@@ -1,9 +1,5 @@
 import { api, LightningElement } from "lwc";
-import { defaultSelectorConfig } from "c/newtonSelectorUtilityConfigDefaults";
-import {
-  isReference,
-  readResourceValue
-} from "c/newtonSelectorFlowCpeUtilityHelpers";
+import { isReference } from "c/newtonSelectorFlowCpeUtilityHelpers";
 
 const MULTI_DEFAULT_LITERAL_ERROR =
   "Pick a text collection variable for multiple default selections.";
@@ -17,23 +13,20 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
   /** Flow resource bound to the screen component's `values` input (multi select). */
   @api valuesRef = "";
 
-  get _config() {
-    return this.config || defaultSelectorConfig();
-  }
-  set _config(value) {
+  emit(config) {
     this.dispatchEvent(
-      new CustomEvent("configpatch", { detail: { path: [], value } })
+      new CustomEvent("configpatch", { detail: { value: config } })
     );
   }
 
   get hasDataSource() {
-    return Boolean(this._config.dataSource);
+    return Boolean(this.config.dataSource);
   }
   get isSingleSelect() {
-    return this._config.selectionMode === "single";
+    return this.config.selectionMode === "single";
   }
   get isMultiSelect() {
-    return this._config.selectionMode === "multi";
+    return this.config.selectionMode === "multi";
   }
 
   defaultSelectionError = "";
@@ -47,7 +40,7 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
     return this.isMultiSelect ? this.valuesRef : this.valueRef;
   }
   handleDefaultSelectionChange(event) {
-    const value = readResourceValue(event);
+    const value = event.detail.newValue;
     // A typed literal can't fill the `values` text collection; keep it unsaved.
     if (this.isMultiSelect && value && !isReference(value)) {
       this.defaultSelectionError = MULTI_DEFAULT_LITERAL_ERROR;
@@ -61,47 +54,47 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
     const leaving = this.defaultSelectionRefName;
     this.defaultSelectionError = "";
     const value = event.detail.checked ? "multi" : "single";
-    const next = { ...this._config, selectionMode: value };
+    const next = { ...this.config, selectionMode: value };
     if (value === "multi") {
       next.autoAdvance = false;
     }
-    this._config = next;
+    this.emit(next);
     this.dispatchRefChange(leaving, "");
   }
   handleToggleChange(event) {
     const key = event.currentTarget.dataset.key;
-    this._config = { ...this._config, [key]: event.detail.checked };
+    this.emit({ ...this.config, [key]: event.detail.checked });
   }
   get minSelectionsValue() {
-    return Number(this._config.minSelections) > 0
-      ? this._config.minSelections
+    return Number(this.config.minSelections) > 0
+      ? this.config.minSelections
       : "";
   }
   get maxSelectionsValue() {
-    return this._config.maxSelections ?? "";
+    return this.config.maxSelections ?? "";
   }
   handleMinChange(event) {
-    this._config = {
-      ...this._config,
+    this.emit({
+      ...this.config,
       minSelections: Number(event.target.value) || 0
-    };
+    });
   }
   handleMaxChange(event) {
     const raw = event.target.value;
-    this._config = {
-      ...this._config,
+    this.emit({
+      ...this.config,
       maxSelections: raw === "" ? null : Number(raw)
-    };
+    });
   }
   handleErrorMessageChange(event) {
-    this._config = {
-      ...this._config,
-      customErrorMessage: readResourceValue(event)
-    };
+    this.emit({
+      ...this.config,
+      customErrorMessage: event.detail.newValue
+    });
   }
 
   get noneOptionPositionTiles() {
-    const active = this._config.noneOptionPosition;
+    const active = this.config.noneOptionPosition;
     return [
       {
         value: "start",
@@ -120,12 +113,13 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
     ];
   }
   handleNoneOptionLabelChange(event) {
-    this._config = { ...this._config, noneOptionLabel: event.target.value };
+    this.emit({ ...this.config, noneOptionLabel: event.target.value });
   }
   handleNoneOptionPositionChange(event) {
-    const value = event.detail?.value;
-    if (value === "start" || value === "end")
-      this._config = { ...this._config, noneOptionPosition: value };
+    this.emit({
+      ...this.config,
+      noneOptionPosition: event.detail.value
+    });
   }
   handleManualInputToggle(event) {
     this.patchManualInput("enabled", event.detail.checked);
@@ -141,10 +135,10 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
     this.patchManualInput("maxLength", raw === "" ? null : Number(raw));
   }
   patchManualInput(key, value) {
-    this._config = {
-      ...this._config,
-      manualInput: { ...this._config.manualInput, [key]: value }
-    };
+    this.emit({
+      ...this.config,
+      manualInput: { ...this.config.manualInput, [key]: value }
+    });
   }
 
   dispatchRefChange(name, value) {

@@ -1,17 +1,10 @@
 <template>
   <template lwc:if={isLookupMode}>
     <div class="slds-form-element">
-      <template lwc:if={showExternalLabel}>
-        <label class="slds-form-element__label" for={inputId}>
-          <abbr lwc:if={required} class="slds-required" title="required"
-            >*</abbr
-          >
-          {label}
-          <template lwc:if={fieldLevelHelp}>
-            <lightning-helptext content={fieldLevelHelp}></lightning-helptext>
-          </template>
-        </label>
-      </template>
+      <label class={labelClass} for={inputId}>
+        <abbr lwc:if={required} class="slds-required" title="required">*</abbr>
+        {label}
+      </label>
       <div class="slds-form-element__control">
         <div class="slds-combobox_container">
           <div class={lookupComboboxClass} onfocusout={handleLookupFocusOut}>
@@ -34,9 +27,8 @@
                 type="text"
                 id={inputId}
                 class={inputClass}
-                placeholder={computedPlaceholder}
+                placeholder={placeholder}
                 value={inputDisplayValue}
-                disabled={disabled}
                 readonly={hasSelection}
                 autocomplete="off"
                 role="combobox"
@@ -64,13 +56,12 @@
                 </span>
               </template>
 
-              <template lwc:if={showClearButton}>
+              <template lwc:if={hasSelection}>
                 <button
                   title="Remove selected option"
                   type="button"
                   onclick={handleClearSelection}
                   class="slds-button slds-button_icon slds-input__icon slds-input__icon_right newton-selector-combobox__clear-button"
-                  disabled={disabled}
                 >
                   <c-newton-selector-icon
                     name="x"
@@ -89,9 +80,12 @@
                 role="listbox"
                 aria-label={label}
                 aria-busy={ariaBusyValue}
-                class={computedLookupDropdownClass}
+                class="slds-dropdown slds-dropdown_fluid newton-selector-combobox__dropdown newton-selector-combobox__lookup-dropdown"
               >
-                <ul class={listboxClass} role="presentation">
+                <ul
+                  class="slds-listbox slds-listbox_vertical newton-selector-combobox__listbox"
+                  role="presentation"
+                >
                   <template lwc:if={_loading}>
                     <li role="presentation">
                       <div
@@ -116,6 +110,7 @@
                           role="option"
                           id={row.optionId}
                           data-id={row.id}
+                          data-index={row.index}
                           aria-selected={row.ariaSelected}
                           onclick={handleSelect}
                           onmousedown={handlePointerDownOption}
@@ -149,17 +144,10 @@
 
   <template lwc:elseif={isSelectMode}>
     <div class="slds-form-element">
-      <template lwc:if={showExternalLabel}>
-        <label class="slds-form-element__label" for={inputId}>
-          <abbr lwc:if={required} class="slds-required" title="required"
-            >*</abbr
-          >
-          {label}
-          <template lwc:if={fieldLevelHelp}>
-            <lightning-helptext content={fieldLevelHelp}></lightning-helptext>
-          </template>
-        </label>
-      </template>
+      <label class={labelClass} for={inputId}>
+        <abbr lwc:if={required} class="slds-required" title="required">*</abbr>
+        {label}
+      </label>
       <div class="slds-form-element__control">
         <div class="slds-combobox_container">
           <div class={selectComboboxClass} onfocusout={handleSelectFocusOut}>
@@ -178,6 +166,7 @@
               </template>
 
               <button
+                lwc:ref="selectButton"
                 id={inputId}
                 type="button"
                 class={selectButtonClass}
@@ -185,8 +174,8 @@
                 aria-haspopup="listbox"
                 aria-controls={_listboxId}
                 aria-expanded={selectExpanded}
+                aria-activedescendant={selectActiveOptionId}
                 aria-required={requiredAria}
-                disabled={disabled}
                 title={selectButtonLabel}
                 onclick={handleSelectToggle}
                 onkeydown={handleSelectKeydown}
@@ -209,10 +198,7 @@
 
             <template lwc:if={_selectOpen}>
               <div
-                id={_listboxId}
-                role="listbox"
-                aria-label={label}
-                class={computedSelectDropdownClass}
+                class="slds-dropdown slds-dropdown_fluid newton-selector-combobox__dropdown newton-selector-combobox__select-dropdown"
               >
                 <template lwc:if={enableSearch}>
                   <div class="newton-selector-combobox__select-search">
@@ -233,16 +219,24 @@
                       <input
                         type="search"
                         class="slds-input"
-                        placeholder={computedPlaceholder}
+                        placeholder={placeholder}
                         value={_selectSearchTerm}
-                        oninput={handleSelectSearch}
                         aria-label="Filter options"
+                        aria-controls={_listboxId}
+                        aria-activedescendant={selectActiveOptionId}
+                        oninput={handleSelectSearch}
+                        onkeydown={handleSelectKeydown}
                       />
                     </div>
                   </div>
                 </template>
 
-                <ul class={listboxClass} role="presentation">
+                <ul
+                  id={_listboxId}
+                  role="listbox"
+                  aria-label={label}
+                  class="slds-listbox slds-listbox_vertical newton-selector-combobox__listbox"
+                >
                   <template lwc:if={hasSelectOptions}>
                     <template for:each={filteredSelectOptions} for:item="row">
                       <li
@@ -251,10 +245,11 @@
                         class="slds-listbox__item newton-selector-combobox__item"
                       >
                         <div
-                          class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_small newton-selector-combobox__option"
+                          class={row.optionClass}
                           role="option"
                           id={row.optionId}
                           data-value={row.id}
+                          data-index={row.index}
                           aria-selected={row.ariaSelected}
                           onclick={handleSelectOption}
                           onmousedown={handleSelectOptionMouseDown}
@@ -291,10 +286,9 @@
       <div class={computedComboboxClass}>
         <slot name="trigger"></slot>
 
-        <template lwc:if={isOpen}>
+        <template lwc:if={open}>
           <div
-            id={resolvedDropdownId}
-            class={computedDropdownClass}
+            class="slds-dropdown slds-dropdown_fluid newton-selector-combobox__dropdown"
             role={dropdownRole}
             aria-label={dropdownLabel}
           >

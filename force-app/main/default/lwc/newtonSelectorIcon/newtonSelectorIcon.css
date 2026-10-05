@@ -69,12 +69,6 @@
 .newton-selector-icon_variant-error {
   color: var(--slds-g-color-error-base-40, #ba0517);
 }
-.newton-selector-icon_variant-warning {
-  color: var(--slds-g-color-warning-base-50, #9a6700);
-}
-.newton-selector-icon_variant-success {
-  color: var(--slds-g-color-success-base-40, #2e844a);
-}
 .newton-selector-icon_variant-inverse {
   color: var(--slds-g-color-on-accent-1, #ffffff);
 }

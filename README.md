@@ -64,9 +64,9 @@ Drop the `Professor Flow | Newton Selector` component onto any Flow Screen and t
 | **4 data sources**      | Picklist field, Record collection, SOQL query, Custom static list                                                           |
 | **7 layouts**           | Grid, List, Horizontal ribbon, Picklist/dropdown, Radio cards, Columns, Dual-listbox-style transfer                         |
 | **Selection modes**     | Single and Multi, with optional minimum and maximum selections in multi mode                                                |
-| **Auto-advance**        | Automatically navigates to the next screen after a single selection                                                         |
+| **Auto-advance**        | After a single selection, goes to the next screen, or finishes the Flow on its last screen                                  |
 | **Search/filter**       | Inline search bar filters tiles as the user types                                                                           |
-| **Select all**          | Select-all and clear-all buttons for multi-select (runtime support; no editor control yet)                                  |
+| **Select all**          | Select-all and clear-all buttons for multi-select (Behavior chapter, multi mode)                                            |
 | **None option**         | Configurable --None-- tile that clears the selection (position: start or end)                                               |
 | **Manual input**        | Optional "Other" choice with configurable label and min/max character rules                                                 |
 | **9 output variables**  | value, values, selectedRecord, selectedRecords, selectedLabel, selectedLabels, allValues, allLabels, selectionCount         |
@@ -88,7 +88,7 @@ Reads values from any SObject picklist or multi-select picklist field. Supports 
 
 ### Record Collection
 
-Accepts a Flow record collection variable (`{T[]}`) as input. A field-mapping section in the CPE lets you point Label, Sublabel, Icon, Badge, Help Text, and Value at any field on the collection's SObject -- no Apex required.
+Accepts a Flow record collection variable (`{T[]}`) as input. A field-mapping section in the CPE lets you point Label, Sublabel, Icon, Badge, Help Text, and Value at the fields of the collection's SObject (compound address and location fields and Base64 fields are not offered) -- no Apex required.
 
 ### SOQL Query
 
@@ -96,7 +96,7 @@ Issues a server-side SOQL query at runtime via `NewtonSelectorRuntimeController.
 
 - **Object selector** -- searchable dropdown of queryable, accessible SObjects (first 80 matches)
 - **WHERE builder** -- visual clause builder with field selector, type-aware operator sets, and AND/OR logic
-- **Field mapping** -- map any field to label, sublabel, value, icon, badge, and help text
+- **Field mapping** -- map label, sublabel, value, icon, badge, and help text to the object's readable fields (compound address and location fields and Base64 fields are not offered)
 - **ORDER BY** -- field + direction selector
 - **LIMIT** -- rows to load, 1 to 2,000 (blank uses 50)
 - **Query validation** -- design-time validation via `NewtonSelectorRuntimeController.validateQuery`, which runs the query once and reports the real error if it fails; a SOQL preview card shows the query the editor builds from your settings
@@ -105,7 +105,7 @@ All queries run in `USER_MODE` and field-level security is enforced server-side.
 
 ### Custom (Static) List
 
-Type options directly into the CPE. Each item has a label, value, sublabel, icon, and badge. Useful for short, stable lists that don't live in the org's data model.
+Type options directly into the CPE. Each item has a label, value, sublabel, icon, badge, and help text, and can be hidden. Useful for short, stable lists that don't live in the org's data model.
 
 ### Manual Input
 
@@ -140,7 +140,7 @@ Both modes support the `required` flag, which blocks the Flow's Next button unti
 
 ## Visual Customization
 
-All visual settings are managed in the CPE's **04 Appearance** chapter -- no CSS editing required.
+All visual settings are managed in the CPE's **Appearance** chapter -- no CSS editing required.
 
 ### Tile Size and Aspect Ratio
 
@@ -169,7 +169,7 @@ How a selected tile communicates its state:
 
 ### Patterns and Surface Styles
 
-Layered decorative overlays on the tile figure: `dots`, `lines`, `diagonal`, `grid`, `glow`, `noise`, `paper`, `waves`, or `none`. Each pattern can be tinted with a tone (brand, success, warning, error, or a custom hex).
+Layered decorative overlays on the tile figure: `dots`, `lines`, `diagonal`, `grid`, `glow`, `noise`, `paper`, `waves`, or `none`. Each pattern can be tinted with a tone (neutral, brand, success, warning, error, violet, pink, teal, or a custom hex).
 
 ### Badges
 
@@ -177,7 +177,7 @@ Every tile can carry a badge from its data source. The CPE lets you configure po
 
 ### Spacing
 
-Grid gap, margin, and padding accept SLDS 2 spacing tokens only (`1`--`9`, `none`, or Auto). Linked toggles apply one value to all sides at once.
+Grid gap, margin, and padding accept SLDS 2 spacing tokens only (`1`--`9` or `none`); only padding also offers Auto, which takes the padding from the tile size. Linked toggles apply one value to all sides at once.
 
 ---
 
@@ -193,8 +193,8 @@ Every output is available as a Flow resource once the component is placed on a s
 | `selectedRecords` | SObject[] | All selected records (SOQL and Collection sources, multi mode; empty for Custom and Picklist)                                      |
 | `selectedLabel`   | String    | Display label of the selected option (single mode)                                                                                 |
 | `selectedLabels`  | String[]  | Display labels of all selected options (multi mode)                                                                                |
-| `allValues`       | String[]  | Every value rendered by the selector, in display order                                                                             |
-| `allLabels`       | String[]  | Every label rendered by the selector, in display order                                                                             |
+| `allValues`       | String[]  | Every value rendered by the selector, in display order (includes None if enabled; excludes the manual Other entry)                 |
+| `allLabels`       | String[]  | Every label rendered by the selector, in display order (includes None if enabled; excludes the manual Other entry)                 |
 | `selectionCount`  | Integer   | Number of currently selected options                                                                                               |
 
 ---
@@ -216,11 +216,11 @@ newtonSelectorFlowCpe                     Custom Property Editor panel in Flow B
         +-- newtonSelectorFlowCpeDataConfig / ContentConfig / BehaviorConfig / AppearanceConfig
 
 Editor controls: ResourceSelector, WhereBuilder, FieldSelector, IconSelector, ChoiceControl,
-                 LookupChoiceOption, Toggle, and the shared newtonSelectorCombobox
+                 LookupChoiceOption, Toggle, ToneRow, and the shared newtonSelectorCombobox
 Primitives:      newtonSelectorIcon (Lucide-style SVG catalog)
 Utilities:       newtonSelectorUtilityConfigDefaults, newtonSelectorUtilityDataSources,
                  newtonSelectorFlowCpeUtility{ConfigOptions,ConfigState,ConfigStyles,
-                 ConfigValidation,Helpers,SearchHighlight}
+                 ConfigValidation,Helpers,Tokens}
 ```
 
 The editor saves the whole configuration as one JSON string (`selectorConfigJson`) on the Flow screen element. See [Architecture](docs/architecture.md) for the full tree, data flow and design-time flow.
@@ -231,16 +231,16 @@ The editor saves the whole configuration as one JSON string (`selectorConfigJson
 
 Apex is used only by the SOQL data source (runtime) and by the editor's object and field pickers (design time). Picklist, collection and custom sources run entirely in the browser.
 
-| Group           | Classes                                                                                                                                                                              |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Entry points    | `NewtonSelectorRuntimeController` (`queryItems`, `validateQuery`), `NewtonSelectorFlowCpeController` (`searchSObjectTypes`, `searchLookupDatasetFieldsForObject`, `getObjectFields`) |
-| Query execution | `NewtonSelectorService`, `NewtonSelectorRecordQuery` (`Database.queryWithBinds` in `USER_MODE`), `NewtonSelectorQueryBuilder` (limits, ordering, bind assembly)                      |
-| Validation      | `NewtonSelectorQueryFieldAccess`, `NewtonSelectorQueryValueUtil`                                                                                                                     |
-| WHERE parsing   | `NewtonSelectorWhereParser`, `NewtonSelectorWhereScanner`, `NewtonSelectorWhereOperatorParser`                                                                                       |
-| CPE describe    | `NewtonSelectorFlowCpeDescribeService`                                                                                                                                               |
-| Data and errors | `NewtonSelectorQueryDTO`, `NewtonSelectorItemDTO`, `NewtonSelectorQueryValidationResultDTO`, `NewtonSelectorException`                                                               |
+| Group           | Classes                                                                                                                                                         |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Entry points    | `NewtonSelectorRuntimeController` (`queryItems`, `validateQuery`), `NewtonSelectorFlowCpeController` (`searchSObjectTypes`, `getObjectFields`)                  |
+| Query execution | `NewtonSelectorService`, `NewtonSelectorRecordQuery` (`Database.queryWithBinds` in `USER_MODE`), `NewtonSelectorQueryBuilder` (limits, ordering, bind assembly) |
+| Validation      | `NewtonSelectorQueryFieldAccess`, `NewtonSelectorQueryValueUtil`                                                                                                |
+| WHERE parsing   | `NewtonSelectorWhereParser`, `NewtonSelectorWhereScanner`, `NewtonSelectorWhereQuotedString`, `NewtonSelectorWhereOperatorParser`                               |
+| CPE describe    | `NewtonSelectorFlowCpeController`                                                                                                                               |
+| Data and errors | `NewtonSelectorQueryDTO`, `NewtonSelectorItemDTO`, `NewtonSelectorQueryValidationResultDTO`, `NewtonSelectorException`                                          |
 
-Runtime classes run `with sharing`, object and field names are validated against describe results, every WHERE value is a bind variable (except `INCLUDES`/`EXCLUDES`, which are escaped literals), and results are capped at 2,000 rows. See the [Apex API reference](docs/reference-apex-api.md) and the [security model](docs/explanation-security-model.md).
+Runtime classes run `with sharing`, object and field names are validated against describe results, every WHERE value is a bind variable (`INCLUDES` and `EXCLUDES` included), and results are capped at 2,000 rows. See the [Apex API reference](docs/reference-apex-api.md) and the [security model](docs/explanation-security-model.md).
 
 ---
 
@@ -352,7 +352,7 @@ Both scripts require `SF_TARGET_ORG` and expect `force-app` to be deployed. Each
 sf apex run test --target-org my-org --result-format human --wait 10
 ```
 
-Key test classes: `NewtonSelectorRuntimeControllerTest`, `NewtonSelectorServiceTest`, `NewtonSelectorRecordQueryTest`, and `NewtonSelectorFlowCpeControllerTest`. All use `NewtonSelectorTestDataFactory` for consistent setup data.
+Key test classes: `NewtonSelectorRuntimeControllerTest`, `NewtonSelectorServiceTest`, `NewtonSelectorRecordQueryTest`, `NewtonSelectorWhereParserTest`, and `NewtonSelectorFlowCpeControllerTest`. All use `NewtonSelectorTestDataFactory` for consistent setup data.
 
 ---
 

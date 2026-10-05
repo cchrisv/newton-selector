@@ -1,9 +1,10 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
 // Compares two CPE_STYLE_SNAPSHOT files from cpe-capture.mjs and reports the
-// elements whose computed style (or ::before/::after style) differs. Exits 1
-// when anything differs, so a CSS refactor that claims "no visual change" can
-// prove it.
+// elements whose computed style (or ::before/::after style) differs, so a CSS
+// refactor that claims "no visual change" can prove it. Exits 0 when
+// identical, 1 when anything differs, and 2 for a usage error or for a
+// snapshot that is empty, incomplete or has a state with no captured elements.
 //
 //   node scripts/e2e/style-snapshot-diff.mjs before.json after.json [report.json]
 //
@@ -23,9 +24,19 @@ if (!beforeFile || !afterFile) {
 const LIMIT = Number(process.env.STYLE_DIFF_LIMIT || 200);
 const VALUE_WIDTH = 80;
 
+const fail = (message) => {
+  console.error(message);
+  process.exit(2);
+};
+
+const isBlank = (b) => b === 0x20 || b === 0x0a || b === 0x0d || b === 0x09;
+
 // Byte range of each top-level value in a JSON object: Map(key → [start, end)).
+// Returns null when the buffer does not hold one complete JSON object.
 function topLevelEntries(buffer) {
+  if (buffer[buffer.findIndex((b) => !isBlank(b))] !== 0x7b) return null;
   const entries = new Map();
+  let closed = false;
   let depth = 0;
   let inString = false;
   let escaped = false;
@@ -51,8 +62,13 @@ function topLevelEntries(buffer) {
       }
       continue;
     }
-    const blank = b === 0x20 || b === 0x0a || b === 0x0d || b === 0x09;
-    if (depth === 1 && key !== null && valueStart < 0 && b !== 0x3a && !blank) {
+    if (
+      depth === 1 &&
+      key !== null &&
+      valueStart < 0 &&
+      b !== 0x3a &&
+      !isBlank(b)
+    ) {
       valueStart = i;
     }
     if (b === 0x22) {
@@ -62,12 +78,24 @@ function topLevelEntries(buffer) {
       depth += 1;
     } else if (b === 0x7d || b === 0x5d) {
       depth -= 1;
-      if (depth === 0 && key !== null) close(i);
+      if (depth === 0) {
+        if (key !== null) close(i);
+        closed = true;
+        break;
+      }
     } else if (b === 0x2c && depth === 1 && key !== null) {
       close(i);
     }
   }
-  return entries;
+  return closed ? entries : null;
+}
+
+function readStates(file) {
+  const buffer = readFileSync(file);
+  const states = topLevelEntries(buffer);
+  if (!states) fail(`${file} is not a complete JSON object.`);
+  if (!states.size) fail(`${file} holds no captured states.`);
+  return { buffer, states };
 }
 
 const parseState = (buffer, [start, end]) =>
@@ -183,10 +211,8 @@ function compareState(a, b, propertyCounts) {
   return entry;
 }
 
-const beforeBuffer = readFileSync(beforeFile);
-const afterBuffer = readFileSync(afterFile);
-const beforeStates = topLevelEntries(beforeBuffer);
-const afterStates = topLevelEntries(afterBuffer);
+const { buffer: beforeBuffer, states: beforeStates } = readStates(beforeFile);
+const { buffer: afterBuffer, states: afterStates } = readStates(afterFile);
 
 const propertyCounts = new Map();
 const report = {
@@ -203,11 +229,19 @@ for (const [state, range] of beforeStates) {
     report.missingStates.push(state);
     continue;
   }
-  const entry = compareState(
-    parseState(beforeBuffer, range),
-    parseState(afterBuffer, afterStates.get(state)),
-    propertyCounts
-  );
+  const before = parseState(beforeBuffer, range);
+  const after = parseState(afterBuffer, afterStates.get(state));
+  for (const [snapshot, file] of [
+    [before, beforeFile],
+    [after, afterFile]
+  ]) {
+    if (!Object.keys(snapshot.elements ?? {}).length) {
+      fail(
+        `${state}: no elements captured in ${file} - the host selector matched nothing.`
+      );
+    }
+  }
+  const entry = compareState(before, after, propertyCounts);
   report.states[state] = entry;
   report.differingElements += entry.differingCount;
   report.missingElements += entry.missingCount;
@@ -235,6 +269,9 @@ for (const state of report.missingStates) {
 }
 for (const state of report.newStates)
   console.log(`${state}: state new in after`);
+if (!Object.keys(report.states).length) {
+  fail("No state was compared: every state in before is missing in after.");
+}
 const top = Object.entries(report.topChangedProperties).slice(0, 15);
 if (top.length) {
   console.log("Most changed properties (element parts affected):");

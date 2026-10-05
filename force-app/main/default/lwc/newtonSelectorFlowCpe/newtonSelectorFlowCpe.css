@@ -5,39 +5,19 @@
    One brand accent; typography does the hierarchy.
    ============================================================================= */
 
+@import "c/newtonSelectorFlowCpeUtilityTokens";
+
+/* Panel-only tokens; the shared ones come from the studio token module. */
 :host {
   display: block;
 
-  /* Surface + ink */
-  --newton-cpe-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
-  --newton-cpe-panel: var(--slds-g-color-surface-1, #ffffff);
-  --newton-cpe-ink-strong: var(--slds-g-color-neutral-base-10, #181818);
   --newton-cpe-ink-body: var(--slds-g-color-neutral-base-20, #2e2e2e);
-  --newton-cpe-ink-muted: var(--slds-g-color-neutral-base-50, #747474);
-  --newton-cpe-hairline: var(--slds-g-color-neutral-base-90, #e5e5e5);
-
-  /* Brand + status */
-  --newton-cpe-brand: var(--slds-g-color-brand-base-50, #0176d3);
+  --newton-cpe-ink-muted: var(--slds-g-color-neutral-base-50, #757575);
   --newton-cpe-brand-deep: var(--slds-g-color-brand-base-40, #0b5cab);
-  --newton-cpe-brand-weak: var(--slds-g-color-brand-base-95, #eaf3ff);
-
-  /* Shape */
-  --newton-cpe-radius: var(--slds-g-radius-border-2, 0.5rem);
-  --newton-cpe-radius-lg: var(--slds-g-radius-border-3, 0.75rem);
-  --newton-cpe-shadow: var(
-    --slds-g-shadow-1,
-    0 1px 2px
-      color-mix(
-        in oklab,
-        var(--slds-g-color-neutral-base-10, #181818) 6%,
-        transparent
-      )
-  );
 
   /* Mono kept ONLY for API-style strings (Lead.Rating, {!myVar}) — not for
        eyebrows or chips. Makes api-code visually distinct from prose. */
-  --newton-cpe-mono:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --newton-cpe-mono: var(--slds-g-font-family-monospace, Consolas, monospace);
 }
 
 .newton-cpe {
@@ -45,8 +25,8 @@
   flex-direction: column;
   gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-2, 0.5rem);
-  background: var(--newton-cpe-canvas);
-  border-radius: var(--newton-cpe-radius);
+  background: var(--newton-studio-canvas);
+  border-radius: var(--newton-studio-radius);
 }
 
 /* =============================================================================
@@ -58,10 +38,10 @@
   gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-error-base-50, #ba0517);
-  background: var(--slds-g-color-error-base-95, #fdeef0);
+    var(--slds-g-color-error-base-50, #ea001e);
+  background: var(--slds-g-color-error-base-95, #fef1ee);
   color: var(--slds-g-color-error-base-30, #8e030f);
-  border-radius: var(--newton-cpe-radius);
+  border-radius: var(--newton-studio-radius);
   align-items: flex-start;
 }
 
@@ -91,9 +71,9 @@
   flex-direction: column;
   overflow: hidden;
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-cpe-hairline);
-  border-radius: var(--newton-cpe-radius);
-  background: var(--newton-cpe-panel);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  background: var(--newton-studio-panel);
 }
 
 .newton-cpe__card-head {
@@ -102,26 +82,14 @@
   gap: 0.125rem;
   padding: 0 0 var(--slds-g-spacing-2, 0.5rem);
   border-bottom: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-cpe-hairline);
-}
-
-/* The component name is already in the panel header; keep it for assistive
-   tech only rather than repeating it as a tracked eyebrow. */
-.newton-cpe__card-eyebrow {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  margin: -1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+    var(--newton-studio-hairline);
 }
 
 .newton-cpe__card-title {
   margin: 0;
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
   font-weight: var(--slds-g-font-weight-7, 700);
-  color: var(--newton-cpe-ink-strong);
+  color: var(--newton-studio-ink);
   line-height: var(--slds-g-font-line-height-2, 1.25);
   letter-spacing: 0;
 }
@@ -137,7 +105,7 @@
   row-gap: var(--slds-g-spacing-1, 0.25rem);
   padding: var(--slds-g-spacing-2, 0.5rem) 0;
   border-bottom: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-cpe-hairline);
+    var(--newton-studio-hairline);
 }
 
 .newton-cpe__section:last-child {
@@ -154,7 +122,7 @@
   font-weight: var(--slds-g-font-weight-7, 700);
   line-height: var(--slds-g-font-line-height-2, 1.25);
   letter-spacing: 0;
-  color: var(--newton-cpe-brand);
+  color: var(--newton-studio-brand);
 }
 
 /* First line in data-source section renders as the "kind" (Picklist, SOQL,
@@ -166,7 +134,7 @@
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-7, 700);
   line-height: var(--slds-g-font-line-height-2, 1.25);
-  color: var(--newton-cpe-ink-strong);
+  color: var(--newton-studio-ink);
 }
 
 .newton-cpe__line {
@@ -185,14 +153,14 @@
 
 /* First line of each non-data section renders stronger — it's the primary
    statement (e.g., "Single select, required"). */
-.newton-cpe__section > .newton-cpe__line:first-of-type {
+.newton-cpe__section
+  > .newton-cpe__line:first-of-type:not([data-muted="true"]) {
   font-weight: var(--slds-g-font-weight-6, 600);
-  color: var(--newton-cpe-ink-strong);
+  color: var(--newton-studio-ink);
 }
 
 /* Muted = supporting detail / secondary info */
 .newton-cpe__line[data-muted="true"] {
-  font-weight: var(--slds-g-font-weight-4, 400);
   color: var(--newton-cpe-ink-muted);
   line-height: var(--slds-g-font-line-height-3, 1.375);
 }
@@ -217,23 +185,23 @@
   inline-size: 100%;
   min-height: var(--slds-g-sizing-8, 1.75rem);
   padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
-  background: var(--newton-cpe-brand);
+  background: var(--newton-studio-brand);
   color: var(--slds-g-color-on-accent-1, #ffffff);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-cpe-brand);
-  border-radius: var(--newton-cpe-radius);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-brand);
+  border-radius: var(--newton-studio-radius);
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-6, 600);
   cursor: pointer;
   transition:
-    background-color 120ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 120ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    background-color 120ms var(--newton-studio-ease),
+    box-shadow 120ms var(--newton-studio-ease),
+    transform 120ms var(--newton-studio-ease);
 }
 
 .newton-cpe__cta:hover {
   background: var(--newton-cpe-brand-deep);
   border-color: var(--newton-cpe-brand-deep);
-  box-shadow: var(--newton-cpe-shadow);
+  box-shadow: var(--newton-studio-shadow);
 }
 
 .newton-cpe__cta:active {
@@ -241,12 +209,8 @@
 }
 
 .newton-cpe__cta:focus-visible {
-  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-cpe-brand);
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
   outline-offset: var(--slds-g-sizing-border-2, 2px);
-}
-
-.newton-cpe__cta c-newton-selector-icon {
-  color: var(--slds-g-color-neutral-base-100, #ffffff);
 }
 
 /* =============================================================================
@@ -258,35 +222,31 @@
   flex-direction: column;
   align-items: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
-  padding: var(--slds-g-spacing-6, 1.5rem) var(--slds-g-spacing-3, 0.75rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-cpe-hairline);
-  border-radius: var(--newton-cpe-radius-lg);
-  background: var(--newton-cpe-panel);
-  box-shadow: var(--newton-cpe-shadow);
+  padding: var(--slds-g-spacing-6, 2rem) var(--slds-g-spacing-3, 0.75rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius-lg);
+  background: var(--newton-studio-panel);
+  box-shadow: var(--newton-studio-shadow);
   text-align: center;
 }
 
 .newton-cpe__empty-glyph {
   inline-size: 2.5rem;
   block-size: 2.5rem;
-  border-radius: var(--slds-g-radius-border-circle, 999px);
-  background: var(--newton-cpe-brand-weak);
+  border-radius: var(--slds-g-radius-border-circle, 50%);
+  background: var(--newton-studio-brand-weak);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--newton-cpe-brand);
+  color: var(--newton-studio-brand);
   margin-bottom: var(--slds-g-spacing-1, 0.25rem);
-}
-
-.newton-cpe__empty-glyph c-newton-selector-icon {
-  color: var(--newton-cpe-brand);
 }
 
 .newton-cpe__empty-title {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--slds-g-font-scale-2, 1rem);
   font-weight: var(--slds-g-font-weight-7, 700);
-  color: var(--newton-cpe-ink-strong);
+  color: var(--newton-studio-ink);
 }
 
 .newton-cpe__empty-copy {

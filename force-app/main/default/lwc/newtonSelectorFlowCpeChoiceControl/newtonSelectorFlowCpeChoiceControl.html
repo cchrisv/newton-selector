@@ -1,8 +1,10 @@
 <template>
   <div class="slds-form-element newton-studio-choice">
-    <template lwc:if={label}>
-      <span class={fieldLabelClass}>{label}</span>
-      <template lwc:if={showFieldLevelHelp}>
+    <template lwc:if={showVisibleLabel}>
+      <span class="slds-form-element__label slds-no-flex" aria-hidden="true"
+        >{label}</span
+      >
+      <template lwc:if={fieldLevelHelp}>
         <lightning-helptext
           class="slds-form-element__icon"
           content={fieldLevelHelp}
@@ -14,13 +16,10 @@
         mode="select"
         variant="label-hidden"
         label={label}
-        disabled={disabled}
         options={items}
         value={value}
         enable-search={enableSearch}
-        placeholder-when-empty="Choose an option"
         placeholder="Search options"
-        scroll-after-n-items="7"
         onselectionchange={handleSelectionChange}
       ></c-newton-selector-combobox>
     </div>

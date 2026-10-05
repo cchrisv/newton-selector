@@ -3,6 +3,15 @@ import DEFAULT_MANUAL_INPUT_LABEL from "@salesforce/label/c.Newton_Selector_Manu
 import DEFAULT_EMPTY_STATE_MESSAGE from "@salesforce/label/c.Newton_Selector_EmptyStateDefault";
 import DEFAULT_ERROR_STATE_MESSAGE from "@salesforce/label/c.Newton_Selector_ErrorStateDefault";
 
+export const DEFAULT_QUERY_LIMIT = 50;
+export const MAX_QUERY_LIMIT = 2000;
+
+const HEX_COLOR = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+
+export function isHexColor(value) {
+  return HEX_COLOR.test(value);
+}
+
 export function parseRemValue(value, fallback) {
   if (value == null || value === "") return fallback;
   const match = String(value)
@@ -18,7 +27,16 @@ export function formatRem(n) {
   return `${rounded}rem`;
 }
 
-const AUTO_BOX = {
+const DEFAULT_MARGIN = {
+  top: "none",
+  right: "none",
+  bottom: "none",
+  left: "none",
+  linked: true
+};
+
+// Blank padding is "Auto": the tile size sets it.
+const AUTO_PADDING = {
   top: "",
   right: "",
   bottom: "",
@@ -34,8 +52,8 @@ const DEFAULT_BADGE_CONFIG = {
 };
 
 const BASE_GRID_CONFIG = {
-  margin: AUTO_BOX,
-  padding: AUTO_BOX,
+  margin: DEFAULT_MARGIN,
+  padding: AUTO_PADDING,
   badge: DEFAULT_BADGE_CONFIG,
   columns: null,
   selectionIndicator: "frame",
@@ -84,11 +102,11 @@ const LAYOUT_PRESETS = {
     aspectRatio: "1:1"
   },
   list: {
-    minWidth: "100%",
+    minWidth: "7.5rem",
     gapH: "none",
     gapV: "1",
     size: "small",
-    aspectRatio: "auto"
+    aspectRatio: "1:1"
   },
   horizontal: {
     minWidth: "7.5rem",
@@ -98,47 +116,47 @@ const LAYOUT_PRESETS = {
     aspectRatio: "1:1"
   },
   picklist: {
-    minWidth: "100%",
+    minWidth: "7.5rem",
     gapH: "none",
     gapV: "1",
     size: "small",
-    aspectRatio: "auto"
+    aspectRatio: "1:1"
   },
   radio: {
-    minWidth: "100%",
+    minWidth: "7.5rem",
     gapH: "none",
     gapV: "1",
     size: "small",
-    aspectRatio: "auto"
+    aspectRatio: "1:1"
   },
   columns: {
-    minWidth: "100%",
+    minWidth: "7.5rem",
     gapH: "3",
     gapV: "1",
     size: "small",
-    aspectRatio: "auto"
+    aspectRatio: "1:1"
   },
   dualListbox: {
-    minWidth: "100%",
+    minWidth: "7.5rem",
     gapH: "3",
     gapV: "1",
     size: "small",
-    aspectRatio: "auto"
+    aspectRatio: "1:1"
   }
 };
 
-export function normalizeLayoutKey(value) {
+function normalizeLayoutKey(value) {
   return Object.prototype.hasOwnProperty.call(LAYOUT_PRESETS, value)
     ? value
     : "grid";
 }
 
-export function defaultGridConfig(layout = "grid") {
+export function defaultGridConfig(layout) {
   return {
     ...BASE_GRID_CONFIG,
-    ...LAYOUT_PRESETS[normalizeLayoutKey(layout)],
-    margin: { ...AUTO_BOX },
-    padding: { ...AUTO_BOX },
+    ...LAYOUT_PRESETS[layout],
+    margin: { ...DEFAULT_MARGIN },
+    padding: { ...AUTO_PADDING },
     badge: { ...DEFAULT_BADGE_CONFIG }
   };
 }
@@ -193,7 +211,7 @@ export function defaultSelectorConfig() {
       whereClause: "",
       orderByField: "",
       orderByDirection: "ASC",
-      limit: 50,
+      queryLimit: DEFAULT_QUERY_LIMIT,
       labelField: "Name",
       valueField: "Id",
       sublabelField: "",
@@ -242,10 +260,6 @@ export function mergeSelectorConfig(initialConfig) {
     sobject: { ...base.sobject, ...incoming.sobject },
     custom: { items: incoming.custom?.items || [] },
     manualInput: { ...base.manualInput, ...incoming.manualInput },
-    overrides:
-      incoming.overrides && typeof incoming.overrides === "object"
-        ? incoming.overrides
-        : {},
     display: { ...base.display, ...incoming.display },
     gridConfig: mergeGridConfig(layout, incoming.gridConfig || {})
   };
@@ -275,8 +289,6 @@ export function manualInputLabelOf(config) {
  */
 export function selectorPropsFromConfig(config, records = []) {
   const grid = config.gridConfig;
-  // A blank gap is the editor's "Auto": the layout's standard gap.
-  const preset = LAYOUT_PRESETS[config.layout];
   return {
     label: config.label,
     helpText: config.helpText,
@@ -312,8 +324,8 @@ export function selectorPropsFromConfig(config, records = []) {
     manualInputMaxLength: config.manualInput.maxLength,
     appearance: {
       gridMinWidth: grid.minWidth,
-      gapHorizontal: grid.gapH || preset.gapH,
-      gapVertical: grid.gapV || preset.gapV,
+      gapHorizontal: grid.gapH,
+      gapVertical: grid.gapV,
       marginTop: grid.margin.top,
       marginRight: grid.margin.right,
       marginBottom: grid.margin.bottom,

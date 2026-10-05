@@ -23,10 +23,10 @@ const BASE_CONFIG = {
     badge: {},
     margin: {
       linked: true,
-      top: "",
-      right: "",
-      bottom: "",
-      left: ""
+      top: "none",
+      right: "none",
+      bottom: "none",
+      left: "none"
     },
     padding: { linked: true, top: "", right: "", bottom: "", left: "" }
   }
@@ -91,6 +91,24 @@ function group(root, label) {
 function byLabel(root, selector, label) {
   return [...root.querySelectorAll(selector)].find(
     (node) => node.label === label || node.getAttribute("label") === label
+  );
+}
+
+function toneRow(root, groupLabel) {
+  return [...root.querySelectorAll("c-newton-selector-flow-cpe-tone-row")].find(
+    (node) => node.groupLabel === groupLabel
+  );
+}
+
+function toneChip(root, groupLabel, value) {
+  return toneRow(root, groupLabel).shadowRoot.querySelector(
+    `[role="group"] [data-value='${value}']`
+  );
+}
+
+function hexInput(root, groupLabel) {
+  return toneRow(root, groupLabel).shadowRoot.querySelector(
+    'input[type="text"]'
   );
 }
 
@@ -174,12 +192,7 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
       false
     );
     cardSelect(group(element.shadowRoot, "Badge position"), "top-right");
-    inputChange(
-      element.shadowRoot.querySelector(
-        'input[aria-label="Badge hex color value"]'
-      ),
-      "#123456"
-    );
+    inputChange(hexInput(element.shadowRoot, "Badge color"), "#123456");
 
     expect(patches.at(-5).value.gridConfig.surfaceStyle).toBe(
       "gradient-radial"
@@ -202,26 +215,14 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
     });
     const patches = collect(element);
 
-    click(
-      group(element.shadowRoot, "Pattern hover color").querySelector(
-        "[data-value='warning']"
-      )
-    );
+    click(toneChip(element.shadowRoot, "Pattern hover color", "warning"));
     inputChange(
-      element.shadowRoot.querySelector(
-        'input[aria-label="Pattern selected hex color value"]'
-      ),
+      hexInput(element.shadowRoot, "Pattern selected color"),
       "#112233"
     );
-    click(
-      group(element.shadowRoot, "Surface hover color").querySelector(
-        "[data-value='teal']"
-      )
-    );
+    click(toneChip(element.shadowRoot, "Surface hover color", "teal"));
     inputChange(
-      element.shadowRoot.querySelector(
-        'input[aria-label="Surface selected hex color value"]'
-      ),
+      hexInput(element.shadowRoot, "Surface selected color"),
       "#445566"
     );
 
@@ -249,22 +250,9 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
 
     cardSelect(group(element.shadowRoot, "Icon decoration"), "badge");
     cardSelect(group(element.shadowRoot, "Icon style"), "outlined");
-    click(
-      group(element.shadowRoot, "Icon color").querySelector(
-        "[data-value='brand']"
-      )
-    );
-    click(
-      group(element.shadowRoot, "Icon glyph color").querySelector(
-        "[data-value='contrast']"
-      )
-    );
-    inputChange(
-      element.shadowRoot.querySelector(
-        'input[aria-label="Icon decoration hex color value"]'
-      ),
-      "#654321"
-    );
+    click(toneChip(element.shadowRoot, "Icon color", "brand"));
+    click(toneChip(element.shadowRoot, "Icon glyph color", "contrast"));
+    inputChange(hexInput(element.shadowRoot, "Icon color"), "#654321");
 
     expect(patches.at(-5).value.gridConfig.iconDecor).toBe("badge");
     expect(patches.at(-4).value.gridConfig.iconStyle).toBe("outlined");
@@ -313,7 +301,7 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
     element.config = patches.at(-1).value;
     await Promise.resolve();
     expect(group(element.shadowRoot, "Badge position")).toBeNull();
-    expect(group(element.shadowRoot, "Badge color")).toBeNull();
+    expect(toneRow(element.shadowRoot, "Badge color")).toBeUndefined();
     expect(group(element.shadowRoot, "Badge shape")).toBeNull();
   });
 
@@ -332,7 +320,7 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
       byLabel(
         element.shadowRoot,
         "c-newton-selector-flow-cpe-toggle",
-        "Link all sides"
+        "Link all margin sides"
       ),
       true
     );

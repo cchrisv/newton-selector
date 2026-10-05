@@ -11,23 +11,9 @@ module.exports = defineConfig([
     extends: [lwcConfig]
   },
 
-  // These components intentionally own cleared timers for debounced lookups,
-  // delayed blur handling, or Flow auto-advance.
-  {
-    files: [
-      "**/lwc/newtonSelectorFlowScreen/newtonSelectorFlowScreen.js",
-      "**/lwc/newtonSelectorFlowCpeIconSelector/newtonSelectorFlowCpeIconSelector.js",
-      "**/lwc/newtonSelectorDataSelector/newtonSelectorDataSelector.js"
-    ],
-    rules: {
-      "@lwc/lwc/no-async-operation": "off"
-    }
-  },
-
-  // LWC configuration with override for LWC test files
+  // Override for LWC test files
   {
     files: ["**/lwc/**/*.test.js"],
-    extends: [lwcConfig],
     rules: {
       "@lwc/lwc/no-unexpected-wire-adapter-usages": "off"
     },

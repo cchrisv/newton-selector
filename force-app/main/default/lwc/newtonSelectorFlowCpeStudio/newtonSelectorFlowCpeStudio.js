@@ -18,15 +18,6 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
   _dragState = null;
   _chapterObserver;
 
-  @api
-  get leftWidth() {
-    return this._leftWidth;
-  }
-  set leftWidth(value) {
-    const next = Number(value);
-    if (Number.isFinite(next)) this._leftWidth = this._clampLeft(next);
-  }
-
   get gridStyle() {
     return [
       `--newton-studio-left-fr: ${this._leftWidth}fr`,
@@ -47,13 +38,13 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
   }
 
   get tabs() {
-    return (this.sections || []).map((section) => ({
+    return this.sections.map((section) => ({
       key: section.key,
       label: section.label,
       icon: section.icon,
-      ariaCurrent: section.ariaCurrent,
-      showStatus: section.showStatus,
-      statusClass: section.statusClass,
+      ariaCurrent: section.active ? "page" : null,
+      showStatus: section.status === "warn" || section.status === "error",
+      statusClass: `newton-studio__nav-status newton-studio__nav-status_${section.status}`,
       statusLabel:
         section.status === "error"
           ? `${section.label} has errors`
@@ -64,13 +55,8 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
     }));
   }
 
-  get hasTabs() {
-    return this.tabs.length > 0;
-  }
-
   handleTabClick(event) {
     const key = event.currentTarget.dataset.key;
-    if (!key) return;
     this.dispatchEvent(new CustomEvent("sectionclick", { detail: key }));
     this._scrollToChapter(key);
   }
@@ -146,10 +132,7 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
   }
 
   _setLeftWidth(value) {
-    const next = this._clampLeft(value);
-    if (next === this._leftWidth) return;
-    this._leftWidth = next;
-    this.dispatchEvent(new CustomEvent("leftwidthchange", { detail: next }));
+    this._leftWidth = this._clampLeft(value);
   }
 
   _clampLeft(value) {
@@ -169,11 +152,10 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
     if (this._chapterObserver) return;
     const controls = this.template.querySelector(".newton-studio__scroll");
     const chapters = this._allChapters();
-    if (
-      !controls ||
-      chapters.length === 0 ||
-      typeof IntersectionObserver === "undefined"
-    )
+    // Flow Builder runs the CPE under Lightning Locker, whose sandbox does not
+    // expose IntersectionObserver. There the tabs still jump to chapters; only
+    // highlighting the chapter scrolled into view is unavailable.
+    if (chapters.length === 0 || typeof IntersectionObserver !== "function")
       return;
     this._chapterObserver = new IntersectionObserver(
       (entries) => {
@@ -193,15 +175,11 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
   }
 
   _allChapters() {
-    const slot = this.template.querySelector('slot[name="controls"]');
-    return (
-      slot?.assignedElements({ flatten: true }).flatMap((element) => {
-        const matches = element.matches?.("[data-chapter]") ? [element] : [];
-        return [
-          ...matches,
-          ...Array.from(element.querySelectorAll?.("[data-chapter]") || [])
-        ];
-      }) || []
-    );
+    return this.template
+      .querySelector('slot[name="controls"]')
+      .assignedElements()
+      .flatMap((element) =>
+        Array.from(element.querySelectorAll("[data-chapter]"))
+      );
   }
 }

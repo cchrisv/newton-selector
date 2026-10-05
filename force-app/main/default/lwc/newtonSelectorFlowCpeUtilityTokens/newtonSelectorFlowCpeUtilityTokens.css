@@ -13,7 +13,7 @@
   --newton-studio-border: var(--slds-g-color-border-1, #c9c9c9);
   --newton-studio-hairline: var(--slds-g-color-neutral-base-90, #e5e5e5);
   --newton-studio-brand: var(--slds-g-color-brand-base-50, #0176d3);
-  --newton-studio-brand-weak: var(--slds-g-color-brand-base-95, #eaf3ff);
+  --newton-studio-brand-weak: var(--slds-g-color-brand-base-95, #eef4ff);
   --newton-studio-radius: var(--slds-g-radius-border-2, 0.5rem);
   --newton-studio-radius-lg: var(--slds-g-radius-border-3, 0.75rem);
   --newton-studio-shadow: var(
@@ -34,15 +34,10 @@
         transparent
       )
   );
-  --newton-studio-error: var(--slds-g-color-error-base-50, #ba0517);
-  --newton-studio-warn: var(--slds-g-color-warning-base-60, #9a5b02);
+  --newton-studio-error: var(--slds-g-color-error-base-40, #ba0517);
+  --newton-studio-warn: var(--slds-g-color-warning-base-40, #825101);
   --newton-studio-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --newton-studio-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
+  --newton-studio-canvas: var(--slds-g-color-surface-container-2, #f3f3f3);
   --newton-studio-panel: var(--slds-g-color-surface-1, #ffffff);
-  --newton-studio-panel-soft: var(--slds-g-color-surface-container-2, #f9f9f9);
-  --newton-studio-depth-border: color-mix(
-    in oklab,
-    var(--newton-studio-brand) 16%,
-    var(--newton-studio-hairline)
-  );
+  --newton-studio-panel-soft: var(--slds-g-color-surface-container-2, #f3f3f3);
 }

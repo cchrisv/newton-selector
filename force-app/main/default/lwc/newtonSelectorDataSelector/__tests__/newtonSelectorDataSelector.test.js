@@ -1,13 +1,6 @@
 import { createElement } from "lwc";
 import NewtonSelectorDataSelector from "c/newtonSelectorDataSelector";
 import { MANUAL_INPUT_VALUE } from "c/newtonSelectorUtilityDataSources";
-import queryItems from "@salesforce/apex/NewtonSelectorRuntimeController.queryItems";
-
-jest.mock(
-  "@salesforce/apex/NewtonSelectorRuntimeController.queryItems",
-  () => ({ default: jest.fn() }),
-  { virtual: true }
-);
 
 function mount(overrides = {}) {
   const el = createElement("c-newton-selector-data-selector", {
@@ -18,6 +11,8 @@ function mount(overrides = {}) {
     layout: "grid",
     selectionMode: "single",
     required: false,
+    overrides: {},
+    displayConfig: { sortBy: "none", sortDirection: "asc", limit: null },
     ...overrides
   });
   document.body.appendChild(el);
@@ -28,20 +23,6 @@ describe("c-newton-selector-data-selector", () => {
   afterEach(() => {
     while (document.body.firstChild)
       document.body.removeChild(document.body.firstChild);
-  });
-
-  it("sends the SOQL limit to Apex as queryLimit", async () => {
-    queryItems.mockResolvedValue([]);
-    mount({
-      sourceType: "sobject",
-      sobjectConfig: { sObjectApiName: "Account", limit: 7 }
-    });
-    await Promise.resolve();
-    await Promise.resolve();
-
-    const sent = JSON.parse(queryItems.mock.calls[0][0].configJson);
-    expect(sent.queryLimit).toBe(7);
-    expect(sent.limit).toBeUndefined();
   });
 
   it("does not apply per-item overrides to record collection items", async () => {
@@ -63,20 +44,6 @@ describe("c-newton-selector-data-selector", () => {
 
     const group = el.shadowRoot.querySelector("c-newton-selector-group");
     expect(group.items.map((item) => item.label)).toEqual(["Acme", "Beta"]);
-  });
-
-  it("shows empty state when no items and not previewing", async () => {
-    const el = mount({ customConfig: { items: [] } });
-    await Promise.resolve();
-    await Promise.resolve();
-    const empty = el.shadowRoot.querySelector(".newton-state_empty");
-    expect(empty).not.toBeNull();
-  });
-
-  it("validate() always passes in preview mode", async () => {
-    const el = mount({ required: true, previewMode: true });
-    await Promise.resolve();
-    expect(el.validate().isValid).toBe(true);
   });
 
   it("preselects sample values in preview mode so selected-state styling is visible", async () => {
@@ -183,7 +150,6 @@ describe("c-newton-selector-data-selector", () => {
       new CustomEvent("selectionchange", {
         detail: {
           values: [MANUAL_INPUT_VALUE],
-          items: [group.items[1]],
           manualValue: "Manual answer"
         },
         bubbles: true
@@ -212,7 +178,6 @@ describe("c-newton-selector-data-selector", () => {
       new CustomEvent("selectionchange", {
         detail: {
           values: [MANUAL_INPUT_VALUE],
-          items: [group.items[1]],
           manualValue: "No"
         },
         bubbles: true

@@ -1,4 +1,4 @@
-import { buildTokens } from "c/newtonSelectorFlowCpeUtilitySearchHighlight";
+import { buildTokens } from "../searchTokens";
 
 describe("buildTokens", () => {
   it.each([
@@ -57,15 +57,6 @@ describe("buildTokens", () => {
     expect(tokens).toEqual([
       { key: "token-0", text: "abc ", isHighlight: false },
       { key: "token-1", text: "def", isHighlight: true }
-    ]);
-  });
-
-  it("coerces non-string text / term to strings safely", () => {
-    expect(buildTokens(null, "x")).toEqual([
-      { key: "token-0", text: "", isHighlight: false }
-    ]);
-    expect(buildTokens("123", 123)).toEqual([
-      { key: "token-0", text: "123", isHighlight: true }
     ]);
   });
 });

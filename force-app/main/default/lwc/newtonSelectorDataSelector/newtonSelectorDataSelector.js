@@ -1,9 +1,8 @@
-import { LightningElement, api, wire, track } from "lwc";
+import { LightningElement, api, wire } from "lwc";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
 import queryItems from "@salesforce/apex/NewtonSelectorRuntimeController.queryItems";
 import requiredLabel from "@salesforce/label/c.Newton_Selector_Required";
 import loadingOptions from "@salesforce/label/c.Newton_Selector_LoadingOptions";
-import errorIconAlt from "@salesforce/label/c.Newton_Selector_ErrorIconAlt";
 import tryAgain from "@salesforce/label/c.Newton_Selector_TryAgain";
 import manualOptionSublabel from "@salesforce/label/c.Newton_Selector_ManualOptionSublabel";
 import makeSelection from "@salesforce/label/c.Newton_Selector_MakeSelection";
@@ -12,11 +11,12 @@ import selectNoMoreThan from "@salesforce/label/c.Newton_Selector_SelectNoMoreTh
 import manualValueRequired from "@salesforce/label/c.Newton_Selector_ManualValueRequired";
 import manualMinLength from "@salesforce/label/c.Newton_Selector_ManualMinLength";
 import manualMaxLength from "@salesforce/label/c.Newton_Selector_ManualMaxLength";
+import picklistNotConfigured from "@salesforce/label/c.Newton_Selector_PicklistNotConfigured";
 import {
+  errorMessageOf,
   formatLabel,
   normalizePicklist,
   normalizeCollection,
-  normalizeSObjectDTO,
   normalizeCustom,
   applyOverrides,
   applyDisplay,
@@ -32,7 +32,6 @@ const SOURCE_CUSTOM = "custom";
 const LABELS = {
   required: requiredLabel,
   loadingOptions,
-  errorIconAlt,
   tryAgain
 };
 
@@ -43,7 +42,8 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   @api helpText;
   @api fieldLevelHelp;
   // Force a state ('' | 'empty' | 'error'). The builder preview uses it, and
-  // the flow screen forces 'error' when its saved config cannot be read.
+  // the flow screen forces 'error', with the parse error as errorStateMessage,
+  // when its saved config cannot be read.
   @api forcedState;
   @api layout;
   @api required;
@@ -56,6 +56,8 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   @api errorStateMessage;
   @api manualInputMinLength;
   @api manualInputMaxLength;
+  // The validation message the flow screen reports; empty when there is none.
+  @api validationMessage;
   // Group appearance properties (layout spacing and tile styling), passed to
   // c-newton-selector-group unchanged. Built by selectorPropsFromConfig().
   @api appearance;
@@ -81,7 +83,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   _value = "";
   _values = [];
 
-  @track _items = [];
+  _items = [];
   _isLoading = false;
   _errorMessage = "";
 
@@ -223,7 +225,10 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     return this._value;
   }
   set value(v) {
-    this._value = v || "";
+    const next = v || "";
+    if (next === this._value) return;
+    this._value = next;
+    this.syncSelection();
   }
 
   @api
@@ -231,7 +236,15 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     return this._values;
   }
   set values(v) {
-    this._values = Array.isArray(v) ? [...v] : [];
+    const next = Array.isArray(v) ? [...v] : [];
+    if (
+      next.length === this._values.length &&
+      next.every((value, index) => value === this._values[index])
+    ) {
+      return;
+    }
+    this._values = next;
+    this.syncSelection();
   }
 
   // --- Picklist wire ---
@@ -303,9 +316,18 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   }
 
   loadPicklist() {
-    // The wire only re-emits when the object/field/record type changes, so a
-    // reload with data already delivered must not strand the skeleton.
-    if (this._rawData != null) return;
+    if (!this.picklistFieldRef) {
+      this._isLoading = false;
+      this._errorMessage = formatLabel(
+        picklistNotConfigured,
+        this._picklistConfig.objectApiName,
+        this._picklistConfig.fieldApiName
+      );
+      return;
+    }
+    // The wire only re-emits when the object/field/record type changes, so
+    // once it has delivered data or an error there is nothing to wait for.
+    if (this._rawData != null || this._errorMessage) return;
     this._isLoading = true;
   }
 
@@ -320,11 +342,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     this._isLoading = true;
     this._errorMessage = "";
     try {
-      // The stored config names the row cap `limit`; the Apex DTO reads `queryLimit`.
-      const { limit, ...sobjectConfig } = this._sobjectConfig || {};
-      const queryLimit = Number(limit);
-      if (queryLimit > 0) sobjectConfig.queryLimit = queryLimit;
-      const configJson = JSON.stringify(sobjectConfig);
+      const configJson = JSON.stringify(this._sobjectConfig);
       this._rawData = await queryItems({ configJson });
       this.reapplyNormalization();
     } finally {
@@ -352,7 +370,9 @@ export default class NewtonSelectorDataSelector extends LightningElement {
           this._collectionConfig?.fieldMap
         );
       case SOURCE_SOBJECT:
-        return normalizeSObjectDTO(this._rawData);
+        // Apex returns finished items: every text field set, value falling
+        // back to the record Id.
+        return this._rawData;
       default:
         return normalizeCustom(this._rawData);
     }
@@ -387,8 +407,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
         icon: "",
         badge: "",
         helpText: "",
-        value: "",
-        disabled: false
+        value: ""
       };
       next =
         this._noneOptionPosition === "end" ? [...next, none] : [none, ...next];
@@ -404,7 +423,6 @@ export default class NewtonSelectorDataSelector extends LightningElement {
           badge: "",
           helpText: "",
           value: MANUAL_INPUT_VALUE,
-          disabled: false,
           manualInput: true
         }
       ];
@@ -413,24 +431,65 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   }
 
   // Emits `itemschange` with every rendered value and label so the flow
-  // screen can surface them as Flow outputs.
+  // screen can surface them as Flow outputs, then reports the selection the
+  // options now resolve to. The manual "Other" entry is left out: its real
+  // value is the text the user types.
   commitItems(items) {
     this._items = items;
+    const outputs = items.filter((item) => !item.manualInput);
     this.dispatchEvent(
       new CustomEvent("itemschange", {
         detail: {
-          values: items.map((i) => String(i.value ?? "")),
-          labels: items.map((i) => String(i.label ?? ""))
+          values: outputs.map((i) => String(i.value ?? "")),
+          labels: outputs.map((i) => String(i.label ?? ""))
         },
         bubbles: true,
         composed: false
       })
     );
+    this.syncSelection();
+  }
+
+  // A selection the user did not make (Default selection, Back, a value Flow
+  // pushes) is matched against the rendered options: a value no option has
+  // is dropped, and the labels and records of the rest are written out.
+  syncSelection() {
+    if (
+      this.previewMode ||
+      this.forcedState ||
+      !this._connectedFlag ||
+      this._rawData == null
+    ) {
+      return;
+    }
+    const pruned = this.pruneSelection();
+    const hasSelection =
+      this.selectionMode === "single"
+        ? Boolean(this._value)
+        : this._values.length > 0;
+    if (pruned || hasSelection) this.emitValueChange(false);
+  }
+
+  // With manual input on, an unknown value is the "Other" text, so only a
+  // selector without it drops values that match no option.
+  pruneSelection() {
+    if (this._allowManualInput) return false;
+    const rendered = this.renderedValueSet;
+    if (this.selectionMode === "single") {
+      if (!this._value || rendered.has(this._value)) return false;
+      this._value = "";
+      return true;
+    }
+    const kept = this._values.filter(
+      (value) => value !== "" && rendered.has(String(value))
+    );
+    if (kept.length === this._values.length) return false;
+    this._values = kept;
+    return true;
   }
 
   handleError(error) {
-    this._errorMessage =
-      error?.body?.message || error?.message || this.errorStateMessage;
+    this._errorMessage = errorMessageOf(error, this.errorStateMessage);
     this._isLoading = false;
   }
 
@@ -440,7 +499,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
 
   // --- Selection ---
   handleSelectionChange(event) {
-    const { values, items, manualValue, noneSelected } = event.detail;
+    const { values, manualValue, noneSelected, fromArrowKey } = event.detail;
     const noneWasPicked = noneSelected === true;
     const manualWasPicked = values.includes(MANUAL_INPUT_VALUE);
     this._manualInputSelected = !noneWasPicked && manualWasPicked;
@@ -456,11 +515,6 @@ export default class NewtonSelectorDataSelector extends LightningElement {
       !noneWasPicked && manualWasPicked && this._manualInputValue
         ? [...normalValues, this._manualInputValue]
         : normalValues;
-    const effectiveItems = noneWasPicked
-      ? []
-      : items.filter((item) => item.value !== MANUAL_INPUT_VALUE);
-    const labels = effectiveItems.map((i) => String(i.label ?? ""));
-    const manualLabel = this._manualInputValue || this._manualInputLabel;
     if (this.selectionMode === "single") {
       this._value = manualWasPicked
         ? this._manualInputValue
@@ -470,25 +524,41 @@ export default class NewtonSelectorDataSelector extends LightningElement {
       this._values = effectiveValues;
       this._value = "";
     }
+    this.emitValueChange(true, fromArrowKey);
+  }
+
+  // Reports the current selection with the labels and records of the options
+  // it matches. `userAction` is false for a selection reported on load, and
+  // `fromArrowKey` is true for a pick made by arrowing through the radio
+  // tiles; neither may auto-advance the screen.
+  emitValueChange(userAction, fromArrowKey = false) {
+    const single = this.selectionMode === "single";
+    const manual = this.hasActiveManualSelection;
+    const manualLabel = this.manualValueForGroup || this._manualInputLabel;
+    const byValue = new Map(
+      this._items
+        .filter(
+          (item) => item.value !== "" && item.value !== MANUAL_INPUT_VALUE
+        )
+        .map((item) => [String(item.value), item])
+    );
+    const selectedItems = (single ? [this._value] : this._values)
+      .map((value) => byValue.get(String(value)))
+      .filter(Boolean);
+    const labels = selectedItems.map((item) => String(item.label ?? ""));
     this.dispatchEvent(
       new CustomEvent("valuechange", {
         detail: {
           value: this._value,
           values: this._values,
-          label: noneWasPicked
-            ? ""
-            : manualWasPicked
-              ? manualLabel
-              : labels[0] || "",
-          labels: noneWasPicked
-            ? []
-            : manualWasPicked && this.selectionMode === "multi"
-              ? [...labels, manualLabel]
-              : labels,
+          label: manual ? manualLabel : labels[0] || "",
+          labels: manual && !single ? [...labels, manualLabel] : labels,
           // Only record-backed sources (SOQL, record collection) carry records.
-          record: manualWasPicked ? null : effectiveItems[0]?.record || null,
-          records: effectiveItems.map((item) => item.record).filter(Boolean),
-          manualInput: manualWasPicked
+          record: manual ? null : selectedItems[0]?.record || null,
+          records: selectedItems.map((item) => item.record).filter(Boolean),
+          manualInput: manual,
+          userAction,
+          fromArrowKey
         },
         bubbles: true,
         composed: false
@@ -500,10 +570,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     if (this.previewMode && !this._value && this._values.length === 0) {
       const previewValues = this._items
         .filter(
-          (item) =>
-            !item.disabled &&
-            item.value !== "" &&
-            item.value !== MANUAL_INPUT_VALUE
+          (item) => item.value !== "" && item.value !== MANUAL_INPUT_VALUE
         )
         .map((item) => item.value);
       if (this.selectionMode === "single") {
@@ -518,8 +585,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
       return this._value ? [this._value] : [];
     }
     const values = this._values.filter((value) => !this.isManualValue(value));
-    return this.hasActiveManualSelection ||
-      this._values.some((value) => this.isManualValue(value))
+    return this.hasActiveManualSelection
       ? [...values, MANUAL_INPUT_VALUE]
       : values;
   }
@@ -561,29 +627,33 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   // --- State flags ---
   get isLoading() {
     if (this.forcedState) return false;
-    return this._isLoading && !this.previewMode;
+    return this._isLoading;
   }
   get hasError() {
     if (this.forcedState === "error") return true;
-    return Boolean(this._errorMessage) && !this.previewMode;
+    return Boolean(this._errorMessage);
   }
   get isEmpty() {
     if (this.forcedState === "empty") return true;
     if (this.forcedState === "error") return false;
-    return (
-      !this.isLoading &&
-      !this.hasError &&
-      this._items.length === 0 &&
-      !this.previewMode
-    );
+    return !this.isLoading && !this.hasError && this._items.length === 0;
   }
   get isPopulated() {
     if (this.forcedState) return false;
     return !this.isLoading && !this.hasError && this._items.length > 0;
   }
-  // A forced error has no load error, so it shows the configured message.
+  // A forced error shows errorStateMessage: the configured text in the
+  // preview, or the parse error the flow screen passes for an unreadable config.
   get resolvedErrorMessage() {
-    return this._errorMessage || this.errorStateMessage;
+    return this.forcedState === "error"
+      ? this.errorStateMessage
+      : this._errorMessage;
+  }
+  // Only a SOQL load can be retried: the picklist wire cannot be re-run, the
+  // in-memory sources fail the same way every time, and a forced error comes
+  // from the preview or an unreadable config.
+  get canRetry() {
+    return !this.forcedState && this._sourceType === SOURCE_SOBJECT;
   }
 
   get hasLabel() {
@@ -592,6 +662,17 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   get hasHelp() {
     return Boolean(this.helpText);
   }
+  get hasValidationMessage() {
+    return Boolean(this.validationMessage);
+  }
+  // The help text (rendered only under a label) and the validation message;
+  // null drops the attribute.
+  get describedBy() {
+    const ids = [];
+    if (this.hasLabel && this.hasHelp) ids.push("selector-help");
+    if (this.hasValidationMessage) ids.push("selector-error");
+    return ids.join(" ") || null;
+  }
   get hasFieldHelp() {
     return Boolean(this.fieldLevelHelp);
   }
@@ -599,7 +680,6 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   // --- Flow validation ---
   @api
   validate() {
-    if (this.previewMode) return { isValid: true };
     if (this.required) {
       if (this.selectionMode === "single" && !this._value) {
         return { isValid: false, errorMessage: makeSelection };
@@ -636,7 +716,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
   }
 
   validateManualInput() {
-    if (!this.hasActiveManualSelection && !this.isManualValue(this._value)) {
+    if (!this.hasActiveManualSelection) {
       return { isValid: true };
     }
     const value = (this.manualValueForGroup || "").trim();

@@ -1,7 +1,7 @@
 /* =============================================================================
    newtonSelectorChoiceTile — first-class visual choice tile (SLDS 2)
-   Self-contained, no slds-newton-selector inheritance. Uses SLDS 2 styling
-   hooks (--slds-g-*) end-to-end so it's theme- and dark-mode-aware.
+   Uses SLDS 2 styling hooks (--slds-g-*) end-to-end so it's theme- and
+   dark-mode-aware.
    ============================================================================= */
 
 :host {
@@ -15,33 +15,41 @@
 .newton-selector-choice-tile {
   --_choice-tile-radius: var(--slds-g-radius-border-2, 0.5rem);
   --_choice-tile-border: var(--slds-g-color-border-1, #c9c9c9);
-  --_choice-tile-border-hover: var(--slds-g-color-neutral-base-50, #747474);
+  --_choice-tile-border-hover: var(--slds-g-color-neutral-base-50, #757575);
   --_choice-tile-border-selected: var(--slds-g-color-brand-base-50, #0176d3);
-  --_choice-tile-surface: var(--slds-g-color-neutral-base-100, #ffffff);
-  --_choice-tile-surface-selected: var(--slds-g-color-brand-base-95, #eaf3ff);
+  --_choice-tile-border-current: var(--_choice-tile-border);
+  --_choice-tile-surface: var(--slds-g-color-surface-container-1, #ffffff);
   --_choice-tile-ink: var(--slds-g-color-neutral-base-10, #181818);
   --_choice-tile-ink-weak: var(--slds-g-color-neutral-base-40, #5c5c5c);
   --_choice-tile-brand: var(--slds-g-color-brand-base-50, #0176d3);
   --_choice-tile-focus: var(--slds-g-color-brand-base-60, #1b96ff);
   --_choice-tile-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --_choice-tile-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* Shared tone palette, declared once and read by every color axis
+     (pattern, corner, surface, icon decoration and glyph). Each axis keeps
+     its own neutral and custom values. */
+  --_tone-brand: var(--slds-g-color-brand-base-50, #0176d3);
+  --_tone-success: var(--slds-g-color-success-base-50, #2e844a);
+  --_tone-warning: var(--slds-g-color-warning-base-50, #a96404);
+  --_tone-error: var(--slds-g-color-error-base-50, #ea001e);
+  --_tone-violet: var(--slds-g-color-palette-purple-50, #9050e9);
+  --_tone-pink: var(--slds-g-color-palette-pink-50, #e3066a);
+  --_tone-teal: var(--slds-g-color-palette-teal-50, #0b827c);
   --_ptn-color-normal: var(
     --_ptn-color,
     var(--slds-g-color-neutral-base-40, #5c5c5c)
   );
-  --_ptn-color-hover: var(--_ptn-color-normal);
   --_ptn-color-selected: var(--slds-g-color-brand-base-50, #0176d3);
-  --_ptn-color-disabled: var(--slds-g-color-neutral-base-60, #9a9a9a);
+  --_ptn-color-disabled: var(--slds-g-color-neutral-base-60, #939393);
   --_ptn-state-color: var(--_ptn-color-normal);
   --_srf-color-normal: var(
     --_srf-color,
-    var(--slds-g-color-neutral-base-50, #747474)
+    var(--slds-g-color-neutral-base-50, #757575)
   );
-  --_srf-color-hover: var(--_srf-color-normal);
   --_srf-color-selected: var(--slds-g-color-brand-base-50, #0176d3);
-  --_srf-color-disabled: var(--slds-g-color-neutral-base-60, #9a9a9a);
+  --_srf-color-disabled: var(--slds-g-color-neutral-base-60, #939393);
   --_srf-state-color: var(--_srf-color-normal);
-  --_srf-bg-base: var(--slds-g-color-neutral-base-100, #ffffff);
+  --_srf-bg-base: var(--slds-g-color-surface-container-1, #ffffff);
   --_srf-solid-bg-normal: color-mix(
     in oklab,
     var(--_srf-color-normal) 3%,
@@ -85,22 +93,6 @@
 }
 
 /* =============================================================================
-   ELEMENT · Visually hidden native input
-   ============================================================================= */
-
-.newton-selector-choice-tile__input {
-  position: absolute;
-  width: var(--slds-g-sizing-border-1, 1px);
-  height: var(--slds-g-sizing-border-1, 1px);
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* =============================================================================
    ELEMENT · Label wrapper
    ============================================================================= */
 
@@ -114,16 +106,15 @@
   margin: 0;
 }
 
-.newton-selector-choice-tile_disabled .newton-selector-choice-tile__label {
-  cursor: not-allowed;
-}
-
 /* =============================================================================
    ELEMENT · Figure (the tile surface)
    ============================================================================= */
 
 .newton-selector-choice-tile__figure {
+  /* A stacking context, so the pattern layer (z-index: -1) paints above the
+     figure's surface and below all of its content. */
   position: relative;
+  z-index: 1;
   /* Hosts that need a uniform tile family (e.g. the property editor) switch
      the figure to a grid with a fixed visual row through these hooks, so the
      title lands on the same line whatever the visual is. */
@@ -166,7 +157,8 @@
   padding-bottom: var(--_choice-tile-pad-b);
   padding-inline-start: var(--_choice-tile-pad-l);
   background: var(--_srf-solid-bg-current, var(--_choice-tile-surface));
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--_choice-tile-border);
+  border: var(--slds-g-sizing-border-1, 1px) solid
+    var(--_choice-tile-border-current);
   border-radius: var(--_choice-tile-radius);
   color: var(--_choice-tile-ink);
   text-align: center;
@@ -186,7 +178,18 @@
    ELEMENT · Icon
    ============================================================================= */
 
+/* The wrap is the positioning context for the icon decoration. Its flex
+   centering also centers the absolutely-positioned decor (static position),
+   which keeps the decor centered in both LTR and RTL. The decoration size is
+   the tile size's base plus the icon style's steps (see ICON DECORATION). */
 .newton-selector-choice-tile__icon-wrap {
+  --_icn-decor-width: calc(
+    var(--_icn-decor-base) + var(--_icn-decor-steps, 0) * var(--_icn-decor-step)
+  );
+  --_icn-decor-height: var(--_icn-decor-width);
+  --_icn-wrap-width: var(--_icn-decor-width);
+  --_icn-wrap-height: var(--_icn-decor-height);
+  position: relative;
   grid-row: 1;
   align-self: center;
   display: inline-flex;
@@ -205,7 +208,7 @@
 .newton-selector-choice-tile_framed-visual
   .newton-selector-choice-tile__icon-wrap {
   --_shape-cell-size: var(--newton-tile-visual-size, 2.5rem);
-  --_shape-cell-ink: var(--slds-g-color-neutral-base-50, #747474);
+  --_shape-cell-ink: var(--slds-g-color-neutral-base-50, #757575);
   --_shape-cell-ring: var(--slds-g-color-border-1, #c9c9c9);
   --_shape-cell-bg: color-mix(
     in oklab,
@@ -226,6 +229,9 @@
   background: var(--_shape-cell-bg);
   box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
     color-mix(in oklab, var(--_shape-cell-ink) 7%, transparent);
+  /* Whatever the cell holds, a shape's outline or a framed icon, takes the
+     cell's ink. */
+  color: var(--_shape-cell-ink);
   transition:
     background-color 160ms var(--_choice-tile-ease),
     border-color 160ms var(--_choice-tile-ease),
@@ -259,13 +265,14 @@
     opacity 160ms var(--_choice-tile-ease);
 }
 
-.newton-selector-choice-tile:not(.newton-selector-choice-tile_disabled):hover
+/* Hover never recolors a selected cell, like the tile edge. */
+.newton-selector-choice-tile:not(.newton-selector-choice-tile_selected):hover
   .newton-selector-choice-tile__shape-wrap,
 .newton-selector-choice-tile_framed-visual:not(
-    .newton-selector-choice-tile_disabled
+    .newton-selector-choice-tile_selected
   ):hover
   .newton-selector-choice-tile__icon-wrap {
-  --_shape-cell-ring: var(--slds-g-color-neutral-base-50, #747474);
+  --_shape-cell-ring: var(--slds-g-color-neutral-base-50, #757575);
 }
 
 .newton-selector-choice-tile_selected .newton-selector-choice-tile__shape-wrap,
@@ -298,14 +305,6 @@
   opacity: 0.9;
 }
 
-/* Whatever the cell holds, a shape's outline or a framed icon, takes the
-   cell's ink. */
-.newton-selector-choice-tile__shape-wrap,
-.newton-selector-choice-tile_framed-visual
-  .newton-selector-choice-tile__icon-wrap {
-  color: var(--_shape-cell-ink);
-}
-
 /* =============================================================================
    ELEMENT · Text stack (title / sub / badge)
    ============================================================================= */
@@ -315,7 +314,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.125rem;
+  gap: var(--slds-g-sizing-1, 0.125rem);
   min-width: 0;
   max-width: 100%;
 }
@@ -343,10 +342,6 @@
    ============================================================================= */
 
 .newton-selector-choice-tile__badge {
-  --_badge-bg: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  --_badge-ink: var(--slds-g-color-neutral-base-30, #444444);
-  --_badge-ring: var(--slds-g-color-neutral-base-90, #e5e5e5);
-
   display: inline-flex;
   align-items: center;
   font-size: 0.6875rem;
@@ -358,7 +353,7 @@
   text-transform: uppercase;
   white-space: nowrap;
   line-height: var(--slds-g-font-line-height-1, 1);
-  box-shadow: inset 0 0 0 1px var(--_badge-ring);
+  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px) var(--_badge-ring);
   z-index: 1;
   transition:
     background-color 160ms var(--_choice-tile-ease),
@@ -386,32 +381,32 @@
 }
 
 .newton-selector-choice-tile__badge_variant-brand {
-  --_badge-bg: var(--slds-g-color-brand-base-95, #eaf3ff);
+  --_badge-bg: var(--slds-g-color-brand-base-95, #eef4ff);
   --_badge-ink: var(--slds-g-color-brand-base-30, #014486);
   --_badge-ring: var(--slds-g-color-brand-base-60, #1b96ff);
 }
 
 .newton-selector-choice-tile__badge_variant-success {
-  --_badge-bg: var(--slds-g-color-success-base-95, #e8f7ee);
-  --_badge-ink: var(--slds-g-color-success-base-30, #2e7d56);
-  --_badge-ring: var(--slds-g-color-success-base-60, #3baa6f);
+  --_badge-bg: var(--slds-g-color-success-base-95, #ebf7e6);
+  --_badge-ink: var(--slds-g-color-success-base-30, #194e31);
+  --_badge-ring: var(--slds-g-color-success-base-60, #3ba755);
 }
 
 .newton-selector-choice-tile__badge_variant-warning {
-  --_badge-bg: var(--slds-g-color-warning-base-95, #fff6e6);
-  --_badge-ink: var(--slds-g-color-warning-base-30, #7a4500);
-  --_badge-ring: var(--slds-g-color-warning-base-60, #9a5b02);
+  --_badge-bg: var(--slds-g-color-warning-base-95, #fff1ea);
+  --_badge-ink: var(--slds-g-color-warning-base-30, #5f3e02);
+  --_badge-ring: var(--slds-g-color-warning-base-60, #dd7a01);
 }
 
 .newton-selector-choice-tile__badge_variant-error {
-  --_badge-bg: var(--slds-g-color-error-base-95, #fdeef0);
+  --_badge-bg: var(--slds-g-color-error-base-95, #fef1ee);
   --_badge-ink: var(--slds-g-color-error-base-30, #8e030f);
-  --_badge-ring: var(--slds-g-color-error-base-60, #ba0517);
+  --_badge-ring: var(--slds-g-color-error-base-60, #fe5c4c);
 }
 
 .newton-selector-choice-tile__badge_variant-inverse {
   --_badge-bg: var(--slds-g-color-neutral-base-10, #181818);
-  --_badge-ink: var(--slds-g-color-on-accent-1, #ffffff);
+  --_badge-ink: var(--slds-g-color-neutral-base-100, #ffffff);
   --_badge-ring: var(--slds-g-color-neutral-base-10, #181818);
 }
 
@@ -422,31 +417,31 @@
 .newton-selector-choice-tile__badge_variant-violet {
   --_badge-bg: color-mix(
     in oklab,
-    var(--slds-g-color-palette-purple-50, #6d42c1) 10%,
+    var(--slds-g-color-palette-purple-50, #9050e9) 10%,
     var(--slds-g-color-neutral-base-100, #ffffff)
   );
-  --_badge-ink: var(--slds-g-color-palette-purple-30, #4c2599);
-  --_badge-ring: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_badge-ink: var(--slds-g-color-palette-purple-30, #5a1ba9);
+  --_badge-ring: var(--slds-g-color-palette-purple-50, #9050e9);
 }
 
 .newton-selector-choice-tile__badge_variant-pink {
   --_badge-bg: color-mix(
     in oklab,
-    var(--slds-g-color-palette-pink-50, #c9257b) 10%,
+    var(--slds-g-color-palette-pink-50, #e3066a) 10%,
     var(--slds-g-color-neutral-base-100, #ffffff)
   );
-  --_badge-ink: var(--slds-g-color-palette-pink-30, #8e1454);
-  --_badge-ring: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_badge-ink: var(--slds-g-color-palette-pink-30, #8a033e);
+  --_badge-ring: var(--slds-g-color-palette-pink-50, #e3066a);
 }
 
 .newton-selector-choice-tile__badge_variant-teal {
   --_badge-bg: color-mix(
     in oklab,
-    var(--slds-g-color-palette-teal-50, #0f7b82) 10%,
+    var(--slds-g-color-palette-teal-50, #0b827c) 10%,
     var(--slds-g-color-neutral-base-100, #ffffff)
   );
-  --_badge-ink: var(--slds-g-color-palette-teal-30, #0a565c);
-  --_badge-ring: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_badge-ink: var(--slds-g-color-palette-teal-30, #024d4c);
+  --_badge-ring: var(--slds-g-color-palette-teal-50, #0b827c);
 }
 
 /* Custom — derived from --_bdg-color-custom (set inline by the choice tile when
@@ -455,7 +450,7 @@
 .newton-selector-choice-tile__badge_variant-custom {
   --_badge-bg: color-mix(
     in oklab,
-    var(--_bdg-color-custom, var(--slds-g-color-neutral-base-50, #747474)) 10%,
+    var(--_bdg-color-custom, var(--slds-g-color-neutral-base-50, #757575)) 10%,
     var(--slds-g-color-neutral-base-100, #ffffff)
   );
   --_badge-ink: var(
@@ -464,7 +459,7 @@
   );
   --_badge-ring: var(
     --_bdg-color-custom,
-    var(--slds-g-color-neutral-base-60, #9a9a9a)
+    var(--slds-g-color-neutral-base-60, #939393)
   );
 }
 
@@ -482,8 +477,16 @@
 .newton-selector-choice-tile__badge_pos-bottom-right {
   position: absolute;
   box-shadow:
-    inset 0 0 0 1px var(--_badge-ring),
-    var(--slds-g-shadow-1, 0 2px 2px 0 #0000001a);
+    inset 0 0 0 var(--slds-g-sizing-border-1, 1px) var(--_badge-ring),
+    var(
+      --slds-g-shadow-1,
+      0 1px 2px
+        color-mix(
+          in oklab,
+          var(--slds-g-color-neutral-base-10, #181818) 6%,
+          transparent
+        )
+    );
 }
 
 .newton-selector-choice-tile__badge_pos-top-left {
@@ -521,7 +524,7 @@
    both `top` and `bottom` stretches the badge across the full tile height.) */
 .newton-selector-choice-tile_size-small .newton-selector-choice-tile__badge {
   font-size: var(--slds-g-font-scale-neg-3, 0.625rem);
-  padding: 0.125rem 0.375rem;
+  padding: var(--slds-g-sizing-1, 0.125rem) 0.375rem;
 }
 .newton-selector-choice-tile_size-small
   .newton-selector-choice-tile__badge_pos-top-left {
@@ -542,22 +545,6 @@
   .newton-selector-choice-tile__badge_pos-bottom-right {
   bottom: var(--slds-g-spacing-1, 0.25rem);
   inset-inline-end: var(--slds-g-spacing-1, 0.25rem);
-}
-
-/* =============================================================================
-   ELEMENT · Screen-reader help text
-   ============================================================================= */
-
-.newton-selector-choice-tile__help {
-  position: absolute;
-  width: var(--slds-g-sizing-border-1, 1px);
-  height: var(--slds-g-sizing-border-1, 1px);
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
 }
 
 /* =============================================================================
@@ -602,27 +589,25 @@
    MODIFIER · Interactive states
    ============================================================================= */
 
-.newton-selector-choice-tile:not(.newton-selector-choice-tile_disabled):hover
-  .newton-selector-choice-tile__figure {
-  border-color: var(--_choice-tile-border-hover);
-}
-
-.newton-selector-choice-tile:not(.newton-selector-choice-tile_disabled):hover {
+/* Border, surface and pattern colors are driven by state variables on the
+   root, so a selected tile keeps its selected colors while hovered. */
+.newton-selector-choice-tile:hover {
   --_choice-tile-elev-shadow-current: var(--_choice-tile-elev-shadow-hover);
   --_choice-tile-transform-current: var(--_choice-tile-hover-transform);
+}
+
+.newton-selector-choice-tile:not(.newton-selector-choice-tile_selected):hover {
+  --_choice-tile-border-current: var(--_choice-tile-border-hover);
   --_ptn-state-color: var(--_ptn-color-hover);
   --_srf-state-color: var(--_srf-color-hover);
   --_srf-solid-bg-current: var(--_srf-solid-bg-hover);
 }
 
 .newton-selector-choice-tile_selected {
+  --_choice-tile-border-current: var(--_choice-tile-border-selected);
   --_ptn-state-color: var(--_ptn-color-selected);
   --_srf-state-color: var(--_srf-color-selected);
   --_srf-solid-bg-current: var(--_srf-solid-bg-selected);
-}
-
-.newton-selector-choice-tile_selected .newton-selector-choice-tile__figure {
-  border-color: var(--_choice-tile-border-selected);
 }
 
 .newton-selector-choice-tile__input:focus-visible
@@ -646,23 +631,17 @@
 
 /* Elevation contributes only neutral depth/edge treatment. Selection
    indicators add selection affordances separately so the styles compose. */
-.newton-selector-choice-tile_elev-plain .newton-selector-choice-tile__figure {
-  --_srf-bg-base: var(--slds-g-color-neutral-base-100, #ffffff);
-  border-color: transparent;
+.newton-selector-choice-tile_elev-plain {
+  --_choice-tile-border: transparent;
+  --_choice-tile-border-hover: transparent;
+  --_choice-tile-border-selected: transparent;
 }
 
-.newton-selector-choice-tile_elev-plain:not(
-    .newton-selector-choice-tile_disabled
-  ):hover
-  .newton-selector-choice-tile__figure {
-  border-color: transparent;
-}
-
-.newton-selector-choice-tile_elev-subtle .newton-selector-choice-tile__figure {
+.newton-selector-choice-tile_elev-subtle {
   --_srf-bg-base: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  border-color: color-mix(
+  --_choice-tile-border: color-mix(
     in oklab,
-    var(--slds-g-color-neutral-base-50, #747474) 18%,
+    var(--slds-g-color-neutral-base-50, #757575) 18%,
     transparent
   );
 }
@@ -689,7 +668,7 @@
       transparent
     );
   --_choice-tile-elev-shadow-hover: 0 var(--slds-g-spacing-2, 0.5rem)
-    var(--slds-g-spacing-5, 1.25rem)
+    var(--slds-g-spacing-5, 1.5rem)
     color-mix(
       in oklab,
       var(--slds-g-color-neutral-base-10, #181818) 13%,
@@ -702,13 +681,14 @@
 
 .newton-selector-choice-tile_elev-floating {
   --_choice-tile-elev-shadow-rest: 0 var(--slds-g-spacing-3, 0.75rem)
-    var(--slds-g-spacing-6, 1.5rem)
+    var(--slds-g-spacing-6, 2rem)
     color-mix(
       in oklab,
       var(--slds-g-color-neutral-base-10, #181818) 14%,
       transparent
     );
-  --_choice-tile-elev-shadow-hover: 0 var(--slds-g-spacing-4, 1rem) 2.5rem
+  --_choice-tile-elev-shadow-hover: 0 var(--slds-g-spacing-4, 1rem)
+    var(--slds-g-spacing-7, 2.5rem)
     color-mix(
       in oklab,
       var(--slds-g-color-neutral-base-10, #181818) 16%,
@@ -724,14 +704,14 @@
     var(--slds-g-sizing-border-1, 1px)
     color-mix(
       in oklab,
-      var(--slds-g-color-neutral-base-50, #747474) 18%,
+      var(--slds-g-color-neutral-base-50, #757575) 18%,
       transparent
     );
   --_choice-tile-elev-shadow-hover: inset 0 0 0
     var(--slds-g-sizing-border-2, 2px)
     color-mix(
       in oklab,
-      var(--slds-g-color-neutral-base-50, #747474) 22%,
+      var(--slds-g-color-neutral-base-50, #757575) 22%,
       transparent
     );
 }
@@ -740,46 +720,33 @@
    MODIFIER · Selection indicator (how the selected state is shown)
    ============================================================================= */
 
-/* Fill variant — tile surface fills with brand-weak, check badge hidden.
+/* Fill variant — check badge hidden; the edge takes the selected surface
+   tone. On a solid surface with no pattern the tile fills with that tone and
+   its content turns white. With a pattern or a gradient/tint surface, the
+   surface keeps its own selected treatment and the shape takes the tint.
    Higher-contrast pick state, suits rating-style selectors. */
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected
+.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected {
+  --_choice-tile-border-selected: var(--_srf-color-selected);
+}
+.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected.newton-selector-choice-tile_surface-solid.newton-selector-choice-tile_pattern-none
   .newton-selector-choice-tile__figure {
   background: var(--_srf-color-selected);
-  border-color: var(--_srf-color-selected);
   color: var(--slds-g-color-on-accent-1, #ffffff);
 }
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected
+.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected.newton-selector-choice-tile_surface-solid.newton-selector-choice-tile_pattern-none
   .newton-selector-choice-tile__title,
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected
+.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected.newton-selector-choice-tile_surface-solid.newton-selector-choice-tile_pattern-none
   .newton-selector-choice-tile__sub {
   color: var(--slds-g-color-on-accent-1, #ffffff);
 }
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected
+.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected.newton-selector-choice-tile_surface-solid.newton-selector-choice-tile_pattern-none
   .newton-selector-choice-tile__shape {
   background: var(--slds-g-color-on-accent-1, #ffffff);
 }
 
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected:not(
-    .newton-selector-choice-tile_pattern-none
-  )
-  .newton-selector-choice-tile__figure {
-  background: var(--_srf-solid-bg-current, var(--_choice-tile-surface));
-  color: var(--_choice-tile-ink);
-}
-
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected:not(
-    .newton-selector-choice-tile_pattern-none
-  )
-  .newton-selector-choice-tile__title,
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected:not(
-    .newton-selector-choice-tile_pattern-none
-  )
-  .newton-selector-choice-tile__sub {
-  color: var(--_choice-tile-ink);
-}
-
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected:not(
-    .newton-selector-choice-tile_pattern-none
+.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected:is(
+    :not(.newton-selector-choice-tile_surface-solid),
+    :not(.newton-selector-choice-tile_pattern-none)
   )
   .newton-selector-choice-tile__shape {
   background: var(--_srf-state-color, var(--_choice-tile-border-selected));
@@ -790,9 +757,8 @@
   overflow: hidden;
 }
 
-.newton-selector-choice-tile_sel-bar.newton-selector-choice-tile_selected
-  .newton-selector-choice-tile__figure {
-  border-color: color-mix(
+.newton-selector-choice-tile_sel-bar.newton-selector-choice-tile_selected {
+  --_choice-tile-border-selected: color-mix(
     in oklab,
     var(--_srf-color-selected) 55%,
     var(--_choice-tile-border)
@@ -913,7 +879,7 @@
 }
 
 .newton-selector-choice-tile_size-large .newton-selector-choice-tile__figure {
-  --newton-tile-pad-base: var(--slds-g-spacing-5, 1.25rem);
+  --newton-tile-pad-base: var(--slds-g-spacing-5, 1.5rem);
 }
 .newton-selector-choice-tile_size-large .newton-selector-choice-tile__title {
   font-size: var(--slds-g-font-scale-2, 1rem);
@@ -930,17 +896,16 @@
 }
 
 /* =============================================================================
-   MODIFIER · Aspect ratio (figure width caps at size, height from aspect-ratio)
-   Size sets the width cap (matching SLDS canonical dimensions at 1:1).
-   Aspect sets the shape (height relative to width).
+   MODIFIER · Aspect ratio (grid tiles only)
+   The figure fills its grid column; the aspect sets its height relative to
+   its width. List tiles carry no aspect class and size to their content.
    ============================================================================= */
 
 .newton-selector-choice-tile_aspect-1-1 .newton-selector-choice-tile__figure,
 .newton-selector-choice-tile_aspect-4-3 .newton-selector-choice-tile__figure,
 .newton-selector-choice-tile_aspect-3-2 .newton-selector-choice-tile__figure,
 .newton-selector-choice-tile_aspect-16-9 .newton-selector-choice-tile__figure,
-.newton-selector-choice-tile_aspect-3-4 .newton-selector-choice-tile__figure,
-.newton-selector-choice-tile_aspect-2-3 .newton-selector-choice-tile__figure {
+.newton-selector-choice-tile_aspect-3-4 .newton-selector-choice-tile__figure {
   width: 100%;
   /* A host-set block size wins over the aspect ratio. */
   height: var(--newton-tile-block-size, auto);
@@ -962,20 +927,6 @@
 .newton-selector-choice-tile_aspect-3-4 .newton-selector-choice-tile__figure {
   aspect-ratio: 3 / 4;
 }
-.newton-selector-choice-tile_aspect-2-3 .newton-selector-choice-tile__figure {
-  aspect-ratio: 2 / 3;
-}
-
-/* No size-based max-width cap. The grid column width (--newton-group-min-w,
-   which the modal binds to the chosen size: small=7.5rem, medium=12rem,
-   large=16rem) determines the tile's rendered width. Figure fills its column
-   so horizontal and vertical gaps are visually identical — no invisible
-   centering whitespace from a size cap that's smaller than the column. */
-.newton-selector-choice-tile_grid .newton-selector-choice-tile__figure {
-  max-width: 100%;
-}
-
-/* List variant never caps — always full row width (overridden below) */
 
 /* =============================================================================
    MODIFIER · List variant (horizontal row)
@@ -993,21 +944,17 @@
     var(--slds-g-spacing-1, 0.25rem),
     calc(var(--_choice-tile-pad-l) * 0.5)
   );
-  padding-inline-end: calc(var(--_choice-tile-pad-r) + 2.5rem);
   text-align: start;
   width: 100%;
-  max-width: none;
-  height: auto;
-  min-height: 0;
-  aspect-ratio: auto;
-  overflow: hidden;
 }
 
-.newton-selector-choice-tile_list:not(
-    .newton-selector-choice-tile_sel-checkmark
-  )
+/* The checkmark sits at the row's inline end, so the row reserves room. */
+.newton-selector-choice-tile_list.newton-selector-choice-tile_sel-checkmark
   .newton-selector-choice-tile__figure {
-  padding-inline-end: var(--_choice-tile-pad-r);
+  padding-inline-end: calc(
+    var(--_choice-tile-pad-r) + var(--slds-g-sizing-7, 1.5rem) +
+      var(--slds-g-spacing-4, 1rem)
+  );
 }
 
 .newton-selector-choice-tile_list .newton-selector-choice-tile__text {
@@ -1045,11 +992,15 @@
 
 @media (prefers-reduced-motion: reduce) {
   .newton-selector-choice-tile__figure,
-  .newton-selector-choice-tile__check {
+  .newton-selector-choice-tile__check,
+  .newton-selector-choice-tile__shape-wrap,
+  .newton-selector-choice-tile_framed-visual
+    .newton-selector-choice-tile__icon-wrap,
+  .newton-selector-choice-tile__shape,
+  .newton-selector-choice-tile__badge {
     transition: none;
   }
-  .newton-selector-choice-tile:not(.newton-selector-choice-tile_disabled):hover
-    .newton-selector-choice-tile__figure {
+  .newton-selector-choice-tile:hover .newton-selector-choice-tile__figure {
     transform: none;
   }
   .newton-selector-choice-tile_list .newton-selector-choice-tile__check {
@@ -1065,34 +1016,34 @@
    PATTERN OVERLAY + TONE
    Configurable tile decoration — dots, scanlines, radial glow, etc. Layered
    via a single absolutely-positioned span (`.newton-selector-choice-tile__pattern`)
-   inside the label, sitting behind content, above surface.
+   inside the figure, painting above the surface and behind the content.
    ============================================================================= */
 
-/* Tone palette — all colors drawn from SLDS 2 palette tokens with
-   hex fallbacks that match the token's rendered value. */
+/* Tone palette — every axis reads the shared --_tone-* values declared on
+   the tile root; only neutral and custom differ per axis. */
 .newton-selector-choice-tile_ptone-neutral {
   --_ptn-color: var(--slds-g-color-neutral-base-40, #5c5c5c);
 }
 .newton-selector-choice-tile_ptone-brand {
-  --_ptn-color: var(--slds-g-color-brand-base-50, #0176d3);
+  --_ptn-color: var(--_tone-brand);
 }
 .newton-selector-choice-tile_ptone-success {
-  --_ptn-color: var(--slds-g-color-success-base-50, #3baa6f);
+  --_ptn-color: var(--_tone-success);
 }
 .newton-selector-choice-tile_ptone-warning {
-  --_ptn-color: var(--slds-g-color-warning-base-50, #b25900);
+  --_ptn-color: var(--_tone-warning);
 }
 .newton-selector-choice-tile_ptone-error {
-  --_ptn-color: var(--slds-g-color-error-base-50, #ba0517);
+  --_ptn-color: var(--_tone-error);
 }
 .newton-selector-choice-tile_ptone-violet {
-  --_ptn-color: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_ptn-color: var(--_tone-violet);
 }
 .newton-selector-choice-tile_ptone-pink {
-  --_ptn-color: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_ptn-color: var(--_tone-pink);
 }
 .newton-selector-choice-tile_ptone-teal {
-  --_ptn-color: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_ptn-color: var(--_tone-teal);
 }
 .newton-selector-choice-tile_ptone-custom {
   --_ptn-color: var(
@@ -1105,25 +1056,25 @@
   --_ptn-color-hover: var(--slds-g-color-neutral-base-40, #5c5c5c);
 }
 .newton-selector-choice-tile_phtone-brand {
-  --_ptn-color-hover: var(--slds-g-color-brand-base-50, #0176d3);
+  --_ptn-color-hover: var(--_tone-brand);
 }
 .newton-selector-choice-tile_phtone-success {
-  --_ptn-color-hover: var(--slds-g-color-success-base-50, #3baa6f);
+  --_ptn-color-hover: var(--_tone-success);
 }
 .newton-selector-choice-tile_phtone-warning {
-  --_ptn-color-hover: var(--slds-g-color-warning-base-50, #b25900);
+  --_ptn-color-hover: var(--_tone-warning);
 }
 .newton-selector-choice-tile_phtone-error {
-  --_ptn-color-hover: var(--slds-g-color-error-base-50, #ba0517);
+  --_ptn-color-hover: var(--_tone-error);
 }
 .newton-selector-choice-tile_phtone-violet {
-  --_ptn-color-hover: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_ptn-color-hover: var(--_tone-violet);
 }
 .newton-selector-choice-tile_phtone-pink {
-  --_ptn-color-hover: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_ptn-color-hover: var(--_tone-pink);
 }
 .newton-selector-choice-tile_phtone-teal {
-  --_ptn-color-hover: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_ptn-color-hover: var(--_tone-teal);
 }
 .newton-selector-choice-tile_phtone-custom {
   --_ptn-color-hover: var(--_ptn-hover-color-custom, var(--_ptn-color-normal));
@@ -1133,25 +1084,25 @@
   --_ptn-color-selected: var(--slds-g-color-neutral-base-40, #5c5c5c);
 }
 .newton-selector-choice-tile_pstone-brand {
-  --_ptn-color-selected: var(--slds-g-color-brand-base-50, #0176d3);
+  --_ptn-color-selected: var(--_tone-brand);
 }
 .newton-selector-choice-tile_pstone-success {
-  --_ptn-color-selected: var(--slds-g-color-success-base-50, #3baa6f);
+  --_ptn-color-selected: var(--_tone-success);
 }
 .newton-selector-choice-tile_pstone-warning {
-  --_ptn-color-selected: var(--slds-g-color-warning-base-50, #b25900);
+  --_ptn-color-selected: var(--_tone-warning);
 }
 .newton-selector-choice-tile_pstone-error {
-  --_ptn-color-selected: var(--slds-g-color-error-base-50, #ba0517);
+  --_ptn-color-selected: var(--_tone-error);
 }
 .newton-selector-choice-tile_pstone-violet {
-  --_ptn-color-selected: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_ptn-color-selected: var(--_tone-violet);
 }
 .newton-selector-choice-tile_pstone-pink {
-  --_ptn-color-selected: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_ptn-color-selected: var(--_tone-pink);
 }
 .newton-selector-choice-tile_pstone-teal {
-  --_ptn-color-selected: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_ptn-color-selected: var(--_tone-teal);
 }
 .newton-selector-choice-tile_pstone-custom {
   --_ptn-color-selected: var(
@@ -1161,28 +1112,28 @@
 }
 
 .newton-selector-choice-tile_pdtone-neutral {
-  --_ptn-color-disabled: var(--slds-g-color-neutral-base-60, #9a9a9a);
+  --_ptn-color-disabled: var(--slds-g-color-neutral-base-60, #939393);
 }
 .newton-selector-choice-tile_pdtone-brand {
-  --_ptn-color-disabled: var(--slds-g-color-brand-base-50, #0176d3);
+  --_ptn-color-disabled: var(--_tone-brand);
 }
 .newton-selector-choice-tile_pdtone-success {
-  --_ptn-color-disabled: var(--slds-g-color-success-base-50, #3baa6f);
+  --_ptn-color-disabled: var(--_tone-success);
 }
 .newton-selector-choice-tile_pdtone-warning {
-  --_ptn-color-disabled: var(--slds-g-color-warning-base-50, #b25900);
+  --_ptn-color-disabled: var(--_tone-warning);
 }
 .newton-selector-choice-tile_pdtone-error {
-  --_ptn-color-disabled: var(--slds-g-color-error-base-50, #ba0517);
+  --_ptn-color-disabled: var(--_tone-error);
 }
 .newton-selector-choice-tile_pdtone-violet {
-  --_ptn-color-disabled: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_ptn-color-disabled: var(--_tone-violet);
 }
 .newton-selector-choice-tile_pdtone-pink {
-  --_ptn-color-disabled: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_ptn-color-disabled: var(--_tone-pink);
 }
 .newton-selector-choice-tile_pdtone-teal {
-  --_ptn-color-disabled: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_ptn-color-disabled: var(--_tone-teal);
 }
 .newton-selector-choice-tile_pdtone-custom {
   --_ptn-color-disabled: var(
@@ -1195,25 +1146,25 @@
   --_cnr-color: var(--slds-g-color-neutral-base-40, #5c5c5c);
 }
 .newton-selector-choice-tile_ctone-brand {
-  --_cnr-color: var(--slds-g-color-brand-base-50, #0176d3);
+  --_cnr-color: var(--_tone-brand);
 }
 .newton-selector-choice-tile_ctone-success {
-  --_cnr-color: var(--slds-g-color-success-base-50, #3baa6f);
+  --_cnr-color: var(--_tone-success);
 }
 .newton-selector-choice-tile_ctone-warning {
-  --_cnr-color: var(--slds-g-color-warning-base-50, #b25900);
+  --_cnr-color: var(--_tone-warning);
 }
 .newton-selector-choice-tile_ctone-error {
-  --_cnr-color: var(--slds-g-color-error-base-50, #ba0517);
+  --_cnr-color: var(--_tone-error);
 }
 .newton-selector-choice-tile_ctone-violet {
-  --_cnr-color: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_cnr-color: var(--_tone-violet);
 }
 .newton-selector-choice-tile_ctone-pink {
-  --_cnr-color: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_cnr-color: var(--_tone-pink);
 }
 .newton-selector-choice-tile_ctone-teal {
-  --_cnr-color: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_cnr-color: var(--_tone-teal);
 }
 .newton-selector-choice-tile_ctone-custom {
   --_cnr-color: var(
@@ -1222,23 +1173,19 @@
   );
 }
 
-/* The pattern layer sits inside the label, flush to its edges, behind
-   everything else. pointer-events:none so it never steals clicks. */
+/* The pattern layer sits inside the figure, flush to its edges. The figure
+   is its stacking context, so z-index: -1 paints it above the figure's
+   surface and below all tile content (shape cell, icon, title, subtitle,
+   badge, check). pointer-events:none so it never steals clicks. */
 .newton-selector-choice-tile__pattern {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
   color: var(--_ptn-state-color, currentColor);
   opacity: 1;
   overflow: hidden;
-}
-
-/* Figure and its contents need z-index so they paint above the pattern. */
-.newton-selector-choice-tile__figure {
-  position: relative;
-  z-index: 1;
 }
 
 /* --- Dots pattern — airy, fine grid of tinted dots. --- */
@@ -1249,7 +1196,8 @@
     currentColor 1px,
     transparent 1.5px
   );
-  background-size: 12px 12px;
+  background-size: var(--slds-g-sizing-4, 0.75rem)
+    var(--slds-g-sizing-4, 0.75rem);
   opacity: 0.18;
   mask-image: radial-gradient(ellipse at 50% 50%, #000 0%, transparent 85%);
   -webkit-mask-image: radial-gradient(
@@ -1320,7 +1268,7 @@
 /* =============================================================================
    CORNER DECORATIONS
    Floating L-shaped brackets / dots at each tile corner. Sit inside the
-   label with absolute positioning.
+   figure with absolute positioning.
    ============================================================================= */
 
 .newton-selector-choice-tile__corner {
@@ -1336,11 +1284,7 @@
     transform 140ms var(--_choice-tile-ease);
 }
 
-/* --- Trim marks — light printer's registration trim. --- */
-.newton-selector-choice-tile_corner-trim .newton-selector-choice-tile__corner {
-  width: var(--slds-g-sizing-3, 0.5rem);
-  height: var(--slds-g-sizing-3, 0.5rem);
-}
+/* --- Trim marks — light printer's registration trim (base corner size). --- */
 .newton-selector-choice-tile_corner-trim
   .newton-selector-choice-tile__corner_tl {
   top: var(--slds-g-spacing-1, 0.25rem);
@@ -1457,13 +1401,14 @@
   }
 }
 
-/* --- Noise texture — subtle fractal grain (SVG inline). -------------- */
+/* --- Noise texture — subtle fractal grain (SVG inline), used as a mask so
+   the grain takes the pattern color like every other pattern. ---------- */
 .newton-selector-choice-tile_pattern-noise
   .newton-selector-choice-tile__pattern {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.8 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  background-size: 160px 160px;
+  background-color: currentColor;
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.8 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.8 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   opacity: 0.14;
-  mix-blend-mode: multiply;
 }
 
 /* --- Paper — gentle crosshatch feel like aged paper. ---------------- */
@@ -1502,94 +1447,93 @@
    SURFACE GRADIENTS
    Background gradient behind the pattern and content. Patterns compose on
    top, so you can combine e.g. `gradient-radial` surface + `dots` pattern.
-   Applied to the label's ::before via a sibling span would conflict with
-   pattern; instead we set the label background directly.
+   Every surface mixes toward --_srf-bg-base, which the elevation sets.
    ============================================================================= */
 
 /* Tone palette for surface — same colors, separate var so surface can be
    tinted independently from patterns and corners. */
 .newton-selector-choice-tile_stone-neutral {
-  --_srf-color: var(--slds-g-color-neutral-base-50, #747474);
+  --_srf-color: var(--slds-g-color-neutral-base-50, #757575);
 }
 .newton-selector-choice-tile_stone-brand {
-  --_srf-color: var(--slds-g-color-brand-base-50, #0176d3);
+  --_srf-color: var(--_tone-brand);
 }
 .newton-selector-choice-tile_stone-success {
-  --_srf-color: var(--slds-g-color-success-base-50, #3baa6f);
+  --_srf-color: var(--_tone-success);
 }
 .newton-selector-choice-tile_stone-warning {
-  --_srf-color: var(--slds-g-color-warning-base-50, #b25900);
+  --_srf-color: var(--_tone-warning);
 }
 .newton-selector-choice-tile_stone-error {
-  --_srf-color: var(--slds-g-color-error-base-50, #ba0517);
+  --_srf-color: var(--_tone-error);
 }
 .newton-selector-choice-tile_stone-violet {
-  --_srf-color: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_srf-color: var(--_tone-violet);
 }
 .newton-selector-choice-tile_stone-pink {
-  --_srf-color: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_srf-color: var(--_tone-pink);
 }
 .newton-selector-choice-tile_stone-teal {
-  --_srf-color: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_srf-color: var(--_tone-teal);
 }
 .newton-selector-choice-tile_stone-custom {
   --_srf-color: var(
     --_srf-color-custom,
-    var(--slds-g-color-neutral-base-50, #747474)
+    var(--slds-g-color-neutral-base-50, #757575)
   );
 }
 
 .newton-selector-choice-tile_shtone-neutral {
-  --_srf-color-hover: var(--slds-g-color-neutral-base-50, #747474);
+  --_srf-color-hover: var(--slds-g-color-neutral-base-50, #757575);
 }
 .newton-selector-choice-tile_shtone-brand {
-  --_srf-color-hover: var(--slds-g-color-brand-base-50, #0176d3);
+  --_srf-color-hover: var(--_tone-brand);
 }
 .newton-selector-choice-tile_shtone-success {
-  --_srf-color-hover: var(--slds-g-color-success-base-50, #3baa6f);
+  --_srf-color-hover: var(--_tone-success);
 }
 .newton-selector-choice-tile_shtone-warning {
-  --_srf-color-hover: var(--slds-g-color-warning-base-50, #b25900);
+  --_srf-color-hover: var(--_tone-warning);
 }
 .newton-selector-choice-tile_shtone-error {
-  --_srf-color-hover: var(--slds-g-color-error-base-50, #ba0517);
+  --_srf-color-hover: var(--_tone-error);
 }
 .newton-selector-choice-tile_shtone-violet {
-  --_srf-color-hover: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_srf-color-hover: var(--_tone-violet);
 }
 .newton-selector-choice-tile_shtone-pink {
-  --_srf-color-hover: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_srf-color-hover: var(--_tone-pink);
 }
 .newton-selector-choice-tile_shtone-teal {
-  --_srf-color-hover: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_srf-color-hover: var(--_tone-teal);
 }
 .newton-selector-choice-tile_shtone-custom {
   --_srf-color-hover: var(--_srf-hover-color-custom, var(--_srf-color-normal));
 }
 
 .newton-selector-choice-tile_sstone-neutral {
-  --_srf-color-selected: var(--slds-g-color-neutral-base-50, #747474);
+  --_srf-color-selected: var(--slds-g-color-neutral-base-50, #757575);
 }
 .newton-selector-choice-tile_sstone-brand {
-  --_srf-color-selected: var(--slds-g-color-brand-base-50, #0176d3);
+  --_srf-color-selected: var(--_tone-brand);
 }
 .newton-selector-choice-tile_sstone-success {
-  --_srf-color-selected: var(--slds-g-color-success-base-50, #3baa6f);
+  --_srf-color-selected: var(--_tone-success);
 }
 .newton-selector-choice-tile_sstone-warning {
-  --_srf-color-selected: var(--slds-g-color-warning-base-50, #b25900);
+  --_srf-color-selected: var(--_tone-warning);
 }
 .newton-selector-choice-tile_sstone-error {
-  --_srf-color-selected: var(--slds-g-color-error-base-50, #ba0517);
+  --_srf-color-selected: var(--_tone-error);
 }
 .newton-selector-choice-tile_sstone-violet {
-  --_srf-color-selected: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_srf-color-selected: var(--_tone-violet);
 }
 .newton-selector-choice-tile_sstone-pink {
-  --_srf-color-selected: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_srf-color-selected: var(--_tone-pink);
 }
 .newton-selector-choice-tile_sstone-teal {
-  --_srf-color-selected: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_srf-color-selected: var(--_tone-teal);
 }
 .newton-selector-choice-tile_sstone-custom {
   --_srf-color-selected: var(
@@ -1599,28 +1543,28 @@
 }
 
 .newton-selector-choice-tile_sdtone-neutral {
-  --_srf-color-disabled: var(--slds-g-color-neutral-base-60, #9a9a9a);
+  --_srf-color-disabled: var(--slds-g-color-neutral-base-60, #939393);
 }
 .newton-selector-choice-tile_sdtone-brand {
-  --_srf-color-disabled: var(--slds-g-color-brand-base-50, #0176d3);
+  --_srf-color-disabled: var(--_tone-brand);
 }
 .newton-selector-choice-tile_sdtone-success {
-  --_srf-color-disabled: var(--slds-g-color-success-base-50, #3baa6f);
+  --_srf-color-disabled: var(--_tone-success);
 }
 .newton-selector-choice-tile_sdtone-warning {
-  --_srf-color-disabled: var(--slds-g-color-warning-base-50, #b25900);
+  --_srf-color-disabled: var(--_tone-warning);
 }
 .newton-selector-choice-tile_sdtone-error {
-  --_srf-color-disabled: var(--slds-g-color-error-base-50, #ba0517);
+  --_srf-color-disabled: var(--_tone-error);
 }
 .newton-selector-choice-tile_sdtone-violet {
-  --_srf-color-disabled: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_srf-color-disabled: var(--_tone-violet);
 }
 .newton-selector-choice-tile_sdtone-pink {
-  --_srf-color-disabled: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_srf-color-disabled: var(--_tone-pink);
 }
 .newton-selector-choice-tile_sdtone-teal {
-  --_srf-color-disabled: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_srf-color-disabled: var(--_tone-teal);
 }
 .newton-selector-choice-tile_sdtone-custom {
   --_srf-color-disabled: var(
@@ -1629,11 +1573,7 @@
   );
 }
 
-/* Solid — flat state-aware tint. */
-.newton-selector-choice-tile_surface-solid
-  .newton-selector-choice-tile__figure {
-  background: var(--_srf-solid-bg-current, var(--_choice-tile-surface));
-}
+/* Solid — flat state-aware tint; it is the figure's base background. */
 
 /* Gradient-top — tinted at top, clean at bottom. Applied to the FIGURE
    (not the label) because the figure paints the tile surface via its own
@@ -1642,13 +1582,8 @@
   .newton-selector-choice-tile__figure {
   background: linear-gradient(
     180deg,
-    color-mix(
-        in oklab,
-        var(--_srf-state-color) 14%,
-        var(--slds-g-color-neutral-base-100, #ffffff)
-      )
-      0%,
-    var(--slds-g-color-neutral-base-100, #ffffff) 85%
+    color-mix(in oklab, var(--_srf-state-color) 14%, var(--_srf-bg-base)) 0%,
+    var(--_srf-bg-base) 85%
   );
 }
 
@@ -1657,13 +1592,8 @@
   .newton-selector-choice-tile__figure {
   background: radial-gradient(
     ellipse at 50% 0%,
-    color-mix(
-        in oklab,
-        var(--_srf-state-color) 18%,
-        var(--slds-g-color-neutral-base-100, #ffffff)
-      )
-      0%,
-    var(--slds-g-color-neutral-base-100, #ffffff) 70%
+    color-mix(in oklab, var(--_srf-state-color) 18%, var(--_srf-bg-base)) 0%,
+    var(--_srf-bg-base) 70%
   );
 }
 
@@ -1672,13 +1602,8 @@
   .newton-selector-choice-tile__figure {
   background: linear-gradient(
     calc(135deg * var(--_choice-tile-inline-dir)),
-    color-mix(
-        in oklab,
-        var(--_srf-state-color) 16%,
-        var(--slds-g-color-neutral-base-100, #ffffff)
-      )
-      0%,
-    var(--slds-g-color-neutral-base-100, #ffffff) 60%
+    color-mix(in oklab, var(--_srf-state-color) 16%, var(--_srf-bg-base)) 0%,
+    var(--_srf-bg-base) 60%
   );
 }
 
@@ -1687,7 +1612,7 @@
   background: color-mix(
     in oklab,
     var(--_srf-state-color) 10%,
-    var(--slds-g-color-neutral-base-100, #ffffff)
+    var(--_srf-bg-base)
   );
 }
 
@@ -1700,28 +1625,12 @@
   filter: saturate(1.15) brightness(0.98);
 }
 
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected:not(
-    .newton-selector-choice-tile_surface-solid
-  )
-  .newton-selector-choice-tile__title,
-.newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected:not(
-    .newton-selector-choice-tile_surface-solid
-  )
-  .newton-selector-choice-tile__sub {
-  color: var(--_choice-tile-ink);
-}
-
 .newton-selector-choice-tile_sel-fill.newton-selector-choice-tile_selected.newton-selector-choice-tile_surface-gradient-top
   .newton-selector-choice-tile__figure {
   background: linear-gradient(
     180deg,
-    color-mix(
-        in oklab,
-        var(--_srf-state-color) 22%,
-        var(--slds-g-color-neutral-base-100, #ffffff)
-      )
-      0%,
-    var(--slds-g-color-neutral-base-100, #ffffff) 85%
+    color-mix(in oklab, var(--_srf-state-color) 22%, var(--_srf-bg-base)) 0%,
+    var(--_srf-bg-base) 85%
   );
 }
 
@@ -1729,13 +1638,8 @@
   .newton-selector-choice-tile__figure {
   background: radial-gradient(
     ellipse at 50% 0%,
-    color-mix(
-        in oklab,
-        var(--_srf-state-color) 28%,
-        var(--slds-g-color-neutral-base-100, #ffffff)
-      )
-      0%,
-    var(--slds-g-color-neutral-base-100, #ffffff) 70%
+    color-mix(in oklab, var(--_srf-state-color) 28%, var(--_srf-bg-base)) 0%,
+    var(--_srf-bg-base) 70%
   );
 }
 
@@ -1743,13 +1647,8 @@
   .newton-selector-choice-tile__figure {
   background: linear-gradient(
     calc(135deg * var(--_choice-tile-inline-dir)),
-    color-mix(
-        in oklab,
-        var(--_srf-state-color) 26%,
-        var(--slds-g-color-neutral-base-100, #ffffff)
-      )
-      0%,
-    var(--slds-g-color-neutral-base-100, #ffffff) 60%
+    color-mix(in oklab, var(--_srf-state-color) 26%, var(--_srf-bg-base)) 0%,
+    var(--_srf-bg-base) 60%
   );
 }
 
@@ -1758,115 +1657,114 @@
   background: color-mix(
     in oklab,
     var(--_srf-state-color) 18%,
-    var(--slds-g-color-neutral-base-100, #ffffff)
+    var(--_srf-bg-base)
   );
 }
 
 /* =============================================================================
-   ICON DECORATION — halo / ring / badge / square behind the icon glyph
-   Rendered by a .newton-selector-choice-tile__icon-decor span that sits inside the icon wrap,
-   absolutely positioned behind the icon itself. Color inherits from the
-   chosen iconTone.
+   ICON DECORATION — ring / halo / medal / square behind the icon glyph
+   Rendered by a .newton-selector-choice-tile__icon-decor span inside the icon
+   wrap, absolutely positioned behind the glyph. The decoration sets the shape
+   and its accent, the icon style (filled / outlined / soft / glow) sets the
+   body, and the tone sets the color, so every combination composes.
    ============================================================================= */
 
-/* Icon wrap becomes the positioning context for decoration. Its flex
-   centering also centers the absolutely-positioned decor (static position),
-   which keeps the decor centered in both LTR and RTL. */
-.newton-selector-choice-tile__icon-wrap {
-  --_icn-decor-width: 2.5rem;
-  --_icn-decor-height: 2.5rem;
-  --_icn-wrap-width: var(--_icn-decor-width);
-  --_icn-wrap-height: var(--_icn-decor-height);
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* Decoration size: the tile size's base, 0.5rem larger than the auto glyph.
+   Soft adds one step and Glow two (set on their wrap rules below), because
+   their edges sit further out from the glyph. */
+.newton-selector-choice-tile_size-small {
+  --_icn-decor-base: var(--slds-g-sizing-9, 2rem);
+  --_icn-decor-step: var(--slds-g-sizing-2, 0.25rem);
+}
+.newton-selector-choice-tile_size-medium {
+  --_icn-decor-base: 2.5rem;
+  --_icn-decor-step: var(--slds-g-sizing-3, 0.5rem);
+}
+.newton-selector-choice-tile_size-large {
+  --_icn-decor-base: 3.5rem;
+  --_icn-decor-step: var(--slds-g-sizing-3, 0.5rem);
 }
 
-/* Fix-size the wrap so it has deterministic bounds. Matches icon-decor
-   sizing so the glyph centers inside the shape. */
+/* Ring, Halo and Medal draw an accent outside the circle body, so their wrap
+   grows by that accent and the layout keeps room for it. */
+.newton-selector-choice-tile__icon-wrap_decor-ring,
+.newton-selector-choice-tile__icon-wrap_decor-halo,
+.newton-selector-choice-tile__icon-wrap_decor-badge {
+  --_icn-wrap-width: calc(
+    var(--_icn-decor-width) + 2 * var(--slds-g-sizing-2, 0.25rem)
+  );
+  --_icn-wrap-height: var(--_icn-wrap-width);
+}
+
+/* Fix-size the wrap so it has deterministic bounds and the glyph centers
+   inside the decoration. */
 .newton-selector-choice-tile__icon-wrap_shape-circle,
 .newton-selector-choice-tile__icon-wrap_shape-square {
   width: var(--_icn-wrap-width);
   height: var(--_icn-wrap-height);
 }
 
-.newton-selector-choice-tile__icon-wrap_decor-halo {
-  --_icn-decor-width: var(--slds-g-sizing-10, 3rem);
-  --_icn-decor-height: var(--slds-g-sizing-10, 3rem);
-}
-
-/* Soft / glow styles need extra breathing room around the glyph. */
-.newton-selector-choice-tile__icon-wrap_style-soft {
-  --_icn-decor-width: var(--slds-g-sizing-10, 3rem);
-  --_icn-decor-height: var(--slds-g-sizing-10, 3rem);
-}
-
-.newton-selector-choice-tile__icon-wrap_style-glow {
-  --_icn-decor-width: 3.5rem;
-  --_icn-decor-height: 3.5rem;
-}
-
 /* Shared tone palette for icon decoration. */
 .newton-selector-choice-tile__icon-wrap_tone-neutral {
-  --_icn-color: var(--slds-g-color-neutral-base-50, #747474);
+  --_icn-color: var(--slds-g-color-neutral-base-50, #757575);
 }
 .newton-selector-choice-tile__icon-wrap_tone-brand {
-  --_icn-color: var(--slds-g-color-brand-base-50, #0176d3);
+  --_icn-color: var(--_tone-brand);
 }
 .newton-selector-choice-tile__icon-wrap_tone-success {
-  --_icn-color: var(--slds-g-color-success-base-50, #3baa6f);
+  --_icn-color: var(--_tone-success);
 }
 .newton-selector-choice-tile__icon-wrap_tone-warning {
-  --_icn-color: var(--slds-g-color-warning-base-50, #b25900);
+  --_icn-color: var(--_tone-warning);
 }
 .newton-selector-choice-tile__icon-wrap_tone-error {
-  --_icn-color: var(--slds-g-color-error-base-50, #ba0517);
+  --_icn-color: var(--_tone-error);
 }
 .newton-selector-choice-tile__icon-wrap_tone-violet {
-  --_icn-color: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_icn-color: var(--_tone-violet);
 }
 .newton-selector-choice-tile__icon-wrap_tone-pink {
-  --_icn-color: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_icn-color: var(--_tone-pink);
 }
 .newton-selector-choice-tile__icon-wrap_tone-teal {
-  --_icn-color: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_icn-color: var(--_tone-teal);
 }
 /* Custom tone — the hex value is injected as --_icn-color-custom on the
    wrapper via inline style. When active, override --_icn-color to use it. */
 .newton-selector-choice-tile__icon-wrap_tone-custom {
   --_icn-color: var(
     --_icn-color-custom,
-    var(--slds-g-color-neutral-base-50, #747474)
+    var(--slds-g-color-neutral-base-50, #757575)
   );
 }
 
 /* Glyph tone palette — controls the icon color independent of the decor
    fill color. `contrast` means "white on filled, tone-color on outlined/
-   soft/glow" (handled per-style below). */
+   soft/glow" (resolved in the tile JS; the glyph-contrast class is only
+   applied for filled). */
 .newton-selector-choice-tile__icon-wrap_glyph-neutral {
   --_icn-glyph-color: var(--slds-g-color-neutral-base-40, #5c5c5c);
 }
 .newton-selector-choice-tile__icon-wrap_glyph-brand {
-  --_icn-glyph-color: var(--slds-g-color-brand-base-50, #0176d3);
+  --_icn-glyph-color: var(--_tone-brand);
 }
 .newton-selector-choice-tile__icon-wrap_glyph-success {
-  --_icn-glyph-color: var(--slds-g-color-success-base-50, #3baa6f);
+  --_icn-glyph-color: var(--_tone-success);
 }
 .newton-selector-choice-tile__icon-wrap_glyph-warning {
-  --_icn-glyph-color: var(--slds-g-color-warning-base-50, #b25900);
+  --_icn-glyph-color: var(--_tone-warning);
 }
 .newton-selector-choice-tile__icon-wrap_glyph-error {
-  --_icn-glyph-color: var(--slds-g-color-error-base-50, #ba0517);
+  --_icn-glyph-color: var(--_tone-error);
 }
 .newton-selector-choice-tile__icon-wrap_glyph-violet {
-  --_icn-glyph-color: var(--slds-g-color-palette-purple-50, #6d42c1);
+  --_icn-glyph-color: var(--_tone-violet);
 }
 .newton-selector-choice-tile__icon-wrap_glyph-pink {
-  --_icn-glyph-color: var(--slds-g-color-palette-pink-50, #c9257b);
+  --_icn-glyph-color: var(--_tone-pink);
 }
 .newton-selector-choice-tile__icon-wrap_glyph-teal {
-  --_icn-glyph-color: var(--slds-g-color-palette-teal-50, #0f7b82);
+  --_icn-glyph-color: var(--_tone-teal);
 }
 .newton-selector-choice-tile__icon-wrap_glyph-custom {
   --_icn-glyph-color: var(
@@ -1886,69 +1784,15 @@
   position: absolute;
   z-index: 0;
   pointer-events: none;
+  box-sizing: border-box;
   width: var(--_icn-decor-width);
   height: var(--_icn-decor-height);
 }
 
 /* Icon sits above the decoration. */
-.newton-selector-choice-tile__icon,
-.newton-selector-choice-tile__icon-wrap c-newton-selector-icon {
+.newton-selector-choice-tile__icon {
   position: relative;
   z-index: 1;
-}
-
-/* Ring — thin circular outline. */
-.newton-selector-choice-tile__icon-wrap_decor-ring
-  .newton-selector-choice-tile__icon-decor {
-  border-radius: var(--slds-g-radius-border-circle, 50%);
-  border: var(--slds-g-sizing-border-2, 2px) solid
-    var(--_icn-color, currentColor);
-  opacity: 0.55;
-}
-
-/* Halo — soft glowing gradient (like a lens flare). */
-.newton-selector-choice-tile__icon-wrap_decor-halo
-  .newton-selector-choice-tile__icon-decor {
-  border-radius: var(--slds-g-radius-border-circle, 50%);
-  background: radial-gradient(
-    circle at center,
-    color-mix(in oklab, var(--_icn-color, currentColor) 28%, transparent) 0%,
-    color-mix(in oklab, var(--_icn-color, currentColor) 6%, transparent) 55%,
-    transparent 75%
-  );
-  width: var(--_icn-decor-width);
-  height: var(--_icn-decor-height);
-}
-
-/* =============================================================================
-   ICON DECORATION × STYLE × SHADING — optional glyph background system.
-
-   Lucide glyphs render as currentColor. CSS controls the decoration shape,
-   fill/outline/glow treatment, optional shading, and glyph color via `color`
-   on the wrap.
-
-   Shape is expressed via border-radius — circle or square.
-
-   Style layers on top:
-     - filled   : solid tinted background
-     - outlined : transparent body + ring
-     - soft     : dashed low-opacity outline + dimmed glyph ("empty space")
-     - glow     : soft radial gradient
-   ============================================================================= */
-
-/* Soft style is a "ghost placeholder" — slightly larger so the dashed edge
-   sits comfortably outside the glyph baseline. */
-.newton-selector-choice-tile__icon-wrap_style-soft
-  .newton-selector-choice-tile__icon-decor {
-  width: var(--_icn-decor-width);
-  height: var(--_icn-decor-height);
-}
-
-/* Glow has the largest footprint since its gradient fades out. */
-.newton-selector-choice-tile__icon-wrap_style-glow
-  .newton-selector-choice-tile__icon-decor {
-  width: var(--_icn-decor-width);
-  height: var(--_icn-decor-height);
 }
 
 /* --- SHAPE: border-radius-based -------------------------------------- */
@@ -1960,6 +1804,68 @@
   .newton-selector-choice-tile__icon-decor {
   border-radius: var(--slds-g-radius-border-2, 0.5rem);
 }
+
+/* --- DECORATION ACCENTS ---------------------------------------------- */
+/* Each accent uses a property no icon style sets (outline or a ::before
+   layer), so it shows on every style. */
+
+/* Ring — a thin concentric outline around the circle body. */
+.newton-selector-choice-tile__icon-wrap_decor-ring
+  .newton-selector-choice-tile__icon-decor {
+  outline: var(--slds-g-sizing-border-1, 1px) solid
+    color-mix(in oklab, var(--_icn-color, currentColor) 60%, transparent);
+  outline-offset: var(--slds-g-sizing-border-3, 3px);
+}
+
+/* Halo — a soft glowing aura around the circle body. */
+.newton-selector-choice-tile__icon-wrap_decor-halo
+  .newton-selector-choice-tile__icon-decor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    0 0 0 var(--slds-g-sizing-2, 0.25rem)
+      color-mix(in oklab, var(--_icn-color, currentColor) 14%, transparent),
+    0 0 var(--slds-g-sizing-3, 0.5rem) var(--slds-g-sizing-2, 0.25rem)
+      color-mix(in oklab, var(--_icn-color, currentColor) 28%, transparent);
+}
+
+/* Medal — a notched rosette rim around the circle body. */
+.newton-selector-choice-tile__icon-wrap_decor-badge
+  .newton-selector-choice-tile__icon-decor::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--slds-g-sizing-2, 0.25rem) * -1);
+  border-radius: var(--slds-g-radius-border-circle, 50%);
+  background: radial-gradient(
+    closest-side,
+    transparent calc(100% - var(--slds-g-sizing-2, 0.25rem)),
+    color-mix(in oklab, var(--_icn-color, currentColor) 45%, transparent) 0
+  );
+  mask-image: repeating-conic-gradient(
+    #000 0deg 10deg,
+    transparent 10deg 20deg
+  );
+  -webkit-mask-image: repeating-conic-gradient(
+    #000 0deg 10deg,
+    transparent 10deg 20deg
+  );
+}
+
+/* =============================================================================
+   ICON DECORATION × STYLE × SHADING — optional glyph background system.
+
+   Lucide glyphs render as currentColor. CSS controls the decoration shape,
+   fill/outline/glow treatment, optional shading, and glyph color via `color`
+   on the wrap.
+
+   Style layers on top of the shape:
+     - filled   : solid tinted background
+     - outlined : transparent body + ring
+     - soft     : dashed low-opacity outline + dimmed glyph ("empty space")
+     - glow     : soft radial gradient
+   ============================================================================= */
 
 /* --- STYLE: filled — solid tinted background, glyph in glyph-color ---- */
 .newton-selector-choice-tile__icon-wrap_style-filled
@@ -2039,6 +1945,7 @@
 }
 
 .newton-selector-choice-tile__icon-wrap_style-soft {
+  --_icn-decor-steps: 1;
   color: color-mix(
     in oklab,
     var(--_icn-glyph-color, var(--_icn-color, currentColor)) 50%,
@@ -2065,31 +1972,6 @@
 }
 
 .newton-selector-choice-tile__icon-wrap_style-glow {
+  --_icn-decor-steps: 2;
   color: var(--_icn-glyph-color, var(--_icn-color, currentColor));
-}
-
-/* Size scaling — make decoration scale with tile size. */
-.newton-selector-choice-tile_size-small
-  .newton-selector-choice-tile__icon-wrap_shape-circle,
-.newton-selector-choice-tile_size-small
-  .newton-selector-choice-tile__icon-wrap_shape-square {
-  --_icn-decor-width: var(--slds-g-sizing-9, 2rem);
-  --_icn-decor-height: var(--slds-g-sizing-9, 2rem);
-}
-.newton-selector-choice-tile_size-large
-  .newton-selector-choice-tile__icon-wrap_shape-circle,
-.newton-selector-choice-tile_size-large
-  .newton-selector-choice-tile__icon-wrap_shape-square {
-  --_icn-decor-width: var(--slds-g-sizing-10, 3rem);
-  --_icn-decor-height: var(--slds-g-sizing-10, 3rem);
-}
-.newton-selector-choice-tile_size-small
-  .newton-selector-choice-tile__icon-wrap_decor-halo {
-  --_icn-decor-width: 2.5rem;
-  --_icn-decor-height: 2.5rem;
-}
-.newton-selector-choice-tile_size-large
-  .newton-selector-choice-tile__icon-wrap_decor-halo {
-  --_icn-decor-width: 3.5rem;
-  --_icn-decor-height: 3.5rem;
 }

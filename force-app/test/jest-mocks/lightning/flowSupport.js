@@ -18,3 +18,13 @@ export class FlowNavigationNextEvent extends CustomEvent {
     });
   }
 }
+
+export class FlowNavigationFinishEvent extends CustomEvent {
+  constructor() {
+    super("flownavigationfinish", {
+      bubbles: true,
+      composed: true,
+      cancelable: false
+    });
+  }
+}

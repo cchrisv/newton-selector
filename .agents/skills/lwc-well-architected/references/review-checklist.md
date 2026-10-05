@@ -3,10 +3,10 @@
 ## Universal Checks (All Levels)
 
 ### Naming & Structure
-- [ ] Component name follows `{app}{Level}{PascalName}` convention
+- [ ] Component name follows `{app}{PascalName}` (`{app}Utility{Name}` for utilities, `{app}Flow{Name}` for Flow components)
 - [ ] App prefix is consistent across the project
-- [ ] Level in name matches actual component responsibilities
-- [ ] File structure: `.js`, `.html`, `.css` (if needed), `.js-meta.xml`, `__tests__/`
+- [ ] Component responsibilities match its level
+- [ ] File structure: `.js`, `.html`, `.css` (if needed), `.js-meta.xml`
 
 ### Public API
 - [ ] All `@api` properties have JSDoc with `@type` and `@default`
@@ -77,10 +77,10 @@
 - [ ] **All states handled** — loading, error, empty, populated
 - [ ] **Connected flag pattern** for safe async lifecycle
 - [ ] **Cleanup in disconnectedCallback** — timers, listeners, subscriptions
-- [ ] **FLS/sharing enforced** at Apex layer (`WITH SECURITY_ENFORCED` or `stripInaccessible`)
+- [ ] **FLS/sharing enforced** at Apex layer (`with sharing`, queries in `AccessLevel.USER_MODE`)
 - [ ] Cross-context tested (desktop, mobile, Experience Cloud if applicable)
 - [ ] Normalize data into unified item shape for children
-- [ ] Business validation logic present and tested
+- [ ] Business validation logic present, with its behavior covered by the E2E script
 
 ---
 
@@ -112,7 +112,6 @@
 - [ ] **Stateless exports** (or cache with clear invalidation API)
 - [ ] **Documented exports** — JSDoc on every public function
 - [ ] **No side effects** on import — module initializes lazily
-- [ ] Unit tested with input/output assertions
 
 ---
 

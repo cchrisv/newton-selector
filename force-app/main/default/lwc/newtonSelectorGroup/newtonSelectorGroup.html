@@ -42,6 +42,7 @@
         class={groupClass}
         style={groupStyle}
         oncardselect={handleCardSelect}
+        oncardrepick={handleCardRepick}
       >
         <template for:each={cards} for:item="item">
           <c-newton-selector-choice-tile
@@ -67,7 +68,7 @@
 
     <template lwc:if={isPicklist}>
       <div
-        class={picklistClass}
+        class="newton-picklist"
         style={groupStyle}
         onfocusout={handlePicklistFocusOut}
       >
@@ -88,6 +89,7 @@
               </template>
 
               <button
+                lwc:ref="trigger"
                 class={picklistInputClass}
                 type="button"
                 role="combobox"
@@ -136,7 +138,7 @@
                       </span>
                       <input
                         type="search"
-                        class="slds-input newton-picklist__search-input"
+                        class="slds-input"
                         placeholder={labels.searchOptions}
                         value={_searchTerm}
                         oninput={handleSearch}
@@ -153,12 +155,16 @@
                     id={picklistListboxId}
                     class="slds-listbox slds-listbox_vertical newton-picklist__listbox"
                     role="listbox"
-                    aria-label={labels.picklistOptions}
+                    aria-label={picklistAriaLabel}
                     aria-multiselectable={picklistAriaMultiselectable}
                     onmousedown={handlePicklistOptionMouseDown}
                   >
                     <template for:each={picklistItems} for:item="item">
-                      <li key={item.id} class={item._class} role="presentation">
+                      <li
+                        key={item.id}
+                        class="slds-listbox__item"
+                        role="presentation"
+                      >
                         <div
                           id={item._optionId}
                           class={item._optionClass}
@@ -168,11 +174,13 @@
                           data-value={item.value}
                           onclick={handlePicklistOptionSelect}
                         >
-                          <c-newton-selector-flow-cpe-lookup-choice-option
-                            row={item}
-                            search-term={_searchTerm}
+                          <c-newton-selector-choice-tile
+                            item={item}
                             selected={item._selected}
-                          ></c-newton-selector-flow-cpe-lookup-choice-option>
+                            disabled={item._disabled}
+                            presentational
+                            lwc:spread={tileProps}
+                          ></c-newton-selector-choice-tile>
                         </div>
                       </li>
                     </template>
@@ -195,6 +203,7 @@
         class={groupClass}
         style={groupStyle}
         oncardselect={handleCardSelect}
+        oncardrepick={handleCardRepick}
       >
         <template for:each={radioItems} for:item="item">
           <div key={item.id} class={item._radioClass}>
@@ -253,37 +262,84 @@
               />
             </div>
           </template>
-          <div
-            class="newton-transfer__list"
-            role="group"
-            aria-labelledby={availableLabelId}
-            oncardselect={handleAvailableCardSelect}
-          >
-            <template lwc:if={hasAvailableItems}>
-              <template for:each={transferAvailableItems} for:item="item">
-                <div
-                  key={item.id}
-                  class={item._class}
-                  data-value={item.value}
-                  draggable={item._draggable}
-                  ondragstart={handleDragStart}
-                >
-                  <c-newton-selector-choice-tile
-                    item={item}
-                    selected={item._selected}
-                    disabled={item._disabled}
-                    lwc:spread={tileProps}
-                  ></c-newton-selector-choice-tile>
-                </div>
+          <template lwc:if={isDualListbox}>
+            <div class="newton-transfer__list">
+              <ul
+                class="slds-listbox slds-listbox_vertical newton-transfer__options"
+                role="listbox"
+                aria-label={labels.availableOptions}
+                aria-multiselectable={dualMultiselectable}
+                data-zone="available"
+                onkeydown={handleDualKeydown}
+              >
+                <template for:each={transferAvailableItems} for:item="item">
+                  <li
+                    key={item.id}
+                    class="slds-listbox__item"
+                    role="presentation"
+                  >
+                    <div
+                      class="newton-transfer__option"
+                      role="option"
+                      tabindex={item._tabindex}
+                      aria-selected={item._ariaSelected}
+                      aria-disabled={item._ariaDisabled}
+                      data-zone="available"
+                      data-value={item.value}
+                      onclick={handleDualOptionClick}
+                    >
+                      <c-newton-selector-choice-tile
+                        item={item}
+                        selected={item._selected}
+                        disabled={item._disabled}
+                        presentational
+                        lwc:spread={tileProps}
+                      ></c-newton-selector-choice-tile>
+                    </div>
+                  </li>
+                </template>
+              </ul>
+              <template lwc:if={isAvailableEmpty}>
+                <p class="newton-transfer__empty">{availableEmptyMessage}</p>
               </template>
-            </template>
-            <template lwc:else>
-              <p class="newton-transfer__empty">{availableEmptyMessage}</p>
-            </template>
-          </div>
+            </div>
+          </template>
+          <template lwc:else>
+            <div
+              class="newton-transfer__list"
+              role="group"
+              aria-labelledby={availableLabelId}
+              oncardselect={handleAvailableCardSelect}
+            >
+              <template lwc:if={hasAvailableItems}>
+                <template for:each={transferAvailableItems} for:item="item">
+                  <div
+                    key={item.id}
+                    class="newton-transfer__item newton-transfer__item_draggable"
+                    data-value={item.value}
+                    draggable={item._draggable}
+                    ondragstart={handleDragStart}
+                  >
+                    <c-newton-selector-choice-tile
+                      item={item}
+                      selected={item._selected}
+                      disabled={item._disabled}
+                      lwc:spread={tileProps}
+                    ></c-newton-selector-choice-tile>
+                  </div>
+                </template>
+              </template>
+              <template lwc:else>
+                <p class="newton-transfer__empty">{availableEmptyMessage}</p>
+              </template>
+            </div>
+          </template>
         </section>
 
         <template lwc:if={isDualListbox}>
+          <div class="slds-assistive-text" aria-live="polite">
+            {_dualAnnouncement}
+          </div>
           <div
             class="newton-transfer__controls"
             role="group"
@@ -364,34 +420,78 @@
             >
             <span class="newton-transfer__count">{selectedCountLabel}</span>
           </header>
-          <div
-            class="newton-transfer__list"
-            role="group"
-            aria-labelledby={selectedLabelId}
-            oncardselect={handleSelectedCardSelect}
-          >
-            <template lwc:if={hasSelectedItems}>
-              <template for:each={transferSelectedItems} for:item="item">
-                <div
-                  key={item.id}
-                  class={item._class}
-                  data-value={item.value}
-                  draggable={item._draggable}
-                  ondragstart={handleDragStart}
-                >
-                  <c-newton-selector-choice-tile
-                    item={item}
-                    selected={item._selected}
-                    disabled={item._disabled}
-                    lwc:spread={tileProps}
-                  ></c-newton-selector-choice-tile>
-                </div>
+          <template lwc:if={isDualListbox}>
+            <div class="newton-transfer__list">
+              <ul
+                class="slds-listbox slds-listbox_vertical newton-transfer__options"
+                role="listbox"
+                aria-label={labels.chosenOptions}
+                aria-multiselectable={dualMultiselectable}
+                data-zone="selected"
+                onkeydown={handleDualKeydown}
+              >
+                <template for:each={transferSelectedItems} for:item="item">
+                  <li
+                    key={item.id}
+                    class="slds-listbox__item"
+                    role="presentation"
+                  >
+                    <div
+                      class="newton-transfer__option"
+                      role="option"
+                      tabindex={item._tabindex}
+                      aria-selected={item._ariaSelected}
+                      aria-disabled={item._ariaDisabled}
+                      data-zone="selected"
+                      data-value={item.value}
+                      onclick={handleDualOptionClick}
+                    >
+                      <c-newton-selector-choice-tile
+                        item={item}
+                        selected={item._selected}
+                        disabled={item._disabled}
+                        presentational
+                        lwc:spread={tileProps}
+                      ></c-newton-selector-choice-tile>
+                    </div>
+                  </li>
+                </template>
+              </ul>
+              <template lwc:if={isSelectedEmpty}>
+                <p class="newton-transfer__empty">{selectedEmptyMessage}</p>
               </template>
-            </template>
-            <template lwc:else>
-              <p class="newton-transfer__empty">{selectedEmptyMessage}</p>
-            </template>
-          </div>
+            </div>
+          </template>
+          <template lwc:else>
+            <div
+              class="newton-transfer__list"
+              role="group"
+              aria-labelledby={selectedLabelId}
+              oncardselect={handleSelectedCardSelect}
+            >
+              <template lwc:if={hasSelectedItems}>
+                <template for:each={transferSelectedItems} for:item="item">
+                  <div
+                    key={item.id}
+                    class="newton-transfer__item newton-transfer__item_draggable"
+                    data-value={item.value}
+                    draggable={item._draggable}
+                    ondragstart={handleDragStart}
+                  >
+                    <c-newton-selector-choice-tile
+                      item={item}
+                      selected={item._selected}
+                      disabled={item._disabled}
+                      lwc:spread={tileProps}
+                    ></c-newton-selector-choice-tile>
+                  </div>
+                </template>
+              </template>
+              <template lwc:else>
+                <p class="newton-transfer__empty">{selectedEmptyMessage}</p>
+              </template>
+            </div>
+          </template>
         </section>
       </div>
     </template>
@@ -409,11 +509,14 @@
             value={manualInputValue}
             minlength={manualInputMinLength}
             maxlength={manualInputMaxLength}
+            aria-describedby={manualInputDescribedBy}
             oninput={handleManualInput}
           />
         </div>
         <template lwc:if={manualInputHelpText}>
-          <div class="slds-form-element__help">{manualInputHelpText}</div>
+          <div id="manual-input-help" class="slds-form-element__help">
+            {manualInputHelpText}
+          </div>
         </template>
       </div>
     </template>

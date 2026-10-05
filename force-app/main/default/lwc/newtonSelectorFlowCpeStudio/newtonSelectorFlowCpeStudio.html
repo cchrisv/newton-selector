@@ -24,34 +24,33 @@
       </div>
 
       <section class="newton-studio__controls">
-        <template lwc:if={hasTabs}>
-          <nav class="newton-studio__tabs" aria-label="Configuration chapters">
-            <template for:each={tabs} for:item="tab">
-              <button
-                key={tab.key}
-                type="button"
-                class={tab.tabClass}
-                data-key={tab.key}
-                aria-current={tab.ariaCurrent}
-                onclick={handleTabClick}
-              >
-                <c-newton-selector-icon
-                  name={tab.icon}
-                  size="xx-small"
-                  alternative-text=""
-                ></c-newton-selector-icon>
-                <span class="newton-studio__tab-label">{tab.label}</span>
-                <template lwc:if={tab.showStatus}>
-                  <span
-                    class={tab.statusClass}
-                    role="img"
-                    aria-label={tab.statusLabel}
-                  ></span>
-                </template>
-              </button>
-            </template>
-          </nav>
-        </template>
+        <nav class="newton-studio__tabs" aria-label="Configuration chapters">
+          <template for:each={tabs} for:item="tab">
+            <button
+              key={tab.key}
+              type="button"
+              class={tab.tabClass}
+              data-key={tab.key}
+              aria-current={tab.ariaCurrent}
+              onclick={handleTabClick}
+            >
+              <c-newton-selector-icon
+                name={tab.icon}
+                size="xx-small"
+                alternative-text=""
+              ></c-newton-selector-icon>
+              <span class="newton-studio__tab-label">{tab.label}</span>
+              <template lwc:if={tab.showStatus}>
+                <span
+                  class={tab.statusClass}
+                  role="img"
+                  aria-label={tab.statusLabel}
+                ></span>
+              </template>
+            </button>
+          </template>
+        </nav>
+        <slot name="issues"></slot>
         <div class="newton-studio__scroll">
           <slot name="controls" onslotchange={handleControlsSlotChange}></slot>
         </div>

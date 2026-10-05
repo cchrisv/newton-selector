@@ -79,8 +79,8 @@
       <div
         class="slds-card__body slds-card__body_inner newton-studio__field-block"
       >
-        <template lwc:if={_loadError}>
-          <p class="slds-text-color_error" role="alert">{_loadError}</p>
+        <template lwc:if={_searchError}>
+          <p class="slds-text-color_error" role="alert">{_searchError}</p>
         </template>
         <template lwc:if={isPicklistMode}>
           <c-newton-selector-combobox
@@ -88,19 +88,26 @@
             label="Object"
             placeholder="Search objects..."
             required
-            min-search-term-length="0"
             selection={picklistObjectSelection}
-            onsearch={handlePicklistObjectSearch}
+            onsearch={handleObjectSearch}
             onselectionchange={handlePicklistObjectSelect}
           ></c-newton-selector-combobox>
           <c-newton-selector-flow-cpe-field-selector
             label="Picklist field"
             required
             field-type-filter="PICKLIST,MULTIPICKLIST"
-            object-api-name={_config.picklist.objectApiName}
-            value={_config.picklist.fieldApiName}
+            object-api-name={config.picklist.objectApiName}
+            value={config.picklist.fieldApiName}
             onfieldchange={handlePicklistFieldChange}
           ></c-newton-selector-flow-cpe-field-selector>
+          <template lwc:if={_recordTypeError}>
+            <p class="slds-text-color_error" role="alert">{_recordTypeError}</p>
+          </template>
+          <template lwc:if={_picklistValuesError}>
+            <p class="slds-text-color_error" role="alert">
+              {_picklistValuesError}
+            </p>
+          </template>
           <template lwc:if={hasRecordTypeOptions}>
             <c-newton-selector-flow-cpe-choice-control
               label="Record type"
@@ -108,7 +115,7 @@
               items={recordTypeOptions}
               enable-search
               onvaluechange={handleRecordTypeComboChange}
-              field-level-help="Pick which record type's picklist values to pull. Default uses the object's default record type for this org."
+              field-level-help="Pick which record type's picklist values to pull. Master uses every active value of the field."
             ></c-newton-selector-flow-cpe-choice-control>
           </template>
           <c-newton-selector-flow-cpe-choice-control
@@ -126,7 +133,7 @@
             required
             builder-context-filter-type="SObject"
             builder-context-filter-collection-boolean
-            value={_sourceRecordsRef}
+            value={sourceRecordsRef}
             onvaluechanged={handleCollectionVariableChange}
             builder-context={builderContext}
             automatic-output-variables={automaticOutputVariables}
@@ -150,42 +157,42 @@
                 data-field="label"
                 required
                 object-api-name={collectionObjectApiName}
-                value={_config.collection.fieldMap.label}
+                value={config.collection.fieldMap.label}
                 onfieldchange={handleCollectionFieldMapChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Value"
                 data-field="value"
                 object-api-name={collectionObjectApiName}
-                value={_config.collection.fieldMap.value}
+                value={config.collection.fieldMap.value}
                 onfieldchange={handleCollectionFieldMapChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Sublabel"
                 data-field="sublabel"
                 object-api-name={collectionObjectApiName}
-                value={_config.collection.fieldMap.sublabel}
+                value={config.collection.fieldMap.sublabel}
                 onfieldchange={handleCollectionFieldMapChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Icon"
                 data-field="icon"
                 object-api-name={collectionObjectApiName}
-                value={_config.collection.fieldMap.icon}
+                value={config.collection.fieldMap.icon}
                 onfieldchange={handleCollectionFieldMapChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Badge"
                 data-field="badge"
                 object-api-name={collectionObjectApiName}
-                value={_config.collection.fieldMap.badge}
+                value={config.collection.fieldMap.badge}
                 onfieldchange={handleCollectionFieldMapChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Help text"
                 data-field="helpText"
                 object-api-name={collectionObjectApiName}
-                value={_config.collection.fieldMap.helpText}
+                value={config.collection.fieldMap.helpText}
                 onfieldchange={handleCollectionFieldMapChange}
               ></c-newton-selector-flow-cpe-field-selector>
             </div>
@@ -198,74 +205,74 @@
             label="Object"
             placeholder="Search objects..."
             required
-            min-search-term-length="0"
             selection={sobjectSelection}
-            onsearch={handleSObjectSearch}
+            onsearch={handleObjectSearch}
             onselectionchange={handleSObjectSelect}
           ></c-newton-selector-combobox>
-          <section
-            class="newton-query-preview"
-            aria-labelledby="newton-query-preview-title"
-          >
-            <header class="newton-query-preview__head">
-              <div>
-                <p class="newton-query-preview__eyebrow">SOQL preview</p>
-                <h4
-                  id="newton-query-preview-title"
-                  class="newton-query-preview__title"
-                >
-                  Validate the generated query
-                </h4>
-              </div>
-              <div class="newton-query-preview__actions">
-                <button
-                  type="button"
-                  class="slds-button slds-button_icon slds-button_icon-border-filled"
-                  title="Copy query"
-                  onclick={handleCopyQueryPreview}
-                >
-                  <c-newton-selector-icon
-                    name="copy"
-                    size="x-small"
-                    box="button"
-                    alternative-text=""
-                  ></c-newton-selector-icon>
-                  <span class="slds-assistive-text">Copy query</span>
-                </button>
-                <lightning-button
-                  variant="brand-outline"
-                  label={validateQueryLabel}
-                  onclick={handleValidateQuery}
-                  disabled={_isValidatingQuery}
-                ></lightning-button>
-              </div>
-            </header>
-            <pre
-              class="newton-query-preview__code"
-            ><code aria-label="Generated SOQL preview"><template for:each={highlightedSobjectQueryPreview} for:item="token"><span key={token.key} class={token.className}>{token.text}</span></template></code></pre>
-            <p class={queryValidationClass} role="status">
-              {queryValidationMessage}
-            </p>
-          </section>
+          <template lwc:if={hasSobjectObject}>
+            <section
+              class="newton-query-preview"
+              aria-labelledby="newton-query-preview-title"
+            >
+              <header class="newton-query-preview__head">
+                <div>
+                  <p class="newton-query-preview__eyebrow">SOQL preview</p>
+                  <h4
+                    id="newton-query-preview-title"
+                    class="newton-query-preview__title"
+                  >
+                    Validate the generated query
+                  </h4>
+                </div>
+                <div class="newton-query-preview__actions">
+                  <button
+                    type="button"
+                    class="slds-button slds-button_icon slds-button_icon-border-filled"
+                    title="Copy query"
+                    onclick={handleCopyQueryPreview}
+                  >
+                    <c-newton-selector-icon
+                      name="copy"
+                      size="x-small"
+                      box="button"
+                      alternative-text=""
+                    ></c-newton-selector-icon>
+                    <span class="slds-assistive-text">Copy query</span>
+                  </button>
+                  <lightning-button
+                    variant="brand-outline"
+                    label={validateQueryLabel}
+                    onclick={handleValidateQuery}
+                    disabled={_isValidatingQuery}
+                  ></lightning-button>
+                </div>
+              </header>
+              <pre
+                class="newton-query-preview__code"
+              ><code><template for:each={highlightedSobjectQueryPreview} for:item="token"><span key={token.key} class={token.className}>{token.text}</span></template></code></pre>
+              <p class={queryValidationClass} role="status">
+                {queryValidationMessage}
+              </p>
+              <p class={copyStatusClass} role="status">{copyStatusMessage}</p>
+            </section>
+          </template>
           <c-newton-selector-flow-cpe-where-builder
-            object-api-name={_config.sobject.sObjectApiName}
-            value={_config.sobject.whereClause}
+            object-api-name={config.sobject.sObjectApiName}
+            value={config.sobject.whereClause}
             builder-context={builderContext}
             automatic-output-variables={automaticOutputVariables}
             onchange={handleWhereChange}
+            onvaliditychange={handleWhereValidityChange}
           ></c-newton-selector-flow-cpe-where-builder>
-          <c-newton-selector-combobox
-            mode="lookup"
+          <c-newton-selector-flow-cpe-field-selector
             label="Order by"
-            placeholder="None"
-            variant="label-stacked"
-            selection={orderByFieldSelection}
-            min-search-term-length="0"
-            scroll-after-n-items="7"
-            onsearch={handleOrderFieldSearch}
-            onselectionchange={handleOrderFieldSelectionChange}
+            data-field="orderByField"
+            sortable-only
+            object-api-name={config.sobject.sObjectApiName}
+            value={config.sobject.orderByField}
+            onfieldchange={handleSObjectFieldChange}
             class="slds-m-bottom_x-small"
-          ></c-newton-selector-combobox>
+          ></c-newton-selector-flow-cpe-field-selector>
           <c-newton-selector-flow-cpe-choice-control
             label="Direction"
             value={orderByDirection}
@@ -276,7 +283,7 @@
           <lightning-input
             type="number"
             label="Rows to load"
-            value={_config.sobject.limit}
+            value={config.sobject.queryLimit}
             placeholder="50"
             min="1"
             max="2000"
@@ -301,43 +308,43 @@
                 label="Label (required)"
                 data-field="labelField"
                 required
-                object-api-name={_config.sobject.sObjectApiName}
-                value={_config.sobject.labelField}
+                object-api-name={config.sobject.sObjectApiName}
+                value={config.sobject.labelField}
                 onfieldchange={handleSObjectFieldChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Value"
                 data-field="valueField"
-                object-api-name={_config.sobject.sObjectApiName}
-                value={_config.sobject.valueField}
+                object-api-name={config.sobject.sObjectApiName}
+                value={config.sobject.valueField}
                 onfieldchange={handleSObjectFieldChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Sublabel"
                 data-field="sublabelField"
-                object-api-name={_config.sobject.sObjectApiName}
-                value={_config.sobject.sublabelField}
+                object-api-name={config.sobject.sObjectApiName}
+                value={config.sobject.sublabelField}
                 onfieldchange={handleSObjectFieldChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Icon"
                 data-field="iconField"
-                object-api-name={_config.sobject.sObjectApiName}
-                value={_config.sobject.iconField}
+                object-api-name={config.sobject.sObjectApiName}
+                value={config.sobject.iconField}
                 onfieldchange={handleSObjectFieldChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Badge"
                 data-field="badgeField"
-                object-api-name={_config.sobject.sObjectApiName}
-                value={_config.sobject.badgeField}
+                object-api-name={config.sobject.sObjectApiName}
+                value={config.sobject.badgeField}
                 onfieldchange={handleSObjectFieldChange}
               ></c-newton-selector-flow-cpe-field-selector>
               <c-newton-selector-flow-cpe-field-selector
                 label="Help text"
                 data-field="helpField"
-                object-api-name={_config.sobject.sObjectApiName}
-                value={_config.sobject.helpField}
+                object-api-name={config.sobject.sObjectApiName}
+                value={config.sobject.helpField}
                 onfieldchange={handleSObjectFieldChange}
               ></c-newton-selector-flow-cpe-field-selector>
             </div>
@@ -719,7 +726,7 @@
             <lightning-button
               variant="neutral"
               label="Select all shown"
-              onclick={handleSelectAllFiltered}
+              onclick={handleSelectAllShown}
               disabled={hasNoFilteredOverrideRows}
             ></lightning-button>
           </div>
@@ -910,6 +917,14 @@
                   disabled={_isLoadingSample}
                 ></lightning-button>
               </div>
+              <template lwc:if={_sampleIgnoresWhere}>
+                <p
+                  class="slds-text-body_small slds-text-color_weak slds-m-top_x-small"
+                >
+                  Sample rows ignore the WHERE clause because it uses Flow
+                  values.
+                </p>
+              </template>
             </template>
             <template lwc:else>
               <lightning-button
@@ -921,6 +936,7 @@
               <template lwc:if={_sampleLoadError}>
                 <p
                   class="slds-text-color_error slds-text-body_regular slds-m-top_x-small"
+                  role="alert"
                 >
                   {_sampleLoadError}
                 </p>
@@ -982,7 +998,7 @@
             label="Maximum options"
             placeholder="No limit"
             value={displayLimit}
-            min="0"
+            min="1"
             onchange={handleDisplayLimitChange}
             field-level-help="Cap how many options render at runtime. Leave blank to show all."
           ></lightning-input>

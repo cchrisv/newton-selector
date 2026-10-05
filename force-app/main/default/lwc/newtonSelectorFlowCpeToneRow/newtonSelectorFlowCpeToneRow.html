@@ -1,0 +1,53 @@
+<template>
+  <div class="newton-tone-state">
+    <div class="newton-tone-row" role="group" aria-label={groupLabel}>
+      <template lwc:if={label}>
+        <span class="newton-tone-row__eyebrow">{label}</span>
+      </template>
+      <template for:each={chips} for:item="chip">
+        <button
+          key={chip.value}
+          type="button"
+          class={chip.className}
+          data-value={chip.value}
+          aria-pressed={chip.ariaPressed}
+          title={chip.label}
+          disabled={disabled}
+          onclick={handleToneClick}
+        >
+          <span class={chip.dotClassName} aria-hidden="true"></span>
+          <span class="newton-tone-chip__label">{chip.label}</span>
+        </button>
+      </template>
+    </div>
+    <template lwc:if={isCustom}>
+      <div class="newton-hex-row">
+        <label class="newton-hex-row__label" for="tone-hex">Custom color</label>
+        <input
+          id="tone-hex"
+          type="color"
+          class="newton-hex-row__selector"
+          value={swatchValue}
+          oninput={handleHexChange}
+          onchange={handleHexChange}
+          aria-label={colorAriaLabel}
+        />
+        <input
+          type="text"
+          class="newton-hex-row__input"
+          value={hexText}
+          placeholder={hexPlaceholder}
+          onchange={handleHexChange}
+          aria-label={hexAriaLabel}
+          aria-invalid={hexInvalid}
+          aria-describedby="tone-hex-error"
+        />
+        <template lwc:if={hexInvalid}>
+          <p id="tone-hex-error" class="newton-hex-row__error">
+            Use a hex color like #1B96FF.
+          </p>
+        </template>
+      </div>
+    </template>
+  </div>
+</template>

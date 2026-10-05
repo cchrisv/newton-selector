@@ -10,56 +10,80 @@ function listPositions(positions) {
   return `${positions.slice(0, -1).join(", ")} and ${positions[positions.length - 1]}`;
 }
 
+// "Option 2 needs" / "Options 2 and 4 need"
+function optionsPhrase(positions, singularVerb, pluralVerb) {
+  return positions.length === 1
+    ? `Option ${positions[0]} ${singularVerb}`
+    : `Options ${listPositions(positions)} ${pluralVerb}`;
+}
+
+// The runtime reads a blank value as the None option and matches selections
+// by value, so every visible custom option needs its own non-blank value.
+function customValueErrors(items) {
+  const blank = [];
+  const repeated = [];
+  const seen = new Set();
+  items.forEach((item, index) => {
+    if (item.hidden === true) return;
+    const value = String(item.value ?? "");
+    if (value === "") blank.push(index + 1);
+    else if (seen.has(value)) repeated.push(index + 1);
+    else seen.add(value);
+  });
+  const errors = [];
+  if (blank.length) {
+    errors.push(`${optionsPhrase(blank, "needs", "need")} a value.`);
+  }
+  if (repeated.length) {
+    errors.push(
+      `${optionsPhrase(repeated, "repeats", "repeat")} an earlier option's value.`
+    );
+  }
+  return errors;
+}
+
+// config is always a mergeSelectorConfig result, so every key is present.
 export function sectionIssues(key, config, refs = {}) {
   const errors = [];
   const warnings = [];
-  const c = config || {};
+  const c = config;
   const dataSource = c.dataSource;
 
   if (key === "data") {
     if (!dataSource) {
       errors.push("Choose a data source.");
     } else if (dataSource === "picklist") {
-      if (!c.picklist?.objectApiName)
+      if (!c.picklist.objectApiName)
         errors.push("Choose the object that has the picklist field.");
-      if (!c.picklist?.fieldApiName) errors.push("Choose the picklist field.");
+      if (!c.picklist.fieldApiName) errors.push("Choose the picklist field.");
     } else if (dataSource === "collection") {
       if (!refs.sourceRecordsRef) errors.push(CHOOSE_COLLECTION_MESSAGE);
-      if (!c.collection?.fieldMap?.label)
+      if (!c.collection.fieldMap.label)
         errors.push("Choose the field to show as each option's label.");
     } else if (dataSource === "sobject") {
-      if (!c.sobject?.sObjectApiName)
-        errors.push("Choose the object to query.");
+      if (!c.sobject.sObjectApiName) errors.push("Choose the object to query.");
       if (refs.whereIncomplete)
         errors.push("Finish or remove the highlighted filter condition.");
     } else if (dataSource === "custom") {
-      const items = c.custom?.items || [];
-      if (items.length === 0 && !c.manualInput?.enabled) {
+      const items = c.custom.items;
+      if (items.length === 0 && !c.manualInput.enabled) {
         errors.push("Add at least one option.");
       }
+      errors.push(...customValueErrors(items));
       const unlabeled = items
         .map((item, index) => (item.label ? null : index + 1))
         .filter(Boolean);
       if (unlabeled.length) {
-        warnings.push(
-          `${unlabeled.length === 1 ? "Option" : "Options"} ${listPositions(unlabeled)} ${unlabeled.length === 1 ? "needs" : "need"} a label.`
-        );
+        warnings.push(`${optionsPhrase(unlabeled, "needs", "need")} a label.`);
       }
     }
   } else if (key === "behavior") {
-    const min = Number(c.minSelections || 0);
-    const max =
-      c.maxSelections === null ||
-      c.maxSelections === undefined ||
-      c.maxSelections === ""
-        ? null
-        : Number(c.maxSelections);
-    const manual = c.manualInput || {};
-    const manualMin = Number(manual.minLength || 0);
+    const min = Number(c.minSelections);
+    const max = c.maxSelections == null ? null : Number(c.maxSelections);
+    const manual = c.manualInput;
+    const manualMin = Number(manual.minLength);
     const manualMax =
-      manual.maxLength === null || manual.maxLength === undefined
-        ? null
-        : Number(manual.maxLength);
+      manual.maxLength == null ? null : Number(manual.maxLength);
     if (c.selectionMode === "multi" && max != null && max < Math.max(min, 1)) {
       errors.push(
         "Maximum selections must be at least the minimum, and at least 1."
@@ -109,12 +133,15 @@ export function activeSectionIssueList(key, config, refs) {
   ];
 }
 
+// levelLabel is read by screen readers before the message, so a blocking
+// error and a warning don't differ only by icon and color.
 function buildIssue(level, message, index) {
+  const isError = level === "error";
   return {
     key: `${level}-${index}-${message}`,
-    level,
+    levelLabel: isError ? "Error: " : "Warning: ",
     message,
-    icon: level === "error" ? "circle-alert" : "triangle-alert",
-    className: `newton-studio__issue newton-studio__issue_${level}`
+    icon: isError ? "circle-alert" : "triangle-alert",
+    className: `newton-studio__issue_${level}`
   };
 }

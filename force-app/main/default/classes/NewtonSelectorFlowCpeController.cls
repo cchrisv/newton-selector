@@ -1,9 +1,15 @@
-/**
- * @description Apex entry point for Newton Selector Flow CPE LWCs. The controller
- * delegates describe/search work to a service so Aura-facing contracts stay small.
- */
+/** @description Apex entry point for the Newton Selector Flow CPE data pickers: object search and field describe. */
 public with sharing class NewtonSelectorFlowCpeController {
-  /** @description Shared row for selectors and lookup results. */
+  private static final Integer MAX_OBJECT_LOOKUP_ROWS = 80;
+  private static final String OBJECT_ICON = 'box';
+  /** @description Field types a selector cannot render as text: compound address/location and binary. */
+  private static final Set<Schema.DisplayType> UNMAPPABLE_FIELD_TYPES = new Set<Schema.DisplayType>{
+    Schema.DisplayType.BASE64,
+    Schema.DisplayType.ADDRESS,
+    Schema.DisplayType.LOCATION
+  };
+
+  /** @description Object search row. */
   public class ChoiceOption implements Comparable {
     @AuraEnabled
     public String value;
@@ -15,9 +21,6 @@ public with sharing class NewtonSelectorFlowCpeController {
     public String icon;
     @AuraEnabled
     public String sObjectType;
-    /** @description Field rows only: Schema.DisplayType name, e.g. STRING, CURRENCY, REFERENCE. */
-    @AuraEnabled
-    public String type;
 
     /**
      * @description Sorts choice rows by label.
@@ -29,7 +32,7 @@ public with sharing class NewtonSelectorFlowCpeController {
     }
   }
 
-  /** @description Serializable field row for LWC resource selector / field selector. */
+  /** @description Serializable field row for the CPE field pickers. */
   public class Field {
     @AuraEnabled
     public String name;
@@ -37,8 +40,12 @@ public with sharing class NewtonSelectorFlowCpeController {
     public String label;
     @AuraEnabled
     public String type;
+    /** @description True when the field can be used in a WHERE filter (isFilterable). */
     @AuraEnabled
-    public String relationshipName;
+    public Boolean filterable;
+    /** @description True when the field can be used in ORDER BY (isSortable). */
+    @AuraEnabled
+    public Boolean sortable;
 
     /**
      * @description Creates a field describe row.
@@ -60,33 +67,88 @@ public with sharing class NewtonSelectorFlowCpeController {
    */
   @AuraEnabled(cacheable=true)
   public static List<ChoiceOption> searchSObjectTypes(String searchKey) {
-    return NewtonSelectorFlowCpeDescribeService.searchSObjectTypes(searchKey);
+    List<ChoiceOption> rows = new List<ChoiceOption>();
+    String normalizedSearchKey = searchKey == null
+      ? ''
+      : searchKey.trim().toLowerCase();
+    for (Schema.SObjectType sObjectType : Schema.getGlobalDescribe().values()) {
+      Schema.DescribeSObjectResult describe = sObjectType.getDescribe(
+        SObjectDescribeOptions.DEFERRED
+      );
+      if (
+        describe.isAccessible() &&
+        describe.isQueryable() &&
+        matchesSearch(describe, normalizedSearchKey)
+      ) {
+        rows.add(objectChoice(describe));
+      }
+    }
+
+    rows.sort();
+    List<ChoiceOption> limited = new List<ChoiceOption>();
+    for (
+      Integer i = 0; i < Math.min(rows.size(), MAX_OBJECT_LOOKUP_ROWS); i++
+    ) {
+      limited.add(rows[i]);
+    }
+    return limited;
   }
 
   /**
-   * @description Finds accessible fields for the selected lookup dataset object.
-   * @param objectApiName Source object API name.
-   * @param searchKey Optional field API name or label search text.
-   * @return Matching field choices capped for the CPE lookup.
-   */
-  @AuraEnabled(cacheable=true)
-  public static List<ChoiceOption> searchLookupDatasetFieldsForObject(
-    String objectApiName,
-    String searchKey
-  ) {
-    return NewtonSelectorFlowCpeDescribeService.searchLookupDatasetFieldsForObject(
-      objectApiName,
-      searchKey
-    );
-  }
-
-  /**
-   * @description Describes accessible fields for a selected object.
-   * @param objectName Source object API name.
-   * @return Accessible field rows; single-target lookups include their relationship name.
+   * @description Describes the fields of an object the running user can read.
+   * A blank, unknown or inaccessible object fails with a message naming it.
+   * @param objectName Source object API name (case-insensitive).
+   * @return Accessible field rows, excluding BASE64, ADDRESS and LOCATION types,
+   * each flagged filterable (usable in WHERE) and sortable (usable in ORDER BY).
    */
   @AuraEnabled(cacheable=true)
   public static List<Field> getObjectFields(String objectName) {
-    return NewtonSelectorFlowCpeDescribeService.getObjectFields(objectName);
+    Schema.DescribeSObjectResult describe;
+    try {
+      describe = NewtonSelectorQueryFieldAccess.describeAccessibleObject(
+        objectName
+      );
+    } catch (NewtonSelectorException e) {
+      throw NewtonSelectorException.toAuraException(e.getMessage());
+    }
+
+    List<Field> fields = new List<Field>();
+    for (Schema.SObjectField fieldToken : describe.fields.getMap().values()) {
+      Schema.DescribeFieldResult fieldDescribe = fieldToken.getDescribe();
+      if (
+        fieldDescribe.isAccessible() &&
+        !UNMAPPABLE_FIELD_TYPES.contains(fieldDescribe.getType())
+      ) {
+        Field row = new Field(
+          fieldDescribe.getName(),
+          fieldDescribe.getLabel(),
+          fieldDescribe.getType().name()
+        );
+        row.filterable = fieldDescribe.isFilterable();
+        row.sortable = fieldDescribe.isSortable();
+        fields.add(row);
+      }
+    }
+    return fields;
+  }
+
+  private static ChoiceOption objectChoice(
+    Schema.DescribeSObjectResult describe
+  ) {
+    ChoiceOption row = new ChoiceOption();
+    row.value = describe.getName();
+    row.label = describe.getLabel();
+    row.subtitle = row.value;
+    row.icon = OBJECT_ICON;
+    row.sObjectType = row.value;
+    return row;
+  }
+
+  private static Boolean matchesSearch(
+    Schema.DescribeSObjectResult describe,
+    String normalizedSearchKey
+  ) {
+    return describe.getName().toLowerCase().contains(normalizedSearchKey) ||
+      describe.getLabel().toLowerCase().contains(normalizedSearchKey);
   }
 }

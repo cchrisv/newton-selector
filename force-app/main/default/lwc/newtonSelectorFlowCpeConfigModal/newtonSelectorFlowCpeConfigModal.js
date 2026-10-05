@@ -1,7 +1,6 @@
 import { api, track } from "lwc";
 import LightningModal from "lightning/modal";
 import { mergeSelectorConfig } from "c/newtonSelectorUtilityConfigDefaults";
-import { setConfigPath } from "c/newtonSelectorFlowCpeUtilityConfigState";
 import {
   activeSectionIssueList,
   sectionIssues as buildSectionIssues,
@@ -9,10 +8,6 @@ import {
   totalIssueCount
 } from "c/newtonSelectorFlowCpeUtilityConfigValidation";
 import { SECTIONS } from "c/newtonSelectorFlowCpeUtilityConfigOptions";
-
-function toPlainConfig(config) {
-  return config === undefined ? config : JSON.parse(JSON.stringify(config));
-}
 
 export default class NewtonSelectorFlowCpeConfigModal extends LightningModal {
   @api initialConfig;
@@ -28,8 +23,6 @@ export default class NewtonSelectorFlowCpeConfigModal extends LightningModal {
   _valuesRef = "";
   _whereIncomplete = false;
   @track _activeSection = "data";
-  @track _forcedPreviewState = "";
-  @track _leftWidth = 50;
   _confirmingDiscard = false;
   _focusAfterRender = "";
   _baseline = "";
@@ -127,20 +120,15 @@ export default class NewtonSelectorFlowCpeConfigModal extends LightningModal {
     this.close({ action: "cancel" });
   }
 
-  // Chapters patch by spreading the config they were handed, so the nested
-  // values in a patch are still Lightning's read-only proxies. Storing them
-  // as-is re-wrapped them in another proxy layer on every change, and since
-  // each layer's traps call the one beneath, every edit made the next one
-  // about twice as slow (seconds after a dozen edits). The config is plain
-  // JSON (it is serialized to Flow on save), so store a plain copy instead.
+  // Chapters emit the whole next config by spreading the one they were
+  // handed, so its nested values are still Lightning's read-only proxies.
+  // Storing them as-is re-wrapped them in another proxy layer on every
+  // change, and since each layer's traps call the one beneath, every edit
+  // made the next one about twice as slow (seconds after a dozen edits). The
+  // config is plain JSON (it is serialized to Flow on save), so store a plain
+  // copy instead.
   handleConfigPatch(event) {
-    const path = event.detail?.path;
-    const value = event.detail?.value;
-    const next =
-      Array.isArray(path) && path.length === 0
-        ? value
-        : setConfigPath(this._config, path, value);
-    this._config = toPlainConfig(next);
+    this._config = JSON.parse(JSON.stringify(event.detail.value));
     this.syncCloseGuard();
   }
 
@@ -164,19 +152,13 @@ export default class NewtonSelectorFlowCpeConfigModal extends LightningModal {
   }
 
   get sections() {
-    return SECTIONS.map((section) => {
-      const status = this.sectionStatus(section.key);
-      const active = section.key === this._activeSection;
-      const showStatus = status === "warn" || status === "error";
-      return {
-        ...section,
-        active,
-        showStatus,
-        status,
-        statusClass: `newton-studio__nav-status newton-studio__nav-status_${status}`,
-        ariaCurrent: active ? "page" : null
-      };
-    });
+    return SECTIONS.map(({ key, label, icon }) => ({
+      key,
+      label,
+      icon,
+      status: this.sectionStatus(key),
+      active: key === this._activeSection
+    }));
   }
 
   sectionStatus(key) {
@@ -223,34 +205,22 @@ export default class NewtonSelectorFlowCpeConfigModal extends LightningModal {
     return this.activeSectionIssues.length > 0;
   }
 
-  handleSectionClick(event) {
+  handleActiveSectionChange(event) {
     this._activeSection = event.detail;
-  }
-
-  handleActiveChapterChange(event) {
-    this._activeSection = event.detail;
-  }
-
-  handleLeftWidthChange(event) {
-    this._leftWidth = event.detail;
-  }
-
-  handlePreviewStateChange(event) {
-    const next = event.detail;
-    this._forcedPreviewState = this._forcedPreviewState === next ? "" : next;
-  }
-
-  get previewForcedState() {
-    return this._forcedPreviewState;
   }
 
   handleSave() {
     if (this.hasBlockingErrors) return;
     this.disableClose = false;
+    // The working copy keeps the collection binding so switching back to
+    // Collection in this session still shows it; only a Collection save keeps
+    // sourceRecords bound on the Flow element.
     this.close({
       action: "save",
       config: this._config,
-      ...this.savedRefs
+      ...this.savedRefs,
+      sourceRecordsRef:
+        this._config.dataSource === "collection" ? this._sourceRecordsRef : ""
     });
   }
 

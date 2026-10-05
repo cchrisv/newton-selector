@@ -6,35 +6,38 @@
   <lightning-modal-body class="newton-modal">
     <c-newton-selector-flow-cpe-studio
       sections={sections}
-      left-width={_leftWidth}
-      onsectionclick={handleSectionClick}
-      onactivechapterchange={handleActiveChapterChange}
-      onleftwidthchange={handleLeftWidthChange}
+      onsectionclick={handleActiveSectionChange}
+      onactivechapterchange={handleActiveSectionChange}
     >
       <c-newton-selector-flow-cpe-config-preview
         slot="preview"
         config={_config}
-        forced-state={previewForcedState}
-        onpreviewstatechange={handlePreviewStateChange}
       ></c-newton-selector-flow-cpe-config-preview>
 
-      <div slot="controls">
-        <template lwc:if={hasActiveSectionIssues}>
-          <ul class="newton-studio__issues" aria-label="Current section issues">
-            <template for:each={activeSectionIssues} for:item="i">
-              <li key={i.key} class={i.className}>
-                <c-newton-selector-icon
-                  name={i.icon}
-                  size="xx-small"
-                  box="option"
-                  alternative-text=""
-                ></c-newton-selector-icon>
-                <span>{i.message}</span>
-              </li>
-            </template>
-          </ul>
-        </template>
+      <template lwc:if={hasActiveSectionIssues}>
+        <ul
+          slot="issues"
+          class="newton-studio__issues"
+          aria-label="Current section issues"
+        >
+          <template for:each={activeSectionIssues} for:item="i">
+            <li key={i.key} class={i.className}>
+              <c-newton-selector-icon
+                name={i.icon}
+                size="xx-small"
+                box="option"
+                alternative-text=""
+              ></c-newton-selector-icon>
+              <span
+                ><span class="slds-assistive-text">{i.levelLabel}</span
+                >{i.message}</span
+              >
+            </li>
+          </template>
+        </ul>
+      </template>
 
+      <div slot="controls">
         <c-newton-selector-flow-cpe-data-config
           data-chapter="data"
           config={_config}

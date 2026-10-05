@@ -14,8 +14,6 @@ describe("c-newton-selector-flow-cpe-studio", () => {
     const element = createElement("c-newton-selector-flow-cpe-studio", {
       is: NewtonSelectorFlowCpeStudio
     });
-    const resizeHandler = jest.fn();
-    element.addEventListener("leftwidthchange", resizeHandler);
 
     document.body.appendChild(element);
     await flush();
@@ -28,9 +26,6 @@ describe("c-newton-selector-flow-cpe-studio", () => {
     );
     await flush();
 
-    expect(resizeHandler).toHaveBeenLastCalledWith(
-      expect.objectContaining({ detail: 100 })
-    );
     expect(splitter.getAttribute("aria-valuenow")).toBe("100");
 
     splitter.dispatchEvent(
@@ -38,9 +33,6 @@ describe("c-newton-selector-flow-cpe-studio", () => {
     );
     await flush();
 
-    expect(resizeHandler).toHaveBeenLastCalledWith(
-      expect.objectContaining({ detail: 0 })
-    );
     expect(splitter.getAttribute("aria-valuenow")).toBe("0");
   });
 });

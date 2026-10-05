@@ -56,7 +56,11 @@
 
     <template lwc:else>
       <template lwc:if={hasSelection}>
-        <div class="cc-where-toolbar" aria-label="WHERE builder actions">
+        <div
+          class="cc-where-toolbar"
+          role="group"
+          aria-label="WHERE builder actions"
+        >
           <div class="cc-where-toolbar__selection">
             <span class="cc-where-toolbar__label">Selected</span>
             <span class="cc-where-toolbar__count">{selectedCount}</span>
@@ -87,14 +91,16 @@
             ondrop={handleDrop}
           >
             <div class="cc-where-node__rail">
-              <input
-                type="checkbox"
-                class="cc-where-node__check"
-                aria-label={row.selectLabel}
-                data-id={row.id}
-                checked={row.selected}
-                onchange={handleNodeSelect}
-              />
+              <template lwc:if={row.isCondition}>
+                <input
+                  type="checkbox"
+                  class="cc-where-node__check"
+                  aria-label={row.selectLabel}
+                  data-id={row.id}
+                  checked={row.selected}
+                  onchange={handleNodeSelect}
+                />
+              </template>
             </div>
 
             <template lwc:if={row.isGroup}>
@@ -129,10 +135,8 @@
 
             <template lwc:if={row.isCondition}>
               <div class="cc-where-condition">
-                <span
-                  class="cc-where-condition__num"
-                  title={row.numberTitle}
-                  aria-label={row.numberTitle}
+                <span class="cc-where-condition__num"
+                  ><span class="slds-assistive-text">Condition </span
                   >{row.number}</span
                 >
                 <div class="cc-where-condition__fields">
@@ -142,8 +146,6 @@
                     placeholder="Select field..."
                     variant="label-hidden"
                     selection={row.fieldSelection}
-                    min-search-term-length="0"
-                    scroll-after-n-items="5"
                     data-id={row.id}
                     onsearch={handleFieldSearch}
                     onselectionchange={handleFieldSelectionChange}
@@ -180,11 +182,8 @@
                     ></c-newton-selector-flow-cpe-resource-selector>
                   </template>
                 </div>
-                <template lwc:if={row.hasError}>
-                  <p class="cc-where-condition__error">
-                    Finish this condition: choose a field, an operator, and a
-                    value.
-                  </p>
+                <template lwc:if={row.errorMessage}>
+                  <p class="cc-where-condition__error">{row.errorMessage}</p>
                 </template>
               </div>
             </template>

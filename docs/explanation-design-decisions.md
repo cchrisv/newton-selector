@@ -6,7 +6,7 @@ Why Newton Selector is built the way it is. The repo does not carry written desi
 
 **The problem.** A Flow screen component declares each design-time property in its `js-meta.xml`. Newton Selector has well over a hundred settings (four data sources, field maps, per-item overrides, color tones per state, spacing per side). Declaring each as a Flow property would make the metadata enormous, force Flow Builder to show a long property list, and make every new option a breaking metadata change.
 
-**The approach.** The component declares two design-time inputs, `selectorConfigJson` and `sourceRecords`, and the Custom Property Editor owns the rest. The whole configuration is one JSON string. On load, `FlowScreen` deep-merges that string over `defaultSelectorConfig()`.
+**The approach.** Configuration reaches the component through two inputs, `selectorConfigJson` and `sourceRecords`. The only other inputs are `value` and `values`, which the editor writes from **Default selection** and which also serve as outputs. The Custom Property Editor owns everything else. The whole configuration is one JSON string. On load, `FlowScreen` deep-merges that string over `defaultSelectorConfig()`.
 
 **What it buys you.**
 
@@ -17,8 +17,8 @@ Why Newton Selector is built the way it is. The repo does not carry written desi
 **What it costs.**
 
 - Flow Builder cannot validate individual settings. Validation lives in the editor and in `validate()`.
-- Hand-editing JSON in Flow XML is possible but unguided. The one key the editor exposes no control for (`showSelectAll`) is reachable only that way. Booleans must be real JSON booleans.
-- Merge fields are stored as literal `{!Var}` text inside the string, so they depend on Flow resolving string inputs.
+- Hand-editing JSON in Flow XML is possible but unguided. Booleans must be real JSON booleans.
+- Merge fields are stored as literal `{!Var}` text inside the string, so they depend on Flow resolving string inputs. Flow splices the resolved text into the JSON unescaped, so a value with a double quote, backslash or line break breaks the configuration; the selector then shows an error naming that cause instead of options.
 
 ## A custom editor instead of the default Flow property panel
 
@@ -31,13 +31,13 @@ Why Newton Selector is built the way it is. The repo does not carry written desi
 **Trade-offs.**
 
 - The editor is most of the codebase. Its bundles are several times larger than the runtime bundles.
-- The right column is a single scroll with no section navigation. The code tracks the active chapter by scroll position (to show that chapter's issues at the top), but no nav control is rendered.
+- The right column has a tab bar (Data, Content, Behavior, Appearance) over one scrolling column. A tab jumps to its chapter, the active tab follows the scroll position, and a warning or error dot marks chapters with issues. The active chapter's issues are listed in a fixed strip between the tabs and the scroll area, so they stay in view.
 
 ## The preview runs the real selector
 
 **The problem.** A separate preview implementation drifts from the real one. The admin approves something that does not match what users see.
 
-**The approach.** `newtonSelectorFlowCpeConfigPreview` renders the real `DataSelector`, fed sample data. The editor's own tile pickers are built from the runtime `Group` and `ChoiceTile`.
+**The approach.** `newtonSelectorFlowCpeConfigPreview` renders the real `DataSelector`, fed sample data. The editor's own tile pickers are built from the runtime `ChoiceTile`.
 
 **Trade-off.** The preview never queries your org, so it cannot show a real SOQL result. It shows neutral sample options (or your real Custom options). **Validate query** is the bridge to real data.
 

@@ -1,5 +1,11 @@
 /** @description Parses text WHERE clauses into validated bind-based SOQL fragments. */
 public with sharing class NewtonSelectorWhereParser {
+  private static final Set<String> LIST_OPERATORS = new Set<String>{
+    'IN',
+    'NOT IN',
+    'INCLUDES',
+    'EXCLUDES'
+  };
   private final NewtonSelectorQueryFieldAccess access;
   private final Map<String, Object> binds;
   private final NewtonSelectorWhereScanner scanner;
@@ -64,26 +70,31 @@ public with sharing class NewtonSelectorWhereParser {
     Schema.DescribeFieldResult field = access.filterableField(
       scanner.parseIdentifier()
     );
-    String operator = NewtonSelectorWhereOperatorParser.parse(scanner);
-    if (operator == 'INCLUDES' || operator == 'EXCLUDES') {
-      return field.getName() +
-        ' ' +
+    String operator = NewtonSelectorWhereOperatorParser.parse(
+      scanner,
+      field.getName()
+    );
+    if (
+      (operator == 'INCLUDES' || operator == 'EXCLUDES') &&
+      field.getType() != Schema.DisplayType.MULTIPICKLIST
+    ) {
+      throw new NewtonSelectorException(
         operator +
-        ' (' +
-        multiPicklistLiterals(field, operator) +
-        ')';
+          ' is only supported for multi-select picklist fields: ' +
+          field.getName()
+      );
     }
-    if (operator == 'IN' || operator == 'NOT IN') {
-      return field.getName() + ' ' + operator + ' (' + inBinds(field) + ')';
+    if (LIST_OPERATORS.contains(operator)) {
+      return field.getName() + ' ' + operator + ' (' + listBinds(field) + ')';
     }
     return field.getName() +
       ' ' +
       operator +
       ' ' +
-      bind(field, scanner.parseLiteral());
+      bind(field, scanner.parseLiteral(operator == 'LIKE'));
   }
 
-  private String inBinds(Schema.DescribeFieldResult field) {
+  private String listBinds(Schema.DescribeFieldResult field) {
     List<String> bindNames = new List<String>();
     for (String rawValue : scanner.parseListLiterals()) {
       bindNames.add(bind(field, rawValue));
@@ -96,35 +107,5 @@ public with sharing class NewtonSelectorWhereParser {
       binds,
       NewtonSelectorQueryValueUtil.coerceValue(field, rawValue)
     );
-  }
-
-  private String multiPicklistLiterals(
-    Schema.DescribeFieldResult field,
-    String operator
-  ) {
-    if (field.getType() != Schema.DisplayType.MULTIPICKLIST) {
-      throw new NewtonSelectorException(
-        operator + ' is only supported for multi-select picklist fields.'
-      );
-    }
-
-    List<String> literals = new List<String>();
-    for (String rawValue : scanner.parseListLiterals()) {
-      if (String.isNotBlank(rawValue)) {
-        literals.add(quoteSoqlStringLiteral(rawValue.trim()));
-      }
-    }
-    if (literals.isEmpty()) {
-      throw new NewtonSelectorException(
-        'At least one multi-select picklist value is required for ' +
-          operator +
-          '.'
-      );
-    }
-    return String.join(literals, ', ');
-  }
-
-  private static String quoteSoqlStringLiteral(String value) {
-    return '\'' + String.escapeSingleQuotes(value.replace('\\', '\\\\')) + '\'';
   }
 }

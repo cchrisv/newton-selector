@@ -1,17 +1,22 @@
 <template>
   <div class={wrapperClass} style={customColorStyle}>
-    <input
-      type={inputType}
-      id={inputId}
-      name={inputName}
-      value={item.value}
-      checked={selected}
-      disabled={isDisabled}
-      aria-describedby={describedBy}
-      class="newton-selector-choice-tile__input"
-      onchange={handleChange}
-    />
-    <label for={inputId} class="newton-selector-choice-tile__label">
+    <template lwc:if={hasInput}>
+      <input
+        type={inputType}
+        id={inputId}
+        name={inputName}
+        value={item.value}
+        checked={selected}
+        disabled={disabled}
+        aria-describedby={describedBy}
+        class="slds-assistive-text newton-selector-choice-tile__input"
+        onchange={handleChange}
+        onclick={handleClick}
+        onkeydown={handleKeyDown}
+        onkeyup={handleKeyUp}
+      />
+    </template>
+    <label for={labelFor} class="newton-selector-choice-tile__label">
       <span class="newton-selector-choice-tile__figure">
         <template lwc:if={hasPattern}>
           <span
@@ -59,7 +64,6 @@
             <c-newton-selector-icon
               name={item.icon}
               size={resolvedIconSize}
-              variant={iconVariant}
               class="newton-selector-choice-tile__icon"
             ></c-newton-selector-icon>
           </span>
@@ -80,15 +84,16 @@
             name="check"
             size="xx-small"
             variant="inverse"
-            class="newton-selector-choice-tile__check-icon"
           ></c-newton-selector-icon>
         </span>
       </span>
-      <template lwc:if={hasHelp}>
-        <span id={helpId} class="newton-selector-choice-tile__help"
-          >{item.helpText}</span
-        >
-      </template>
     </label>
+    <template lwc:if={hasHelp}>
+      <span
+        id={helpId}
+        class="slds-assistive-text newton-selector-choice-tile__help"
+        >{item.helpText}</span
+      >
+    </template>
   </div>
 </template>

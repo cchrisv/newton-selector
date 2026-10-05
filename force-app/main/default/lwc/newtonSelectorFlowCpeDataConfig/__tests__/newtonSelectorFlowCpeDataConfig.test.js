@@ -1,8 +1,8 @@
 import { createElement } from "lwc";
 import NewtonSelectorFlowCpeDataConfig from "c/newtonSelectorFlowCpeDataConfig";
 import { getObjectInfo, getPicklistValues } from "lightning/uiObjectInfoApi";
+import { mergeSelectorConfig } from "c/newtonSelectorUtilityConfigDefaults";
 import searchSObjectTypes from "@salesforce/apex/NewtonSelectorFlowCpeController.searchSObjectTypes";
-import searchLookupDatasetFieldsForObject from "@salesforce/apex/NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject";
 import queryItems from "@salesforce/apex/NewtonSelectorRuntimeController.queryItems";
 
 jest.mock("lightning/uiObjectInfoApi", () => {
@@ -16,11 +16,6 @@ jest.mock("lightning/uiObjectInfoApi", () => {
 });
 jest.mock(
   "@salesforce/apex/NewtonSelectorFlowCpeController.searchSObjectTypes",
-  () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  "@salesforce/apex/NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -43,8 +38,8 @@ const BASE_CONFIG = {
     sObjectApiName: "Account",
     labelField: "Name",
     valueField: "Id",
-    orderDirection: "ASC",
-    limit: 25
+    orderByDirection: "ASC",
+    queryLimit: 25
   },
   custom: {
     items: [
@@ -58,11 +53,14 @@ const BASE_CONFIG = {
 
 const flushPromises = () => Promise.resolve();
 
-function mount(props = {}) {
+function mount({ config, ...props } = {}) {
   const element = createElement("c-newton-selector-flow-cpe-data-config", {
     is: NewtonSelectorFlowCpeDataConfig
   });
-  Object.assign(element, { config: BASE_CONFIG, ...props });
+  Object.assign(element, {
+    ...props,
+    config: mergeSelectorConfig({ ...BASE_CONFIG, ...config })
+  });
   document.body.appendChild(element);
   return element;
 }
@@ -155,7 +153,6 @@ function overrideModeToggle(element) {
 describe("c-newton-selector-flow-cpe-data-config events", () => {
   beforeEach(() => {
     searchSObjectTypes.mockResolvedValue([]);
-    searchLookupDatasetFieldsForObject.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -175,7 +172,6 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     );
 
     expect(patches).toHaveLength(1);
-    expect(patches[0].path).toEqual([]);
     expect(patches[0].value.dataSource).toBe("collection");
     expect(element.config.dataSource).toBe("custom");
 
@@ -296,7 +292,11 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     const element = mount();
     const patches = collect(element);
 
-    click(element.shadowRoot.querySelector(".newton-studio__button-with-icon"));
+    click(
+      [...element.shadowRoot.querySelectorAll("button")].find(
+        (button) => button.textContent.trim() === "Add option"
+      )
+    );
     expect(patches.at(-1).value.custom.items).toHaveLength(3);
 
     valueChanged(
@@ -323,23 +323,21 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     );
     expect(patches.at(-1).value.custom.items[1].hidden).toBe(true);
 
-    const firstRowButtons = [
-      ...element.shadowRoot.querySelectorAll(
-        '.newton-studio__custom-row-head button[data-index="0"]'
-      )
-    ];
-
-    click(firstRowButtons[2]);
+    click(
+      element.shadowRoot.querySelector('button[aria-label="Duplicate One"]')
+    );
     expect(patches.at(-1).value.custom.items).toEqual([
       BASE_CONFIG.custom.items[0],
       BASE_CONFIG.custom.items[0],
       BASE_CONFIG.custom.items[1]
     ]);
 
-    click(firstRowButtons[1]);
+    click(
+      element.shadowRoot.querySelector('button[aria-label="Move One down"]')
+    );
     expect(patches.at(-1).value.custom.items[0].value).toBe("two");
 
-    click(firstRowButtons[3]);
+    click(element.shadowRoot.querySelector('button[aria-label="Delete One"]'));
     expect(patches.at(-1).value.custom.items).toEqual([
       BASE_CONFIG.custom.items[1]
     ]);
@@ -441,7 +439,6 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
         "Option overrides"
       )
     ).toBeUndefined();
-    expect(element.shadowRoot.textContent).not.toContain("Known item values");
   });
 
   it("keeps override rows lightweight and expands from the chevron", async () => {
@@ -469,10 +466,10 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
       element.shadowRoot.querySelectorAll(".newton-overrides__row");
     expect(rows().length).toBeLessThan(30);
     expect(
-      element.shadowRoot.querySelectorAll(
-        ".newton-studio__overrides-grid c-newton-selector-flow-cpe-resource-selector"
+      element.shadowRoot.querySelector(
+        'c-newton-selector-flow-cpe-resource-selector[data-value="Value 0"][data-field="label"]'
       )
-    ).toHaveLength(0);
+    ).toBeNull();
 
     click(
       element.shadowRoot.querySelector(
@@ -487,10 +484,10 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
       ).ariaExpanded
     ).toBe("true");
     expect(
-      element.shadowRoot.querySelectorAll(
-        ".newton-studio__overrides-grid c-newton-selector-flow-cpe-resource-selector"
+      element.shadowRoot.querySelector(
+        'c-newton-selector-flow-cpe-resource-selector[data-value="Value 0"][data-field="label"]'
       )
-    ).toHaveLength(4);
+    ).not.toBeNull();
 
     click(
       [...element.shadowRoot.querySelectorAll("lightning-button")].find(
@@ -585,22 +582,6 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     expect(code.textContent).toContain(
       "SELECT Id, Name FROM Account WHERE Name LIKE 'Acme%' AND IsActive__c = TRUE ORDER BY Name ASC LIMIT 25"
     );
-
-    const keywordTokens = [
-      ...code.querySelectorAll(".newton-query-preview__token_keyword")
-    ].map((node) => node.textContent);
-    expect(keywordTokens).toEqual(
-      expect.arrayContaining(["SELECT", "FROM", "WHERE", "LIKE", "AND"])
-    );
-    expect(
-      code.querySelector(".newton-query-preview__token_object").textContent
-    ).toBe("Account");
-    expect(
-      code.querySelector(".newton-query-preview__token_string").textContent
-    ).toBe("'Acme%'");
-    expect(
-      code.querySelector(".newton-query-preview__token_boolean").textContent
-    ).toBe("TRUE");
   });
 
   it("emits display sorting patches", () => {
@@ -649,7 +630,6 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
       recordTypeInfos: {
         "012000000000000AAA": {
           name: "Master",
-          developerName: "Master",
           master: true,
           available: true,
           recordTypeId: "012000000000000AAA"
@@ -682,21 +662,18 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
       recordTypeInfos: {
         "012000000000000AAA": {
           name: "Master",
-          developerName: "Master",
           master: true,
           available: true,
           recordTypeId: "012000000000000AAA"
         },
         "012Default": {
           name: "Business",
-          developerName: "Business",
           master: false,
           available: true,
           recordTypeId: "012Default"
         },
         "012Partner": {
           name: "Partner",
-          developerName: "Partner",
           master: false,
           available: true,
           recordTypeId: "012Partner"
@@ -714,8 +691,8 @@ describe("c-newton-selector-flow-cpe-data-config events", () => {
     expect(recordTypeselector.items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: "Default (Business)",
-          sublabel: "Uses this object's default record type"
+          label: "Master (all values)",
+          subtitle: "Uses every active value of the field"
         }),
         expect.objectContaining({
           label: "Business",

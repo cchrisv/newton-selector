@@ -10,11 +10,13 @@ public class NewtonSelectorTestDataFactory {
     'Account.AnnualRevenue',
     'Account.NumberOfEmployees',
     'Account.Description',
+    'Account.BillingAddress',
     'Contact.AccountId',
     'Contact.BuyerAttributes'
   };
   private static Integer userCounter = 0;
   private static Id accessPermissionSetId;
+  private static Id viewSetupPermissionSetId;
 
   /**
    * @description Creates Account test records with the supplied industry.
@@ -39,10 +41,24 @@ public class NewtonSelectorTestDataFactory {
   }
 
   /**
+   * @description Creates one Account per supplied name.
+   * @param names Account Name values.
+   * @return Inserted Account records.
+   */
+  public static List<Account> createNamedAccounts(List<String> names) {
+    List<Account> accounts = new List<Account>();
+    for (String name : names) {
+      accounts.add(new Account(Name = name));
+    }
+    insert accounts;
+    return accounts;
+  }
+
+  /**
    * @description Creates a non-admin user on a profile without Account access. A test
-   * permission set grants read/create/edit on Account and Contact plus the fields in
-   * GRANTED_FIELDS; every other object (e.g. Opportunity) and field (e.g. Account.Rating)
-   * stays inaccessible. Avoids profile names, which are localized.
+   * permission set grants read on Account and Contact plus the fields in GRANTED_FIELDS;
+   * every other object (e.g. Opportunity) and field (e.g. Account.Rating) stays
+   * inaccessible. Avoids profile names, which are localized.
    * @return Inserted User.
    */
   public static User createStandardUser() {
@@ -72,6 +88,22 @@ public class NewtonSelectorTestDataFactory {
   }
 
   /**
+   * @description Creates a standard user who also has View Setup and Configuration,
+   * which FlexQueueItem requires.
+   * @return Inserted User.
+   */
+  public static User createViewSetupUser() {
+    User u = createStandardUser();
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      insert new PermissionSetAssignment(
+        AssigneeId = u.Id,
+        PermissionSetId = viewSetupPermissionSet()
+      );
+    }
+    return u;
+  }
+
+  /**
    * @description Builds the standard Account query config used by runtime Apex tests.
    * @return Account selector query config.
    */
@@ -84,6 +116,18 @@ public class NewtonSelectorTestDataFactory {
     config.orderByField = 'Name';
     config.orderByDirection = 'ASC';
     config.queryLimit = 50;
+    return config;
+  }
+
+  /**
+   * @description Builds a Contact query config labeled and sorted by LastName.
+   * @return Contact selector query config.
+   */
+  public static NewtonSelectorQueryDTO buildSimpleContactConfig() {
+    NewtonSelectorQueryDTO config = new NewtonSelectorQueryDTO();
+    config.sObjectApiName = 'Contact';
+    config.labelField = 'LastName';
+    config.orderByField = 'LastName';
     return config;
   }
 
@@ -125,9 +169,7 @@ public class NewtonSelectorTestDataFactory {
         new ObjectPermissions(
           ParentId = permissionSet.Id,
           SobjectType = objectName,
-          PermissionsRead = true,
-          PermissionsCreate = true,
-          PermissionsEdit = true
+          PermissionsRead = true
         )
       );
     }
@@ -140,8 +182,7 @@ public class NewtonSelectorTestDataFactory {
           ParentId = permissionSet.Id,
           SobjectType = field.substringBefore('.'),
           Field = field,
-          PermissionsRead = true,
-          PermissionsEdit = true
+          PermissionsRead = true
         )
       );
     }
@@ -149,5 +190,20 @@ public class NewtonSelectorTestDataFactory {
 
     accessPermissionSetId = permissionSet.Id;
     return accessPermissionSetId;
+  }
+
+  private static Id viewSetupPermissionSet() {
+    if (viewSetupPermissionSetId != null) {
+      return viewSetupPermissionSetId;
+    }
+    PermissionSet permissionSet = new PermissionSet(
+      Name = 'Newton_Selector_Test_View_Setup',
+      Label = 'Newton Selector Test View Setup',
+      PermissionsViewSetup = true,
+      PermissionsViewRoles = true
+    );
+    insert permissionSet;
+    viewSetupPermissionSetId = permissionSet.Id;
+    return viewSetupPermissionSetId;
   }
 }
