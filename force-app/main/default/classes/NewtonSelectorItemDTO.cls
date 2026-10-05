@@ -14,11 +14,7 @@ public class NewtonSelectorItemDTO {
   public String helpText;
   @AuraEnabled
   public String value;
+  /** @description Queried source record; carries Id and the configured fields only. */
   @AuraEnabled
-  public Boolean disabled;
-
-  /** @description Creates a selectable item with disabled defaulting to false. */
-  public NewtonSelectorItemDTO() {
-    this.disabled = false;
-  }
+  public SObject record;
 }

@@ -4,5 +4,5 @@
     <isExposed>false</isExposed>
     <masterLabel>Newton Selector Flow CPE | Toggle</masterLabel>
     <description
-  >Reusable toggle switch. Emits a plain {name, checked} event by default; set wireFormat="cb-sentinel" for the legacy Flow CPE CB_TRUE/CB_FALSE shape.</description>
+  >Two-option setting control for the CPE. Emits toggle with detail {checked}.</description>
 </LightningComponentBundle>

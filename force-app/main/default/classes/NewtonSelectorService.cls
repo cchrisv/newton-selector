@@ -8,43 +8,26 @@ public with sharing class NewtonSelectorService {
   public static List<NewtonSelectorItemDTO> fetchItems(
     NewtonSelectorQueryDTO config
   ) {
-    if (config == null) {
-      throw new NewtonSelectorException('Query configuration is required.');
-    }
-    List<SObject> records = NewtonSelectorRecordQuery.query(config);
-    return mapRecords(records, config);
-  }
-
-  private static List<NewtonSelectorItemDTO> mapRecords(
-    List<SObject> records,
-    NewtonSelectorQueryDTO config
-  ) {
     List<NewtonSelectorItemDTO> dtos = new List<NewtonSelectorItemDTO>();
-    if (records == null || records.isEmpty()) {
-      return dtos;
-    }
-
-    for (Integer i = 0; i < records.size(); i++) {
-      SObject record = records[i];
-      dtos.add(mapSingle(record, config, i));
+    for (SObject record : NewtonSelectorRecordQuery.query(config)) {
+      dtos.add(mapSingle(record, config));
     }
     return dtos;
   }
 
   private static NewtonSelectorItemDTO mapSingle(
     SObject record,
-    NewtonSelectorQueryDTO config,
-    Integer index
+    NewtonSelectorQueryDTO config
   ) {
     NewtonSelectorItemDTO dto = new NewtonSelectorItemDTO();
-    dto.id = String.valueOf(record.Id != null ? record.Id : 'rec-' + index);
+    dto.id = record.Id;
     dto.label = readString(record, config.labelField);
     dto.sublabel = readString(record, config.sublabelField);
     dto.icon = readString(record, config.iconField);
     dto.badge = readString(record, config.badgeField);
     dto.helpText = readString(record, config.helpField);
     dto.value = resolveValue(record, config, dto.id);
-    dto.disabled = false;
+    dto.record = record;
     return dto;
   }
 
@@ -61,12 +44,7 @@ public with sharing class NewtonSelectorService {
     NewtonSelectorQueryDTO config,
     String fallbackId
   ) {
-    if (String.isNotBlank(config.valueField)) {
-      String v = readString(record, config.valueField);
-      if (String.isNotBlank(v)) {
-        return v;
-      }
-    }
-    return fallbackId;
+    String value = readString(record, config.valueField);
+    return String.isNotBlank(value) ? value : fallbackId;
   }
 }

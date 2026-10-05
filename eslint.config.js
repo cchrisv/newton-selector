@@ -1,17 +1,10 @@
 const { defineConfig } = require("eslint/config");
 const eslintJs = require("@eslint/js");
 const jestPlugin = require("eslint-plugin-jest");
-const auraConfig = require("@salesforce/eslint-plugin-aura");
 const lwcConfig = require("@salesforce/eslint-config-lwc/recommended");
 const globals = require("globals");
 
 module.exports = defineConfig([
-  // Aura configuration
-  {
-    files: ["**/aura/**/*.js"],
-    extends: [...auraConfig.configs.recommended, ...auraConfig.configs.locker]
-  },
-
   // LWC configuration
   {
     files: ["**/lwc/**/*.js"],
@@ -23,7 +16,6 @@ module.exports = defineConfig([
   {
     files: [
       "**/lwc/newtonSelectorFlowScreen/newtonSelectorFlowScreen.js",
-      "**/lwc/newtonSelectorFlowCpeCustomLookup/newtonSelectorFlowCpeCustomLookup.js",
       "**/lwc/newtonSelectorFlowCpeIconSelector/newtonSelectorFlowCpeIconSelector.js",
       "**/lwc/newtonSelectorDataSelector/newtonSelectorDataSelector.js"
     ],

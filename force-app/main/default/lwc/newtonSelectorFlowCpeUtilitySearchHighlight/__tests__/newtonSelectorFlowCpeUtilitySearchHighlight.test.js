@@ -1,32 +1,15 @@
 import { buildTokens } from "c/newtonSelectorFlowCpeUtilitySearchHighlight";
 
 describe("buildTokens", () => {
-  it("returns a single non-highlighted token when text is empty", () => {
-    expect(buildTokens("", "foo")).toEqual([
-      { key: "token-0", text: "", isHighlight: false }
+  it.each([
+    ["text is empty", "", "foo"],
+    ["term is empty", "Account Name", ""],
+    ["term is only whitespace", "Account Name", "   "],
+    ["there is no match", "Account Name", "xyz"]
+  ])("returns one plain token when %s", (_, text, term) => {
+    expect(buildTokens(text, term)).toEqual([
+      { key: "token-0", text, isHighlight: false }
     ]);
-  });
-
-  it("returns a single non-highlighted token when term is empty", () => {
-    expect(buildTokens("Account Name", "")).toEqual([
-      { key: "token-0", text: "Account Name", isHighlight: false }
-    ]);
-  });
-
-  it("returns a single non-highlighted token when term is only whitespace", () => {
-    expect(buildTokens("Account Name", "   ")).toEqual([
-      { key: "token-0", text: "Account Name", isHighlight: false }
-    ]);
-  });
-
-  it("returns a single non-highlighted token when there is no match", () => {
-    const tokens = buildTokens("Account Name", "xyz");
-    expect(tokens).toHaveLength(1);
-    expect(tokens[0]).toEqual({
-      key: "token-0",
-      text: "Account Name",
-      isHighlight: false
-    });
   });
 
   it("splits around a single match preserving surrounding text", () => {

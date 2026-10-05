@@ -24,23 +24,28 @@ private class NewtonSelectorServiceTest {
           dto.sublabel,
           'Sublabel should map to Industry'
         );
-        Assert.areEqual(false, dto.disabled, 'Disabled defaults to false');
       }
     }
   }
 
   @IsTest
-  static void fetchItemsRejectsNullConfig() {
+  static void fetchItemsDefaultsLabelToNameAndValueToId() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
+      Account account = new Account(Name = 'Only Account');
+      insert account;
+      NewtonSelectorQueryDTO config = new NewtonSelectorQueryDTO();
+      config.sObjectApiName = 'Account';
+
       Test.startTest();
-      try {
-        NewtonSelectorService.fetchItems(null);
-        Assert.fail('Should have thrown for null config');
-      } catch (NewtonSelectorException e) {
-        Assert.isTrue(e.getMessage().contains('required'));
-      }
+      List<NewtonSelectorItemDTO> dtos = NewtonSelectorService.fetchItems(
+        config
+      );
       Test.stopTest();
+
+      Assert.areEqual(1, dtos.size());
+      Assert.areEqual('Only Account', dtos[0].label);
+      Assert.areEqual(String.valueOf(account.Id), dtos[0].value);
     }
   }
 

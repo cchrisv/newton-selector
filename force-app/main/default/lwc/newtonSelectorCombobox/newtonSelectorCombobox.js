@@ -45,25 +45,18 @@ function normalizeResult(result) {
 export default class NewtonSelectorCombobox extends LightningElement {
   @api mode = "slot";
   @api open = false;
-  @api comboboxClass = "";
   @api dropdownClass = "";
   @api dropdownId = "";
   @api dropdownLabel = "Options";
   @api dropdownRole = "listbox";
-  @api ariaBusy;
-  @api ariaMultiselectable;
   @api label = "Search";
   @api placeholder = "";
   @api variant = "label-stacked";
   @api required = false;
   @api disabled = false;
-  @api isMultiEntry = false;
   @api minSearchTermLength = DEFAULT_MIN_SEARCH;
   @api scrollAfterNItems = null;
-  @api messageWhenValueMissing = "A selection is required.";
   @api fieldLevelHelp;
-  @api errors = [];
-  @api newRecordOptions = [];
   @api selectionMode = "single";
   @api enableSearch = false;
   @api placeholderWhenEmpty = "Choose an option";
@@ -82,21 +75,13 @@ export default class NewtonSelectorCombobox extends LightningElement {
   _searchTerm = "";
   _debounceTimer;
   _activeIndex = -1;
-  _customValidity = "";
-  _showValidityError = false;
-  _closeTimer;
   _listboxId = `newton-selector-combobox-lb-${comboboxCounter}`;
-  _errorId = `newton-selector-combobox-err-${comboboxCounter}`;
   _inputId = `newton-selector-combobox-input-${comboboxCounter}`;
 
   disconnectedCallback() {
     if (this._debounceTimer) {
       clearTimeout(this._debounceTimer);
       this._debounceTimer = undefined;
-    }
-    if (this._closeTimer) {
-      clearTimeout(this._closeTimer);
-      this._closeTimer = undefined;
     }
   }
 
@@ -124,9 +109,7 @@ export default class NewtonSelectorCombobox extends LightningElement {
   }
 
   get selection() {
-    return this.isMultiEntry
-      ? [...this._selection]
-      : this._selection[0] || null;
+    return this._selection[0] || null;
   }
 
   get isOpen() {
@@ -154,7 +137,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
       "slds-combobox",
       "slds-dropdown-trigger",
       "slds-dropdown-trigger_click",
-      this.comboboxClass,
       this.isOpen ? "slds-is-open" : ""
     ]
       .filter(Boolean)
@@ -306,86 +288,41 @@ export default class NewtonSelectorCombobox extends LightningElement {
     return this.filteredSelectOptions.length > 0;
   }
 
-  get pillItems() {
-    return this._selection;
-  }
-
   get hasSelection() {
     return this._selection.length > 0;
-  }
-
-  get isSingleEntry() {
-    return !this.isMultiEntry;
-  }
-
-  get hasLookupErrors() {
-    return (
-      (Array.isArray(this.errors) && this.errors.length > 0) ||
-      this.hasInternalValidityError
-    );
-  }
-
-  get hasInternalValidityError() {
-    return Boolean(this._customValidity) || this.hasMissingRequiredSelection;
-  }
-
-  get hasMissingRequiredSelection() {
-    return Boolean(
-      this._showValidityError && this.required && !this.hasSelection
-    );
   }
 
   get showExternalLabel() {
     return this.variant === "label-stacked";
   }
 
-  get formElementClass() {
-    return this.hasLookupErrors
-      ? "slds-form-element slds-has-error"
-      : "slds-form-element";
-  }
-
   get selectedIconName() {
-    if (!this.isSingleEntry || !this.hasSelection) {
-      return null;
-    }
-    return this._selection[0].icon || null;
+    return this._selection[0]?.icon || null;
   }
 
   get inputDisplayValue() {
-    if (this.isSingleEntry && this.hasSelection) {
-      return this._selection[0].title || "";
-    }
-    return this._inputValue;
+    return this.hasSelection ? this._selection[0].title : this._inputValue;
   }
 
-  get isInputReadonly() {
-    return this.isSingleEntry && this.hasSelection;
+  get showSearchIcon() {
+    return !this.hasSelection;
   }
 
   get showClearButton() {
-    return this.isSingleEntry && this.hasSelection && !this.disabled;
+    return this.hasSelection && !this.disabled;
   }
 
   get inputContainerClass() {
     const base = "slds-combobox__form-element slds-input-has-icon";
-    if (this.isSingleEntry && this.hasSelection) {
-      return `${base} slds-input-has-icon_left-right`;
-    }
-    return `${base} slds-input-has-icon_right`;
+    return this.hasSelection
+      ? `${base} slds-input-has-icon_left-right`
+      : `${base} slds-input-has-icon_right`;
   }
 
   get inputClass() {
     const base =
       "slds-input slds-combobox__input newton-selector-combobox__lookup-input";
-    if (this.isSingleEntry && this.hasSelection) {
-      return `${base} slds-combobox__input-value`;
-    }
-    return base;
-  }
-
-  get showSearchIcon() {
-    return !(this.isSingleEntry && this.hasSelection);
+    return this.hasSelection ? `${base} slds-combobox__input-value` : base;
   }
 
   get requiredAria() {
@@ -445,19 +382,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
     return Math.max(0, Math.floor(count));
   }
 
-  get inlineErrorMessage() {
-    if (Array.isArray(this.errors) && this.errors.length) {
-      return this.errors.map((error) => error.message).join(" ");
-    }
-    if (this._customValidity) {
-      return this._customValidity;
-    }
-    if (this.hasMissingRequiredSelection) {
-      return this.messageWhenValueMissing;
-    }
-    return "";
-  }
-
   get comboboxExpanded() {
     return this._dropdownOpen ? "true" : "false";
   }
@@ -468,16 +392,8 @@ export default class NewtonSelectorCombobox extends LightningElement {
     return this._dropdownOpen ? `${base} slds-is-open` : base;
   }
 
-  get ariaInvalidValue() {
-    return this.hasLookupErrors ? "true" : undefined;
-  }
-
   get ariaBusyValue() {
     return this._loading ? "true" : "false";
-  }
-
-  get errorDescribedById() {
-    return this.inlineErrorMessage ? this._errorId : undefined;
   }
 
   get computedPlaceholder() {
@@ -518,46 +434,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
     return this._selection.map((row) => ({ ...row }));
   }
 
-  @api
-  focus() {
-    const input = this.refs?.searchinput;
-    if (input) {
-      if (!(this.isSingleEntry && this.hasSelection)) {
-        this._dropdownOpen = true;
-      }
-      input.focus();
-    }
-  }
-
-  @api
-  blur() {
-    const input = this.refs?.searchinput;
-    if (input) {
-      input.blur();
-    }
-    this.closeDropdown();
-  }
-
-  @api
-  checkValidity() {
-    if (Array.isArray(this.errors) && this.errors.length) return false;
-    if (this._customValidity) return false;
-    if (!this.required) return true;
-    if (this.isSelectMode) return this._selectValues.length > 0;
-    return this._selection.length > 0;
-  }
-
-  @api
-  reportValidity() {
-    this._showValidityError = true;
-    return this.checkValidity();
-  }
-
-  @api
-  setCustomValidity(message) {
-    this._customValidity = message == null ? "" : String(message);
-  }
-
   handleSelectToggle() {
     if (this.disabled) return;
     this._selectOpen = !this._selectOpen;
@@ -572,9 +448,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
   }
 
   handleSelectOption(event) {
-    if (this._closeTimer) {
-      clearTimeout(this._closeTimer);
-    }
     const value = event.currentTarget.dataset.value;
     if (value === undefined || value === null) return;
     const row = this._selectOptions.find((option) => option.id === value);
@@ -612,11 +485,12 @@ export default class NewtonSelectorCombobox extends LightningElement {
     );
   }
 
-  handleSelectBlur() {
-    // eslint-disable-next-line @lwc/lwc/no-async-operation
-    this._closeTimer = window.setTimeout(() => {
+  // Option rows cancel mousedown, so focus only leaves the combobox when the
+  // user moves elsewhere.
+  handleSelectFocusOut(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
       this._selectOpen = false;
-    }, 200);
+    }
   }
 
   handleSelectKeydown(event) {
@@ -683,7 +557,7 @@ export default class NewtonSelectorCombobox extends LightningElement {
   }
 
   handleFocus() {
-    if (this.isSingleEntry && this.hasSelection) {
+    if (this.hasSelection) {
       return;
     }
     this.openDropdown();
@@ -702,11 +576,10 @@ export default class NewtonSelectorCombobox extends LightningElement {
     }
   }
 
-  handleBlur() {
-    // eslint-disable-next-line @lwc/lwc/no-async-operation
-    this._closeTimer = window.setTimeout(() => {
+  handleLookupFocusOut(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
       this.closeDropdown();
-    }, 200);
+    }
   }
 
   handlePointerDownOption(event) {
@@ -726,9 +599,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
   }
 
   handleSelect(event) {
-    if (this._closeTimer) {
-      clearTimeout(this._closeTimer);
-    }
     const id = event.currentTarget.dataset.id;
     const row = this._options.find((option) => option.id === id);
     if (!row) {
@@ -742,26 +612,11 @@ export default class NewtonSelectorCombobox extends LightningElement {
       clearTimeout(this._debounceTimer);
       this._debounceTimer = undefined;
     }
-    let changed = true;
-    if (this.isMultiEntry) {
-      if (this._selection.some((selection) => selection.id === row.id)) {
-        changed = false;
-      } else {
-        this._selection = [...this._selection, row];
-      }
-      this._options = this._options.filter((option) => option.id !== row.id);
-      this._activeIndex = this._options.length ? 0 : -1;
-      this._dropdownOpen = true;
-    } else {
-      this._selection = [row];
-      this._options = [];
-      this.closeDropdown();
-    }
+    this._selection = [row];
+    this._options = [];
+    this.closeDropdown();
     this._searchTerm = "";
     this._inputValue = "";
-    if (!changed) {
-      return;
-    }
     this.dispatchEvent(
       new CustomEvent("selectionchange", {
         detail: {
@@ -769,25 +624,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
         }
       })
     );
-    if (this.isMultiEntry) {
-      Promise.resolve().then(() => this.refs.searchinput?.focus());
-    }
-  }
-
-  handleRemovePill(event) {
-    const id = event.currentTarget.name;
-    this._selection = this._selection.filter(
-      (selection) => selection.id !== id
-    );
-    this.dispatchEvent(
-      new CustomEvent("selectionchange", {
-        detail: {
-          selectedIds: this.selectedIds
-        }
-      })
-    );
-
-    Promise.resolve().then(() => this.refs.searchinput?.focus());
   }
 
   handleKeydown(event) {
@@ -830,17 +666,6 @@ export default class NewtonSelectorCombobox extends LightningElement {
     } else if (event.key === "Escape") {
       this.closeDropdown();
     }
-  }
-
-  handleNewRecord(event) {
-    const type = event.currentTarget.dataset.object;
-    this.dispatchEvent(
-      new CustomEvent("newrecord", {
-        detail: {
-          objectApiName: type
-        }
-      })
-    );
   }
 
   _scrollActiveIntoView() {

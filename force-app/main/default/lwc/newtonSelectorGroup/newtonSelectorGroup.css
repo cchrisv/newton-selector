@@ -68,9 +68,9 @@
        fit exactly) stays at the right edge — tiles never spread apart to fill. */
   justify-content: start;
   margin-top: var(--newton-group-margin-t, 0);
-  margin-right: var(--newton-group-margin-r, 0);
+  margin-inline-end: var(--newton-group-margin-r, 0);
   margin-bottom: var(--newton-group-margin-b, 0);
-  margin-left: var(--newton-group-margin-l, 0);
+  margin-inline-start: var(--newton-group-margin-l, 0);
 }
 
 /* List layout: single column flex */
@@ -79,14 +79,14 @@
   flex-direction: column;
   gap: var(--newton-group-gap-y);
   margin-top: var(--newton-group-margin-t, 0);
-  margin-right: var(--newton-group-margin-r, 0);
+  margin-inline-end: var(--newton-group-margin-r, 0);
   margin-bottom: var(--newton-group-margin-b, 0);
-  margin-left: var(--newton-group-margin-l, 0);
+  margin-inline-start: var(--newton-group-margin-l, 0);
 }
 
 .newton-group_list c-newton-selector-choice-tile {
   display: block;
-  width: var(--newton-static-v-100-percent, 100%);
+  width: 100%;
 }
 
 /* Fixed-column override: when --newton-group-cols is set (1–6), force an
@@ -99,9 +99,8 @@
   );
 }
 /* Fixed column count — tiles keep their configured width (size setting)
-   rather than stretching to fill the container. Previously we used
-   `minmax(0, 1fr)` which made column count dominate tile size; users
-   expect "columns = how many per row", not "columns = tile width". If
+   rather than stretching to fill the container (\`minmax(0, 1fr)\` would let
+   the column count dominate tile size); "columns" means how many per row. If
    the container is narrower than cols × min-width, tiles overflow — that's
    the deliberate consequence of pinning a column count. */
 .newton-group_grid[style*="--newton-group-cols:"] {
@@ -127,9 +126,9 @@
   scroll-padding-inline: var(--newton-group-margin-l, 0);
   padding-bottom: var(--slds-g-spacing-2, 0.5rem); /* room for scrollbar */
   margin-top: var(--newton-group-margin-t, 0);
-  margin-right: var(--newton-group-margin-r, 0);
+  margin-inline-end: var(--newton-group-margin-r, 0);
   margin-bottom: var(--newton-group-margin-b, 0);
-  margin-left: var(--newton-group-margin-l, 0);
+  margin-inline-start: var(--newton-group-margin-l, 0);
 }
 
 .newton-group_horizontal c-newton-selector-choice-tile {
@@ -143,7 +142,7 @@
 }
 .newton-group_horizontal::-webkit-scrollbar-thumb {
   background: var(--slds-g-color-neutral-base-80, #d4d4d4);
-  border-radius: var(--newton-static-v-999px, 999px);
+  border-radius: var(--slds-g-radius-border-pill, 15rem);
 }
 .newton-group_horizontal::-webkit-scrollbar-thumb:hover {
   background: var(--slds-g-color-neutral-base-70, #aeaeae);
@@ -158,9 +157,9 @@
   flex-direction: column;
   gap: var(--newton-group-gap-y);
   margin-top: var(--newton-group-margin-t, 0);
-  margin-right: var(--newton-group-margin-r, 0);
+  margin-inline-end: var(--newton-group-margin-r, 0);
   margin-bottom: var(--newton-group-margin-b, 0);
-  margin-left: var(--newton-group-margin-l, 0);
+  margin-inline-start: var(--newton-group-margin-l, 0);
 }
 
 .newton-radio-card {
@@ -173,7 +172,7 @@
 .newton-radio-card c-newton-selector-choice-tile {
   display: block;
   min-width: 0;
-  width: var(--newton-static-v-100-percent, 100%);
+  width: 100%;
 }
 
 .newton-radio-card__marker {
@@ -182,7 +181,7 @@
   height: var(--slds-g-sizing-5, 1rem);
   border: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-border-base-1, #c9c9c9);
-  border-radius: var(--newton-static-v-999px, 999px);
+  border-radius: var(--slds-g-radius-border-circle, 50%);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
 }
 
@@ -206,14 +205,15 @@
   .newton-radio-card__marker::after {
   content: "";
   position: absolute;
-  top: var(--newton-static-v-2px, 2px);
-  left: var(--newton-static-v-4px, 4px);
-  width: var(--newton-static-v-4px, 4px);
-  height: var(--newton-static-v-7px, 7px);
-  border-right: var(--slds-g-sizing-border-2, 2px) solid
-    var(--slds-g-color-on-accent-1, #ffffff);
-  border-bottom: var(--slds-g-sizing-border-2, 2px) solid
-    var(--slds-g-color-on-accent-1, #ffffff);
+  top: 2px;
+  inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
+  width: 4px;
+  height: 7px;
+  /* Physical on purpose: a checkmark glyph must not mirror in RTL. */
+  border-style: solid;
+  border-color: var(--slds-g-color-on-accent-1, #ffffff);
+  border-width: 0 var(--slds-g-sizing-border-2, 2px)
+    var(--slds-g-sizing-border-2, 2px) 0;
   transform: rotate(45deg);
 }
 
@@ -226,18 +226,13 @@
 .newton-picklist {
   position: relative;
   margin-top: var(--newton-group-margin-t, 0);
-  margin-right: var(--newton-group-margin-r, 0);
+  margin-inline-end: var(--newton-group-margin-r, 0);
   margin-bottom: var(--newton-group-margin-b, 0);
-  margin-left: var(--newton-group-margin-l, 0);
+  margin-inline-start: var(--newton-group-margin-l, 0);
 }
 
 .newton-picklist__combobox {
   position: relative;
-  --newton-selector-combobox-dropdown-max-height: var(
-    --newton-static-v-20rem,
-    20rem
-  );
-  --newton-selector-combobox-dropdown-padding: 0;
 }
 
 .newton-picklist__selected-icon {
@@ -249,8 +244,8 @@
 .newton-picklist__button {
   display: flex;
   align-items: center;
-  width: var(--newton-static-v-100-percent, 100%);
-  text-align: left;
+  width: 100%;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -260,7 +255,12 @@
 }
 
 .newton-picklist__menu {
-  z-index: var(--newton-z-index-dropdown);
+  max-height: var(--slds-g-sizing-15, 20rem);
+  padding: 0;
+  overflow-y: auto;
+  border-color: var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-3, 0.5rem);
+  box-shadow: var(--slds-g-shadow-2, 0 2px 8px #0000001f);
 }
 
 .newton-picklist__search {
@@ -289,6 +289,13 @@
   background: var(--slds-g-color-neutral-base-95, #f3f3f3);
 }
 
+/* The keyboard-active option (aria-activedescendant). */
+.newton-picklist__option.slds-has-focus {
+  outline: var(--slds-g-sizing-border-2, 2px) solid
+    var(--slds-g-color-brand-base-50, #0176d3);
+  outline-offset: calc(-1 * var(--slds-g-sizing-border-2, 2px));
+}
+
 .newton-picklist__item_selected .newton-picklist__option {
   background: var(--slds-g-color-brand-base-95, #eef4ff);
   box-shadow:
@@ -300,7 +307,7 @@
 
 .newton-picklist__item c-newton-selector-choice-tile {
   display: block;
-  width: var(--newton-static-v-100-percent, 100%);
+  width: 100%;
   --newton-tile-pad-base: var(--slds-g-spacing-2, 0.5rem);
   --newton-tile-pad-l: var(--slds-g-spacing-2, 0.5rem);
   --newton-tile-pad-r: var(--slds-g-spacing-2, 0.5rem);
@@ -335,16 +342,16 @@
   column-gap: var(--newton-group-gap-x);
   row-gap: var(--newton-group-gap-y);
   margin-top: var(--newton-group-margin-t, 0);
-  margin-right: var(--newton-group-margin-r, 0);
+  margin-inline-end: var(--newton-group-margin-r, 0);
   margin-bottom: var(--newton-group-margin-b, 0);
-  margin-left: var(--newton-group-margin-l, 0);
+  margin-inline-start: var(--newton-group-margin-l, 0);
 }
 
 .newton-transfer__panel {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: var(--newton-static-v-12rem, 12rem);
+  min-height: 12rem;
   border: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-border-base-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
@@ -426,7 +433,7 @@
   flex: 1 1 auto;
   flex-direction: column;
   gap: var(--newton-group-gap-y);
-  min-height: var(--newton-static-v-10rem, 10rem);
+  min-height: var(--slds-g-sizing-13, 10rem);
   padding: var(--slds-g-spacing-3, 0.75rem);
 }
 
@@ -449,7 +456,7 @@
 
 .newton-transfer__item c-newton-selector-choice-tile {
   display: block;
-  width: var(--newton-static-v-100-percent, 100%);
+  width: 100%;
 }
 
 .newton-transfer__empty {
@@ -457,7 +464,7 @@
   align-items: center;
   justify-content: center;
   flex: 1 1 auto;
-  min-height: var(--newton-static-v-6rem, 6rem);
+  min-height: 6rem;
   margin: 0;
   padding: var(--slds-g-spacing-4, 1rem);
   color: var(--slds-g-color-neutral-base-50, #747474);
@@ -469,7 +476,7 @@
 }
 
 .newton-manual-input__control {
-  max-width: var(--newton-static-v-100-percent, 100%);
+  max-width: 100%;
 }
 
 /* Empty state */

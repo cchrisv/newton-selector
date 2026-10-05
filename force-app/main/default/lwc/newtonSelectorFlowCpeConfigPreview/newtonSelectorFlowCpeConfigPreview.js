@@ -1,65 +1,49 @@
 import { api, LightningElement } from "lwc";
-import { resolvedLayoutGridConfig } from "c/newtonSelectorUtilityConfigDefaults";
+import {
+  mergeSelectorConfig,
+  selectorPropsFromConfig
+} from "c/newtonSelectorUtilityConfigDefaults";
+import { LAYOUT_TILES } from "c/newtonSelectorFlowCpeUtilityConfigOptions";
 
 const PREVIEW_SAMPLE_ITEMS = Object.freeze([
   {
-    id: "preview-serena-williams",
-    label: "Serena Williams",
-    sublabel: "Preview sample record - tennis icon",
-    icon: "trophy",
+    id: "preview-option-a",
+    label: "Option A",
+    sublabel: "Sample option",
+    icon: "circle",
     badge: "Sample",
-    helpText: "Mock data used only inside the builder preview.",
-    value: "preview-serena-williams",
+    helpText: "",
+    value: "preview-option-a",
     disabled: false
   },
   {
-    id: "preview-pedro-pascal",
-    label: "Pedro Pascal",
-    sublabel: "Preview sample record - actor",
-    icon: "clapperboard",
-    badge: "Mock",
-    helpText: "Mock data used only inside the builder preview.",
-    value: "preview-pedro-pascal",
-    disabled: false
-  },
-  {
-    id: "preview-zendaya",
-    label: "Zendaya",
-    sublabel: "Preview sample record - performer",
-    icon: "sparkles",
-    badge: "Demo",
-    helpText: "Mock data used only inside the builder preview.",
-    value: "preview-zendaya",
-    disabled: false
-  },
-  {
-    id: "preview-simone-biles",
-    label: "Simone Biles",
-    sublabel: "Preview sample record - gymnast",
-    icon: "badge-check",
+    id: "preview-option-b",
+    label: "Option B",
+    sublabel: "Sample option",
+    icon: "square",
     badge: "Sample",
-    helpText: "Mock data used only inside the builder preview.",
-    value: "preview-simone-biles",
+    helpText: "",
+    value: "preview-option-b",
     disabled: false
   },
   {
-    id: "preview-ava-duvernay",
-    label: "Ava DuVernay",
-    sublabel: "Preview sample record - filmmaker",
-    icon: "video",
-    badge: "Mock",
-    helpText: "Mock data used only inside the builder preview.",
-    value: "preview-ava-duvernay",
+    id: "preview-option-c",
+    label: "Option C",
+    sublabel: "Sample option",
+    icon: "triangle",
+    badge: "Sample",
+    helpText: "",
+    value: "preview-option-c",
     disabled: false
   },
   {
-    id: "preview-dwayne-johnson",
-    label: "Dwayne Johnson",
-    sublabel: "Preview sample record - entertainer",
+    id: "preview-option-d",
+    label: "Option D",
+    sublabel: "Sample option",
     icon: "star",
-    badge: "Demo",
-    helpText: "Mock data used only inside the builder preview.",
-    value: "preview-dwayne-johnson",
+    badge: "Sample",
+    helpText: "",
+    value: "preview-option-d",
     disabled: false
   }
 ]);
@@ -68,50 +52,87 @@ function sampleAt(index) {
   return PREVIEW_SAMPLE_ITEMS[index % PREVIEW_SAMPLE_ITEMS.length];
 }
 
-function normalizePreviewValue(value, fallback) {
+function previewValue(value, fallback) {
   return value === undefined || value === null || value === ""
     ? fallback
     : String(value);
 }
 
+// Custom options render as configured (gaps filled from the samples); every
+// other source shows sample options keyed by the configured overrides.
+function previewItems(config) {
+  const customItems = config.custom.items.filter(
+    (item) => item?.hidden !== true
+  );
+  if (config.dataSource === "custom" && customItems.length > 0) {
+    return customItems.map((item, index) => {
+      const sample = sampleAt(index);
+      return {
+        ...sample,
+        ...item,
+        id: item.id || `preview-custom-${index}`,
+        label: item.label || sample.label,
+        sublabel: item.sublabel || sample.sublabel,
+        icon: item.icon || sample.icon,
+        badge: item.badge || sample.badge,
+        value: previewValue(item.value, sample.value),
+        disabled: Boolean(item.disabled)
+      };
+    });
+  }
+  const values = [
+    ...new Set([
+      ...Object.keys(config.overrides).filter(Boolean),
+      ...PREVIEW_SAMPLE_ITEMS.map((item) => item.value)
+    ])
+  ].slice(0, 6);
+  return values.map((value, index) => ({
+    ...sampleAt(index),
+    id: `preview-mock-${index}`,
+    value
+  }));
+}
+
 export default class NewtonSelectorFlowCpeConfigPreview extends LightningElement {
-  @api config;
   @api forcedState = "";
+
+  _config = mergeSelectorConfig();
+  _rawConfig;
+  // Built once per config change so the preview selector reloads only then.
+  _selectorProps = this.buildSelectorProps();
+
+  // The preview reads the config the same way the flow runtime does
+  // (mergeSelectorConfig + selectorPropsFromConfig), so it renders what the
+  // screen will.
+  @api
+  get config() {
+    return this._rawConfig;
+  }
+  set config(value) {
+    this._rawConfig = value;
+    this._config = mergeSelectorConfig(value);
+    this._selectorProps = this.buildSelectorProps();
+  }
+
+  buildSelectorProps() {
+    return {
+      ...selectorPropsFromConfig(this._config),
+      sourceType: "custom",
+      customConfig: { items: previewItems(this._config) },
+      previewMode: true
+    };
+  }
+
+  get selectorProps() {
+    return this._selectorProps;
+  }
 
   handlePreviewStateChange(event) {
     this.dispatchEvent(
       new CustomEvent("previewstatechange", {
-        detail: event.currentTarget?.dataset?.state || ""
+        detail: event.currentTarget.dataset.state
       })
     );
-  }
-
-  get c() {
-    return this.config || {};
-  }
-  get gridConfig() {
-    return this.c.gridConfig || {};
-  }
-  get gridDefaults() {
-    return resolvedLayoutGridConfig(this.c.layout || "grid");
-  }
-  get badgeConfig() {
-    return this.gridConfig.badge || {};
-  }
-  get hasDataSource() {
-    return Boolean(this.c.dataSource);
-  }
-  get isPicklistMode() {
-    return this.c.dataSource === "picklist";
-  }
-  get isSObjectMode() {
-    return this.c.dataSource === "sobject";
-  }
-  get isCustomMode() {
-    return this.c.dataSource === "custom";
-  }
-  get isCollectionMode() {
-    return this.c.dataSource === "collection";
   }
 
   get previewStateButtons() {
@@ -131,277 +152,30 @@ export default class NewtonSelectorFlowCpeConfigPreview extends LightningElement
     ];
   }
 
-  get hasPreviewableSource() {
-    return this.hasDataSource;
-  }
-  get showMockPreview() {
-    return this.hasPreviewableSource;
-  }
   get previewEmpty() {
-    return !this.hasDataSource;
-  }
-  get previewRefreshKey() {
-    return JSON.stringify(this.c);
-  }
-  get previewItems() {
-    if (this.isCustomMode && (this.c.custom?.items?.length || 0) > 0) {
-      return this.c.custom.items
-        .filter((item) => item?.hidden !== true)
-        .map((item, index) => {
-          const sample = sampleAt(index);
-          return {
-            ...sample,
-            ...item,
-            id: item.id || `preview-custom-${index}`,
-            label: item.label || sample.label,
-            sublabel: item.sublabel || sample.sublabel,
-            icon: item.icon || sample.icon,
-            badge: item.badge || sample.badge,
-            helpText: item.helpText || sample.helpText,
-            value: normalizePreviewValue(item.value, sample.value),
-            disabled: Boolean(item.disabled)
-          };
-        });
-    }
-
-    const overrideValues = Object.keys(this.c.overrides || {}).filter(Boolean);
-    const values = [
-      ...overrideValues,
-      ...PREVIEW_SAMPLE_ITEMS.map((item) => item.value)
-    ];
-    const uniqueValues = [...new Set(values)].slice(0, 6);
-    const length = Math.max(4, uniqueValues.length);
-    return Array.from({ length }, (_, index) => {
-      const sample = sampleAt(index);
-      const value = uniqueValues[index] || sample.value;
-      return {
-        ...sample,
-        id: `preview-mock-${index}`,
-        value
-      };
-    });
-  }
-  get previewCustomConfig() {
-    return { items: this.previewItems };
+    return !this._config.dataSource;
   }
 
+  // The empty state already says to pick a data source, so no caption then.
   get previewCaption() {
-    if (!this.hasDataSource)
-      return "Pick a data source to see your selector come to life.";
-    if (this.isCustomMode && (this.c.custom?.items?.length || 0) === 0) {
-      return "Showing sample options until custom items are added.";
+    if (this.previewEmpty) return "";
+    if (
+      this._config.dataSource === "custom" &&
+      this._config.custom.items.length === 0
+    ) {
+      return "Sample options until you add your own.";
     }
-    return "Showing deterministic sample data. Runtime data is not queried in the preview.";
+    return "Sample data. Your real options load when the flow runs.";
   }
 
   get previewLayoutLabel() {
-    const labels = {
-      grid: "Grid",
-      list: "List",
-      horizontal: "Horizontal",
-      picklist: "Picklist",
-      dropdown: "Picklist",
-      radio: "Radio",
-      columns: "Columns",
-      dualListbox: "Multi-select"
-    };
-    return labels[this.c.layout] || "Grid";
-  }
-  get previewSelectionLabel() {
-    return this.c.selectionMode === "multi" ? "Multi" : "Single";
-  }
-  get dataSelectorCustomConfig() {
-    return this.previewCustomConfig;
-  }
-  get dataSelectorOverrides() {
-    return this.c.overrides || {};
-  }
-  get dataSelectorDisplayConfig() {
     return (
-      this.c.display || { sortBy: "none", sortDirection: "asc", limit: null }
+      LAYOUT_TILES.find((tile) => tile.value === this._config.layout)?.label ||
+      "Grid"
     );
   }
 
-  get noneOptionValue() {
-    return this.c.includeNoneOption === true;
-  }
-  get noneOptionLabelValue() {
-    return this.c.noneOptionLabel || "--None--";
-  }
-  get noneOptionPositionValue() {
-    return this.c.noneOptionPosition || "start";
-  }
-  get manualInputConfig() {
-    return this.c.manualInput || {};
-  }
-  get manualInputValue() {
-    return Boolean(this.manualInputConfig.enabled);
-  }
-  get manualInputLabelValue() {
-    return this.manualInputConfig.label || "Other";
-  }
-  get manualInputMinLengthValue() {
-    return this.manualInputConfig.minLength || 0;
-  }
-  get manualInputMaxLengthValue() {
-    const max = this.manualInputConfig.maxLength;
-    return max === null || max === undefined || max === "" ? undefined : max;
-  }
-  get dataSelectorGridMinWidth() {
-    return this.gridConfig.minWidth || this.gridDefaults.minWidth;
-  }
-  get dataSelectorGapHorizontal() {
-    return this.gridConfig.gapH || this.gridDefaults.gapH;
-  }
-  get dataSelectorGapVertical() {
-    return this.gridConfig.gapV || this.gridDefaults.gapV;
-  }
-  get dataSelectorSize() {
-    return this.gridConfig.size || this.gridDefaults.size;
-  }
-  get dataSelectorAspectRatio() {
-    return this.gridConfig.aspectRatio || this.gridDefaults.aspectRatio;
-  }
-  get dataSelectorBadgePosition() {
-    return this.badgeConfig.position || "bottom-inline";
-  }
-  get dataSelectorBadgeVariant() {
-    return this.badgeConfig.variant || "neutral";
-  }
-  get dataSelectorBadgeShape() {
-    return this.badgeConfig.shape || "pill";
-  }
-  get dataSelectorColumns() {
-    const n = Number(this.gridConfig.columns);
-    return Number.isFinite(n) && n >= 1 && n <= 6 ? n : undefined;
-  }
-  get dataSelectorSelectionIndicator() {
-    return (
-      this.gridConfig.selectionIndicator || this.gridDefaults.selectionIndicator
-    );
-  }
-  get dataSelectorElevation() {
-    return this.gridConfig.elevation || "outlined";
-  }
-  get dataSelectorPattern() {
-    return this.gridConfig.pattern || "none";
-  }
-  get dataSelectorPatternTone() {
-    return this.gridConfig.patternTone || "neutral";
-  }
-  get dataSelectorPatternHoverTone() {
-    return this.gridConfig.patternHoverTone || this.dataSelectorPatternTone;
-  }
-  get dataSelectorPatternSelectedTone() {
-    return this.gridConfig.patternSelectedTone || "brand";
-  }
-  get dataSelectorPatternDisabledTone() {
-    return this.gridConfig.patternDisabledTone || "neutral";
-  }
-  get dataSelectorCornerStyle() {
-    return this.gridConfig.cornerStyle || "none";
-  }
-  get dataSelectorCornerTone() {
-    return this.gridConfig.cornerTone || "neutral";
-  }
-  get dataSelectorSurfaceStyle() {
-    return this.gridConfig.surfaceStyle || "solid";
-  }
-  get dataSelectorSurfaceTone() {
-    return this.gridConfig.surfaceTone || "neutral";
-  }
-  get dataSelectorSurfaceHoverTone() {
-    return this.gridConfig.surfaceHoverTone || this.dataSelectorSurfaceTone;
-  }
-  get dataSelectorSurfaceSelectedTone() {
-    return this.gridConfig.surfaceSelectedTone || "brand";
-  }
-  get dataSelectorSurfaceDisabledTone() {
-    return this.gridConfig.surfaceDisabledTone || "neutral";
-  }
-  get dataSelectorIconDecor() {
-    return this.gridConfig.iconDecor || this.gridDefaults.iconDecor;
-  }
-  get dataSelectorIconStyle() {
-    return this.gridConfig.iconStyle || this.gridDefaults.iconStyle;
-  }
-  get dataSelectorIconShading() {
-    return this.gridConfig.iconShading || "flat";
-  }
-  get dataSelectorIconTone() {
-    return this.gridConfig.iconTone || this.gridDefaults.iconTone;
-  }
-  get dataSelectorIconGlyphTone() {
-    return this.gridConfig.iconGlyphTone || "auto";
-  }
-  get dataSelectorIconGlyphToneHex() {
-    return this.gridConfig.iconGlyphToneHex || "";
-  }
-  get dataSelectorIconSize() {
-    const raw = this.gridConfig.iconSize;
-    return raw && raw !== "auto" ? raw : "large";
-  }
-  get dataSelectorIconToneHex() {
-    return this.gridConfig.iconToneHex || "";
-  }
-  get dataSelectorPatternToneHex() {
-    return this.gridConfig.patternToneHex || "";
-  }
-  get dataSelectorPatternHoverToneHex() {
-    return this.gridConfig.patternHoverToneHex || "";
-  }
-  get dataSelectorPatternSelectedToneHex() {
-    return this.gridConfig.patternSelectedToneHex || "";
-  }
-  get dataSelectorPatternDisabledToneHex() {
-    return this.gridConfig.patternDisabledToneHex || "";
-  }
-  get dataSelectorCornerToneHex() {
-    return this.gridConfig.cornerToneHex || "";
-  }
-  get dataSelectorSurfaceToneHex() {
-    return this.gridConfig.surfaceToneHex || "";
-  }
-  get dataSelectorSurfaceHoverToneHex() {
-    return this.gridConfig.surfaceHoverToneHex || "";
-  }
-  get dataSelectorSurfaceSelectedToneHex() {
-    return this.gridConfig.surfaceSelectedToneHex || "";
-  }
-  get dataSelectorSurfaceDisabledToneHex() {
-    return this.gridConfig.surfaceDisabledToneHex || "";
-  }
-  get dataSelectorBadgeVariantHex() {
-    return this.badgeConfig.variantHex || "";
-  }
-  get dataSelectorShowIcons() {
-    return this.gridConfig.showIcons !== false;
-  }
-  get dataSelectorShowBadges() {
-    return this.gridConfig.showBadges !== false;
-  }
-  get dataSelectorMarginTop() {
-    return this.gridConfig.margin?.top ?? "";
-  }
-  get dataSelectorMarginRight() {
-    return this.gridConfig.margin?.right ?? "";
-  }
-  get dataSelectorMarginBottom() {
-    return this.gridConfig.margin?.bottom ?? "";
-  }
-  get dataSelectorMarginLeft() {
-    return this.gridConfig.margin?.left ?? "";
-  }
-  get dataSelectorPaddingTop() {
-    return this.gridConfig.padding?.top || undefined;
-  }
-  get dataSelectorPaddingRight() {
-    return this.gridConfig.padding?.right || undefined;
-  }
-  get dataSelectorPaddingBottom() {
-    return this.gridConfig.padding?.bottom || undefined;
-  }
-  get dataSelectorPaddingLeft() {
-    return this.gridConfig.padding?.left || undefined;
+  get previewSelectionLabel() {
+    return this._config.selectionMode === "multi" ? "Multi" : "Single";
   }
 }

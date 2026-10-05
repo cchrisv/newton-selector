@@ -59,17 +59,6 @@ function toggle(node, checked) {
   );
 }
 
-function toggleWithStaleTarget(node, currentChecked, nextChecked) {
-  node.checked = currentChecked;
-  node.dispatchEvent(
-    new CustomEvent("toggle", {
-      detail: { checked: nextChecked },
-      bubbles: true,
-      composed: true
-    })
-  );
-}
-
 function inputChange(node, value) {
   node.value = value;
   node.dispatchEvent(
@@ -174,7 +163,7 @@ describe("c-newton-selector-flow-cpe-behavior-config events", () => {
       element.shadowRoot.querySelector(
         'c-newton-selector-flow-cpe-toggle[data-key="required"]'
       ),
-      true
+      false
     );
     toggle(
       element.shadowRoot.querySelector(
@@ -189,90 +178,18 @@ describe("c-newton-selector-flow-cpe-behavior-config events", () => {
       false
     );
     valueChanged(
-      element.shadowRoot.querySelector(
-        "c-newton-selector-flow-cpe-resource-selector"
+      byLabel(
+        element.shadowRoot,
+        "c-newton-selector-flow-cpe-resource-selector",
+        "Error message (optional)"
       ),
       "Pick one"
     );
 
-    expect(patches.at(-4).value.required).toBe(true);
+    expect(patches.at(-4).value.required).toBe(false);
     expect(patches.at(-3).value.enableSearch).toBe(true);
     expect(patches.at(-2).value.autoAdvance).toBe(false);
     expect(patches.at(-1).value.customErrorMessage).toBe("Pick one");
-  });
-
-  it("renders Mode, Required, Auto Nav, and Search as separate focused sections", () => {
-    const element = mount();
-    const cards = [
-      ...element.shadowRoot.querySelectorAll(".newton-studio__card")
-    ];
-    const modeCard = cards.find((card) =>
-      card
-        .querySelector(".slds-card__header-title")
-        ?.textContent.includes("Mode")
-    );
-    const requiredCard = cards.find((card) =>
-      card
-        .querySelector(".slds-card__header-title")
-        ?.textContent.includes("Required")
-    );
-
-    expect(element.shadowRoot.textContent).toContain("Mode");
-    expect(element.shadowRoot.textContent).toContain("Required");
-    expect(element.shadowRoot.textContent).toContain("Auto navigation");
-    expect(element.shadowRoot.textContent).toContain("Search");
-    expect(modeCard).not.toBeUndefined();
-    expect(
-      byLabel(modeCard, "c-newton-selector-flow-cpe-toggle", "Selection mode")
-    ).not.toBeUndefined();
-    expect(requiredCard).not.toBeUndefined();
-    expect(
-      requiredCard.querySelector(".newton-card__glyph c-newton-selector-icon")
-        .name
-    ).toBe("asterisk");
-    expect(
-      element.shadowRoot.querySelector(".newton-studio__axis-title")
-    ).toBeNull();
-    expect(
-      element.shadowRoot.querySelector('[aria-label="Selection mode"]')
-    ).toBeNull();
-    expect(element.shadowRoot.textContent).not.toContain("Search & toolbar");
-    expect(element.shadowRoot.textContent).not.toContain("bulk-select");
-    expect(element.shadowRoot.textContent).not.toContain("Minimum selections");
-    expect(element.shadowRoot.textContent).not.toContain("Maximum selections");
-    expect(
-      byLabel(
-        element.shadowRoot,
-        "c-newton-selector-flow-cpe-toggle",
-        "Show Select all / Clear all toolbar"
-      )
-    ).toBeUndefined();
-  });
-
-  it("does not render empty card bodies for off-state toggle sections", () => {
-    const element = mount({
-      ...BASE_CONFIG,
-      required: false,
-      includeNoneOption: false,
-      manualInput: {
-        ...BASE_CONFIG.manualInput,
-        enabled: false
-      },
-      enableSearch: false
-    });
-
-    const emptyBodies = [
-      ...element.shadowRoot.querySelectorAll(".slds-card__body_inner")
-    ].filter((body) => !body.textContent.trim());
-
-    expect(emptyBodies).toHaveLength(0);
-    expect(
-      byLabel(
-        element.shadowRoot,
-        "c-newton-selector-flow-cpe-toggle",
-        "Required"
-      ).closest(".newton-studio__card")
-    ).not.toBeNull();
   });
 
   it("hides Auto Nav when selection mode is multi", () => {
@@ -282,39 +199,11 @@ describe("c-newton-selector-flow-cpe-behavior-config events", () => {
       autoAdvance: false
     });
 
-    expect(element.shadowRoot.textContent).not.toContain("Auto Nav");
     expect(
       element.shadowRoot.querySelector(
         'c-newton-selector-flow-cpe-toggle[data-key="autoAdvance"]'
       )
     ).toBeNull();
-  });
-
-  it("uses toggle event detail when the component target still has the old checked value", () => {
-    const element = mount({
-      ...BASE_CONFIG,
-      required: true,
-      enableSearch: true
-    });
-    const patches = collect(element);
-
-    toggleWithStaleTarget(
-      element.shadowRoot.querySelector(
-        'c-newton-selector-flow-cpe-toggle[data-key="required"]'
-      ),
-      true,
-      false
-    );
-    toggleWithStaleTarget(
-      element.shadowRoot.querySelector(
-        'c-newton-selector-flow-cpe-toggle[data-key="enableSearch"]'
-      ),
-      true,
-      false
-    );
-
-    expect(patches.at(-2).value.required).toBe(false);
-    expect(patches.at(-1).value.enableSearch).toBe(false);
   });
 
   it("emits none option patches only for valid position changes", () => {

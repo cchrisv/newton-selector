@@ -1,19 +1,18 @@
 /* =============================================================================
-   newtonSelectorFlowCpeConfigModal — SLDS 2 studio shell
+   newtonSelectorFlowCpeStudio — SLDS 2 studio shell
    Preview panel | splitter | configuration controls
    ============================================================================= */
 
 :host {
   --newton-studio-left-fr: 50fr;
   --newton-studio-right-fr: 50fr;
-  --newton-studio-splitter-w: var(--newton-static-v-0-375rem, 0.375rem);
+  --newton-studio-splitter-w: 0.375rem;
   --newton-studio-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
   --newton-studio-panel: var(--slds-g-color-surface-1, #ffffff);
   --newton-studio-panel-soft: var(--slds-g-color-surface-container-2, #f9f9f9);
   --newton-studio-ink-weak: var(--slds-g-color-neutral-base-40, #5c5c5c);
   --newton-studio-hairline: var(--slds-g-color-border-base-1, #e5e5e5);
   --newton-studio-brand: var(--slds-g-color-brand-base-50, #0176d3);
-  --newton-studio-brand-weak: var(--slds-g-color-brand-base-95, #eaf3ff);
   --newton-studio-radius: var(--slds-g-radius-border-2, 0.25rem);
   --newton-studio-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -22,7 +21,7 @@
   display: grid;
   grid-template-rows: minmax(0, 1fr);
   height: 78vh;
-  min-height: var(--newton-static-v-34rem, 34rem);
+  min-height: 34rem;
   background: var(--newton-studio-canvas);
   border-block-start: var(--slds-g-sizing-border-1, 1px) solid
     var(--newton-studio-hairline);
@@ -54,14 +53,116 @@
   overflow: hidden;
 }
 
+/* Controls column = fixed chapter tabs over an independently scrolling body. */
 .newton-studio__controls {
-  overflow-y: auto;
-  padding: var(--slds-g-spacing-4, 1rem);
   display: flex;
   flex-direction: column;
-  gap: var(--slds-g-spacing-4, 1rem);
+  overflow: hidden;
   container-type: inline-size;
   container-name: newton-studio-controls;
+}
+
+.newton-studio__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--slds-g-spacing-3, 0.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newton-studio__scroll {
+    scroll-behavior: auto;
+  }
+}
+
+/* Chapter tabs — jump between Data / Content / Behavior / Appearance and
+   keep the active chapter and any warn/error status in view while scrolling. */
+.newton-studio__tabs {
+  flex: 0 0 auto;
+  display: flex;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem) 0;
+  background: var(--newton-studio-panel);
+  border-block-end: var(--slds-g-sizing-border-1, 1px) solid
+    var(--newton-studio-hairline);
+  overflow-x: auto;
+}
+
+.newton-studio__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  min-block-size: var(--slds-g-sizing-9, 2rem);
+  margin-block-end: calc(-1 * var(--slds-g-sizing-border-1, 1px));
+  padding: 0 var(--slds-g-spacing-3, 0.75rem);
+  border: 0;
+  border-block-end: var(--slds-g-sizing-border-3, 3px) solid transparent;
+  border-start-start-radius: var(--newton-studio-radius);
+  border-start-end-radius: var(--newton-studio-radius);
+  background: transparent;
+  color: var(--newton-studio-ink-weak);
+  font: inherit;
+  font-size: var(--slds-g-font-scale-base, 0.8125rem);
+  font-weight: var(--slds-g-font-weight-5, 500);
+  line-height: var(--slds-g-font-line-height-1, 1);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 160ms var(--newton-studio-ease),
+    background-color 160ms var(--newton-studio-ease),
+    border-color 160ms var(--newton-studio-ease);
+}
+
+.newton-studio__tab:hover {
+  background: var(--newton-studio-panel-soft);
+  color: var(--slds-g-color-neutral-base-10, #181818);
+}
+
+.newton-studio__tab:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
+  outline-offset: calc(-1 * var(--slds-g-sizing-border-2, 2px));
+}
+
+.newton-studio__tab_active {
+  border-block-end-color: var(--newton-studio-brand);
+  color: var(--slds-g-color-neutral-base-10, #181818);
+  font-weight: var(--slds-g-font-weight-7, 700);
+}
+
+.newton-studio__tab c-newton-selector-icon {
+  color: currentColor;
+}
+
+.newton-studio__tab_active c-newton-selector-icon {
+  color: var(--newton-studio-brand);
+}
+
+/* Status pip — only rendered when a chapter has a warning or error. */
+.newton-studio__nav-status {
+  flex: 0 0 auto;
+  inline-size: 0.4375rem;
+  block-size: 0.4375rem;
+  border-radius: var(--slds-g-radius-border-circle, 50%);
+  background: currentColor;
+}
+
+.newton-studio__nav-status_warn {
+  color: var(--slds-g-color-warning-base-60, #9a5b02);
+}
+
+.newton-studio__nav-status_error {
+  color: var(--slds-g-color-error-base-50, #ba0517);
+}
+
+/* Narrow controls column: icons drop out, labels stay. */
+@container newton-studio-controls (max-width: 24rem) {
+  .newton-studio__tab c-newton-selector-icon {
+    display: none;
+  }
 }
 
 .newton-studio__splitter {
@@ -81,7 +182,7 @@
 .newton-studio__splitter-grip {
   display: block;
   width: var(--slds-g-sizing-border-1, 1px);
-  height: var(--newton-static-v-100-percent, 100%);
+  height: 100%;
   background: var(--newton-studio-hairline);
   transition:
     background-color 120ms ease,
@@ -97,23 +198,21 @@
 }
 
 .newton-studio__splitter:focus-visible {
-  outline: none;
-}
-
-.newton-studio__splitter:focus-visible .newton-studio__splitter-grip {
-  box-shadow: 0 0 0 2px var(--newton-studio-brand-weak);
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
+  outline-offset: calc(-1 * var(--slds-g-sizing-border-2, 2px));
 }
 
 .newton-studio__splitter::before,
 .newton-studio__splitter::after {
   content: "";
   position: absolute;
-  left: var(--newton-static-v-50-percent, 50%);
+  inset-inline: 0;
+  margin-inline: auto;
   width: var(--slds-g-sizing-border-3, 3px);
   height: var(--slds-g-sizing-border-3, 3px);
-  border-radius: var(--newton-static-v-50-percent, 50%);
+  border-radius: var(--slds-g-radius-border-circle, 50%);
   background: var(--newton-studio-ink-weak);
-  transform: translateX(-50%) scale(0);
+  transform: scale(0);
   transition: transform 160ms var(--newton-studio-ease);
   pointer-events: none;
 }
@@ -132,7 +231,7 @@
 .newton-studio__splitter:focus-visible::after,
 .newton-studio__splitter:active::before,
 .newton-studio__splitter:active::after {
-  transform: translateX(-50%) scale(1);
+  transform: scale(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -144,10 +243,6 @@
 }
 
 @media (max-width: 56rem) {
-  .newton-studio {
-    min-height: var(--newton-static-v-34rem, 34rem);
-  }
-
   .newton-studio__body {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
@@ -158,7 +253,7 @@
   }
 
   .newton-studio__left,
-  .newton-studio__controls {
-    padding: var(--slds-g-spacing-4, 1rem);
+  .newton-studio__scroll {
+    padding: var(--slds-g-spacing-3, 0.75rem);
   }
 }

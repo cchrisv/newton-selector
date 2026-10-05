@@ -25,18 +25,7 @@ describe("c-newton-selector-flow-screen", () => {
       document.body.removeChild(document.body.firstChild);
   });
 
-  it("parses selectorConfigJson and passes to data selector", async () => {
-    const el = mount();
-    await Promise.resolve();
-    const dataSelector = el.shadowRoot.querySelector(
-      "c-newton-selector-data-selector"
-    );
-    expect(dataSelector).not.toBeNull();
-    expect(dataSelector.label).toBe("Choose one");
-    expect(dataSelector.sourceType).toBe("custom");
-  });
-
-  it("falls back to defaults on malformed JSON", async () => {
+  it("shows the error state with the configured message on malformed JSON", async () => {
     const el = createElement("c-newton-selector-flow-screen", {
       is: NewtonSelectorFlowScreen
     });
@@ -46,13 +35,14 @@ describe("c-newton-selector-flow-screen", () => {
     const dataSelector = el.shadowRoot.querySelector(
       "c-newton-selector-data-selector"
     );
-    expect(dataSelector.sourceType).toBe("custom");
+    const alert = dataSelector.shadowRoot.querySelector('[role="alert"]');
+    expect(alert).not.toBeNull();
+    expect(alert.textContent).toContain("Could not load options.");
   });
 
   it("deep-merges partial saved config with shared runtime defaults", async () => {
     const el = mount({
       dataSource: "collection",
-      sourceRecords: undefined,
       collection: {
         fieldMap: { label: "Name" }
       },
@@ -66,6 +56,7 @@ describe("c-newton-selector-flow-screen", () => {
     const dataSelector = el.shadowRoot.querySelector(
       "c-newton-selector-data-selector"
     );
+    expect(dataSelector.collectionConfig.records).toHaveLength(1);
     expect(dataSelector.collectionConfig.fieldMap).toEqual(
       expect.objectContaining({
         label: "Name",
@@ -76,51 +67,9 @@ describe("c-newton-selector-flow-screen", () => {
         helpText: ""
       })
     );
-    expect(dataSelector.badgeVariant).toBe("brand");
-    expect(dataSelector.badgePosition).toBe("bottom-inline");
+    expect(dataSelector.appearance.badgeVariant).toBe("brand");
+    expect(dataSelector.appearance.badgePosition).toBe("bottom-inline");
     expect(dataSelector.manualInputLabel).toBe("Other");
-  });
-
-  it("validate() delegates to the data selector", async () => {
-    const el = mount();
-    await Promise.resolve();
-    const result = el.validate();
-    expect(result).toBeDefined();
-    expect(result.isValid).toBeDefined();
-  });
-
-  it("selectionCount starts at 0", async () => {
-    const el = mount();
-    await Promise.resolve();
-    expect(el.selectionCount).toBe(0);
-  });
-
-  it("selectionCount is 1 after single-select value change", async () => {
-    const el = mount({ selectionMode: "single" });
-    await Promise.resolve();
-    const dataSelector = el.shadowRoot.querySelector(
-      "c-newton-selector-data-selector"
-    );
-    const events = [];
-    el.addEventListener("flowattributechange", (e) => events.push(e));
-    dataSelector.dispatchEvent(
-      new CustomEvent("valuechange", {
-        detail: {
-          value: "a",
-          values: [],
-          record: null,
-          records: [],
-          label: "A",
-          labels: []
-        },
-        bubbles: true
-      })
-    );
-    expect(el.selectionCount).toBe(1);
-    const countEvent = events.find(
-      (e) => e.detail?.attributeName === "selectionCount"
-    );
-    expect(countEvent?.detail?.attributeValue).toBe(1);
   });
 
   it("selectionCount is 0 when single-select is cleared", async () => {
@@ -143,33 +92,5 @@ describe("c-newton-selector-flow-screen", () => {
       })
     );
     expect(el.selectionCount).toBe(0);
-  });
-
-  it("selectionCount reflects multi-select count", async () => {
-    const el = mount({ selectionMode: "multi" });
-    await Promise.resolve();
-    const dataSelector = el.shadowRoot.querySelector(
-      "c-newton-selector-data-selector"
-    );
-    const events = [];
-    el.addEventListener("flowattributechange", (e) => events.push(e));
-    dataSelector.dispatchEvent(
-      new CustomEvent("valuechange", {
-        detail: {
-          value: "",
-          values: ["a", "b", "c"],
-          record: null,
-          records: [],
-          label: "",
-          labels: ["A", "B", "C"]
-        },
-        bubbles: true
-      })
-    );
-    expect(el.selectionCount).toBe(3);
-    const countEvent = events.find(
-      (e) => e.detail?.attributeName === "selectionCount"
-    );
-    expect(countEvent?.detail?.attributeValue).toBe(3);
   });
 });

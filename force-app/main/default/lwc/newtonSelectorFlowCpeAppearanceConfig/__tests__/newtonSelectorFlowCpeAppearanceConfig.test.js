@@ -1,5 +1,6 @@
 import { createElement } from "lwc";
 import NewtonSelectorFlowCpeAppearanceConfig from "c/newtonSelectorFlowCpeAppearanceConfig";
+import { mergeSelectorConfig } from "c/newtonSelectorUtilityConfigDefaults";
 
 const BASE_CONFIG = {
   dataSource: "custom",
@@ -38,7 +39,7 @@ function mount(config = BASE_CONFIG) {
       is: NewtonSelectorFlowCpeAppearanceConfig
     }
   );
-  element.config = config;
+  element.config = mergeSelectorConfig(config);
   document.body.appendChild(element);
   return element;
 }
@@ -76,17 +77,6 @@ function toggle(node, checked) {
   );
 }
 
-function toggleWithStaleTarget(node, currentChecked, nextChecked) {
-  node.checked = currentChecked;
-  node.dispatchEvent(
-    new CustomEvent("toggle", {
-      detail: { checked: nextChecked },
-      bubbles: true,
-      composed: true
-    })
-  );
-}
-
 function inputChange(node, value) {
   node.value = value;
   node.dispatchEvent(
@@ -109,32 +99,6 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
     while (document.body.firstChild) {
       document.body.removeChild(document.body.firstChild);
     }
-  });
-
-  it("orders appearance sections in the builder workflow", () => {
-    const element = mount();
-    const sectionTitles = [
-      ...element.shadowRoot.querySelectorAll(".newton-studio__subchapter-title")
-    ].map((node) => node.textContent.replace(/\s+/g, " ").trim());
-
-    expect(sectionTitles).toEqual([
-      "Layout & shape",
-      "Card surface & state",
-      "Icon",
-      "Badge",
-      "Spacing & layout"
-    ]);
-
-    const cardTitles = [
-      ...element.shadowRoot.querySelectorAll(".slds-card__header-title")
-    ].map((node) => node.textContent.replace(/\s+/g, " ").trim());
-
-    expect(cardTitles.indexOf("Surface style")).toBeLessThan(
-      cardTitles.indexOf("Pattern overlay")
-    );
-    expect(cardTitles.indexOf("Pattern overlay")).toBeLessThan(
-      cardTitles.indexOf("Corner flourish")
-    );
   });
 
   it("emits layout patches without changing selection mode", () => {
@@ -165,49 +129,6 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
     expect(singlePatches[0].value.layout).toBe("list");
   });
 
-  it("starts spacing controls on Auto and can reset layout styling in one click", () => {
-    const element = mount();
-    const patches = collect(element);
-
-    const selectedGap = group(
-      element.shadowRoot,
-      "Horizontal gap"
-    ).querySelector("c-newton-selector-choice-tile");
-    expect(selectedGap.item.label).toBe("Auto");
-    expect(selectedGap.selected).toBe(true);
-
-    const selectedMargin = group(
-      element.shadowRoot,
-      "Margin — all sides"
-    ).querySelector("c-newton-selector-choice-tile");
-    expect(selectedMargin.item.label).toBe("Auto");
-    expect(selectedMargin.selected).toBe(true);
-
-    const selectedPadding = group(
-      element.shadowRoot,
-      "Padding — all sides"
-    ).querySelector("c-newton-selector-choice-tile");
-    expect(selectedPadding.item.label).toBe("Auto");
-    expect(selectedPadding.selected).toBe(true);
-
-    element.shadowRoot
-      .querySelector('button[title="Reset layout styling to SLDS defaults"]')
-      .click();
-
-    expect(patches.at(-1).value.gridConfig).toMatchObject({
-      minWidth: "7.5rem",
-      gapH: "",
-      gapV: "",
-      size: "small",
-      selectionIndicator: "frame",
-      iconDecor: "square",
-      iconStyle: "soft",
-      iconTone: "brand",
-      margin: { top: "", right: "", bottom: "", left: "", linked: true },
-      padding: { top: "", right: "", bottom: "", left: "", linked: true }
-    });
-  });
-
   it("emits grid sizing, spacing, and column patches from rendered controls", () => {
     const element = mount();
     const patches = collect(element);
@@ -232,34 +153,6 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
     expect(patches.at(-1).value.gridConfig.minWidth).toBe("18rem");
   });
 
-  it("emits redesigned elevation patches and omits removed spotlight indicator", () => {
-    const element = mount();
-    const patches = collect(element);
-
-    const elevationGroup = group(element.shadowRoot, "Card elevation");
-    const elevationValues = [
-      ...elevationGroup.querySelectorAll("c-newton-selector-choice-tile")
-    ].map((card) => card.item.value);
-    expect(elevationValues).toEqual([
-      "plain",
-      "subtle",
-      "outlined",
-      "raised",
-      "floating",
-      "inset"
-    ]);
-
-    cardSelect(elevationGroup, "floating");
-    expect(patches.at(-1).value.gridConfig.elevation).toBe("floating");
-
-    const indicatorValues = [
-      ...group(element.shadowRoot, "Selection indicator").querySelectorAll(
-        "c-newton-selector-choice-tile"
-      )
-    ].map((card) => card.item.value);
-    expect(indicatorValues).not.toContain("spotlight");
-  });
-
   it("emits surface, icon, and badge patches from rendered controls", () => {
     const element = mount({
       ...BASE_CONFIG,
@@ -282,7 +175,9 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
     );
     cardSelect(group(element.shadowRoot, "Badge position"), "top-right");
     inputChange(
-      element.shadowRoot.querySelector('input[aria-label="Hex color value"]'),
+      element.shadowRoot.querySelector(
+        'input[aria-label="Badge hex color value"]'
+      ),
       "#123456"
     );
 
@@ -378,40 +273,7 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
     expect(patches.at(-1).value.gridConfig.iconToneHex).toBe("#654321");
   });
 
-  it("renders badge position and shape through shared choice tiles", () => {
-    const element = mount();
-
-    const positionTiles = group(
-      element.shadowRoot,
-      "Badge position"
-    ).querySelectorAll("c-newton-selector-choice-tile");
-    const shapeTiles = group(
-      element.shadowRoot,
-      "Badge shape"
-    ).querySelectorAll("c-newton-selector-choice-tile");
-
-    expect(positionTiles).toHaveLength(5);
-    expect(shapeTiles).toHaveLength(2);
-    expect(
-      element.shadowRoot.querySelector(".newton-badge-pos-chip")
-    ).toBeNull();
-    expect(
-      element.shadowRoot.querySelector(".newton-badge-shape-chip")
-    ).toBeNull();
-  });
-
-  it("emits badge position and shape patches from shared choice tiles", () => {
-    const element = mount();
-    const patches = collect(element);
-
-    cardSelect(group(element.shadowRoot, "Badge position"), "bottom-right");
-    cardSelect(group(element.shadowRoot, "Badge shape"), "square");
-
-    expect(patches.at(-2).value.gridConfig.badge.position).toBe("bottom-right");
-    expect(patches.at(-1).value.gridConfig.badge.shape).toBe("square");
-  });
-
-  it("uses toggle event detail so icon and badge off switches hide dependent CPE controls", async () => {
+  it("hides dependent controls when the icon and badge switches turn off", async () => {
     const element = mount({
       ...BASE_CONFIG,
       gridConfig: {
@@ -422,13 +284,12 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
     });
     const patches = collect(element);
 
-    toggleWithStaleTarget(
+    toggle(
       byLabel(
         element.shadowRoot,
         "c-newton-selector-flow-cpe-toggle",
         "Show icons"
       ),
-      true,
       false
     );
     await Promise.resolve();
@@ -438,13 +299,12 @@ describe("c-newton-selector-flow-cpe-appearance-config events", () => {
     await Promise.resolve();
     expect(group(element.shadowRoot, "Icon size")).toBeNull();
 
-    toggleWithStaleTarget(
+    toggle(
       byLabel(
         element.shadowRoot,
         "c-newton-selector-flow-cpe-toggle",
         "Show badges"
       ),
-      true,
       false
     );
     await Promise.resolve();

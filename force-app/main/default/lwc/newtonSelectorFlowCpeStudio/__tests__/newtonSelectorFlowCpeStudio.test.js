@@ -10,23 +10,6 @@ describe("c-newton-selector-flow-cpe-studio", () => {
     }
   });
 
-  it("defaults to an even preview and controls split", async () => {
-    const element = createElement("c-newton-selector-flow-cpe-studio", {
-      is: NewtonSelectorFlowCpeStudio
-    });
-
-    document.body.appendChild(element);
-    await flush();
-
-    const shell = element.shadowRoot.querySelector(".newton-studio");
-    expect(shell.getAttribute("style")).toContain(
-      "--newton-studio-left-fr: 50fr"
-    );
-    expect(shell.getAttribute("style")).toContain(
-      "--newton-studio-right-fr: 50fr"
-    );
-  });
-
   it("allows keyboard resize to give either pane the full available width", async () => {
     const element = createElement("c-newton-selector-flow-cpe-studio", {
       is: NewtonSelectorFlowCpeStudio
@@ -48,9 +31,7 @@ describe("c-newton-selector-flow-cpe-studio", () => {
     expect(resizeHandler).toHaveBeenLastCalledWith(
       expect.objectContaining({ detail: 100 })
     );
-    expect(
-      element.shadowRoot.querySelector(".newton-studio").style.cssText
-    ).toContain("--newton-studio-left-fr: 100fr");
+    expect(splitter.getAttribute("aria-valuenow")).toBe("100");
 
     splitter.dispatchEvent(
       new KeyboardEvent("keydown", { key: "Home", bubbles: true })
@@ -60,8 +41,6 @@ describe("c-newton-selector-flow-cpe-studio", () => {
     expect(resizeHandler).toHaveBeenLastCalledWith(
       expect.objectContaining({ detail: 0 })
     );
-    expect(
-      element.shadowRoot.querySelector(".newton-studio").style.cssText
-    ).toContain("--newton-studio-right-fr: 100fr");
+    expect(splitter.getAttribute("aria-valuenow")).toBe("0");
   });
 });

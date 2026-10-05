@@ -43,6 +43,7 @@
           automatic-output-variables={automaticOutputVariables}
           onconfigpatch={handleConfigPatch}
           onrefchange={handleRefChange}
+          onfiltervaliditychange={handleFilterValidityChange}
         ></c-newton-selector-flow-cpe-data-config>
 
         <c-newton-selector-flow-cpe-content-config
@@ -58,7 +59,10 @@
           config={_config}
           builder-context={builderContext}
           automatic-output-variables={automaticOutputVariables}
+          value-ref={_valueRef}
+          values-ref={_valuesRef}
           onconfigpatch={handleConfigPatch}
+          onrefchange={handleRefChange}
         ></c-newton-selector-flow-cpe-behavior-config>
 
         <c-newton-selector-flow-cpe-appearance-config
@@ -71,13 +75,38 @@
   </lightning-modal-body>
 
   <lightning-modal-footer>
-    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
-    <lightning-button
-      variant="brand"
-      label="Save"
-      disabled={saveDisabled}
-      title={saveDisabledTitle}
-      onclick={handleSave}
-    ></lightning-button>
+    <template lwc:if={confirmingDiscard}>
+      <div class="newton-modal__footer">
+        <p class="newton-discard__message" role="alert">
+          Discard your unsaved changes?
+        </p>
+        <lightning-button
+          class="newton-discard__keep"
+          label="Keep editing"
+          onclick={handleKeepEditing}
+        ></lightning-button>
+        <lightning-button
+          variant="destructive"
+          label="Discard changes"
+          onclick={handleDiscard}
+        ></lightning-button>
+      </div>
+    </template>
+    <template lwc:else>
+      <div class="newton-modal__footer">
+        <p class="newton-modal__status" role="status">{saveStatus}</p>
+        <lightning-button
+          class="newton-modal__cancel"
+          label="Cancel"
+          onclick={handleCancel}
+        ></lightning-button>
+        <lightning-button
+          variant="brand"
+          label="Save"
+          disabled={saveDisabled}
+          onclick={handleSave}
+        ></lightning-button>
+      </div>
+    </template>
   </lightning-modal-footer>
 </template>

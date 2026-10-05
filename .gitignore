@@ -13,10 +13,10 @@ deploy-options.json
 
 # LWC Jest coverage reports
 coverage/
-artifacts/
-output/playwright/
-.tmp/
-force-app/main/default/flows/Newton_Selector_E2E.flow-meta.xml
+
+# Flows the E2E scripts generate and delete after each run
+fixtures/main/default/flows/Newton_Selector_E2E.flow-meta.xml
+fixtures/main/default/flows/Newton_Selector_Features.flow-meta.xml
 
 # Logs
 logs
@@ -68,3 +68,6 @@ CLAUDE.md
 .github/
 .copilot/
 .github/copilot-instructions.md
+
+# Playwright / e2e artifacts
+output/

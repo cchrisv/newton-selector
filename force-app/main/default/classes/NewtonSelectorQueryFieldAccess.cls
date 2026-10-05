@@ -1,143 +1,84 @@
-/** @description Field and object access validation for Newton Selector query building. */
+/** @description Validates the source object once per query build and checks field access against its field map. */
 public with sharing class NewtonSelectorQueryFieldAccess {
+  /** @description Canonical object API name. */
+  public final String objectName;
+  private final Map<String, Schema.SObjectField> fieldMap;
+
   /**
-   * @description Validates the configured source object.
-   * @param apiName Source object API name.
+   * @description Resolves and validates the configured source object.
+   * @param objectApiName Source object API name.
    */
-  public static void validateObject(String apiName) {
-    if (String.isBlank(apiName)) {
+  public NewtonSelectorQueryFieldAccess(String objectApiName) {
+    if (String.isBlank(objectApiName)) {
       throw new NewtonSelectorException('Object API name is required.');
     }
 
-    Schema.SObjectType type = Schema.getGlobalDescribe().get(apiName);
+    Schema.SObjectType type = Schema.getGlobalDescribe().get(objectApiName);
     if (type == null) {
-      throw new NewtonSelectorException('Unknown object: ' + apiName);
+      throw new NewtonSelectorException('Unknown object: ' + objectApiName);
     }
 
-    Schema.DescribeSObjectResult describe = describeSObject(type);
-    if (!describe.isQueryable() || !describe.isAccessible()) {
-      throw new NewtonSelectorException('Object not accessible: ' + apiName);
-    }
-  }
-
-  /**
-   * @description Collects every field needed by runtime mapping and sorting.
-   * @param config Selector query configuration.
-   * @return Field API names to query.
-   */
-  public static List<String> collectFields(NewtonSelectorQueryDTO config) {
-    Set<String> fieldSet = new Set<String>{ 'Id' };
-    addIfPresent(fieldSet, config.labelField);
-    addIfPresent(fieldSet, config.valueField);
-    addIfPresent(fieldSet, config.sublabelField);
-    addIfPresent(fieldSet, config.iconField);
-    addIfPresent(fieldSet, config.badgeField);
-    addIfPresent(fieldSet, config.helpField);
-    addIfPresent(fieldSet, config.orderByField);
-    return new List<String>(fieldSet);
-  }
-
-  /**
-   * @description Validates read access for every query field.
-   * @param apiName Source object API name.
-   * @param fields Field API names.
-   */
-  public static void validateFields(String apiName, List<String> fields) {
-    Schema.SObjectType type = Schema.getGlobalDescribe().get(apiName);
-    Map<String, Schema.SObjectField> fieldMap = describeSObject(type)
-      .fields.getMap();
-    for (String fieldApiName : fields) {
-      validateReadableField(apiName, fieldApiName, fieldMap);
-    }
-  }
-
-  /**
-   * @description Resolves a filter field to its canonical API name and validates filter access.
-   * @param objectApiName Source object API name.
-   * @param fieldApiName Filter field API name.
-   * @return Canonical field API name.
-   */
-  public static String canonicalFilterField(
-    String objectApiName,
-    String fieldApiName
-  ) {
-    Schema.DescribeFieldResult describe = getFieldDescribe(
-      objectApiName,
-      fieldApiName
+    Schema.DescribeSObjectResult describe = type.getDescribe(
+      SObjectDescribeOptions.DEFERRED
     );
-    if (!describe.isFilterable()) {
+    if (!describe.isQueryable() || !describe.isAccessible()) {
       throw new NewtonSelectorException(
-        'Field not filterable on ' + objectApiName + ': ' + fieldApiName
+        'Object not accessible: ' + objectApiName
       );
     }
-    return describe.getName();
+    objectName = describe.getName();
+    fieldMap = describe.fields.getMap();
   }
 
   /**
-   * @description Resolves and validates a field describe for runtime querying.
-   * @param objectApiName Source object API name.
+   * @description Returns the describe of a field the running user can read.
    * @param fieldApiName Field API name.
    * @return Field describe result.
    */
-  public static Schema.DescribeFieldResult getFieldDescribe(
-    String objectApiName,
-    String fieldApiName
-  ) {
-    if (String.isBlank(fieldApiName)) {
-      throw new NewtonSelectorException('Filter field is required.');
-    }
-
-    Schema.SObjectType type = Schema.getGlobalDescribe().get(objectApiName);
-    Map<String, Schema.SObjectField> fieldMap = describeSObject(type)
-      .fields.getMap();
+  public Schema.DescribeFieldResult readableField(String fieldApiName) {
     Schema.SObjectField token = fieldMap.get(fieldApiName.toLowerCase());
     if (token == null) {
       throw new NewtonSelectorException(
-        'Unknown field on ' + objectApiName + ': ' + fieldApiName
+        'Unknown field on ' + objectName + ': ' + fieldApiName
       );
     }
 
     Schema.DescribeFieldResult describe = token.getDescribe();
     if (!describe.isAccessible()) {
       throw new NewtonSelectorException(
-        'Field not accessible on ' + objectApiName + ': ' + fieldApiName
+        'Field not accessible on ' + objectName + ': ' + fieldApiName
       );
     }
     return describe;
   }
 
   /**
-   * @description Gets a deferred object describe to avoid eager child relationship loading.
-   * @param type SObject type token.
-   * @return Deferred describe result.
+   * @description Returns the describe of a readable field that can be used in WHERE.
+   * @param fieldApiName Field API name.
+   * @return Field describe result.
    */
-  public static Schema.DescribeSObjectResult describeSObject(
-    Schema.SObjectType type
-  ) {
-    return type.getDescribe(SObjectDescribeOptions.DEFERRED);
-  }
-
-  private static void addIfPresent(Set<String> target, String value) {
-    if (String.isNotBlank(value)) {
-      target.add(value);
-    }
-  }
-
-  private static void validateReadableField(
-    String apiName,
-    String fieldApiName,
-    Map<String, Schema.SObjectField> fieldMap
-  ) {
-    Schema.SObjectField token = fieldMap.get(fieldApiName.toLowerCase());
-    if (token == null) {
+  public Schema.DescribeFieldResult filterableField(String fieldApiName) {
+    Schema.DescribeFieldResult describe = readableField(fieldApiName);
+    if (!describe.isFilterable()) {
       throw new NewtonSelectorException(
-        'Unknown field on ' + apiName + ': ' + fieldApiName
+        'Field not filterable on ' + objectName + ': ' + fieldApiName
       );
     }
-    if (!token.getDescribe().isAccessible()) {
+    return describe;
+  }
+
+  /**
+   * @description Returns the describe of a readable field that can be used in ORDER BY.
+   * @param fieldApiName Field API name.
+   * @return Field describe result.
+   */
+  public Schema.DescribeFieldResult sortableField(String fieldApiName) {
+    Schema.DescribeFieldResult describe = readableField(fieldApiName);
+    if (!describe.isSortable()) {
       throw new NewtonSelectorException(
-        'Field not accessible on ' + apiName + ': ' + fieldApiName
+        'Field not sortable on ' + objectName + ': ' + fieldApiName
       );
     }
+    return describe;
   }
 }

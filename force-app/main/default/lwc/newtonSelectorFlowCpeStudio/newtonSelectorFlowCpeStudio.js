@@ -3,6 +3,9 @@ import { api, LightningElement, track } from "lwc";
 const MIN_LEFT_PERCENT = 0;
 const MAX_LEFT_PERCENT = 100;
 const DEFAULT_LEFT_PERCENT = 50;
+// The scroll area's top padding (--slds-g-spacing-3, 0.75rem = 12px), kept
+// above a jumped-to chapter so it sits where it would at the top of the list.
+const SCROLL_PADDING_TOP_PX = 12;
 
 export default class NewtonSelectorFlowCpeStudio extends LightningElement {
   @api sections = [];
@@ -38,8 +41,53 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
     return MAX_LEFT_PERCENT;
   }
 
+  get tabs() {
+    return (this.sections || []).map((section) => ({
+      key: section.key,
+      label: section.label,
+      icon: section.icon,
+      ariaCurrent: section.ariaCurrent,
+      showStatus: section.showStatus,
+      statusClass: section.statusClass,
+      statusLabel:
+        section.status === "error"
+          ? `${section.label} has errors`
+          : `${section.label} needs attention`,
+      tabClass: section.active
+        ? "newton-studio__tab newton-studio__tab_active"
+        : "newton-studio__tab"
+    }));
+  }
+
+  get hasTabs() {
+    return this.tabs.length > 0;
+  }
+
+  handleTabClick(event) {
+    const key = event.currentTarget.dataset.key;
+    if (!key) return;
+    this.dispatchEvent(new CustomEvent("sectionclick", { detail: key }));
+    this._scrollToChapter(key);
+  }
+
   handleControlsSlotChange() {
     this._setupChapterObserver();
+  }
+
+  // Assigns scrollTop rather than calling scrollTo(): Lightning's secure
+  // element wrapper ignores scrollTo from component code. Smoothness (and its
+  // reduced-motion opt-out) lives in CSS on .newton-studio__scroll.
+  _scrollToChapter(key) {
+    const scroller = this.template.querySelector(".newton-studio__scroll");
+    const chapter = this._allChapters().find(
+      (element) => element.getAttribute("data-chapter") === key
+    );
+    if (!scroller || !chapter) return;
+    const offset =
+      chapter.getBoundingClientRect().top -
+      scroller.getBoundingClientRect().top +
+      scroller.scrollTop;
+    scroller.scrollTop = Math.max(0, offset - SCROLL_PADDING_TOP_PX);
   }
 
   renderedCallback() {
@@ -111,7 +159,7 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
 
   _setupChapterObserver() {
     if (this._chapterObserver) return;
-    const controls = this.template.querySelector(".newton-studio__controls");
+    const controls = this.template.querySelector(".newton-studio__scroll");
     const chapters = this._allChapters();
     if (
       !controls ||

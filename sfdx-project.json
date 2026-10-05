@@ -7,6 +7,10 @@
       "versionName": "Newton Selector v1.0",
       "versionNumber": "1.0.0.NEXT",
       "versionDescription": "Newton Selector for Flow Screens with CPE. Supports picklist, collection, SObject+SOQL, and custom data sources."
+    },
+    {
+      "path": "fixtures",
+      "default": false
     }
   ],
   "name": "newton-selector",

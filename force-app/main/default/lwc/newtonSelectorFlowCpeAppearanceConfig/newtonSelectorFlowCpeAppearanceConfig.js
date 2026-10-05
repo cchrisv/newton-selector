@@ -1,7 +1,9 @@
 import { api, LightningElement } from "lwc";
 import {
-  defaultGridConfig,
-  defaultSelectorConfig,
+  resetAppearance,
+  switchLayout
+} from "c/newtonSelectorFlowCpeUtilityConfigState";
+import {
   formatRem,
   parseRemValue
 } from "c/newtonSelectorUtilityConfigDefaults";
@@ -14,7 +16,7 @@ import {
   CORNER_TILES,
   ELEVATION_TILES,
   GLYPH_TONE_SWATCHES,
-  GRID_SLIDER_RANGES,
+  GRID_MIN_WIDTH_RANGE,
   ICON_DECOR_TILES,
   ICON_SHADING_TILES,
   ICON_SIZE_TILES,
@@ -24,7 +26,7 @@ import {
   PATTERN_TILES,
   SELECTION_INDICATOR_TILES,
   SIDE_META,
-  SIZE_LAYOUT_MAP,
+  SIZE_COLUMN_WIDTHS,
   SIZE_TILES,
   SPACING_SIDES,
   SURFACE_TILES,
@@ -32,107 +34,93 @@ import {
   spacingTileList
 } from "c/newtonSelectorFlowCpeUtilityConfigOptions";
 
+// The runtime accepts #RGB, #RRGGBB and #RRGGBBAA and drops anything else.
+const HEX_COLOR = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+
+const ICON_SIZE_OPTIONS = [
+  { value: "auto", label: "Auto", sublabel: "Match tile", icon: "refresh-cw" },
+  ...ICON_SIZE_TILES
+];
+
+const BADGE_TONES = [
+  ...TONE_SWATCHES.slice(0, -1),
+  { value: "inverse", label: "Inverse" },
+  TONE_SWATCHES[TONE_SWATCHES.length - 1]
+];
+
+const STATE_TONES = [
+  { key: "normal", label: "Normal", suffix: "Tone" },
+  { key: "hover", label: "Hover", suffix: "HoverTone" },
+  { key: "selected", label: "Selected", suffix: "SelectedTone" },
+  { key: "disabled", label: "Disabled", suffix: "DisabledTone" }
+];
+
+/**
+ * Appearance chapter of the config modal. Reads the merged selector config
+ * (every key present) and emits `configpatch` with the whole next config.
+ */
 export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElement {
   @api config;
 
-  get _config() {
-    return this.config || defaultSelectorConfig();
-  }
-  set _config(value) {
-    this.dispatchEvent(
-      new CustomEvent("configpatch", { detail: { path: [], value } })
-    );
-  }
+  // Hex fields whose typed value was rejected, keyed by config key; the value
+  // is "true" so it can drive aria-invalid directly.
+  _hexErrors = {};
+
+  // "Reset appearance" with Undo: keep what Reset replaced until the
+  // appearance changes again, then withdraw the offer so Undo can never
+  // overwrite newer work.
+  _undoReset = null;
+
   get gridConfig() {
-    return this._config.gridConfig || defaultGridConfig(this._currentLayout);
+    return this.config.gridConfig;
   }
-  get badgeCfg() {
-    return this.gridConfig.badge || {};
+  get layout() {
+    return this.config.layout;
   }
-  get isLayoutSection() {
-    return true;
+  get hexErrors() {
+    return this._hexErrors;
   }
 
-  get _currentLayout() {
-    return this.normalizeLayout(this._config.layout || "grid");
-  }
-  get isTileLayout() {
-    return true;
-  }
-  get showTileSize() {
-    return this.isTileLayout;
-  }
   get showAspectRatio() {
-    return (
-      this._currentLayout === "grid" || this._currentLayout === "horizontal"
-    );
+    return this.layout === "grid" || this.layout === "horizontal";
   }
   get showColumns() {
-    return this._currentLayout === "grid";
+    return this.layout === "grid";
   }
   get showGridMinWidth() {
-    return (
-      this._currentLayout === "grid" || this._currentLayout === "horizontal"
-    );
+    return this.showAspectRatio;
   }
   get showGapHorizontal() {
-    return (
-      this._currentLayout === "grid" ||
-      this._currentLayout === "horizontal" ||
-      this._currentLayout === "columns" ||
-      this._currentLayout === "dualListbox"
+    return ["grid", "horizontal", "columns", "dualListbox"].includes(
+      this.layout
     );
   }
   get showGapVertical() {
-    return (
-      this._currentLayout === "grid" ||
-      this._currentLayout === "list" ||
-      this._currentLayout === "picklist" ||
-      this._currentLayout === "radio" ||
-      this._currentLayout === "columns" ||
-      this._currentLayout === "dualListbox"
-    );
+    return [
+      "grid",
+      "list",
+      "picklist",
+      "radio",
+      "columns",
+      "dualListbox"
+    ].includes(this.layout);
   }
   get showGapCard() {
     return this.showGapHorizontal || this.showGapVertical;
   }
-  get showSelectionIndicator() {
-    return this.isTileLayout;
-  }
-  get showElevation() {
-    return this.isTileLayout;
-  }
-  get showBadgeCard() {
-    return this.isTileLayout;
-  }
-  get showMarginPadding() {
-    return this.isTileLayout;
-  }
 
   get layoutTiles() {
-    const active = this._currentLayout;
-    return LAYOUT_TILES.map((tile) => {
-      const normalizedValue = this.normalizeLayout(tile.value);
-      return {
-        ...tile,
-        id: tile.value,
-        sublabel: tile.sublabel,
-        _selected: normalizedValue === active,
-        _disabled: false
-      };
-    });
+    return this.selectedTiles(LAYOUT_TILES, this.layout);
   }
   get sizeTiles() {
-    return this.selectedTiles(SIZE_TILES, this.gridConfig.size || "small");
+    return this.selectedTiles(SIZE_TILES, this.gridConfig.size);
   }
   get aspectTiles() {
-    return this.selectedTiles(
-      ASPECT_TILES,
-      this.gridConfig.aspectRatio || "1:1"
-    );
+    return this.selectedTiles(ASPECT_TILES, this.gridConfig.aspectRatio);
   }
   get columnChips() {
-    const active = this.columnsValue;
+    const active =
+      this.gridConfig.columns == null ? "" : String(this.gridConfig.columns);
     return COLUMN_CHIPS.map((chip) => ({
       ...chip,
       className:
@@ -142,590 +130,341 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
       ariaPressed: String(chip.value === active)
     }));
   }
-  get columnsValue() {
-    const value = this.gridConfig.columns;
-    return value == null ? "" : String(value);
-  }
   get selectionIndicatorTiles() {
     return this.selectedTiles(
       SELECTION_INDICATOR_TILES,
-      this.normalizeSelectionIndicator(
-        this.gridConfig.selectionIndicator || "frame"
-      )
+      this.gridConfig.selectionIndicator
     );
   }
   get elevationTiles() {
-    return this.selectedTiles(
-      ELEVATION_TILES,
-      this.normalizeElevation(this.gridConfig.elevation || "outlined")
-    );
+    return this.selectedTiles(ELEVATION_TILES, this.gridConfig.elevation);
   }
 
   get patternTiles() {
-    return this.selectedTiles(PATTERN_TILES, this.gridConfig.pattern || "none");
+    return this.selectedTiles(PATTERN_TILES, this.gridConfig.pattern);
   }
   get patternToneRows() {
-    return this.buildStateToneRows(
+    return this.stateToneRows(
       "pattern",
       "Pattern",
-      (this.gridConfig.pattern || "none") !== "none"
+      this.gridConfig.pattern !== "none"
     );
-  }
-  get patternToneChips() {
-    return this.buildToneChips(
-      this.gridConfig.patternTone || "neutral",
-      (this.gridConfig.pattern || "none") !== "none"
-    );
-  }
-  get patternToneIsCustom() {
-    return this.gridConfig.patternTone === "custom";
-  }
-  get patternToneHexValue() {
-    return this.gridConfig.patternToneHex || "";
   }
 
   get cornerTiles() {
-    return this.selectedTiles(
-      CORNER_TILES,
-      this.gridConfig.cornerStyle || "none"
-    );
+    return this.selectedTiles(CORNER_TILES, this.gridConfig.cornerStyle);
   }
   get cornerToneChips() {
-    return this.buildToneChips(
-      this.gridConfig.cornerTone || "neutral",
-      (this.gridConfig.cornerStyle || "none") !== "none"
+    return this.toneChips(
+      TONE_SWATCHES,
+      this.gridConfig.cornerTone,
+      this.gridConfig.cornerStyle !== "none"
     );
   }
   get cornerToneIsCustom() {
     return this.gridConfig.cornerTone === "custom";
   }
-  get cornerToneHexValue() {
-    return this.gridConfig.cornerToneHex || "";
-  }
 
   get surfaceTiles() {
-    return this.selectedTiles(
-      SURFACE_TILES,
-      this.gridConfig.surfaceStyle || "solid"
-    );
+    return this.selectedTiles(SURFACE_TILES, this.gridConfig.surfaceStyle);
   }
   get surfaceToneRows() {
-    return this.buildStateToneRows("surface", "Surface", true);
-  }
-  get surfaceToneChips() {
-    return this.buildToneChips(this.gridConfig.surfaceTone || "neutral", true);
-  }
-  get surfaceToneIsCustom() {
-    return this.gridConfig.surfaceTone === "custom";
-  }
-  get surfaceToneHexValue() {
-    return this.gridConfig.surfaceToneHex || "";
+    return this.stateToneRows("surface", "Surface", true);
   }
 
   get showIconsValue() {
-    return this.gridConfig.showIcons !== false;
+    return this.gridConfig.showIcons;
   }
   get showBadgesValue() {
-    return this.gridConfig.showBadges !== false;
+    return this.gridConfig.showBadges;
   }
   get iconSubchapterClass() {
-    const base = "newton-studio__subchapter newton-studio__subchapter_icon";
-    return this.showIconsValue ? base : `${base} newton-studio__subchapter_off`;
+    return this.showIconsValue
+      ? "newton-studio__subchapter"
+      : "newton-studio__subchapter newton-studio__subchapter_off";
   }
   get badgeSubchapterClass() {
-    const base = "newton-studio__subchapter newton-studio__subchapter_badge";
     return this.showBadgesValue
-      ? base
-      : `${base} newton-studio__subchapter_off`;
+      ? "newton-studio__subchapter"
+      : "newton-studio__subchapter newton-studio__subchapter_off";
   }
 
   get iconSizeTiles() {
-    return this.selectedTiles(
-      [
-        {
-          value: "auto",
-          label: "Auto",
-          sublabel: "Match tile",
-          icon: "refresh-cw"
-        },
-        ...ICON_SIZE_TILES
-      ],
-      this.gridConfig.iconSize || "auto",
-      this.showIconsValue
-    );
+    return this.selectedTiles(ICON_SIZE_OPTIONS, this.gridConfig.iconSize);
   }
-
   get iconDecorTiles() {
-    return this.selectedTiles(
-      ICON_DECOR_TILES,
-      this.gridConfig.iconDecor || "square",
-      this.showIconsValue
-    );
-  }
-  get hasIconDecor() {
-    return (this.gridConfig.iconDecor || "square") !== "none";
+    return this.selectedTiles(ICON_DECOR_TILES, this.gridConfig.iconDecor);
   }
   get showIconTreatment() {
-    return this.showIconsValue && this.hasIconDecor;
+    return this.gridConfig.iconDecor !== "none";
   }
   get iconStyleTiles() {
-    return this.selectedTiles(
-      ICON_STYLE_TILES,
-      this.gridConfig.iconStyle || "soft",
-      this.showIconTreatment
-    );
-  }
-  get iconShadingTiles() {
-    return this.selectedTiles(
-      ICON_SHADING_TILES,
-      this.gridConfig.iconShading || "flat",
-      this.showIconTreatment &&
-        (this.gridConfig.iconStyle || "soft") === "filled"
-    );
+    return this.selectedTiles(ICON_STYLE_TILES, this.gridConfig.iconStyle);
   }
   get showIconShading() {
-    return (
-      this.showIconTreatment &&
-      (this.gridConfig.iconStyle || "soft") === "filled"
-    );
+    return this.gridConfig.iconStyle === "filled";
+  }
+  get iconShadingTiles() {
+    return this.selectedTiles(ICON_SHADING_TILES, this.gridConfig.iconShading);
   }
   get iconToneChips() {
-    return this.buildToneChips(
-      this.gridConfig.iconTone || "brand",
-      this.showIconTreatment
-    );
+    return this.toneChips(TONE_SWATCHES, this.gridConfig.iconTone, true);
   }
   get iconToneIsCustom() {
     return this.gridConfig.iconTone === "custom";
   }
-  get iconToneHexValue() {
-    return this.gridConfig.iconToneHex || "";
-  }
   get iconGlyphToneChips() {
-    return GLYPH_TONE_SWATCHES.map((tone) => ({
-      ...tone,
-      className: this.toneChipClass(
-        tone.value,
-        this.gridConfig.iconGlyphTone || "auto",
-        this.showIconTreatment
-      ),
-      ariaPressed: String(
-        tone.value === (this.gridConfig.iconGlyphTone || "auto")
-      ),
-      dotClassName: `newton-tone-chip__dot newton-tone-chip__dot_${tone.value}`,
-      disabled: !this.showIconTreatment
-    }));
+    return this.toneChips(
+      GLYPH_TONE_SWATCHES,
+      this.gridConfig.iconGlyphTone,
+      true
+    );
   }
   get iconGlyphToneIsCustom() {
     return this.gridConfig.iconGlyphTone === "custom";
   }
-  get iconGlyphToneHexValue() {
-    return this.gridConfig.iconGlyphToneHex || "";
-  }
 
-  get showBadgeGroupCards() {
-    return this.showBadgesValue;
-  }
-  get badgePosition() {
-    return this.badgeCfg.position || "bottom-inline";
-  }
-  get badgeVariant() {
-    return this.badgeCfg.variant || "neutral";
-  }
-  get badgeShape() {
-    return this.badgeCfg.shape || "pill";
-  }
-  get badgePositionChips() {
-    return BADGE_POSITIONS.map((chip) => ({
-      ...chip,
-      id: chip.value,
-      _selected: chip.value === this.badgePosition,
-      _disabled: false
-    }));
+  get badgePositionTiles() {
+    return this.selectedTiles(BADGE_POSITIONS, this.gridConfig.badge.position);
   }
   get badgeVariantChips() {
-    const all = [...TONE_SWATCHES];
-    all.splice(all.length - 1, 0, { value: "inverse", label: "Inverse" });
-    return all.map((tone) => ({
-      ...tone,
-      className: this.toneChipClass(tone.value, this.badgeVariant, true),
-      ariaPressed: String(tone.value === this.badgeVariant),
-      dotClassName: `newton-tone-chip__dot newton-tone-chip__dot_${tone.value}`,
-      disabled: false
-    }));
+    return this.toneChips(BADGE_TONES, this.gridConfig.badge.variant, true);
   }
   get badgeVariantIsCustom() {
-    return this.badgeVariant === "custom";
+    return this.gridConfig.badge.variant === "custom";
   }
-  get badgeVariantHexValue() {
-    return this.badgeCfg.variantHex || "";
-  }
-  get badgeShapeChips() {
-    return BADGE_SHAPES.map((shape) => ({
-      ...shape,
-      id: shape.value,
-      _selected: shape.value === this.badgeShape,
-      _disabled: false
-    }));
+  get badgeShapeTiles() {
+    return this.selectedTiles(BADGE_SHAPES, this.gridConfig.badge.shape);
   }
 
   get gapHTiles() {
-    return spacingTileList(AUTO_SPACING_TILES, this.gridConfig.gapH ?? "");
+    return spacingTileList(AUTO_SPACING_TILES, this.gridConfig.gapH);
   }
   get gapVTiles() {
-    return spacingTileList(AUTO_SPACING_TILES, this.gridConfig.gapV ?? "");
+    return spacingTileList(AUTO_SPACING_TILES, this.gridConfig.gapV);
   }
   get marginLinked() {
-    return this.gridConfig.margin?.linked !== false;
+    return this.gridConfig.margin.linked;
   }
   get paddingLinked() {
-    return this.gridConfig.padding?.linked !== false;
+    return this.gridConfig.padding.linked;
   }
   get marginAllTiles() {
-    return spacingTileList(
-      AUTO_SPACING_TILES,
-      this.gridConfig.margin?.top ?? ""
-    );
+    return spacingTileList(AUTO_SPACING_TILES, this.gridConfig.margin.top);
   }
   get paddingAllTiles() {
-    return spacingTileList(PADDING_TILES, this.gridConfig.padding?.top ?? "");
+    return spacingTileList(PADDING_TILES, this.gridConfig.padding.top);
   }
   get marginSideSections() {
-    return this.sideSections(
-      AUTO_SPACING_TILES,
-      this.gridConfig.margin || {},
-      ""
-    );
+    return this.sideSections(AUTO_SPACING_TILES, "margin", "Margin");
   }
   get paddingSideSections() {
-    return this.sideSections(PADDING_TILES, this.gridConfig.padding || {}, "");
+    return this.sideSections(PADDING_TILES, "padding", "Padding");
   }
 
   get gridMinWidthRange() {
-    return GRID_SLIDER_RANGES.minWidth;
+    return GRID_MIN_WIDTH_RANGE;
   }
   get gridMinWidthNumber() {
     return parseRemValue(
       this.gridConfig.minWidth,
-      GRID_SLIDER_RANGES.minWidth.fallback
+      GRID_MIN_WIDTH_RANGE.fallback
     );
   }
   get gridMinWidthDisplay() {
     return `${this.gridMinWidthNumber} rem`;
   }
   get gridMinWidthScaleMin() {
-    return `${GRID_SLIDER_RANGES.minWidth.min} rem`;
+    return `${GRID_MIN_WIDTH_RANGE.min} rem`;
   }
   get gridMinWidthScaleMax() {
-    return `${GRID_SLIDER_RANGES.minWidth.max} rem`;
+    return `${GRID_MIN_WIDTH_RANGE.max} rem`;
   }
 
+  get showResetUndo() {
+    return Boolean(
+      this._undoReset &&
+      JSON.stringify(this.gridConfig) === this._undoReset.resetSignature
+    );
+  }
+
+  // Switching layout keeps every style setting and swaps only the geometry,
+  // remembering each layout's own geometry so switching back restores it.
   handleLayoutTileChange(event) {
-    const value = this.normalizeLayout(event.detail?.value || "grid");
-    this._config = {
-      ...this._config,
-      layout: value,
-      gridConfig: defaultGridConfig(value)
+    const next = switchLayout(this.config, event.detail.value);
+    if (next !== this.config) this.emit(next);
+  }
+
+  handleResetAppearance() {
+    const next = resetAppearance(this.config);
+    this._undoReset = {
+      before: JSON.parse(
+        JSON.stringify({
+          gridConfig: this.gridConfig,
+          layoutGeometry: this.config.layoutGeometry || {}
+        })
+      ),
+      resetSignature: JSON.stringify(next.gridConfig)
     };
+    this.emit(next);
   }
-  handleResetLayoutDefaults() {
-    const layout = this._currentLayout;
-    this._config = {
-      ...this._config,
-      gridConfig: defaultGridConfig(layout)
-    };
+
+  handleUndoReset() {
+    const { before } = this._undoReset;
+    this._undoReset = null;
+    this.emit({ ...this.config, ...before });
   }
-  normalizeLayout(value) {
-    if (value === "dropdown") return "picklist";
-    return value;
-  }
-  normalizeSelectionIndicator(value) {
-    if (value === "spotlight") return "checkmark";
-    return SELECTION_INDICATOR_TILES.some((tile) => tile.value === value)
-      ? value
-      : "frame";
-  }
-  normalizeElevation(value) {
-    const normalized =
-      value === "flat" ? "plain" : value === "elevated" ? "raised" : value;
-    return ELEVATION_TILES.some((tile) => tile.value === normalized)
-      ? normalized
-      : "outlined";
-  }
+
   handleSizeTileChange(event) {
-    const value = event.detail?.value || "small";
-    const layout = SIZE_LAYOUT_MAP[value] || SIZE_LAYOUT_MAP.small;
-    this.patchGrid({ size: value, minWidth: layout.column });
-  }
-  handleAspectChange(event) {
-    this.patchGrid({ aspectRatio: event.detail?.value || "1:1" });
+    const size = event.detail.value;
+    this.patchGrid({ size, minWidth: SIZE_COLUMN_WIDTHS[size] });
   }
   handleColumnsChange(event) {
-    const raw = event.currentTarget?.dataset?.value;
+    const raw = event.currentTarget.dataset.value;
     this.patchGrid({ columns: raw === "" ? null : Number(raw) });
   }
-  handleSelectionIndicatorChange(event) {
-    this.patchGrid({
-      selectionIndicator: this.normalizeSelectionIndicator(
-        event.detail?.value || "frame"
-      )
-    });
-  }
-  handleElevationChange(event) {
-    this.patchGrid({
-      elevation: this.normalizeElevation(event.detail?.value || "outlined")
-    });
-  }
-  handlePatternChange(event) {
-    this.patchGrid({ pattern: event.detail?.value || "none" });
-  }
-  handleCornerChange(event) {
-    this.patchGrid({ cornerStyle: event.detail?.value || "none" });
-  }
-  handleSurfaceChange(event) {
-    this.patchGrid({ surfaceStyle: event.detail?.value || "solid" });
-  }
-  handleIconSizeChange(event) {
-    this.patchGrid({ iconSize: event.detail?.value || "auto" });
-  }
-  handleIconDecorChange(event) {
-    this.patchGrid({ iconDecor: event.detail?.value || "square" });
-  }
-  handleIconStyleChange(event) {
-    this.patchGrid({ iconStyle: event.detail?.value || "soft" });
-  }
-  handleIconShadingChange(event) {
-    this.patchGrid({ iconShading: event.detail?.value || "flat" });
-  }
-  handleGapHorizontalToken(event) {
-    this.patchGrid({ gapH: event.detail?.value ?? "" });
-  }
-  handleGapVerticalToken(event) {
-    this.patchGrid({ gapV: event.detail?.value ?? "" });
-  }
   handleGridMinWidthChange(event) {
-    const raw = Number(event.target.value);
-    this.patchGrid({
-      minWidth: formatRem(
-        Number.isFinite(raw) ? raw : GRID_SLIDER_RANGES.minWidth.fallback
-      )
-    });
+    this.patchGrid({ minWidth: formatRem(Number(event.target.value)) });
   }
 
-  handlePatternToneChange(event) {
-    this.patchDatasetGrid(event, "patternTone");
+  // Tile groups and tone chips name the gridConfig key they set in
+  // data-key; tiles report the value in the cardselect detail, chips in
+  // data-value.
+  handleTileChange(event) {
+    this.patchGrid({ [event.currentTarget.dataset.key]: event.detail.value });
   }
-  handlePatternStateToneChange(event) {
-    this.patchStateTone(event);
+  handleToneChange(event) {
+    const { key, value } = event.currentTarget.dataset;
+    this.patchGrid({ [key]: value });
   }
-  handleCornerToneChange(event) {
-    this.patchDatasetGrid(event, "cornerTone");
-  }
-  handleSurfaceToneChange(event) {
-    this.patchDatasetGrid(event, "surfaceTone");
-  }
-  handleSurfaceStateToneChange(event) {
-    this.patchStateTone(event);
-  }
-  handleIconToneChange(event) {
-    this.patchDatasetGrid(event, "iconTone");
-  }
-  handleIconGlyphToneChange(event) {
-    this.patchDatasetGrid(event, "iconGlyphTone");
-  }
-  handlePatternToneHexChange(event) {
-    this.patchGrid({ patternToneHex: event.target?.value || "" });
-  }
-  handlePatternStateToneHexChange(event) {
-    this.patchStateToneHex(event);
-  }
-  handleCornerToneHexChange(event) {
-    this.patchGrid({ cornerToneHex: event.target?.value || "" });
-  }
-  handleSurfaceToneHexChange(event) {
-    this.patchGrid({ surfaceToneHex: event.target?.value || "" });
-  }
-  handleSurfaceStateToneHexChange(event) {
-    this.patchStateToneHex(event);
-  }
-  handleIconToneHexChange(event) {
-    this.patchGrid({ iconToneHex: event.target?.value || "" });
-  }
-  handleIconGlyphToneHexChange(event) {
-    this.patchGrid({ iconGlyphToneHex: event.target?.value || "" });
-  }
-  handleShowIconsToggle(event) {
-    this.patchGrid({
-      showIcons: Boolean(event.detail?.checked ?? event.target?.checked)
-    });
-  }
-  handleShowBadgesToggle(event) {
-    this.patchGrid({
-      showBadges: Boolean(event.detail?.checked ?? event.target?.checked)
-    });
-  }
-  handleBadgePositionChange(event) {
-    this.patchDatasetBadge(event, "position");
-  }
-  handleBadgePositionTileChange(event) {
-    this.patchBadgeFromTileEvent(event, "position");
+  handleBadgeTileChange(event) {
+    this.patchBadge({ [event.currentTarget.dataset.key]: event.detail.value });
   }
   handleBadgeVariantChange(event) {
-    this.patchDatasetBadge(event, "variant");
+    this.patchBadge({ variant: event.currentTarget.dataset.value });
   }
-  handleBadgeShapeChange(event) {
-    this.patchDatasetBadge(event, "shape");
+
+  // Color swatches always produce a valid hex; typed values are checked and
+  // only stored when valid (or cleared), otherwise an inline error shows.
+  handleHexChange(event) {
+    const key = event.target.dataset.hexKey;
+    const value = event.target.value.trim();
+    const valid = value === "" || HEX_COLOR.test(value);
+    const errors = { ...this._hexErrors };
+    if (valid) delete errors[key];
+    else errors[key] = "true";
+    this._hexErrors = errors;
+    if (!valid) return;
+    if (key === "variantHex") this.patchBadge({ variantHex: value });
+    else this.patchGrid({ [key]: value });
   }
-  handleBadgeShapeTileChange(event) {
-    this.patchBadgeFromTileEvent(event, "shape");
+
+  handleShowIconsToggle(event) {
+    this.patchGrid({ showIcons: event.detail.checked });
   }
-  handleBadgeVariantHexChange(event) {
-    this.patchBadge({ variantHex: event.target?.value || "" });
+  handleShowBadgesToggle(event) {
+    this.patchGrid({ showBadges: event.detail.checked });
   }
 
   handleMarginLinkToggle(event) {
-    this.patchBox("margin", Boolean(event.detail?.checked), "");
+    this.patchBoxLinked("margin", event.detail.checked);
   }
   handlePaddingLinkToggle(event) {
-    this.patchBox("padding", Boolean(event.detail?.checked), "");
+    this.patchBoxLinked("padding", event.detail.checked);
   }
   handleMarginAllChange(event) {
-    this.patchBoxAll("margin", event.detail?.value ?? "");
+    this.patchBoxAll("margin", event.detail.value);
   }
   handlePaddingAllChange(event) {
-    this.patchBoxAll("padding", event.detail?.value ?? "");
+    this.patchBoxAll("padding", event.detail.value);
   }
   handleMarginSideChange(event) {
     this.patchBoxSide(
       "margin",
-      event.currentTarget?.dataset?.side,
-      event.detail?.value ?? ""
+      event.currentTarget.dataset.side,
+      event.detail.value
     );
   }
   handlePaddingSideChange(event) {
     this.patchBoxSide(
       "padding",
-      event.currentTarget?.dataset?.side,
-      event.detail?.value ?? ""
+      event.currentTarget.dataset.side,
+      event.detail.value
     );
   }
 
-  selectedTiles(source, active, enabled = true) {
+  selectedTiles(source, active) {
     return source.map((tile) => ({
       ...tile,
       id: tile.value,
-      _selected: tile.value === active,
-      _disabled: !enabled
+      _selected: tile.value === active
     }));
   }
-  buildToneChips(active, enabled) {
-    return TONE_SWATCHES.map((tone) => ({
+  toneChips(tones, active, enabled) {
+    return tones.map((tone) => ({
       ...tone,
-      className: this.toneChipClass(tone.value, active, enabled),
+      className: [
+        "newton-tone-chip",
+        `newton-tone-chip_${tone.value}`,
+        tone.value === active ? "newton-tone-chip_active" : "",
+        enabled ? "" : "newton-tone-chip_disabled"
+      ]
+        .filter(Boolean)
+        .join(" "),
       ariaPressed: String(tone.value === active),
       dotClassName: `newton-tone-chip__dot newton-tone-chip__dot_${tone.value}`,
       disabled: !enabled
     }));
   }
-  buildStateToneRows(axis, axisLabel, enabled) {
-    const stateDefs = [
-      {
-        key: "normal",
-        label: "Normal",
-        toneKey: `${axis}Tone`,
-        hexKey: `${axis}ToneHex`,
-        fallback: "neutral"
-      },
-      {
-        key: "hover",
-        label: "Hover",
-        toneKey: `${axis}HoverTone`,
-        hexKey: `${axis}HoverToneHex`,
-        fallback: this.gridConfig[`${axis}Tone`] || "neutral"
-      },
-      {
-        key: "selected",
-        label: "Selected",
-        toneKey: `${axis}SelectedTone`,
-        hexKey: `${axis}SelectedToneHex`,
-        fallback: "brand"
-      },
-      {
-        key: "disabled",
-        label: "Disabled",
-        toneKey: `${axis}DisabledTone`,
-        hexKey: `${axis}DisabledToneHex`,
-        fallback: "neutral"
-      }
-    ];
-    return stateDefs.map((def) => {
-      const active = this.gridConfig[def.toneKey] || def.fallback;
-      const stateLabel = def.label.toLowerCase();
+  stateToneRows(axis, axisLabel, enabled) {
+    return STATE_TONES.map((state) => {
+      const toneKey = `${axis}${state.suffix}`;
+      const hexKey = `${toneKey}Hex`;
+      const active = this.gridConfig[toneKey];
+      const stateLabel = state.label.toLowerCase();
       return {
-        ...def,
-        rowKey: `${axis}-${def.key}`,
+        label: state.label,
+        toneKey,
+        hexKey,
+        rowKey: `${axis}-${state.key}`,
         ariaLabel: `${axisLabel} ${stateLabel} color`,
-        chips: this.buildToneChips(active, enabled),
+        chips: this.toneChips(TONE_SWATCHES, active, enabled),
         isCustom: enabled && active === "custom",
-        hexValue: this.gridConfig[def.hexKey] || "",
-        hexId: `${axis}-${def.key}-tone-hex`,
+        hexValue: this.gridConfig[hexKey],
+        hexId: `${axis}-${state.key}-tone-hex`,
+        hexErrorId: `${axis}-${state.key}-tone-hex-error`,
+        hexInvalid: this._hexErrors[hexKey],
         colorAriaLabel: `Pick ${axisLabel.toLowerCase()} ${stateLabel} color`,
         hexAriaLabel: `${axisLabel} ${stateLabel} hex color value`
       };
     });
   }
-  toneChipClass(value, active, enabled) {
-    return [
-      "newton-tone-chip",
-      `newton-tone-chip_${value}`,
-      value === active ? "newton-tone-chip_active" : "",
-      enabled ? "" : "newton-tone-chip_disabled"
-    ]
-      .filter(Boolean)
-      .join(" ");
-  }
-  sideSections(source, config, fallback) {
+  sideSections(source, name, property) {
     return SIDE_META.map((meta) => ({
       ...meta,
-      tiles: spacingTileList(source, config[meta.side] ?? fallback)
+      groupLabel: `${property} ${meta.label.toLowerCase()}`,
+      tiles: spacingTileList(source, this.gridConfig[name][meta.side])
     }));
   }
-  patchDatasetGrid(event, key) {
-    const value = event.currentTarget?.dataset?.value;
-    if (value) this.patchGrid({ [key]: value });
-  }
-  patchStateTone(event) {
-    const key = event.currentTarget?.dataset?.toneKey;
-    const value = event.currentTarget?.dataset?.value;
-    if (key && value) this.patchGrid({ [key]: value });
-  }
-  patchStateToneHex(event) {
-    const key =
-      event.currentTarget?.dataset?.hexKey || event.target?.dataset?.hexKey;
-    if (key) this.patchGrid({ [key]: event.target?.value || "" });
-  }
-  patchDatasetBadge(event, key) {
-    const value = event.currentTarget?.dataset?.value;
-    if (value) this.patchBadge({ [key]: value });
-  }
-  patchBadgeFromTileEvent(event, key) {
-    const value = event.detail?.value;
-    if (value) this.patchBadge({ [key]: value });
+
+  emit(config) {
+    this.dispatchEvent(
+      new CustomEvent("configpatch", { detail: { path: [], value: config } })
+    );
   }
   patchGrid(values) {
-    this._config = {
-      ...this._config,
+    this.emit({
+      ...this.config,
       gridConfig: { ...this.gridConfig, ...values }
-    };
+    });
   }
   patchBadge(values) {
-    this.patchGrid({ badge: { ...this.badgeCfg, ...values } });
+    this.patchGrid({ badge: { ...this.gridConfig.badge, ...values } });
   }
-  patchBox(name, linked, fallback) {
-    const box = { ...(this.gridConfig[name] || {}), linked };
+  patchBoxLinked(name, linked) {
+    const box = { ...this.gridConfig[name], linked };
     if (linked) {
-      const base = box.top ?? fallback;
-      box.top = box.right = box.bottom = box.left = base;
+      box.right = box.bottom = box.left = box.top;
     }
     this.patchGrid({ [name]: box });
   }
@@ -743,7 +482,7 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
   patchBoxSide(name, side, value) {
     if (!SPACING_SIDES.includes(side)) return;
     this.patchGrid({
-      [name]: { ...(this.gridConfig[name] || {}), [side]: value, linked: false }
+      [name]: { ...this.gridConfig[name], [side]: value, linked: false }
     });
   }
 }

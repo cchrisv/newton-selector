@@ -1,15 +1,9 @@
 /**
  * Newton Selector Flow CPE | Helpers
  *
- * Merged utility module for the CPE Toolkit. Three logical sections:
- *   1. Field metadata cache  — stateful LRU cache around getObjectFields
- *   2. Merge-field helpers   — pure functions for {!...} reference detection and formatting
- *   3. Data source helpers   — pure transforms for the six data-source modes
- *
- * Usage:
- *   import {
- *       fetchFields, iconForFieldType, isReference, formattedValue, normalizeInputMode
- *   } from 'c/newtonSelectorFlowCpeUtilityHelpers';
+ *   1. Field metadata cache — getObjectFields results, shared per object
+ *   2. Type icons           — the one field/resource type → Lucide icon map
+ *   3. Merge-field helpers  — {!...} reference detection and formatting
  *
  * Attribution: merge-field helpers adapted from UnofficialSF fsc_flowComboboxUtils
  * (Apache-2.0). See repo LICENSE and NOTICE.
@@ -47,6 +41,7 @@ function touchLru(key) {
 /**
  * Fetch fields for an SObject, returning cached results when available.
  * Dedupes concurrent callers by returning the same in-flight Promise.
+ * Rejects when Apex fails, so callers can tell the admin why the list is empty.
  * @param {string} objectApiName
  * @returns {Promise<{name:string, label:string, type:string, relationshipName:string}[]>}
  */
@@ -67,106 +62,94 @@ export function fetchFields(objectApiName) {
       const result = Array.isArray(fields) ? fields : [];
       _fieldCache.set(key, result);
       touchLru(key);
-      _fieldInflight.delete(key);
       return result;
     })
-    .catch(() => {
+    .finally(() => {
       _fieldInflight.delete(key);
-      return [];
     });
   _fieldInflight.set(key, p);
   return p;
 }
 
-/** Clear all cached field metadata. */
-export function clearFieldCache() {
-  _fieldCache.clear();
-  _fieldInflight.clear();
-  _fieldLru.length = 0;
+/**
+ * "Couldn't load <what>: <reason>" for an Apex or wire error.
+ * @param {string} what — e.g. "fields"
+ * @param {*} error
+ * @returns {string}
+ */
+export function loadErrorMessage(what, error) {
+  const reason =
+    error?.body?.message ||
+    error?.message ||
+    "Try again or reload Flow Builder.";
+  return `Couldn't load ${what}: ${reason}`;
 }
 
-/** Clear cache for a specific object (useful when a custom field is added mid-session). */
-export function clearFieldCacheFor(objectApiName) {
-  if (!objectApiName) return;
-  const key = objectApiName.trim().toLowerCase();
-  _fieldCache.delete(key);
-  _fieldInflight.delete(key);
-  const idx = _fieldLru.indexOf(key);
-  if (idx > -1) _fieldLru.splice(idx, 1);
-}
+// ═════════════════════════════════════════════════════════════════
+// 2. TYPE ICONS
+// ═════════════════════════════════════════════════════════════════
 
-/** Diagnostics for tests/debugging. */
-export function getFieldCacheStats() {
-  return {
-    size: _fieldCache.size,
-    inflight: _fieldInflight.size,
-    lru: [..._fieldLru]
-  };
-}
-
-// ── Field type → SLDS icon mapping ────────────────────────────────
-
-const TYPE_ICON_MAP = Object.freeze({
+/**
+ * Field or Flow resource type (upper case: Schema.DisplayType names such as
+ * "CURRENCY", or Flow data types such as "SOBJECT") → Lucide icon name.
+ */
+export const TYPE_ICON_MAP = Object.freeze({
   STRING: "type",
-  TEXTAREA: "typearea",
+  TEXTAREA: "file-text",
   INTEGER: "hash",
   LONG: "hash",
   DOUBLE: "hash",
+  NUMBER: "hash",
   CURRENCY: "dollar-sign",
   PERCENT: "percent",
-  BOOLEAN: "check",
+  BOOLEAN: "toggle-left",
   DATE: "calendar-days",
   DATETIME: "calendar-clock",
   TIME: "clock",
-  PICKLIST: "list_type",
-  COMBOBOX: "list_type",
+  PICKLIST: "list",
+  COMBOBOX: "list",
   MULTIPICKLIST: "list-checks",
-  REFERENCE: "circle_lookup",
-  EMAIL: "mail",
-  PHONE: "smartphone",
-  URL: "link",
+  REFERENCE: "link-2",
   ID: "key-round",
+  EMAIL: "mail",
+  PHONE: "phone",
+  URL: "link",
   ADDRESS: "map-pin",
   LOCATION: "map-pin",
   ENCRYPTEDSTRING: "lock",
-  BASE64: "image"
+  BASE64: "image",
+  SOBJECT: "database",
+  APEX: "code-xml",
+  ACTIONCALLS: "workflow",
+  SCREENACTION: "workflow",
+  SCREENCOMPONENT: "screen-share"
 });
 
-const FALLBACK_ICON = "type";
-
-/**
- * Return the SLDS utility icon name for a Salesforce field type.
- * @param {string} fieldType — Schema.DisplayType name (e.g. "STRING", "CURRENCY")
- * @returns {string}
- */
-export function iconForFieldType(fieldType) {
-  if (!fieldType) return FALLBACK_ICON;
-  return TYPE_ICON_MAP[fieldType.toUpperCase()] || FALLBACK_ICON;
+function iconForFieldType(fieldType) {
+  return TYPE_ICON_MAP[String(fieldType || "").toUpperCase()] || "type";
 }
 
-/**
- * Format a field type for display (title case).
- * @param {string} fieldType — e.g. "MULTIPICKLIST" → "Multi-Picklist"
- * @returns {string}
- */
-export function formatFieldType(fieldType) {
+const FIELD_TYPE_LABELS = Object.freeze({
+  MULTIPICKLIST: "Multi-Picklist",
+  ENCRYPTEDSTRING: "Encrypted Text",
+  TEXTAREA: "Text Area",
+  DATETIME: "Date/Time",
+  COMBOBOX: "Combobox",
+  BOOLEAN: "Checkbox",
+  REFERENCE: "Lookup",
+  INTEGER: "Number",
+  DOUBLE: "Number",
+  LONG: "Number",
+  BASE64: "Base64"
+});
+
+// "MULTIPICKLIST" → "Multi-Picklist", "CURRENCY" → "Currency".
+function formatFieldType(fieldType) {
   if (!fieldType) return "";
-  const map = {
-    MULTIPICKLIST: "Multi-Picklist",
-    ENCRYPTEDSTRING: "Encrypted Text",
-    TEXTAREA: "Text Area",
-    DATETIME: "Date/Time",
-    COMBOBOX: "Combobox",
-    BOOLEAN: "Checkbox",
-    REFERENCE: "Lookup",
-    INTEGER: "Number",
-    DOUBLE: "Number",
-    LONG: "Number",
-    BASE64: "Base64"
-  };
   const upper = fieldType.toUpperCase();
-  if (map[upper]) return map[upper];
-  return upper.charAt(0) + upper.slice(1).toLowerCase();
+  return (
+    FIELD_TYPE_LABELS[upper] || upper.charAt(0) + upper.slice(1).toLowerCase()
+  );
 }
 
 /**
@@ -203,7 +186,7 @@ export function filterFieldOptions(options, term) {
 }
 
 // ═════════════════════════════════════════════════════════════════
-// 2. MERGE-FIELD / FLOW RESOURCE HELPERS
+// 3. MERGE-FIELD / FLOW RESOURCE HELPERS
 // ═════════════════════════════════════════════════════════════════
 // Adapted from UnofficialSF fsc_flowComboboxUtils (Apache-2.0).
 
@@ -266,4 +249,14 @@ export function removeFormatting(value) {
   if (!value) return value;
   if (!isReference(value)) return value;
   return value.substring(0, value.lastIndexOf("}")).replace("{!", "");
+}
+
+/**
+ * The value a resource selector reported in its `valuechanged` event: plain
+ * text as typed, or a Flow resource as "{!Name}".
+ * @param {CustomEvent} event
+ * @returns {string}
+ */
+export function readResourceValue(event) {
+  return event.detail.newValue;
 }

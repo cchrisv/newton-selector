@@ -1,526 +1,772 @@
 <template>
-  <section class="newton-chapter newton-chapter_04" data-chapter="appearance">
-    <aside class="newton-chapter__mark" aria-hidden="true">
-      <span class="newton-chapter__numeral">04</span>
-      <span class="newton-chapter__rule"></span>
-    </aside>
+  <section class="newton-chapter" data-chapter="appearance">
     <header class="newton-chapter__head">
       <p class="newton-chapter__eyebrow">Appearance</p>
       <h2 class="newton-chapter__title">How it looks</h2>
     </header>
   </section>
-  <template lwc:if={isLayoutSection}>
-    <!-- ▂▂▂▂ LAYOUT & SHAPE — layout + tile geometry ▂▂▂▂ -->
-    <div
-      class="newton-studio__subchapter newton-studio__subchapter_layout"
-      role="separator"
-      aria-label="Layout and shape"
+  <div class="newton-studio__subchapter">
+    <h3 class="newton-studio__subchapter-eyebrow">
+      <span class="newton-studio__subchapter-numeral" aria-hidden="true"
+        >04·A</span
+      >
+      <span class="newton-studio__subchapter-title">Layout &amp; shape</span>
+    </h3>
+    <span class="newton-studio__subchapter-rule" aria-hidden="true"></span>
+    <span></span>
+  </div>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header
+      class="slds-card__header newton-card__head newton-card__head_with-action"
     >
-      <span class="newton-studio__subchapter-eyebrow">
-        <span class="newton-studio__subchapter-numeral">04·A</span>
-        <span class="newton-studio__subchapter-title">Layout &amp; shape</span>
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="layout-grid"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
       </span>
-      <span class="newton-studio__subchapter-rule" aria-hidden="true"></span>
-      <span></span>
-    </div>
-
-    <article
-      class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_layout"
-    >
-      <header class="slds-card__header newton-card__head">
-        <span
-          class="newton-card__glyph newton-card__glyph_appearance"
-          aria-hidden="true"
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Layout style
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          How the options are arranged: tiles, rows, a dropdown, or two lists.
+        </p>
+      </div>
+      <span class="newton-card__action"
+        ><button
+          type="button"
+          class="slds-button slds-button_neutral newton-studio__reset"
+          onclick={handleResetAppearance}
         >
           <c-newton-selector-icon
-            name="layout-grid"
+            name="rotate-ccw"
+            size="xx-small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+          <span>Reset appearance</span>
+        </button></span
+      >
+      <lightning-helptext
+        class="newton-card__help"
+        content="Every layout uses the same tile design. Switching layouts keeps your styling, and each layout remembers its own tile size and spacing. Reset appearance returns every appearance setting to its default."
+      ></lightning-helptext>
+    </header>
+    <div class="slds-card__body slds-card__body_inner">
+      <div class="newton-studio__undo-region" role="status">
+        <template lwc:if={showResetUndo}>
+          <div class="newton-studio__undo">
+            <span>Appearance reset to defaults.</span>
+            <button
+              type="button"
+              class="slds-button newton-studio__undo-btn"
+              onclick={handleUndoReset}
+            >
+              Undo
+            </button>
+          </div>
+        </template>
+      </div>
+      <div
+        class="newton-studio__selectorgroup"
+        role="radiogroup"
+        aria-label="Layout"
+        oncardselect={handleLayoutTileChange}
+      >
+        <template for:each={layoutTiles} for:item="tile">
+          <c-newton-selector-choice-tile
+            key={tile.value}
+            item={tile}
+            selected={tile._selected}
+            selection-mode="single"
+            group-name="newton-layout"
+            size="small"
+            framed-visual
+            aspect-ratio="3:2"
+          ></c-newton-selector-choice-tile>
+        </template>
+      </div>
+    </div>
+  </article>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="expand"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Tile size
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          How wide each tile is and how dense the typography feels.
+        </p>
+      </div>
+      <lightning-helptext
+        class="newton-card__help"
+        content="Size fixes the tile width: Small = 7.5rem, Medium = 12rem, Large = 16rem. The grid column width follows the size so layouts stay predictable."
+      ></lightning-helptext>
+    </header>
+    <div class="slds-card__body slds-card__body_inner">
+      <div
+        class="newton-studio__selectorgroup"
+        role="radiogroup"
+        aria-label="Tile size"
+        oncardselect={handleSizeTileChange}
+      >
+        <template for:each={sizeTiles} for:item="tile">
+          <c-newton-selector-choice-tile
+            key={tile.value}
+            item={tile}
+            selected={tile._selected}
+            selection-mode="single"
+            group-name="newton-size"
+            size="small"
+            framed-visual
+            aspect-ratio="3:2"
+          ></c-newton-selector-choice-tile>
+        </template>
+      </div>
+    </div>
+  </article>
+  <template lwc:if={showAspectRatio}>
+    <article class="slds-card newton-studio__card newton-studio__section-card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="crop"
             size="small"
             alternative-text=""
           ></c-newton-selector-icon>
         </span>
         <div class="newton-card__headings">
           <h3 class="slds-card__header-title slds-text-heading_small">
-            Layout style
+            Aspect ratio
           </h3>
           <p
             class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
-            Arrange the same customizable cards into different selector layouts.
+            The shape of each tile — square, landscape, wide, or portrait.
           </p>
         </div>
-        <span class="newton-card__action">
-          <button
-            type="button"
-            class="slds-button slds-button_icon slds-button_icon-border-filled"
-            title="Reset layout styling to SLDS defaults"
-            onclick={handleResetLayoutDefaults}
-          >
-            <c-newton-selector-icon
-              name="rotate-ccw"
-              size="x-small"
-              box="button"
-              alternative-text=""
-            ></c-newton-selector-icon>
-            <span class="slds-assistive-text">
-              Reset layout styling to SLDS defaults
-            </span>
-          </button>
-        </span>
         <lightning-helptext
           class="newton-card__help"
-          content="Every layout consumes the same card design. Pick the layout pattern here, then use the card controls below to tune the card surface, icon, badge, selection, and spacing."
+          content="Tile height is calculated from this ratio applied to its width. 1:1 is square; 16:9 is cinematic; 3:4 is portrait."
         ></lightning-helptext>
       </header>
       <div class="slds-card__body slds-card__body_inner">
         <div
           class="newton-studio__selectorgroup"
           role="radiogroup"
-          aria-label="Layout"
-          oncardselect={handleLayoutTileChange}
+          aria-label="Aspect ratio"
+          data-key="aspectRatio"
+          oncardselect={handleTileChange}
         >
-          <template for:each={layoutTiles} for:item="tile">
+          <template for:each={aspectTiles} for:item="tile">
             <c-newton-selector-choice-tile
               key={tile.value}
               item={tile}
               selected={tile._selected}
-              disabled={tile._disabled}
               selection-mode="single"
-              group-name="newton-layout"
+              group-name="newton-aspect"
               size="small"
-              aspect-ratio="1:1"
+              framed-visual
+              aspect-ratio="3:2"
             ></c-newton-selector-choice-tile>
           </template>
         </div>
       </div>
     </article>
-
-    <template lwc:if={showTileSize}>
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_layout"
-      >
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
+  </template>
+  <template lwc:if={showColumns}>
+    <article class="slds-card newton-studio__card newton-studio__section-card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="table"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">
+            Column count
+          </h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
-            <c-newton-selector-icon
-              name="expand"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Tile size
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              How wide each tile is and how dense the typography feels.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Size fixes the tile width: Small = 7.5rem, Medium = 12rem, Large = 16rem. The grid column width follows the size so layouts stay predictable."
-          ></lightning-helptext>
-        </header>
-        <div class="slds-card__body slds-card__body_inner">
-          <div
-            class="newton-studio__selectorgroup"
-            role="radiogroup"
-            aria-label="Tile size"
-            oncardselect={handleSizeTileChange}
-          >
-            <template for:each={sizeTiles} for:item="tile">
-              <c-newton-selector-choice-tile
-                key={tile.value}
-                item={tile}
-                selected={tile._selected}
-                selection-mode="single"
-                group-name="newton-size"
-                size="small"
-                aspect-ratio="1:1"
-              ></c-newton-selector-choice-tile>
-            </template>
-          </div>
+            Set a fixed number of columns. Auto lets tiles reflow with the
+            container.
+          </p>
         </div>
-      </article>
-    </template>
-
-    <template lwc:if={showAspectRatio}>
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_layout"
-      >
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="crop"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Aspect ratio
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        <lightning-helptext
+          class="newton-card__help"
+          content="Grid layout only. Auto fits as many columns as the width allows at the chosen tile size. A number from 1 to 6 always uses that many equal columns."
+        ></lightning-helptext>
+      </header>
+      <div class="slds-card__body slds-card__body_inner">
+        <div class="newton-studio__col-row" role="group" aria-label="Columns">
+          <template for:each={columnChips} for:item="chip">
+            <button
+              key={chip.value}
+              type="button"
+              class={chip.className}
+              data-value={chip.value}
+              aria-pressed={chip.ariaPressed}
+              onclick={handleColumnsChange}
             >
-              The shape of each tile — square, landscape, wide, or portrait.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Tile height is calculated from this ratio applied to its width. 1:1 is square; 16:9 is cinematic; 3:4 is portrait."
-          ></lightning-helptext>
-        </header>
-        <div class="slds-card__body slds-card__body_inner">
-          <div
-            class="newton-studio__selectorgroup newton-studio__selectorgroup_2x2"
-            role="radiogroup"
-            aria-label="Aspect ratio"
-            oncardselect={handleAspectChange}
-          >
-            <template for:each={aspectTiles} for:item="tile">
-              <c-newton-selector-choice-tile
-                key={tile.value}
-                item={tile}
-                selected={tile._selected}
-                selection-mode="single"
-                group-name="newton-aspect"
-                size="small"
-                aspect-ratio="1:1"
-              ></c-newton-selector-choice-tile>
-            </template>
-          </div>
+              {chip.label}
+            </button>
+          </template>
         </div>
-      </article>
-    </template>
-
-    <!-- ═════════════════════ COLUMNS ═════════════════════ -->
-    <template lwc:if={showColumns}>
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_layout"
+      </div>
+    </article>
+  </template>
+  <div class="newton-studio__subchapter">
+    <h3 class="newton-studio__subchapter-eyebrow">
+      <span class="newton-studio__subchapter-numeral" aria-hidden="true"
+        >04·B</span
       >
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="table"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Column count
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Force a fixed grid width. Auto lets tiles reflow with the
-              container.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Grid mode only. Auto uses the tile size's canonical column width and wraps responsively. Fixed (1–6) forces that many equal columns regardless of container width."
-          ></lightning-helptext>
-        </header>
-        <div class="slds-card__body slds-card__body_inner">
-          <div
-            class="newton-studio__col-row"
-            role="radiogroup"
-            aria-label="Columns"
-          >
-            <template for:each={columnChips} for:item="chip">
+      <span class="newton-studio__subchapter-title"
+        >Tile surface &amp; state</span
+      >
+    </h3>
+    <span class="newton-studio__subchapter-rule" aria-hidden="true"></span>
+    <span></span>
+  </div>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="layers"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Tile elevation
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          Edge and depth for each tile.
+        </p>
+      </div>
+      <lightning-helptext
+        class="newton-card__help"
+        content="Elevation sets only the tile's depth and edge. Selection indicator, pattern, and surface are separate settings that combine with it."
+      ></lightning-helptext>
+    </header>
+    <div class="slds-card__body slds-card__body_inner">
+      <div
+        class="newton-studio__selectorgroup"
+        role="radiogroup"
+        aria-label="Tile elevation"
+        data-key="elevation"
+        oncardselect={handleTileChange}
+      >
+        <template for:each={elevationTiles} for:item="tile">
+          <c-newton-selector-choice-tile
+            key={tile.value}
+            item={tile}
+            selected={tile._selected}
+            selection-mode="single"
+            group-name="newton-elevation"
+            size="small"
+            framed-visual
+            aspect-ratio="3:2"
+          ></c-newton-selector-choice-tile>
+        </template>
+      </div>
+    </div>
+  </article>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="list"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Surface style
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          Background gradient on each tile. Compose with pattern overlays.
+        </p>
+      </div>
+    </header>
+    <div
+      class="slds-card__body slds-card__body_inner newton-studio__field-block"
+    >
+      <div
+        class="newton-studio__selectorgroup"
+        role="radiogroup"
+        aria-label="Surface style"
+        data-key="surfaceStyle"
+        oncardselect={handleTileChange}
+      >
+        <template for:each={surfaceTiles} for:item="tile">
+          <c-newton-selector-choice-tile
+            key={tile.value}
+            item={tile}
+            selected={tile._selected}
+            selection-mode="single"
+            group-name="newton-surface"
+            size="small"
+            framed-visual
+            aspect-ratio="3:2"
+          ></c-newton-selector-choice-tile>
+        </template>
+      </div>
+      <template for:each={surfaceToneRows} for:item="row">
+        <div key={row.rowKey} class="newton-tone-state">
+          <div class="newton-tone-row" role="group" aria-label={row.ariaLabel}>
+            <span class="newton-tone-row__eyebrow">{row.label}</span>
+            <template for:each={row.chips} for:item="chip">
               <button
                 key={chip.value}
                 type="button"
                 class={chip.className}
+                data-key={row.toneKey}
                 data-value={chip.value}
                 aria-pressed={chip.ariaPressed}
-                onclick={handleColumnsChange}
+                title={chip.label}
+                disabled={chip.disabled}
+                onclick={handleToneChange}
               >
-                {chip.label}
+                <span class={chip.dotClassName} aria-hidden="true"></span>
+                <span class="newton-tone-chip__label">{chip.label}</span>
               </button>
             </template>
           </div>
+          <template lwc:if={row.isCustom}>
+            <div class="newton-hex-row">
+              <label class="newton-hex-row__label" for={row.hexId}
+                >Custom color</label
+              >
+              <input
+                id={row.hexId}
+                type="color"
+                class="newton-hex-row__selector"
+                data-hex-key={row.hexKey}
+                value={row.hexValue}
+                oninput={handleHexChange}
+                onchange={handleHexChange}
+                aria-label={row.colorAriaLabel}
+              />
+              <input
+                type="text"
+                class="newton-hex-row__input"
+                data-hex-key={row.hexKey}
+                value={row.hexValue}
+                placeholder="#3baa6f"
+                onchange={handleHexChange}
+                aria-label={row.hexAriaLabel}
+                aria-invalid={row.hexInvalid}
+                aria-describedby={row.hexErrorId}
+              />
+              <template lwc:if={row.hexInvalid}>
+                <p id={row.hexErrorId} class="newton-hex-row__error">
+                  Use a hex color like #1B96FF.
+                </p>
+              </template>
+            </div>
+          </template>
         </div>
-      </article>
-    </template>
-
-    <!-- ▂▂▂▂ CARD — tile surface + state design ▂▂▂▂ -->
-    <template lwc:if={isTileLayout}>
-      <div
-        class="newton-studio__subchapter newton-studio__subchapter_card"
-        role="separator"
-        aria-label="Card surface and state"
-      >
-        <span class="newton-studio__subchapter-eyebrow">
-          <span class="newton-studio__subchapter-numeral">04·B</span>
-          <span class="newton-studio__subchapter-title"
-            >Card surface &amp; state</span
-          >
-        </span>
-        <span class="newton-studio__subchapter-rule" aria-hidden="true"></span>
-        <span></span>
+      </template>
+    </div>
+  </article>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="check"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Selection indicator
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          How a picked tile shows its selected state.
+        </p>
       </div>
-    </template>
-
-    <!-- ═════════════════════ ELEVATION ═════════════════════ -->
-    <template lwc:if={showElevation}>
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_card"
+    </header>
+    <div class="slds-card__body slds-card__body_inner">
+      <div
+        class="newton-studio__selectorgroup"
+        role="radiogroup"
+        aria-label="Selection indicator"
+        data-key="selectionIndicator"
+        oncardselect={handleTileChange}
       >
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="layers"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Card elevation
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Edge and depth treatment for each card.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Elevation controls only neutral card depth and edge treatment. Selection indicators, patterns, and surfaces layer separately so the choices stay compatible."
-          ></lightning-helptext>
-        </header>
-        <div class="slds-card__body slds-card__body_inner">
-          <div
-            class="newton-studio__selectorgroup"
-            role="radiogroup"
-            aria-label="Card elevation"
-            oncardselect={handleElevationChange}
-          >
-            <template for:each={elevationTiles} for:item="tile">
-              <c-newton-selector-choice-tile
-                key={tile.value}
-                item={tile}
-                selected={tile._selected}
-                selection-mode="single"
-                group-name="newton-elevation"
-                size="small"
-                aspect-ratio="1:1"
-              ></c-newton-selector-choice-tile>
-            </template>
-          </div>
-        </div>
-      </article>
-    </template>
-
-    <!-- ═══════════════ SURFACE — gradient styles ═══════════════ -->
-    <template lwc:if={isTileLayout}>
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_card"
-      >
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="list"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Surface style
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Background gradient on each tile. Compose with pattern overlays.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Surface gradients tint the tile background. Combine them with overlay patterns for layered depth."
-          ></lightning-helptext>
-        </header>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
+        <template for:each={selectionIndicatorTiles} for:item="tile">
+          <c-newton-selector-choice-tile
+            key={tile.value}
+            item={tile}
+            selected={tile._selected}
+            selection-mode="single"
+            group-name="newton-selindicator"
+            size="small"
+            framed-visual
+            aspect-ratio="3:2"
+          ></c-newton-selector-choice-tile>
+        </template>
+      </div>
+    </div>
+  </article>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="network"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Pattern overlay
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
-          <div
-            class="newton-studio__selectorgroup"
-            role="radiogroup"
-            aria-label="Surface style"
-            oncardselect={handleSurfaceChange}
-          >
-            <template for:each={surfaceTiles} for:item="tile">
-              <c-newton-selector-choice-tile
-                key={tile.value}
-                item={tile}
-                selected={tile._selected}
-                selection-mode="single"
-                group-name="newton-surface"
-                size="small"
-                aspect-ratio="1:1"
-              ></c-newton-selector-choice-tile>
+          Decorative texture layered on each tile. Choose a pattern, then its
+          color tone.
+        </p>
+      </div>
+    </header>
+    <div
+      class="slds-card__body slds-card__body_inner newton-studio__field-block"
+    >
+      <div
+        class="newton-studio__selectorgroup"
+        role="radiogroup"
+        aria-label="Pattern"
+        data-key="pattern"
+        oncardselect={handleTileChange}
+      >
+        <template for:each={patternTiles} for:item="tile">
+          <c-newton-selector-choice-tile
+            key={tile.value}
+            item={tile}
+            selected={tile._selected}
+            selection-mode="single"
+            group-name="newton-pattern"
+            size="small"
+            framed-visual
+            aspect-ratio="3:2"
+          ></c-newton-selector-choice-tile>
+        </template>
+      </div>
+      <template for:each={patternToneRows} for:item="row">
+        <div key={row.rowKey} class="newton-tone-state">
+          <div class="newton-tone-row" role="group" aria-label={row.ariaLabel}>
+            <span class="newton-tone-row__eyebrow">{row.label}</span>
+            <template for:each={row.chips} for:item="chip">
+              <button
+                key={chip.value}
+                type="button"
+                class={chip.className}
+                data-key={row.toneKey}
+                data-value={chip.value}
+                aria-pressed={chip.ariaPressed}
+                title={chip.label}
+                disabled={chip.disabled}
+                onclick={handleToneChange}
+              >
+                <span class={chip.dotClassName} aria-hidden="true"></span>
+                <span class="newton-tone-chip__label">{chip.label}</span>
+              </button>
             </template>
           </div>
-          <template for:each={surfaceToneRows} for:item="row">
-            <div key={row.rowKey} class="newton-tone-state">
-              <div
-                class="newton-tone-row"
-                role="radiogroup"
-                aria-label={row.ariaLabel}
+          <template lwc:if={row.isCustom}>
+            <div class="newton-hex-row">
+              <label class="newton-hex-row__label" for={row.hexId}
+                >Custom color</label
               >
-                <span class="newton-tone-row__eyebrow">{row.label}</span>
-                <template for:each={row.chips} for:item="chip">
-                  <button
-                    key={chip.value}
-                    type="button"
-                    class={chip.className}
-                    data-tone-key={row.toneKey}
-                    data-value={chip.value}
-                    aria-pressed={chip.ariaPressed}
-                    title={chip.label}
-                    disabled={chip.disabled}
-                    onclick={handleSurfaceStateToneChange}
-                  >
-                    <span class={chip.dotClassName} aria-hidden="true"></span>
-                    <span class="newton-tone-chip__label">{chip.label}</span>
-                  </button>
-                </template>
-              </div>
-              <template lwc:if={row.isCustom}>
-                <div class="newton-hex-row">
-                  <label class="newton-hex-row__label" for={row.hexId}
-                    >Custom color</label
-                  >
-                  <input
-                    id={row.hexId}
-                    type="color"
-                    class="newton-hex-row__selector"
-                    data-hex-key={row.hexKey}
-                    value={row.hexValue}
-                    oninput={handleSurfaceStateToneHexChange}
-                    onchange={handleSurfaceStateToneHexChange}
-                    aria-label={row.colorAriaLabel}
-                  />
-                  <input
-                    type="text"
-                    class="newton-hex-row__input"
-                    data-hex-key={row.hexKey}
-                    value={row.hexValue}
-                    placeholder="#3baa6f"
-                    onchange={handleSurfaceStateToneHexChange}
-                    aria-label={row.hexAriaLabel}
-                  />
-                </div>
+              <input
+                id={row.hexId}
+                type="color"
+                class="newton-hex-row__selector"
+                data-hex-key={row.hexKey}
+                value={row.hexValue}
+                oninput={handleHexChange}
+                onchange={handleHexChange}
+                aria-label={row.colorAriaLabel}
+              />
+              <input
+                type="text"
+                class="newton-hex-row__input"
+                data-hex-key={row.hexKey}
+                value={row.hexValue}
+                placeholder="#3baa6f"
+                onchange={handleHexChange}
+                aria-label={row.hexAriaLabel}
+                aria-invalid={row.hexInvalid}
+                aria-describedby={row.hexErrorId}
+              />
+              <template lwc:if={row.hexInvalid}>
+                <p id={row.hexErrorId} class="newton-hex-row__error">
+                  Use a hex color like #1B96FF.
+                </p>
               </template>
             </div>
           </template>
         </div>
-      </article>
-    </template>
-
-    <!-- ═════════════════ SELECTION INDICATOR ═════════════════ -->
-    <template lwc:if={showSelectionIndicator}>
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_card"
+      </template>
+    </div>
+  </article>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="crop"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Corner flourish
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          Printer-style trim marks, heavier brackets, or corner dots.
+        </p>
+      </div>
+    </header>
+    <div
+      class="slds-card__body slds-card__body_inner newton-studio__field-block"
+    >
+      <div
+        class="newton-studio__selectorgroup"
+        role="radiogroup"
+        aria-label="Corner style"
+        data-key="cornerStyle"
+        oncardselect={handleTileChange}
       >
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
+        <template for:each={cornerTiles} for:item="tile">
+          <c-newton-selector-choice-tile
+            key={tile.value}
+            item={tile}
+            selected={tile._selected}
+            selection-mode="single"
+            group-name="newton-corner"
+            size="small"
+            framed-visual
+            aspect-ratio="3:2"
+          ></c-newton-selector-choice-tile>
+        </template>
+      </div>
+      <div class="newton-tone-row" role="group" aria-label="Corner color">
+        <span class="newton-tone-row__eyebrow">Color</span>
+        <template for:each={cornerToneChips} for:item="chip">
+          <button
+            key={chip.value}
+            type="button"
+            class={chip.className}
+            data-key="cornerTone"
+            data-value={chip.value}
+            aria-pressed={chip.ariaPressed}
+            title={chip.label}
+            disabled={chip.disabled}
+            onclick={handleToneChange}
           >
-            <c-newton-selector-icon
-              name="check"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Selection indicator
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              How a picked tile shows its selected state.
+            <span class={chip.dotClassName} aria-hidden="true"></span>
+            <span class="newton-tone-chip__label">{chip.label}</span>
+          </button>
+        </template>
+      </div>
+      <template lwc:if={cornerToneIsCustom}>
+        <div class="newton-hex-row">
+          <label class="newton-hex-row__label" for="corner-tone-hex"
+            >Custom color</label
+          >
+          <input
+            id="corner-tone-hex"
+            type="color"
+            class="newton-hex-row__selector"
+            data-hex-key="cornerToneHex"
+            value={gridConfig.cornerToneHex}
+            oninput={handleHexChange}
+            onchange={handleHexChange}
+            aria-label="Pick corner color"
+          />
+          <input
+            type="text"
+            class="newton-hex-row__input"
+            data-hex-key="cornerToneHex"
+            value={gridConfig.cornerToneHex}
+            placeholder="#3baa6f"
+            onchange={handleHexChange}
+            aria-label="Corner hex color value"
+            aria-invalid={hexErrors.cornerToneHex}
+            aria-describedby="corner-tone-hex-error"
+          />
+          <template lwc:if={hexErrors.cornerToneHex}>
+            <p id="corner-tone-hex-error" class="newton-hex-row__error">
+              Use a hex color like #1B96FF.
             </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Checkmark shows a floating circle badge. Other indicators avoid the badge and use a selected fill, edge, frame, corner, or pulse treatment."
-          ></lightning-helptext>
-        </header>
-        <div class="slds-card__body slds-card__body_inner">
-          <div
-            class="newton-studio__selectorgroup"
-            role="radiogroup"
-            aria-label="Selection indicator"
-            oncardselect={handleSelectionIndicatorChange}
-          >
-            <template for:each={selectionIndicatorTiles} for:item="tile">
-              <c-newton-selector-choice-tile
-                key={tile.value}
-                item={tile}
-                selected={tile._selected}
-                selection-mode="single"
-                group-name="newton-selindicator"
-                size="small"
-                aspect-ratio="1:1"
-                selection-indicator={tile.value}
-              ></c-newton-selector-choice-tile>
-            </template>
-          </div>
+          </template>
         </div>
-      </article>
-    </template>
-
-    <!-- ═══════════════ PATTERN — dots/lines/diagonal/etc. ═══════════════ -->
-    <template lwc:if={isTileLayout}>
+      </template>
+    </div>
+  </article>
+  <div class={iconSubchapterClass}>
+    <h3 class="newton-studio__subchapter-eyebrow">
+      <span class="newton-studio__subchapter-numeral" aria-hidden="true"
+        >04·C</span
+      >
+      <span class="newton-studio__subchapter-title">Icon</span>
+    </h3>
+    <span class="newton-studio__subchapter-rule" aria-hidden="true"></span>
+    <span class="newton-studio__subchapter-toggle"
+      ><c-newton-selector-flow-cpe-toggle
+        label="Show icons"
+        variant="label-hidden"
+        active-label="Shown"
+        inactive-label="Hidden"
+        checked={showIconsValue}
+        ontoggle={handleShowIconsToggle}
+      ></c-newton-selector-flow-cpe-toggle
+    ></span>
+  </div>
+  <template lwc:if={showIconsValue}>
+    <article class="slds-card newton-studio__card newton-studio__section-card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="expand"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">
+            Icon size
+          </h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+          >
+            How large the glyph renders inside the tile.
+          </p>
+        </div>
+        <lightning-helptext
+          class="newton-card__help"
+          content="Auto scales with the tile size (default). Explicit values pin the glyph regardless of tile size — useful for consistent glyph scale across mixed tile sizes."
+        ></lightning-helptext>
+      </header>
+      <div class="slds-card__body slds-card__body_inner">
+        <div
+          class="newton-studio__selectorgroup"
+          role="radiogroup"
+          aria-label="Icon size"
+          data-key="iconSize"
+          oncardselect={handleTileChange}
+        >
+          <template for:each={iconSizeTiles} for:item="tile">
+            <c-newton-selector-choice-tile
+              key={tile.value}
+              item={tile}
+              selected={tile._selected}
+              selection-mode="single"
+              group-name="newton-selector-icon-size"
+              size="small"
+              framed-visual
+              aspect-ratio="3:2"
+            ></c-newton-selector-choice-tile>
+          </template>
+        </div>
+      </div>
+    </article>
+    <article class="slds-card newton-studio__card newton-studio__section-card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="circle"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">
+            Icon decoration
+          </h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+          >
+            Optional shape behind each tile's icon.
+          </p>
+        </div>
+      </header>
+      <div class="slds-card__body slds-card__body_inner">
+        <div
+          class="newton-studio__selectorgroup"
+          role="radiogroup"
+          aria-label="Icon decoration"
+          data-key="iconDecor"
+          oncardselect={handleTileChange}
+        >
+          <template for:each={iconDecorTiles} for:item="tile">
+            <c-newton-selector-choice-tile
+              key={tile.value}
+              item={tile}
+              selected={tile._selected}
+              selection-mode="single"
+              group-name="newton-selector-icon-decor"
+              size="small"
+              framed-visual
+              aspect-ratio="3:2"
+            ></c-newton-selector-choice-tile>
+          </template>
+        </div>
+      </div>
+    </article>
+    <template lwc:if={showIconTreatment}>
       <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_card"
+        class="slds-card newton-studio__card newton-studio__section-card"
       >
         <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
-          >
+          <span class="newton-card__glyph" aria-hidden="true">
             <c-newton-selector-icon
-              name="network"
+              name="sliders-horizontal"
               size="small"
               alternative-text=""
             ></c-newton-selector-icon>
           </span>
           <div class="newton-card__headings">
             <h3 class="slds-card__header-title slds-text-heading_small">
-              Pattern overlay
+              Icon treatment
             </h3>
             <p
               class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
             >
-              Decorative texture layered on each tile. Choose a pattern, then
-              its color tone.
+              Decoration style, depth, and glyph color.
             </p>
           </div>
           <lightning-helptext
             class="newton-card__help"
-            content="Patterns layer over the surface. They work with every surface style — e.g. brand radial surface + neutral dots pattern."
+            content="These settings apply to the icon decoration in every tile layout. Glyph color can follow the decoration color or be set on its own."
           ></lightning-helptext>
         </header>
         <div
@@ -529,135 +775,243 @@
           <div
             class="newton-studio__selectorgroup"
             role="radiogroup"
-            aria-label="Pattern"
-            oncardselect={handlePatternChange}
+            aria-label="Icon style"
+            data-key="iconStyle"
+            oncardselect={handleTileChange}
           >
-            <template for:each={patternTiles} for:item="tile">
+            <template for:each={iconStyleTiles} for:item="tile">
               <c-newton-selector-choice-tile
                 key={tile.value}
                 item={tile}
                 selected={tile._selected}
                 selection-mode="single"
-                group-name="newton-pattern"
+                group-name="newton-selector-icon-style"
                 size="small"
-                aspect-ratio="1:1"
+                aspect-ratio="3:2"
+                icon-decor={gridConfig.iconDecor}
+                icon-style={tile.value}
+                icon-shading={gridConfig.iconShading}
+                icon-tone={gridConfig.iconTone}
+                icon-glyph-tone={gridConfig.iconGlyphTone}
               ></c-newton-selector-choice-tile>
             </template>
           </div>
-          <template for:each={patternToneRows} for:item="row">
-            <div key={row.rowKey} class="newton-tone-state">
-              <div
-                class="newton-tone-row"
-                role="radiogroup"
-                aria-label={row.ariaLabel}
-              >
-                <span class="newton-tone-row__eyebrow">{row.label}</span>
-                <template for:each={row.chips} for:item="chip">
-                  <button
-                    key={chip.value}
-                    type="button"
-                    class={chip.className}
-                    data-tone-key={row.toneKey}
-                    data-value={chip.value}
-                    aria-pressed={chip.ariaPressed}
-                    title={chip.label}
-                    disabled={chip.disabled}
-                    onclick={handlePatternStateToneChange}
-                  >
-                    <span class={chip.dotClassName} aria-hidden="true"></span>
-                    <span class="newton-tone-chip__label">{chip.label}</span>
-                  </button>
-                </template>
-              </div>
-              <template lwc:if={row.isCustom}>
-                <div class="newton-hex-row">
-                  <label class="newton-hex-row__label" for={row.hexId}
-                    >Custom color</label
-                  >
-                  <input
-                    id={row.hexId}
-                    type="color"
-                    class="newton-hex-row__selector"
-                    data-hex-key={row.hexKey}
-                    value={row.hexValue}
-                    oninput={handlePatternStateToneHexChange}
-                    onchange={handlePatternStateToneHexChange}
-                    aria-label={row.colorAriaLabel}
-                  />
-                  <input
-                    type="text"
-                    class="newton-hex-row__input"
-                    data-hex-key={row.hexKey}
-                    value={row.hexValue}
-                    placeholder="#3baa6f"
-                    onchange={handlePatternStateToneHexChange}
-                    aria-label={row.hexAriaLabel}
-                  />
-                </div>
+          <template lwc:if={showIconShading}>
+            <div
+              class="newton-studio__selectorgroup"
+              role="radiogroup"
+              aria-label="Icon shading"
+              data-key="iconShading"
+              oncardselect={handleTileChange}
+            >
+              <template for:each={iconShadingTiles} for:item="tile">
+                <c-newton-selector-choice-tile
+                  key={tile.value}
+                  item={tile}
+                  selected={tile._selected}
+                  selection-mode="single"
+                  group-name="newton-selector-icon-shading"
+                  size="small"
+                  aspect-ratio="3:2"
+                  icon-decor={gridConfig.iconDecor}
+                  icon-style="filled"
+                  icon-shading={tile.value}
+                  icon-tone={gridConfig.iconTone}
+                  icon-glyph-tone={gridConfig.iconGlyphTone}
+                ></c-newton-selector-choice-tile>
               </template>
             </div>
           </template>
-        </div>
-      </article>
-
-      <!-- ═══════════════ CORNERS — trim/brackets/dots ═══════════════ -->
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_card"
-      >
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="crop"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Corner flourish
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Printer-style trim marks, heavier brackets, or corner dots.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Corner decorations sit inside each tile edge. Pick the style, then a color tone."
-          ></lightning-helptext>
-        </header>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
-        >
-          <div
-            class="newton-studio__selectorgroup"
-            role="radiogroup"
-            aria-label="Corner style"
-            oncardselect={handleCornerChange}
-          >
-            <template for:each={cornerTiles} for:item="tile">
-              <c-newton-selector-choice-tile
-                key={tile.value}
-                item={tile}
-                selected={tile._selected}
-                selection-mode="single"
-                group-name="newton-corner"
-                size="small"
-                aspect-ratio="1:1"
-              ></c-newton-selector-choice-tile>
+          <div class="newton-tone-row" role="group" aria-label="Icon color">
+            <span class="newton-tone-row__eyebrow">Decoration</span>
+            <template for:each={iconToneChips} for:item="chip">
+              <button
+                key={chip.value}
+                type="button"
+                class={chip.className}
+                data-key="iconTone"
+                data-value={chip.value}
+                aria-pressed={chip.ariaPressed}
+                title={chip.label}
+                disabled={chip.disabled}
+                onclick={handleToneChange}
+              >
+                <span class={chip.dotClassName} aria-hidden="true"></span>
+                <span class="newton-tone-chip__label">{chip.label}</span>
+              </button>
             </template>
           </div>
+          <template lwc:if={iconToneIsCustom}>
+            <div class="newton-hex-row">
+              <label class="newton-hex-row__label" for="icon-tone-hex"
+                >Custom color</label
+              >
+              <input
+                id="icon-tone-hex"
+                type="color"
+                class="newton-hex-row__selector"
+                data-hex-key="iconToneHex"
+                value={gridConfig.iconToneHex}
+                oninput={handleHexChange}
+                onchange={handleHexChange}
+                aria-label="Pick icon decoration color"
+              />
+              <input
+                type="text"
+                class="newton-hex-row__input"
+                data-hex-key="iconToneHex"
+                value={gridConfig.iconToneHex}
+                placeholder="#3baa6f"
+                onchange={handleHexChange}
+                aria-label="Icon decoration hex color value"
+                aria-invalid={hexErrors.iconToneHex}
+                aria-describedby="icon-tone-hex-error"
+              />
+              <template lwc:if={hexErrors.iconToneHex}>
+                <p id="icon-tone-hex-error" class="newton-hex-row__error">
+                  Use a hex color like #1B96FF.
+                </p>
+              </template>
+            </div>
+          </template>
           <div
             class="newton-tone-row"
-            role="radiogroup"
-            aria-label="Corner color"
+            role="group"
+            aria-label="Icon glyph color"
           >
-            <span class="newton-tone-row__eyebrow">Color</span>
-            <template for:each={cornerToneChips} for:item="chip">
+            <span class="newton-tone-row__eyebrow">Glyph</span>
+            <template for:each={iconGlyphToneChips} for:item="chip">
+              <button
+                key={chip.value}
+                type="button"
+                class={chip.className}
+                data-key="iconGlyphTone"
+                data-value={chip.value}
+                aria-pressed={chip.ariaPressed}
+                title={chip.label}
+                disabled={chip.disabled}
+                onclick={handleToneChange}
+              >
+                <span class={chip.dotClassName} aria-hidden="true"></span>
+                <span class="newton-tone-chip__label">{chip.label}</span>
+              </button>
+            </template>
+          </div>
+          <template lwc:if={iconGlyphToneIsCustom}>
+            <div class="newton-hex-row">
+              <label class="newton-hex-row__label" for="icon-glyph-tone-hex"
+                >Custom glyph</label
+              >
+              <input
+                id="icon-glyph-tone-hex"
+                type="color"
+                class="newton-hex-row__selector"
+                data-hex-key="iconGlyphToneHex"
+                value={gridConfig.iconGlyphToneHex}
+                oninput={handleHexChange}
+                onchange={handleHexChange}
+                aria-label="Pick icon glyph color"
+              />
+              <input
+                type="text"
+                class="newton-hex-row__input"
+                data-hex-key="iconGlyphToneHex"
+                value={gridConfig.iconGlyphToneHex}
+                placeholder="#ffffff"
+                onchange={handleHexChange}
+                aria-label="Icon glyph hex color value"
+                aria-invalid={hexErrors.iconGlyphToneHex}
+                aria-describedby="icon-glyph-tone-hex-error"
+              />
+              <template lwc:if={hexErrors.iconGlyphToneHex}>
+                <p id="icon-glyph-tone-hex-error" class="newton-hex-row__error">
+                  Use a hex color like #1B96FF.
+                </p>
+              </template>
+            </div>
+          </template>
+        </div>
+      </article>
+    </template>
+  </template>
+  <template lwc:else>
+    <p class="newton-studio__subchapter-off-note" role="note">
+      Icons are hidden across every tile. Turn the toggle above on to configure
+      icon styling.
+    </p>
+  </template>
+  <div class={badgeSubchapterClass}>
+    <h3 class="newton-studio__subchapter-eyebrow">
+      <span class="newton-studio__subchapter-numeral" aria-hidden="true"
+        >04·D</span
+      >
+      <span class="newton-studio__subchapter-title">Badge</span>
+    </h3>
+    <span class="newton-studio__subchapter-rule" aria-hidden="true"></span>
+    <span class="newton-studio__subchapter-toggle"
+      ><c-newton-selector-flow-cpe-toggle
+        label="Show badges"
+        variant="label-hidden"
+        active-label="Shown"
+        inactive-label="Hidden"
+        checked={showBadgesValue}
+        ontoggle={handleShowBadgesToggle}
+      ></c-newton-selector-flow-cpe-toggle
+    ></span>
+  </div>
+  <template lwc:if={showBadgesValue}>
+    <article class="slds-card newton-studio__card newton-studio__section-card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="award"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">Badge</h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+          >
+            Highlight a tile with a short status label.
+          </p>
+        </div>
+        <lightning-helptext
+          class="newton-card__help"
+          content="Badge text comes from each option's badge field. Position, color, and shape apply to every tile."
+        ></lightning-helptext>
+      </header>
+      <div
+        class="slds-card__body slds-card__body_inner newton-badge-card__body"
+      >
+        <div class="newton-badge-card__control">
+          <span class="newton-badge-card__eyebrow">Position</span>
+          <div
+            class="newton-studio__selectorgroup"
+            role="radiogroup"
+            aria-label="Badge position"
+            data-key="position"
+            oncardselect={handleBadgeTileChange}
+          >
+            <template for:each={badgePositionTiles} for:item="tile">
+              <c-newton-selector-choice-tile
+                key={tile.value}
+                item={tile}
+                selected={tile._selected}
+                selection-mode="single"
+                group-name="newton-selector-badge-position"
+                size="small"
+                framed-visual
+                aspect-ratio="3:2"
+              ></c-newton-selector-choice-tile>
+            </template>
+          </div>
+        </div>
+        <div class="newton-badge-card__control">
+          <span class="newton-badge-card__eyebrow">Color</span>
+          <div class="newton-tone-row" role="group" aria-label="Badge color">
+            <template for:each={badgeVariantChips} for:item="chip">
               <button
                 key={chip.value}
                 type="button"
@@ -666,963 +1020,444 @@
                 aria-pressed={chip.ariaPressed}
                 title={chip.label}
                 disabled={chip.disabled}
-                onclick={handleCornerToneChange}
+                onclick={handleBadgeVariantChange}
               >
                 <span class={chip.dotClassName} aria-hidden="true"></span>
                 <span class="newton-tone-chip__label">{chip.label}</span>
               </button>
             </template>
           </div>
-          <template lwc:if={cornerToneIsCustom}>
+          <template lwc:if={badgeVariantIsCustom}>
             <div class="newton-hex-row">
-              <label class="newton-hex-row__label" for="corner-tone-hex"
+              <label class="newton-hex-row__label" for="badge-variant-hex"
                 >Custom color</label
               >
               <input
-                id="corner-tone-hex"
+                id="badge-variant-hex"
                 type="color"
                 class="newton-hex-row__selector"
-                value={cornerToneHexValue}
-                oninput={handleCornerToneHexChange}
-                onchange={handleCornerToneHexChange}
-                aria-label="Pick corner color"
+                data-hex-key="variantHex"
+                value={gridConfig.badge.variantHex}
+                oninput={handleHexChange}
+                onchange={handleHexChange}
+                aria-label="Pick badge color"
               />
               <input
                 type="text"
                 class="newton-hex-row__input"
-                value={cornerToneHexValue}
+                data-hex-key="variantHex"
+                value={gridConfig.badge.variantHex}
                 placeholder="#3baa6f"
-                onchange={handleCornerToneHexChange}
-                aria-label="Hex color value"
+                onchange={handleHexChange}
+                aria-label="Badge hex color value"
+                aria-invalid={hexErrors.variantHex}
+                aria-describedby="badge-variant-hex-error"
               />
+              <template lwc:if={hexErrors.variantHex}>
+                <p id="badge-variant-hex-error" class="newton-hex-row__error">
+                  Use a hex color like #1B96FF.
+                </p>
+              </template>
             </div>
           </template>
         </div>
-      </article>
-
-      <!-- ▂▂▂▂ ICON — glyph treatment (gated by global show-icons) ▂▂▂▂ -->
-      <template lwc:if={isTileLayout}>
-        <div
-          class={iconSubchapterClass}
-          role="separator"
-          aria-label="Icon section"
-        >
-          <span class="newton-studio__subchapter-eyebrow">
-            <span class="newton-studio__subchapter-numeral">04·C</span>
-            <span class="newton-studio__subchapter-title">Icon</span>
-          </span>
-          <span
-            class="newton-studio__subchapter-rule"
-            aria-hidden="true"
-          ></span>
-          <span class="newton-studio__subchapter-toggle">
-            <c-newton-selector-flow-cpe-toggle
-              label="Show icons"
-              variant="label-hidden"
-              active-label="Shown"
-              inactive-label="Hidden"
-              message-toggle-active="Icons on"
-              message-toggle-inactive="Icons hidden"
-              checked={showIconsValue}
-              ontoggle={handleShowIconsToggle}
-            ></c-newton-selector-flow-cpe-toggle>
-          </span>
-        </div>
-        <template lwc:if={showIconsValue}>
-          <!-- When icons are globally hidden, none of the axis cards
-                         render — keeps the appearance chapter from showing
-                         knobs that have no effect. Flip the toggle on to bring
-                         back icon sizing. -->
-        </template>
-        <template lwc:else>
-          <p class="newton-studio__subchapter-off-note" role="note">
-            Icons are hidden across every tile. Turn the toggle above on to
-            configure icon styling.
-          </p>
-        </template>
-      </template>
-
-      <!-- ═══════════════ ICON SIZE ═══════════════ -->
-      <template lwc:if={showIconsValue}>
-        <article
-          class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_icon"
-        >
-          <header class="slds-card__header newton-card__head">
-            <span
-              class="newton-card__glyph newton-card__glyph_appearance"
-              aria-hidden="true"
-            >
-              <c-newton-selector-icon
-                name="expand"
-                size="small"
-                alternative-text=""
-              ></c-newton-selector-icon>
-            </span>
-            <div class="newton-card__headings">
-              <h3 class="slds-card__header-title slds-text-heading_small">
-                Icon size
-              </h3>
-              <p
-                class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-              >
-                How large the glyph renders inside the tile.
-              </p>
-            </div>
-            <lightning-helptext
-              class="newton-card__help"
-              content="Auto scales with the tile size (default). Explicit values pin the glyph regardless of tile size — useful for consistent glyph scale across mixed tile sizes."
-            ></lightning-helptext>
-          </header>
-          <div class="slds-card__body slds-card__body_inner">
-            <div
-              class="newton-studio__selectorgroup"
-              role="radiogroup"
-              aria-label="Icon size"
-              oncardselect={handleIconSizeChange}
-            >
-              <template for:each={iconSizeTiles} for:item="tile">
-                <c-newton-selector-choice-tile
-                  key={tile.value}
-                  item={tile}
-                  selected={tile._selected}
-                  disabled={tile._disabled}
-                  selection-mode="single"
-                  group-name="newton-selector-icon-size"
-                  size="small"
-                  aspect-ratio="1:1"
-                ></c-newton-selector-choice-tile>
-              </template>
-            </div>
-          </div>
-        </article>
-
-        <article
-          class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_icon"
-        >
-          <header class="slds-card__header newton-card__head">
-            <span
-              class="newton-card__glyph newton-card__glyph_appearance"
-              aria-hidden="true"
-            >
-              <c-newton-selector-icon
-                name="circle"
-                size="small"
-                alternative-text=""
-              ></c-newton-selector-icon>
-            </span>
-            <div class="newton-card__headings">
-              <h3 class="slds-card__header-title slds-text-heading_small">
-                Icon decoration
-              </h3>
-              <p
-                class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-              >
-                Optional shape behind each card icon.
-              </p>
-            </div>
-            <lightning-helptext
-              class="newton-card__help"
-              content="Decoration is card-level and follows the card into every layout. Pick None for a plain glyph, or add a ring, halo, badge, or square treatment."
-            ></lightning-helptext>
-          </header>
-          <div class="slds-card__body slds-card__body_inner">
-            <div
-              class="newton-studio__selectorgroup"
-              role="radiogroup"
-              aria-label="Icon decoration"
-              oncardselect={handleIconDecorChange}
-            >
-              <template for:each={iconDecorTiles} for:item="tile">
-                <c-newton-selector-choice-tile
-                  key={tile.value}
-                  item={tile}
-                  selected={tile._selected}
-                  disabled={tile._disabled}
-                  selection-mode="single"
-                  group-name="newton-selector-icon-decor"
-                  size="small"
-                  aspect-ratio="1:1"
-                  icon-decor="square"
-                  icon-style="outlined"
-                  icon-shading="flat"
-                  icon-tone="brand"
-                  icon-glyph-tone="brand"
-                ></c-newton-selector-choice-tile>
-              </template>
-            </div>
-          </div>
-        </article>
-
-        <template lwc:if={showIconTreatment}>
-          <article
-            class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_icon"
+        <div class="newton-badge-card__control">
+          <span class="newton-badge-card__eyebrow">Shape</span>
+          <div
+            class="newton-studio__selectorgroup"
+            role="radiogroup"
+            aria-label="Badge shape"
+            data-key="shape"
+            oncardselect={handleBadgeTileChange}
           >
-            <header class="slds-card__header newton-card__head">
-              <span
-                class="newton-card__glyph newton-card__glyph_appearance"
-                aria-hidden="true"
-              >
-                <c-newton-selector-icon
-                  name="sliders-horizontal"
-                  size="small"
-                  alternative-text=""
-                ></c-newton-selector-icon>
-              </span>
-              <div class="newton-card__headings">
-                <h3 class="slds-card__header-title slds-text-heading_small">
-                  Icon treatment
-                </h3>
-                <p
-                  class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-                >
-                  Decoration style, depth, and glyph color.
-                </p>
-              </div>
-              <lightning-helptext
-                class="newton-card__help"
-                content="These settings apply to the icon decoration on every card-consuming layout. Glyph color can stay automatic or be split from the decoration color."
-              ></lightning-helptext>
-            </header>
-            <div
-              class="slds-card__body slds-card__body_inner newton-studio__field-block"
+            <template for:each={badgeShapeTiles} for:item="tile">
+              <c-newton-selector-choice-tile
+                key={tile.value}
+                item={tile}
+                selected={tile._selected}
+                selection-mode="single"
+                group-name="newton-selector-badge-shape"
+                size="small"
+                framed-visual
+                aspect-ratio="3:2"
+              ></c-newton-selector-choice-tile>
+            </template>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+  <template lwc:else>
+    <p class="newton-studio__subchapter-off-note" role="note">
+      Badges are hidden across every tile. Turn the toggle above on to configure
+      position, color, and shape.
+    </p>
+  </template>
+  <div class="newton-studio__subchapter">
+    <h3 class="newton-studio__subchapter-eyebrow">
+      <span class="newton-studio__subchapter-numeral" aria-hidden="true"
+        >04·E</span
+      >
+      <span class="newton-studio__subchapter-title">Spacing &amp; layout</span>
+    </h3>
+    <span class="newton-studio__subchapter-rule" aria-hidden="true"></span>
+    <span></span>
+  </div>
+  <template lwc:if={showGridMinWidth}>
+    <article class="slds-card newton-studio__card newton-studio__section-card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="battery-medium"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">
+            Grid density
+          </h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+          >
+            Override the grid column width. Picking a size above sets this
+            automatically.
+          </p>
+        </div>
+        <lightning-helptext
+          class="newton-card__help"
+          content="By default the grid column width is bound to the Tile size. Drag the slider to override — smaller values pack more tiles per row, larger values spread them out."
+        ></lightning-helptext>
+      </header>
+      <div
+        class="slds-card__body slds-card__body_inner newton-studio__slider-stack"
+      >
+        <div class="newton-studio__slider">
+          <div class="newton-studio__slider-head">
+            <span class="newton-studio__slider-label"
+              >Minimum column width</span
             >
-              <div
-                class="newton-studio__selectorgroup"
-                role="radiogroup"
-                aria-label="Icon style"
-                oncardselect={handleIconStyleChange}
-              >
-                <template for:each={iconStyleTiles} for:item="tile">
-                  <c-newton-selector-choice-tile
-                    key={tile.value}
-                    item={tile}
-                    selected={tile._selected}
-                    disabled={tile._disabled}
-                    selection-mode="single"
-                    group-name="newton-selector-icon-style"
-                    size="small"
-                    aspect-ratio="1:1"
-                    icon-decor={gridConfig.iconDecor}
-                    icon-style={tile.value}
-                    icon-shading={gridConfig.iconShading}
-                    icon-tone={gridConfig.iconTone}
-                    icon-glyph-tone={gridConfig.iconGlyphTone}
-                  ></c-newton-selector-choice-tile>
-                </template>
+            <span class="newton-studio__slider-value"
+              >{gridMinWidthDisplay}</span
+            >
+          </div>
+          <lightning-input
+            type="range"
+            variant="label-hidden"
+            label="Minimum column width"
+            min={gridMinWidthRange.min}
+            max={gridMinWidthRange.max}
+            step={gridMinWidthRange.step}
+            value={gridMinWidthNumber}
+            onchange={handleGridMinWidthChange}
+          ></lightning-input>
+          <div class="newton-studio__slider-scale">
+            <span>{gridMinWidthScaleMin}</span>
+            <span>{gridMinWidthScaleMax}</span>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+  <template lwc:if={showGapCard}>
+    <article class="slds-card newton-studio__card newton-studio__section-card">
+      <header class="slds-card__header newton-card__head">
+        <span class="newton-card__glyph" aria-hidden="true">
+          <c-newton-selector-icon
+            name="rows-3"
+            size="small"
+            alternative-text=""
+          ></c-newton-selector-icon>
+        </span>
+        <div class="newton-card__headings">
+          <h3 class="slds-card__header-title slds-text-heading_small">
+            Tile gaps
+          </h3>
+          <p
+            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+          >
+            Space between tiles.
+          </p>
+        </div>
+        <lightning-helptext
+          class="newton-card__help"
+          content="Horizontal is the space between side-by-side tiles. Vertical is the space between rows."
+        ></lightning-helptext>
+      </header>
+      <div
+        class="slds-card__body slds-card__body_inner newton-studio__field-block"
+      >
+        <template lwc:if={showGapHorizontal}>
+          <div class="newton-studio__axis">
+            <div class="newton-studio__axis-head">
+              <c-newton-selector-icon
+                name="move-horizontal"
+                size="x-small"
+                alternative-text=""
+              ></c-newton-selector-icon>
+              <div class="newton-studio__axis-text">
+                <h4 class="newton-studio__axis-title">Horizontal</h4>
+                <p class="newton-studio__axis-sub">Column gap between tiles.</p>
               </div>
-
-              <template lwc:if={showIconShading}>
-                <div
-                  class="newton-studio__selectorgroup"
-                  role="radiogroup"
-                  aria-label="Icon shading"
-                  oncardselect={handleIconShadingChange}
-                >
-                  <template for:each={iconShadingTiles} for:item="tile">
-                    <c-newton-selector-choice-tile
-                      key={tile.value}
-                      item={tile}
-                      selected={tile._selected}
-                      disabled={tile._disabled}
-                      selection-mode="single"
-                      group-name="newton-selector-icon-shading"
-                      size="small"
-                      aspect-ratio="1:1"
-                      icon-decor={gridConfig.iconDecor}
-                      icon-style="filled"
-                      icon-shading={tile.value}
-                      icon-tone={gridConfig.iconTone}
-                      icon-glyph-tone={gridConfig.iconGlyphTone}
-                    ></c-newton-selector-choice-tile>
-                  </template>
-                </div>
-              </template>
-
-              <div
-                class="newton-tone-row"
-                role="radiogroup"
-                aria-label="Icon color"
-              >
-                <span class="newton-tone-row__eyebrow">Decoration</span>
-                <template for:each={iconToneChips} for:item="chip">
-                  <button
-                    key={chip.value}
-                    type="button"
-                    class={chip.className}
-                    data-value={chip.value}
-                    aria-pressed={chip.ariaPressed}
-                    title={chip.label}
-                    disabled={chip.disabled}
-                    onclick={handleIconToneChange}
-                  >
-                    <span class={chip.dotClassName} aria-hidden="true"></span>
-                    <span class="newton-tone-chip__label">{chip.label}</span>
-                  </button>
-                </template>
-              </div>
-              <template lwc:if={iconToneIsCustom}>
-                <div class="newton-hex-row">
-                  <label class="newton-hex-row__label" for="icon-tone-hex"
-                    >Custom color</label
-                  >
-                  <input
-                    id="icon-tone-hex"
-                    type="color"
-                    class="newton-hex-row__selector"
-                    value={iconToneHexValue}
-                    oninput={handleIconToneHexChange}
-                    onchange={handleIconToneHexChange}
-                    aria-label="Pick icon decoration color"
-                  />
-                  <input
-                    type="text"
-                    class="newton-hex-row__input"
-                    value={iconToneHexValue}
-                    placeholder="#3baa6f"
-                    onchange={handleIconToneHexChange}
-                    aria-label="Icon decoration hex color value"
-                  />
-                </div>
-              </template>
-
-              <div
-                class="newton-tone-row"
-                role="radiogroup"
-                aria-label="Icon glyph color"
-              >
-                <span class="newton-tone-row__eyebrow">Glyph</span>
-                <template for:each={iconGlyphToneChips} for:item="chip">
-                  <button
-                    key={chip.value}
-                    type="button"
-                    class={chip.className}
-                    data-value={chip.value}
-                    aria-pressed={chip.ariaPressed}
-                    title={chip.label}
-                    disabled={chip.disabled}
-                    onclick={handleIconGlyphToneChange}
-                  >
-                    <span class={chip.dotClassName} aria-hidden="true"></span>
-                    <span class="newton-tone-chip__label">{chip.label}</span>
-                  </button>
-                </template>
-              </div>
-              <template lwc:if={iconGlyphToneIsCustom}>
-                <div class="newton-hex-row">
-                  <label class="newton-hex-row__label" for="icon-glyph-tone-hex"
-                    >Custom glyph</label
-                  >
-                  <input
-                    id="icon-glyph-tone-hex"
-                    type="color"
-                    class="newton-hex-row__selector"
-                    value={iconGlyphToneHexValue}
-                    oninput={handleIconGlyphToneHexChange}
-                    onchange={handleIconGlyphToneHexChange}
-                    aria-label="Pick icon glyph color"
-                  />
-                  <input
-                    type="text"
-                    class="newton-hex-row__input"
-                    value={iconGlyphToneHexValue}
-                    placeholder="#ffffff"
-                    onchange={handleIconGlyphToneHexChange}
-                    aria-label="Icon glyph hex color value"
-                  />
-                </div>
+            </div>
+            <div
+              class="newton-studio__selectorgroup"
+              role="radiogroup"
+              aria-label="Horizontal gap"
+              data-key="gapH"
+              oncardselect={handleTileChange}
+            >
+              <template for:each={gapHTiles} for:item="tile">
+                <c-newton-selector-choice-tile
+                  key={tile.id}
+                  item={tile}
+                  selected={tile._selected}
+                  selection-mode="single"
+                  group-name="newton-gap-h"
+                  size="small"
+                  framed-visual
+                  aspect-ratio="3:2"
+                ></c-newton-selector-choice-tile>
               </template>
             </div>
-          </article>
+          </div>
         </template>
-      </template>
-    </template>
-
-    <!-- ▂▂▂▂ BADGE — tile status label (gated by global show-badges) ▂▂▂▂ -->
-    <template lwc:if={showBadgeCard}>
-      <div
-        class={badgeSubchapterClass}
-        role="separator"
-        aria-label="Badge section"
-      >
-        <span class="newton-studio__subchapter-eyebrow">
-          <span class="newton-studio__subchapter-numeral">04·D</span>
-          <span class="newton-studio__subchapter-title">Badge</span>
-        </span>
-        <span class="newton-studio__subchapter-rule" aria-hidden="true"></span>
-        <span class="newton-studio__subchapter-toggle">
-          <c-newton-selector-flow-cpe-toggle
-            label="Show badges"
-            variant="label-hidden"
-            active-label="Shown"
-            inactive-label="Hidden"
-            message-toggle-active="Badges on"
-            message-toggle-inactive="Badges hidden"
-            checked={showBadgesValue}
-            ontoggle={handleShowBadgesToggle}
-          ></c-newton-selector-flow-cpe-toggle>
-        </span>
+        <template lwc:if={showGapVertical}>
+          <div class="newton-studio__axis">
+            <div class="newton-studio__axis-head">
+              <c-newton-selector-icon
+                name="move-vertical"
+                size="x-small"
+                alternative-text=""
+              ></c-newton-selector-icon>
+              <div class="newton-studio__axis-text">
+                <h4 class="newton-studio__axis-title">Vertical</h4>
+                <p class="newton-studio__axis-sub">Row gap between tiles.</p>
+              </div>
+            </div>
+            <div
+              class="newton-studio__selectorgroup"
+              role="radiogroup"
+              aria-label="Vertical gap"
+              data-key="gapV"
+              oncardselect={handleTileChange}
+            >
+              <template for:each={gapVTiles} for:item="tile">
+                <c-newton-selector-choice-tile
+                  key={tile.id}
+                  item={tile}
+                  selected={tile._selected}
+                  selection-mode="single"
+                  group-name="newton-gap-v"
+                  size="small"
+                  framed-visual
+                  aspect-ratio="3:2"
+                ></c-newton-selector-choice-tile>
+              </template>
+            </div>
+          </div>
+        </template>
       </div>
-      <template lwc:if={showBadgesValue}>
-        <!-- Badges shown; configurator renders below. -->
+    </article>
+  </template>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header
+      class="slds-card__header newton-card__head newton-card__head_with-action"
+    >
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="expand"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Outer margin
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          Space around the whole selector at runtime.
+        </p>
+      </div>
+      <span class="newton-card__action"
+        ><c-newton-selector-flow-cpe-toggle
+          label="Link all sides"
+          variant="label-hidden"
+          active-label="Linked"
+          inactive-label="Per side"
+          checked={marginLinked}
+          ontoggle={handleMarginLinkToggle}
+        ></c-newton-selector-flow-cpe-toggle
+      ></span>
+    </header>
+    <div
+      class="slds-card__body slds-card__body_inner newton-studio__field-block"
+    >
+      <template lwc:if={marginLinked}>
+        <div
+          class="newton-studio__selectorgroup"
+          role="radiogroup"
+          aria-label="Margin — all sides"
+          oncardselect={handleMarginAllChange}
+        >
+          <template for:each={marginAllTiles} for:item="tile">
+            <c-newton-selector-choice-tile
+              key={tile.id}
+              item={tile}
+              selected={tile._selected}
+              selection-mode="single"
+              group-name="newton-margin-all"
+              size="small"
+              framed-visual
+              aspect-ratio="3:2"
+            ></c-newton-selector-choice-tile>
+          </template>
+        </div>
       </template>
       <template lwc:else>
-        <p class="newton-studio__subchapter-off-note" role="note">
-          Badges are hidden across every tile. Turn the toggle above on to
-          configure position, color, and shape.
-        </p>
-      </template>
-    </template>
-
-    <template lwc:if={showBadgeGroupCards}>
-      <template lwc:if={showBadgeCard}>
-        <article
-          class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_badge newton-badge-card"
-        >
-          <header class="slds-card__header newton-card__head">
-            <span
-              class="newton-card__glyph newton-card__glyph_appearance"
-              aria-hidden="true"
-            >
+        <template for:each={marginSideSections} for:item="section">
+          <div
+            key={section.side}
+            class="newton-studio__axis"
+            data-section-side={section.side}
+          >
+            <div class="newton-studio__axis-head">
               <c-newton-selector-icon
-                name="award"
-                size="small"
+                name={section.icon}
+                size="x-small"
                 alternative-text=""
               ></c-newton-selector-icon>
-            </span>
-            <div class="newton-card__headings">
-              <h3 class="slds-card__header-title slds-text-heading_small">
-                Badge
-              </h3>
-              <p
-                class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-              >
-                Highlight a tile with a short status label.
-              </p>
-            </div>
-            <lightning-helptext
-              class="newton-card__help"
-              content="Badge text comes from your data (the badge field). Position, color, and shape are global settings applied to every tile. Per-item overrides are supported via item.badgeVariant."
-            ></lightning-helptext>
-          </header>
-          <div
-            class="slds-card__body slds-card__body_inner newton-badge-card__body"
-          >
-            <!-- Position -->
-            <div class="newton-badge-card__control">
-              <span class="newton-badge-card__eyebrow">Position</span>
-              <div
-                class="newton-studio__selectorgroup"
-                role="radiogroup"
-                aria-label="Badge position"
-                oncardselect={handleBadgePositionTileChange}
-              >
-                <template for:each={badgePositionChips} for:item="chip">
-                  <c-newton-selector-choice-tile
-                    key={chip.value}
-                    data-value={chip.value}
-                    item={chip}
-                    selected={chip._selected}
-                    disabled={chip._disabled}
-                    selection-mode="single"
-                    group-name="newton-selector-badge-position"
-                    size="small"
-                    aspect-ratio="1:1"
-                    icon-decor="square"
-                    icon-style="outlined"
-                    icon-shading="flat"
-                    icon-tone="brand"
-                    icon-glyph-tone="brand"
-                  ></c-newton-selector-choice-tile>
-                </template>
+              <div class="newton-studio__axis-text">
+                <h4 class="newton-studio__axis-title">{section.label}</h4>
               </div>
             </div>
-
-            <!-- Variant -->
-            <div class="newton-badge-card__control">
-              <span class="newton-badge-card__eyebrow">Color</span>
-              <div
-                class="newton-tone-row"
-                role="radiogroup"
-                aria-label="Badge color"
-              >
-                <template for:each={badgeVariantChips} for:item="chip">
-                  <button
-                    key={chip.value}
-                    type="button"
-                    class={chip.className}
-                    data-value={chip.value}
-                    aria-pressed={chip.ariaPressed}
-                    title={chip.label}
-                    disabled={chip.disabled}
-                    onclick={handleBadgeVariantChange}
-                  >
-                    <span class={chip.dotClassName} aria-hidden="true"></span>
-                    <span class="newton-tone-chip__label">{chip.label}</span>
-                  </button>
-                </template>
-              </div>
-              <template lwc:if={badgeVariantIsCustom}>
-                <div class="newton-hex-row">
-                  <label class="newton-hex-row__label" for="badge-variant-hex"
-                    >Custom color</label
-                  >
-                  <input
-                    id="badge-variant-hex"
-                    type="color"
-                    class="newton-hex-row__selector"
-                    value={badgeVariantHexValue}
-                    oninput={handleBadgeVariantHexChange}
-                    onchange={handleBadgeVariantHexChange}
-                    aria-label="Pick badge color"
-                  />
-                  <input
-                    type="text"
-                    class="newton-hex-row__input"
-                    value={badgeVariantHexValue}
-                    placeholder="#3baa6f"
-                    onchange={handleBadgeVariantHexChange}
-                    aria-label="Hex color value"
-                  />
-                </div>
+            <div
+              class="newton-studio__selectorgroup"
+              role="radiogroup"
+              aria-label={section.groupLabel}
+              data-side={section.side}
+              oncardselect={handleMarginSideChange}
+            >
+              <template for:each={section.tiles} for:item="tile">
+                <c-newton-selector-choice-tile
+                  key={tile.id}
+                  item={tile}
+                  selected={tile._selected}
+                  selection-mode="single"
+                  group-name="newton-margin-side"
+                  size="small"
+                  framed-visual
+                  aspect-ratio="3:2"
+                ></c-newton-selector-choice-tile>
               </template>
             </div>
-
-            <!-- Shape -->
-            <div class="newton-badge-card__control">
-              <span class="newton-badge-card__eyebrow">Shape</span>
-              <div
-                class="newton-studio__selectorgroup"
-                role="radiogroup"
-                aria-label="Badge shape"
-                oncardselect={handleBadgeShapeTileChange}
-              >
-                <template for:each={badgeShapeChips} for:item="chip">
-                  <c-newton-selector-choice-tile
-                    key={chip.value}
-                    data-value={chip.value}
-                    item={chip}
-                    selected={chip._selected}
-                    disabled={chip._disabled}
-                    selection-mode="single"
-                    group-name="newton-selector-badge-shape"
-                    size="small"
-                    aspect-ratio="1:1"
-                  ></c-newton-selector-choice-tile>
-                </template>
-              </div>
-            </div>
           </div>
-        </article>
+        </template>
       </template>
-    </template>
-
-    <!-- ▂▂▂▂ SPACING & LAYOUT — density + gaps + margins ▂▂▂▂ -->
-    <template lwc:if={isTileLayout}>
-      <div
-        class="newton-studio__subchapter newton-studio__subchapter_spacing"
-        role="separator"
-        aria-label="Spacing and layout"
-      >
-        <span class="newton-studio__subchapter-eyebrow">
-          <span class="newton-studio__subchapter-numeral">04·E</span>
-          <span class="newton-studio__subchapter-title"
-            >Spacing &amp; layout</span
-          >
-        </span>
-        <span class="newton-studio__subchapter-rule" aria-hidden="true"></span>
-        <span></span>
+    </div>
+  </article>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header
+      class="slds-card__header newton-card__head newton-card__head_with-action"
+    >
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="shrink"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Inner tile padding
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          Space inside each tile between its border and content.
+        </p>
       </div>
-    </template>
-
-    <template lwc:if={showGridMinWidth}>
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_spacing"
-      >
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="battery-medium"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Grid density
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Override the grid column width. Picking a size above sets this
-              automatically.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="By default the grid column width is bound to the Tile size. Drag the slider to override — smaller values pack more tiles per row, larger values spread them out."
-          ></lightning-helptext>
-        </header>
+      <span class="newton-card__action"
+        ><c-newton-selector-flow-cpe-toggle
+          label="Link all sides"
+          variant="label-hidden"
+          active-label="Linked"
+          inactive-label="Per side"
+          checked={paddingLinked}
+          ontoggle={handlePaddingLinkToggle}
+        ></c-newton-selector-flow-cpe-toggle
+      ></span>
+      <lightning-helptext
+        class="newton-card__help"
+        content="Padding drives the content gap too — the space between icon and text is always half the padding. Pick Auto to follow the tile size's default."
+      ></lightning-helptext>
+    </header>
+    <div
+      class="slds-card__body slds-card__body_inner newton-studio__field-block"
+    >
+      <template lwc:if={paddingLinked}>
         <div
-          class="slds-card__body slds-card__body_inner newton-studio__slider-stack"
+          class="newton-studio__selectorgroup"
+          role="radiogroup"
+          aria-label="Padding — all sides"
+          oncardselect={handlePaddingAllChange}
         >
-          <div class="newton-studio__slider">
-            <div class="newton-studio__slider-head">
-              <span class="newton-studio__slider-label"
-                >Minimum column width</span
-              >
-              <span class="newton-studio__slider-value"
-                >{gridMinWidthDisplay}</span
-              >
-            </div>
-            <lightning-input
-              type="range"
-              variant="label-hidden"
-              label="Minimum column width"
-              min={gridMinWidthRange.min}
-              max={gridMinWidthRange.max}
-              step={gridMinWidthRange.step}
-              value={gridMinWidthNumber}
-              onchange={handleGridMinWidthChange}
-            ></lightning-input>
-            <div class="newton-studio__slider-scale">
-              <span>{gridMinWidthScaleMin}</span>
-              <span>{gridMinWidthScaleMax}</span>
-            </div>
-          </div>
-        </div>
-      </article>
-    </template>
-
-    <template lwc:if={showGapCard}>
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_spacing"
-      >
-        <header class="slds-card__header newton-card__head">
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="rows-3"
+          <template for:each={paddingAllTiles} for:item="tile">
+            <c-newton-selector-choice-tile
+              key={tile.id}
+              item={tile}
+              selected={tile._selected}
+              selection-mode="single"
+              group-name="newton-padding-all"
               size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Tile gaps
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Space between tiles.
-            </p>
-          </div>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Each chip maps to an SLDS 2 spacing token. Horizontal controls column gap (side-by-side tiles); vertical controls row gap (stacked rows)."
-          ></lightning-helptext>
-        </header>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
-        >
-          <template lwc:if={showGapHorizontal}>
-            <div class="newton-studio__axis">
-              <div class="newton-studio__axis-head">
-                <c-newton-selector-icon
-                  name="move-horizontal"
-                  size="x-small"
-                  alternative-text=""
-                ></c-newton-selector-icon>
-                <div class="newton-studio__axis-text">
-                  <h4 class="newton-studio__axis-title">Horizontal</h4>
-                  <p class="newton-studio__axis-sub">
-                    Column gap between tiles.
-                  </p>
-                </div>
-              </div>
-              <div
-                class="newton-studio__selectorgroup newton-studio__selectorgroup_compact"
-                role="radiogroup"
-                aria-label="Horizontal gap"
-                oncardselect={handleGapHorizontalToken}
-              >
-                <template for:each={gapHTiles} for:item="tile">
-                  <c-newton-selector-choice-tile
-                    key={tile.id}
-                    item={tile}
-                    selected={tile._selected}
-                    selection-mode="single"
-                    group-name="newton-gap-h"
-                    size="small"
-                    aspect-ratio="3:4"
-                    icon-size="small"
-                  ></c-newton-selector-choice-tile>
-                </template>
-              </div>
-            </div>
-          </template>
-          <template lwc:if={showGapVertical}>
-            <div class="newton-studio__axis">
-              <div class="newton-studio__axis-head">
-                <c-newton-selector-icon
-                  name="move-vertical"
-                  size="x-small"
-                  alternative-text=""
-                ></c-newton-selector-icon>
-                <div class="newton-studio__axis-text">
-                  <h4 class="newton-studio__axis-title">Vertical</h4>
-                  <p class="newton-studio__axis-sub">Row gap between tiles.</p>
-                </div>
-              </div>
-              <div
-                class="newton-studio__selectorgroup newton-studio__selectorgroup_compact"
-                role="radiogroup"
-                aria-label="Vertical gap"
-                oncardselect={handleGapVerticalToken}
-              >
-                <template for:each={gapVTiles} for:item="tile">
-                  <c-newton-selector-choice-tile
-                    key={tile.id}
-                    item={tile}
-                    selected={tile._selected}
-                    selection-mode="single"
-                    group-name="newton-gap-v"
-                    size="small"
-                    aspect-ratio="3:4"
-                    icon-size="small"
-                  ></c-newton-selector-choice-tile>
-                </template>
-              </div>
-            </div>
+              framed-visual
+              aspect-ratio="3:2"
+            ></c-newton-selector-choice-tile>
           </template>
         </div>
-      </article>
-    </template>
-
-    <template lwc:if={showMarginPadding}>
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_spacing"
-      >
-        <header
-          class="slds-card__header newton-card__head newton-card__head_with-action"
-        >
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
+      </template>
+      <template lwc:else>
+        <template for:each={paddingSideSections} for:item="section">
+          <div
+            key={section.side}
+            class="newton-studio__axis"
+            data-section-side={section.side}
           >
-            <c-newton-selector-icon
-              name="expand"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Outer margin
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Space around the whole selector at runtime.
-            </p>
-          </div>
-          <span class="newton-card__action">
-            <c-newton-selector-flow-cpe-toggle
-              label="Link all sides"
-              variant="label-hidden"
-              active-label="Linked"
-              inactive-label="Per side"
-              message-toggle-active="All four sides share one value"
-              message-toggle-inactive="Set each side independently"
-              checked={marginLinked}
-              ontoggle={handleMarginLinkToggle}
-            ></c-newton-selector-flow-cpe-toggle>
-          </span>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Link all sides to set one value, or unlink for per-side control. Each side maps to an SLDS 2 spacing token."
-          ></lightning-helptext>
-        </header>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
-        >
-          <template lwc:if={marginLinked}>
+            <div class="newton-studio__axis-head">
+              <c-newton-selector-icon
+                name={section.icon}
+                size="x-small"
+                alternative-text=""
+              ></c-newton-selector-icon>
+              <div class="newton-studio__axis-text">
+                <h4 class="newton-studio__axis-title">{section.label}</h4>
+              </div>
+            </div>
             <div
-              class="newton-studio__selectorgroup newton-studio__selectorgroup_compact"
+              class="newton-studio__selectorgroup"
               role="radiogroup"
-              aria-label="Margin — all sides"
-              oncardselect={handleMarginAllChange}
+              aria-label={section.groupLabel}
+              data-side={section.side}
+              oncardselect={handlePaddingSideChange}
             >
-              <template for:each={marginAllTiles} for:item="tile">
+              <template for:each={section.tiles} for:item="tile">
                 <c-newton-selector-choice-tile
                   key={tile.id}
                   item={tile}
                   selected={tile._selected}
                   selection-mode="single"
-                  group-name="newton-margin-all"
+                  group-name="newton-padding-side"
                   size="small"
-                  aspect-ratio="3:4"
-                  icon-size="small"
+                  framed-visual
+                  aspect-ratio="3:2"
                 ></c-newton-selector-choice-tile>
               </template>
             </div>
-          </template>
-          <template lwc:else>
-            <template for:each={marginSideSections} for:item="section">
-              <div
-                key={section.side}
-                class="newton-studio__axis"
-                data-section-side={section.side}
-              >
-                <div class="newton-studio__axis-head">
-                  <c-newton-selector-icon
-                    name={section.icon}
-                    size="x-small"
-                    alternative-text=""
-                  ></c-newton-selector-icon>
-                  <div class="newton-studio__axis-text">
-                    <h4 class="newton-studio__axis-title">{section.label}</h4>
-                  </div>
-                </div>
-                <div
-                  class="newton-studio__selectorgroup newton-studio__selectorgroup_compact"
-                  role="radiogroup"
-                  aria-label={section.label}
-                  data-side={section.side}
-                  oncardselect={handleMarginSideChange}
-                >
-                  <template for:each={section.tiles} for:item="tile">
-                    <c-newton-selector-choice-tile
-                      key={tile.id}
-                      item={tile}
-                      selected={tile._selected}
-                      selection-mode="single"
-                      group-name="newton-margin-side"
-                      size="small"
-                      aspect-ratio="1:1"
-                      icon-size="small"
-                    ></c-newton-selector-choice-tile>
-                  </template>
-                </div>
-              </div>
-            </template>
-          </template>
-        </div>
-      </article>
-
-      <article
-        class="slds-card newton-studio__card newton-studio__section-card newton-studio__section-card_spacing"
-      >
-        <header
-          class="slds-card__header newton-card__head newton-card__head_with-action"
-        >
-          <span
-            class="newton-card__glyph newton-card__glyph_appearance"
-            aria-hidden="true"
-          >
-            <c-newton-selector-icon
-              name="shrink"
-              size="small"
-              alternative-text=""
-            ></c-newton-selector-icon>
-          </span>
-          <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
-              Inner tile padding
-            </h3>
-            <p
-              class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-            >
-              Space inside each tile between its border and content.
-            </p>
           </div>
-          <span class="newton-card__action">
-            <c-newton-selector-flow-cpe-toggle
-              label="Link all sides"
-              variant="label-hidden"
-              active-label="Linked"
-              inactive-label="Per side"
-              message-toggle-active="All four sides share one value"
-              message-toggle-inactive="Set each side independently"
-              checked={paddingLinked}
-              ontoggle={handlePaddingLinkToggle}
-            ></c-newton-selector-flow-cpe-toggle>
-          </span>
-          <lightning-helptext
-            class="newton-card__help"
-            content="Padding drives the content gap too — the space between icon and text is always half the padding. Pick Auto to follow the tile size's default."
-          ></lightning-helptext>
-        </header>
-        <div
-          class="slds-card__body slds-card__body_inner newton-studio__field-block"
-        >
-          <template lwc:if={paddingLinked}>
-            <div
-              class="newton-studio__selectorgroup newton-studio__selectorgroup_compact"
-              role="radiogroup"
-              aria-label="Padding — all sides"
-              oncardselect={handlePaddingAllChange}
-            >
-              <template for:each={paddingAllTiles} for:item="tile">
-                <c-newton-selector-choice-tile
-                  key={tile.id}
-                  item={tile}
-                  selected={tile._selected}
-                  selection-mode="single"
-                  group-name="newton-padding-all"
-                  size="small"
-                  aspect-ratio="3:4"
-                  icon-size="small"
-                ></c-newton-selector-choice-tile>
-              </template>
-            </div>
-          </template>
-          <template lwc:else>
-            <template for:each={paddingSideSections} for:item="section">
-              <div
-                key={section.side}
-                class="newton-studio__axis"
-                data-section-side={section.side}
-              >
-                <div class="newton-studio__axis-head">
-                  <c-newton-selector-icon
-                    name={section.icon}
-                    size="x-small"
-                    alternative-text=""
-                  ></c-newton-selector-icon>
-                  <div class="newton-studio__axis-text">
-                    <h4 class="newton-studio__axis-title">{section.label}</h4>
-                  </div>
-                </div>
-                <div
-                  class="newton-studio__selectorgroup newton-studio__selectorgroup_compact"
-                  role="radiogroup"
-                  aria-label={section.label}
-                  data-side={section.side}
-                  oncardselect={handlePaddingSideChange}
-                >
-                  <template for:each={section.tiles} for:item="tile">
-                    <c-newton-selector-choice-tile
-                      key={tile.id}
-                      item={tile}
-                      selected={tile._selected}
-                      selection-mode="single"
-                      group-name="newton-padding-side"
-                      size="small"
-                      aspect-ratio="1:1"
-                      icon-size="small"
-                    ></c-newton-selector-choice-tile>
-                  </template>
-                </div>
-              </div>
-            </template>
-          </template>
-        </div>
-      </article>
-    </template>
-  </template>
+        </template>
+      </template>
+    </div>
+  </article>
 </template>

@@ -4,32 +4,35 @@
   "version": "1.0.0",
   "description": "Newton Selector for Salesforce Flow Screens",
   "scripts": {
-    "lint": "eslint **/{aura,lwc}/**/*.js",
+    "lint": "eslint \"**/lwc/**/*.js\"",
+    "lint:slds": "slds-linter lint force-app/main/default/lwc",
     "test": "npm run test:unit",
     "test:unit": "sfdx-lwc-jest",
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
-    "smoke:flow-builder:install": "playwright install chromium",
-    "smoke:flow-builder": "node scripts/smoke/flow-builder-ui-smoke.mjs",
-    "test:e2e:flow-builder": "node scripts/e2e/flow-builder-newton-selector-e2e.mjs",
-    "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
-    "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "test:e2e:install": "playwright install chromium",
+    "test:e2e:builder": "node scripts/e2e/flow-builder-newton-selector-e2e.mjs",
+    "test:e2e:runtime": "node scripts/e2e/newton-selector-runtime-e2e.mjs",
+    "prettier": "prettier --write \"**/*.{cls,css,html,js,json,md,xml,yaml,yml}\"",
+    "prettier:verify": "prettier --check \"**/*.{cls,css,html,js,json,md,xml,yaml,yml}\"",
     "generate:lucide-icons": "node scripts/icons/generate-lucide-lwc.mjs",
     "audit:lucide-icons": "node scripts/icons/audit-lucide-usage.mjs",
     "prepare": "husky || true",
     "precommit": "lint-staged"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@lwc/eslint-plugin-lwc": "^3.1.0",
     "@prettier/plugin-xml": "^3.4.1",
+    "@salesforce-ux/slds-linter": "^1.2.1",
     "@salesforce/eslint-config-lwc": "^4.0.0",
-    "@salesforce/eslint-plugin-aura": "^3.0.0",
     "@salesforce/eslint-plugin-lightning": "^2.0.0",
     "@salesforce/sfdx-lwc-jest": "^7.0.2",
     "eslint": "^9.29.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest": "^28.14.0",
+    "globals": "^15.15.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "lucide-static": "^1.12.0",
@@ -43,10 +46,10 @@
     }
   },
   "lint-staged": {
-    "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [
+    "**/*.{cls,css,html,js,json,md,xml,yaml,yml}": [
       "prettier --write"
     ],
-    "**/{aura,lwc}/**/*.js": [
+    "**/lwc/**/*.js": [
       "eslint"
     ],
     "**/lwc/**": [

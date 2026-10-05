@@ -4,6 +4,6 @@
   <isExposed>false</isExposed>
   <masterLabel>Newton Selector Flow CPE | Choice Control</masterLabel>
   <description>
-    CPE studio choice control that renders finite options through the Newton selector base.
+    CPE picklist control built on the Newton selector combobox. Emits valuechange with detail {value}.
   </description>
 </LightningComponentBundle>

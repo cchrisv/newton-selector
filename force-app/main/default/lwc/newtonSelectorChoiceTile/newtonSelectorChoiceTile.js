@@ -6,6 +6,7 @@ const VARIANT_GRID = "grid";
 const VARIANT_LIST = "list";
 const VALID_VARIANTS = new Set([VARIANT_GRID, VARIANT_LIST]);
 const VALID_SIZES = new Set(["small", "medium", "large"]);
+const DEFAULT_SIZE = "small";
 const VALID_ASPECTS = new Set(["1:1", "4:3", "3:2", "16:9", "3:4", "2:3"]);
 const DEFAULT_ASPECT = "1:1";
 
@@ -39,7 +40,7 @@ const VALID_BADGE_SHAPES = new Set(["pill", "square"]);
 const DEFAULT_BADGE_SHAPE = "pill";
 
 // Selection indicator style — how the "this tile is picked" state is shown.
-//   checkmark — floating circle badge top-right (historical)
+//   checkmark — floating circle badge top-right
 //   fill      — tile surface fills with brand-weak, check hidden
 //   bar       — thick brand-colored bar on the leading edge
 //   frame     — inset selected frame
@@ -70,21 +71,17 @@ const VALID_ELEVATIONS = new Set([
   "floating",
   "inset"
 ]);
-const ELEVATION_ALIASES = {
-  flat: "plain",
-  elevated: "raised"
-};
 const DEFAULT_ELEVATION = "outlined";
 
-// Pattern — decorative overlay inspired by the empty/error state
-// backgrounds. `none` leaves the surface clean; the others layer a subtle
-// pattern tinted by patternTone.
+// Pattern — decorative overlay. `none` leaves the surface clean; the others
+// layer a subtle pattern tinted by patternTone.
 //   none     — no overlay (default)
-//   dots     — fine dotted grid (from empty-state)
-//   lines    — horizontal scanlines (from error-state)
+//   dots     — fine dotted grid
+//   lines    — horizontal scanlines
 //   diagonal — 45deg stripes
 //   grid     — crosshatch
 //   glow     — soft radial gradient at top
+//   noise / paper / waves — textured surfaces
 const VALID_PATTERNS = new Set([
   "none",
   "dots",
@@ -123,8 +120,10 @@ const DEFAULT_ICON_DECOR = "square";
 //   outlined   — transparent fill + tone-colored outline, icon in tone color
 //   soft       — low-opacity dashed outline, dimmed icon — "empty space" feel
 //   glow       — soft radial gradient (halo), icon in tone color
+// A glyph without decoration always uses the plain, undimmed outlined style.
 const VALID_ICON_STYLES = new Set(["filled", "outlined", "soft", "glow"]);
-const DEFAULT_ICON_STYLE = "outlined";
+const DEFAULT_ICON_STYLE = "soft";
+const UNDECORATED_ICON_STYLE = "outlined";
 
 // Icon shading — surface treatment applied to filled shapes. Ignored for
 // outlined/soft/glow styles.
@@ -168,22 +167,16 @@ function safeHex(v) {
   return HEX_RE.test(s) ? s : "";
 }
 
-function isExplicitFalse(value) {
-  return value === false || value === "false" || value === "FALSE";
-}
-
 function aspectClassKey(aspect) {
   return aspect.replace(":", "-");
 }
 
-function resolveTone(itemTone, apiTone, fallback) {
-  if (itemTone && VALID_TONES.has(itemTone)) return itemTone;
-  if (apiTone && VALID_TONES.has(apiTone)) return apiTone;
-  return fallback;
+function resolveTone(tone, fallback) {
+  return VALID_TONES.has(tone) ? tone : fallback;
 }
 
-function resolveHex(itemHex, apiHex, fallbackHex = "") {
-  return safeHex(itemHex) || safeHex(apiHex) || fallbackHex;
+function resolveHex(hex, fallbackHex = "") {
+  return safeHex(hex) || fallbackHex;
 }
 
 export default class NewtonSelectorChoiceTile extends LightningElement {
@@ -193,9 +186,10 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   @api disabled = false;
   @api selectionMode = MODE_SINGLE;
   @api groupName = "newtonSelectorChoiceTile";
-  @api size = "medium";
+  @api size = DEFAULT_SIZE;
   @api aspectRatio = DEFAULT_ASPECT;
-  @api iconSize = "large";
+  // "auto" scales the glyph with the tile size; any icon size pins it.
+  @api iconSize = "auto";
   @api badgePosition = DEFAULT_BADGE_POSITION;
   @api badgeVariant = DEFAULT_BADGE_VARIANT;
   @api badgeShape = DEFAULT_BADGE_SHAPE;
@@ -214,12 +208,16 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   @api surfaceSelectedTone;
   @api surfaceDisabledTone;
   @api iconDecor = DEFAULT_ICON_DECOR;
+  // Draws the icon in the same plain framed cell as a shape (neutral at rest,
+  // brand when selected) instead of an icon decoration, so a set of tiles
+  // mixing icons and shapes reads as one family. Used by the property editor.
+  @api framedVisual = false;
   @api iconStyle = DEFAULT_ICON_STYLE;
   @api iconShading = DEFAULT_ICON_SHADING;
   @api iconTone = DEFAULT_ICON_TONE;
   // Glyph color — controls the icon ITSELF (as distinct from the decor fill).
-  // When unset, glyphTone inherits from iconTone for back-compat. Setting it
-  // independently lets admins design e.g. a neutral-gray decoration with a
+  // Unset or 'auto' follows iconTone (the editor's "Auto" glyph color). Setting
+  // it independently lets admins design e.g. a neutral-gray decoration with a
   // brand-blue glyph on top.
   @api iconGlyphTone;
   @api iconGlyphToneHex = "";
@@ -241,9 +239,7 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   // tinted badge.
   @api badgeVariantHex = "";
   // Global on/off switches — default ON. LWC disallows `true` defaults on
-  // `@api` booleans, so the property starts `undefined` and our check
-  // (`showIcons !== false`) treats undefined as "show". To hide, a parent
-  // must explicitly pass `false`.
+  // `@api` booleans, so undefined means "show"; only `false` hides.
   @api showIcons;
   @api showBadges;
 
@@ -251,24 +247,20 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
     return VALID_VARIANTS.has(this.variant) ? this.variant : VARIANT_GRID;
   }
   get resolvedSize() {
-    return VALID_SIZES.has(this.size) ? this.size : "medium";
+    return VALID_SIZES.has(this.size) ? this.size : DEFAULT_SIZE;
   }
-  // Legacy configs may set aspectRatio to 'auto'; silently normalize to the default.
+  // Values outside the tile's aspect set (list layouts use 'auto') use the default.
   get resolvedAspect() {
     return VALID_ASPECTS.has(this.aspectRatio)
       ? this.aspectRatio
       : DEFAULT_ASPECT;
   }
-  // Icon size resolution order: item override > @api override > tile-size default.
-  // The tile-size default gives small/medium/large tiles naturally-scaled icons
-  // (previously icons were always 'large', making list-mode rows all the same
-  // apparent height regardless of tile size).
+  // Tile sizes share their names with icon sizes, so "auto" (or unset) uses
+  // the tile size as the glyph size.
   get resolvedIconSize() {
-    if (this.item?.iconSize) return this.item.iconSize;
-    if (this.iconSize && this.iconSize !== "large") return this.iconSize; // explicit non-default
-    // Default: scale with tile size.
-    const map = { small: "small", medium: "medium", large: "large" };
-    return map[this.resolvedSize] || "medium";
+    return this.iconSize && this.iconSize !== "auto"
+      ? this.iconSize
+      : this.resolvedSize;
   }
 
   get resolvedBadgePosition() {
@@ -277,10 +269,6 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
       : DEFAULT_BADGE_POSITION;
   }
   get resolvedBadgeVariant() {
-    // Per-item override wins over the selector-wide variant.
-    const itemVariant = this.item?.badgeVariant;
-    if (itemVariant && VALID_BADGE_VARIANTS.has(itemVariant))
-      return itemVariant;
     return VALID_BADGE_VARIANTS.has(this.badgeVariant)
       ? this.badgeVariant
       : DEFAULT_BADGE_VARIANT;
@@ -296,50 +284,31 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
       : DEFAULT_SELECTION_INDICATOR;
   }
   get resolvedElevation() {
-    const value = ELEVATION_ALIASES[this.elevation] || this.elevation;
+    const value = this.elevation;
     return VALID_ELEVATIONS.has(value) ? value : DEFAULT_ELEVATION;
   }
   get resolvedPattern() {
-    const itemPattern = this.item?.pattern;
-    if (itemPattern && VALID_PATTERNS.has(itemPattern)) return itemPattern;
     return VALID_PATTERNS.has(this.pattern) ? this.pattern : DEFAULT_PATTERN;
   }
   get resolvedPatternTone() {
-    const itemTone = this.item?.patternTone;
-    return resolveTone(itemTone, this.patternTone, DEFAULT_TONE);
+    return resolveTone(this.patternTone, DEFAULT_TONE);
   }
   get resolvedPatternHoverTone() {
-    return resolveTone(
-      this.item?.patternHoverTone,
-      this.patternHoverTone,
-      this.resolvedPatternTone
-    );
+    return resolveTone(this.patternHoverTone, this.resolvedPatternTone);
   }
   get resolvedPatternSelectedTone() {
-    return resolveTone(
-      this.item?.patternSelectedTone,
-      this.patternSelectedTone,
-      "brand"
-    );
+    return resolveTone(this.patternSelectedTone, "brand");
   }
   get resolvedPatternDisabledTone() {
-    return resolveTone(
-      this.item?.patternDisabledTone,
-      this.patternDisabledTone,
-      "neutral"
-    );
+    return resolveTone(this.patternDisabledTone, "neutral");
   }
   get resolvedCornerStyle() {
-    const itemCorner = this.item?.cornerStyle;
-    if (itemCorner && VALID_CORNERS.has(itemCorner)) return itemCorner;
     return VALID_CORNERS.has(this.cornerStyle)
       ? this.cornerStyle
       : DEFAULT_CORNER;
   }
   get resolvedCornerTone() {
-    const itemTone = this.item?.cornerTone;
-    if (itemTone && VALID_TONES.has(itemTone)) return itemTone;
-    return VALID_TONES.has(this.cornerTone) ? this.cornerTone : DEFAULT_TONE;
+    return resolveTone(this.cornerTone, DEFAULT_TONE);
   }
   get hasCornerDecor() {
     return this.resolvedCornerStyle !== "none";
@@ -348,40 +317,24 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
     return this.resolvedPattern !== "none";
   }
   get resolvedSurfaceStyle() {
-    const itemSurface = this.item?.surfaceStyle;
-    if (itemSurface && VALID_SURFACES.has(itemSurface)) return itemSurface;
     return VALID_SURFACES.has(this.surfaceStyle)
       ? this.surfaceStyle
       : DEFAULT_SURFACE;
   }
   get resolvedSurfaceTone() {
-    const itemTone = this.item?.surfaceTone;
-    return resolveTone(itemTone, this.surfaceTone, DEFAULT_TONE);
+    return resolveTone(this.surfaceTone, DEFAULT_TONE);
   }
   get resolvedSurfaceHoverTone() {
-    return resolveTone(
-      this.item?.surfaceHoverTone,
-      this.surfaceHoverTone,
-      this.resolvedSurfaceTone
-    );
+    return resolveTone(this.surfaceHoverTone, this.resolvedSurfaceTone);
   }
   get resolvedSurfaceSelectedTone() {
-    return resolveTone(
-      this.item?.surfaceSelectedTone,
-      this.surfaceSelectedTone,
-      "brand"
-    );
+    return resolveTone(this.surfaceSelectedTone, "brand");
   }
   get resolvedSurfaceDisabledTone() {
-    return resolveTone(
-      this.item?.surfaceDisabledTone,
-      this.surfaceDisabledTone,
-      "neutral"
-    );
+    return resolveTone(this.surfaceDisabledTone, "neutral");
   }
   get resolvedIconDecor() {
-    const itemDecor = this.item?.iconDecor;
-    if (itemDecor && VALID_ICON_DECORS.has(itemDecor)) return itemDecor;
+    if (this.framedVisual) return "none";
     return VALID_ICON_DECORS.has(this.iconDecor)
       ? this.iconDecor
       : DEFAULT_ICON_DECOR;
@@ -397,41 +350,25 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   }
 
   get resolvedIconStyle() {
-    const itemStyle = this.item?.iconStyle;
-    if (itemStyle && VALID_ICON_STYLES.has(itemStyle)) return itemStyle;
-    if (
-      VALID_ICON_STYLES.has(this.iconStyle) &&
-      this.resolvedIconDecor !== "none"
-    ) {
-      return this.iconStyle;
-    }
-    const decor = this.resolvedIconDecor;
-    if (decor === "ring") return "outlined";
-    if (decor === "halo") return "glow";
-    if (decor === "badge") return "filled";
-    if (decor === "square") return "filled";
-    return DEFAULT_ICON_STYLE;
+    if (!this.hasIconDecor) return UNDECORATED_ICON_STYLE;
+    return VALID_ICON_STYLES.has(this.iconStyle)
+      ? this.iconStyle
+      : DEFAULT_ICON_STYLE;
   }
   get resolvedIconShading() {
-    const itemShading = this.item?.iconShading;
-    if (itemShading && VALID_ICON_SHADINGS.has(itemShading)) return itemShading;
     return VALID_ICON_SHADINGS.has(this.iconShading)
       ? this.iconShading
       : DEFAULT_ICON_SHADING;
   }
   get resolvedIconTone() {
-    const itemTone = this.item?.iconTone;
-    return resolveTone(itemTone, this.iconTone, DEFAULT_ICON_TONE);
+    return resolveTone(this.iconTone, DEFAULT_ICON_TONE);
   }
-  // Glyph tone — if not explicitly set, derive from iconTone. This keeps
-  // legacy behaviour (single-color icon + decor) while enabling the split
-  // when admin chooses it.
-  //   - 'auto' or undefined → inherit from iconTone (legacy)
+  // Glyph tone — if not set, follow iconTone (one color for icon and
+  // decoration); an explicit tone splits them.
+  //   - 'auto' or undefined → follow iconTone
   //   - 'contrast'          → white for filled decoration, tone for others
   //   - any valid tone      → use that tone explicitly
   get resolvedIconGlyphTone() {
-    const itemGlyph = this.item?.iconGlyphTone;
-    if (itemGlyph && VALID_TONES.has(itemGlyph)) return itemGlyph;
     if (this.iconGlyphTone === "auto" || !this.iconGlyphTone) {
       // Glyph follows the decor tone, but for filled decoration
       // we render white text for contrast.
@@ -446,80 +383,54 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   }
   get resolvedIconGlyphHex() {
     if (this.resolvedIconGlyphTone !== "custom") return "";
-    return (
-      safeHex(this.item?.iconGlyphToneHex) || safeHex(this.iconGlyphToneHex)
-    );
+    return safeHex(this.iconGlyphToneHex);
   }
   // When tone='custom', resolve to the hex value (validated). Everything
   // else returns '' so the CSS class-based palette handles it.
   get resolvedIconHex() {
     if (this.resolvedIconTone !== "custom") return "";
-    return safeHex(this.item?.iconToneHex) || safeHex(this.iconToneHex);
+    return safeHex(this.iconToneHex);
   }
   get resolvedPatternHex() {
     if (this.resolvedPatternTone !== "custom") return "";
-    return resolveHex(this.item?.patternToneHex, this.patternToneHex);
+    return resolveHex(this.patternToneHex);
   }
   get resolvedPatternHoverHex() {
     if (this.resolvedPatternHoverTone !== "custom") return "";
-    return resolveHex(
-      this.item?.patternHoverToneHex,
-      this.patternHoverToneHex,
-      this.resolvedPatternHex
-    );
+    return resolveHex(this.patternHoverToneHex, this.resolvedPatternHex);
   }
   get resolvedPatternSelectedHex() {
     if (this.resolvedPatternSelectedTone !== "custom") return "";
-    return resolveHex(
-      this.item?.patternSelectedToneHex,
-      this.patternSelectedToneHex,
-      this.resolvedPatternHex
-    );
+    return resolveHex(this.patternSelectedToneHex, this.resolvedPatternHex);
   }
   get resolvedPatternDisabledHex() {
     if (this.resolvedPatternDisabledTone !== "custom") return "";
-    return resolveHex(
-      this.item?.patternDisabledToneHex,
-      this.patternDisabledToneHex,
-      this.resolvedPatternHex
-    );
+    return resolveHex(this.patternDisabledToneHex, this.resolvedPatternHex);
   }
   get resolvedCornerHex() {
     if (this.resolvedCornerTone !== "custom") return "";
-    return safeHex(this.item?.cornerToneHex) || safeHex(this.cornerToneHex);
+    return safeHex(this.cornerToneHex);
   }
   get resolvedSurfaceHex() {
     if (this.resolvedSurfaceTone !== "custom") return "";
-    return resolveHex(this.item?.surfaceToneHex, this.surfaceToneHex);
+    return resolveHex(this.surfaceToneHex);
   }
   get resolvedSurfaceHoverHex() {
     if (this.resolvedSurfaceHoverTone !== "custom") return "";
-    return resolveHex(
-      this.item?.surfaceHoverToneHex,
-      this.surfaceHoverToneHex,
-      this.resolvedSurfaceHex
-    );
+    return resolveHex(this.surfaceHoverToneHex, this.resolvedSurfaceHex);
   }
   get resolvedSurfaceSelectedHex() {
     if (this.resolvedSurfaceSelectedTone !== "custom") return "";
-    return resolveHex(
-      this.item?.surfaceSelectedToneHex,
-      this.surfaceSelectedToneHex,
-      this.resolvedSurfaceHex
-    );
+    return resolveHex(this.surfaceSelectedToneHex, this.resolvedSurfaceHex);
   }
   get resolvedSurfaceDisabledHex() {
     if (this.resolvedSurfaceDisabledTone !== "custom") return "";
-    return resolveHex(
-      this.item?.surfaceDisabledToneHex,
-      this.surfaceDisabledToneHex,
-      this.resolvedSurfaceHex
-    );
+    return resolveHex(this.surfaceDisabledToneHex, this.resolvedSurfaceHex);
   }
   // Badge custom hex — active only when resolvedBadgeVariant === 'custom'.
   get resolvedBadgeHex() {
     if (this.resolvedBadgeVariant !== "custom") return "";
-    return safeHex(this.item?.badgeVariantHex) || safeHex(this.badgeVariantHex);
+    return safeHex(this.badgeVariantHex);
   }
 
   // Inline style on the wrapper — sets CSS custom properties for any
@@ -599,9 +510,6 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
     ].join(" ");
   }
 
-  get isList() {
-    return this.resolvedVariant === VARIANT_LIST;
-  }
   get isMulti() {
     return this.selectionMode === MODE_MULTI;
   }
@@ -619,6 +527,9 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   get helpId() {
     return `${this.inputId}-help`;
   }
+  get describedBy() {
+    return this.hasHelp ? this.helpId : null;
+  }
   get hasHelp() {
     return Boolean(this.item?.helpText);
   }
@@ -626,7 +537,7 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   // Admin can flip showBadges=false at the selector level to blanket-hide
   // all badges even when items carry badge values.
   get hasBadge() {
-    return Boolean(this.item?.badge) && !isExplicitFalse(this.showBadges);
+    return Boolean(this.item?.badge) && this.showBadges !== false;
   }
   get hasShape() {
     const s = this.item?.shape;
@@ -638,9 +549,7 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
   // Shape beats icon, and both respect the global showIcons switch.
   get hasIcon() {
     return (
-      !this.hasShape &&
-      Boolean(this.item?.icon) &&
-      !isExplicitFalse(this.showIcons)
+      !this.hasShape && Boolean(this.item?.icon) && this.showIcons !== false
     );
   }
   get hasSublabel() {
@@ -681,6 +590,8 @@ export default class NewtonSelectorChoiceTile extends LightningElement {
       `newton-selector-choice-tile_sstone-${this.resolvedSurfaceSelectedTone}`,
       `newton-selector-choice-tile_sdtone-${this.resolvedSurfaceDisabledTone}`
     ];
+    if (this.framedVisual)
+      parts.push("newton-selector-choice-tile_framed-visual");
     if (this.selected) parts.push("newton-selector-choice-tile_selected");
     if (this.isDisabled) parts.push("newton-selector-choice-tile_disabled");
     return parts.join(" ");

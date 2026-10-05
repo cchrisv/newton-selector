@@ -1,14 +1,13 @@
 /* =============================================================================
-   newtonSelectorFlowCpeConfigModal — SLDS 2 two-panel studio
-   Left panel (nav + live preview) | splitter | right panel (section controls)
+   Newton Selector Flow CPE — shared editor styles
+   Imported by the config modal and its chapter components (Data, Content,
+   Behavior, Appearance). Each selector's values live in one rule: change a
+   value where it is set instead of adding an override further down.
    ============================================================================= */
 
 :host {
-  --newton-studio-left-w: 20rem;
-
   --newton-studio-surface: var(--slds-g-color-neutral-base-100, #ffffff);
   --newton-studio-surface-alt: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  --newton-studio-surface-sunk: var(--slds-g-color-neutral-base-90, #ececec);
   --newton-studio-ink: var(--slds-g-color-neutral-base-10, #181818);
   --newton-studio-ink-weak: var(--slds-g-color-neutral-base-40, #5c5c5c);
   --newton-studio-border: var(--slds-g-color-border-base-1, #c9c9c9);
@@ -17,957 +16,64 @@
   --newton-studio-brand-weak: var(--slds-g-color-brand-base-95, #eaf3ff);
   --newton-studio-radius: var(--slds-g-radius-border-2, 0.25rem);
   --newton-studio-radius-lg: var(--slds-g-radius-border-3, 0.5rem);
-  --newton-studio-shadow: var(--slds-g-shadow-1, 0 1px 2px rgba(0, 0, 0, 0.06));
-  --newton-studio-shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --newton-studio-shadow: var(
+    --slds-g-shadow-1,
+    0 1px 2px
+      color-mix(
+        in oklab,
+        var(--slds-g-color-neutral-base-10, #181818) 6%,
+        transparent
+      )
+  );
+  --newton-studio-shadow-lift: var(
+    --slds-g-shadow-2,
+    0 2px 8px
+      color-mix(
+        in oklab,
+        var(--slds-g-color-neutral-base-10, #181818) 12%,
+        transparent
+      )
+  );
   --newton-studio-error: var(--slds-g-color-error-base-50, #ba0517);
   --newton-studio-warn: var(--slds-g-color-warning-base-60, #9a5b02);
-  --newton-studio-success: var(--slds-g-color-success-base-50, #3baa6f);
   --newton-studio-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* 3-column grid: left (45%) | splitter | controls (55%).
-   Using fr units keeps the ratio stable across modal widths. The splitter
-   sits between them as a thin fixed-width column. */
-.newton-studio {
-  display: grid;
-  grid-template-columns: minmax(0, 45fr) 0.375rem minmax(0, 55fr);
-  height: 78vh;
-  min-height: var(--newton-static-v-34rem, 34rem);
-  background: var(--newton-studio-surface);
-  overflow: hidden;
-}
-
-/* =============================================================================
-   LEFT PANEL · tab nav (top) + live preview (fills below)
-   ============================================================================= */
-
-.newton-studio__left {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  background: var(--newton-studio-surface-alt);
-  border-right: var(--newton-static-v-1px, 1px) solid
-    var(--newton-studio-hairline);
-  overflow: hidden;
-}
-
-/* =============================================================================
-   CHAPTER NAV RAIL
-   Vertical table-of-contents down the left preview pane. Each row claims its
-   own chapter hue (same palette as the section cards & CPE summary):
-     01 DATA        blue    #0176d3
-     02 CONTENT     green   #3baa6f
-     03 BEHAVIOR    amber   #b25900
-     04 APPEARANCE  violet  #6d42c1
-   Idle rows are neutral; active row asserts the chapter hue via a full-height
-   left stripe, a tinted surface, strong label, and a filled glyph chip.
-   ============================================================================= */
-
-.newton-studio__nav {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: var(--slds-g-spacing-3, 0.75rem) 0;
-  border-bottom: var(--newton-static-v-1px, 1px) solid
-    var(--newton-studio-hairline);
-  background: var(--newton-studio-surface-alt);
-}
-
-/* Chapter hue — per-row CSS var consumed by stripe, numeral, chip. Defaults
-   per data-chapter so the hue is inherited even without an active state. */
-.newton-studio__nav-btn[data-chapter="data"] {
-  --_nav-hue: var(--slds-g-color-brand-base-50, #0176d3);
-}
-.newton-studio__nav-btn[data-chapter="content"] {
-  --_nav-hue: var(--slds-g-color-success-base-50, #3baa6f);
-}
-.newton-studio__nav-btn[data-chapter="behavior"] {
-  --_nav-hue: var(--slds-g-color-warning-base-50, #b25900);
-}
-.newton-studio__nav-btn[data-chapter="appearance"] {
-  --_nav-hue: #6d42c1;
-}
-
-/* Row grid: stripe | numeral | glyph | label | status? */
-.newton-studio__nav-btn {
-  position: relative;
-  display: grid;
-  grid-template-columns: 0.1875rem 1.375rem 1.5rem minmax(0, 1fr) auto;
-  column-gap: 0.5rem;
-  align-items: center;
-  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem)
-    var(--slds-g-spacing-2, 0.5rem) 0;
-  background: transparent;
-  border: 0;
-  border-top: var(--newton-static-v-1px, 1px) solid transparent;
-  border-bottom: var(--newton-static-v-1px, 1px) solid transparent;
-  text-align: left;
-  color: var(--newton-studio-ink-weak, #5c5c5c);
-  cursor: pointer;
-  width: var(--newton-static-v-100-percent, 100%);
-  font: inherit;
-  transition:
-    background-color 160ms var(--newton-studio-ease),
-    color 160ms var(--newton-studio-ease),
-    border-color 160ms var(--newton-studio-ease);
-}
-
-/* Left stripe — slim vertical bar at the row's left edge, tinted to the
-   chapter hue. Only becomes visible on hover + active. */
-.newton-studio__nav-stripe {
-  align-self: stretch;
-  background: transparent;
-  transition: background-color 160ms var(--newton-studio-ease);
-}
-
-/* Chapter numeral — monospace, subtle. Picks up hue on hover/active. */
-.newton-studio__nav-numeral {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.04em;
-  color: var(--newton-studio-ink-soft, #9a9a9a);
-  font-variant-numeric: tabular-nums;
-  line-height: var(--slds-g-font-line-height-1, 1);
-  transition: color 160ms var(--newton-studio-ease);
-}
-
-/* Glyph chip — 1.5rem tinted square. Subtle hue tint on idle, full hue on
-   active. Echoes the chapter card glyphs in the right pane. */
-.newton-studio__nav-glyph {
-  width: var(--slds-g-sizing-7, 1.5rem);
-  height: var(--slds-g-sizing-7, 1.5rem);
-  border-radius: var(--newton-studio-radius, 0.25rem);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(
+  --newton-studio-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
+  --newton-studio-panel: var(--slds-g-color-surface-1, #ffffff);
+  --newton-studio-panel-soft: var(--slds-g-color-surface-container-2, #f9f9f9);
+  --newton-studio-depth-border: color-mix(
     in oklab,
-    var(--_nav-hue, currentColor) 10%,
-    transparent
-  );
-  color: var(--_nav-hue, currentColor);
-  transition:
-    background-color 160ms var(--newton-studio-ease),
-    color 160ms var(--newton-studio-ease),
-    box-shadow 160ms var(--newton-studio-ease);
-}
-
-.newton-studio__nav-glyph c-newton-selector-icon {
-  color: currentColor;
-}
-
-.newton-studio__nav-label {
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
-  font-weight: var(--slds-g-font-weight-5, 500);
-  color: var(--newton-studio-ink, #181818);
-  line-height: var(--newton-static-v-1-2, 1.2);
-  letter-spacing: -0.005em;
-  transition:
-    font-weight 160ms var(--newton-studio-ease),
-    color 160ms var(--newton-studio-ease);
-}
-
-/* Hover — gently warm up the row in the chapter hue. */
-.newton-studio__nav-btn:hover {
-  background: color-mix(in oklab, var(--_nav-hue) 5%, transparent);
-}
-
-.newton-studio__nav-btn:hover .newton-studio__nav-stripe {
-  background: color-mix(in oklab, var(--_nav-hue) 30%, transparent);
-}
-
-.newton-studio__nav-btn:hover .newton-studio__nav-numeral {
-  color: var(--_nav-hue);
-}
-
-.newton-studio__nav-btn:hover .newton-studio__nav-glyph {
-  background: color-mix(in oklab, var(--_nav-hue) 20%, transparent);
-}
-
-.newton-studio__nav-btn:focus-visible {
-  outline: var(--slds-g-sizing-border-2, 2px) solid var(--_nav-hue);
-  outline-offset: -2px;
-}
-
-/* Active — this chapter is open. Full stripe, tinted surface, filled chip,
-   strong label + numeral in hue. */
-.newton-studio__nav-btn_active {
-  background: color-mix(in oklab, var(--_nav-hue) 8%, transparent);
-  border-top-color: color-mix(in oklab, var(--_nav-hue) 18%, transparent);
-  border-bottom-color: color-mix(in oklab, var(--_nav-hue) 18%, transparent);
-}
-
-.newton-studio__nav-btn_active .newton-studio__nav-stripe {
-  background: var(--_nav-hue);
-  box-shadow: 0 0 0 1px var(--_nav-hue);
-}
-
-.newton-studio__nav-btn_active .newton-studio__nav-numeral {
-  color: var(--_nav-hue);
-}
-
-.newton-studio__nav-btn_active .newton-studio__nav-glyph {
-  background: var(--_nav-hue);
-  color: var(--slds-g-color-on-accent-1, #ffffff);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.1),
-    0 0 0 3px color-mix(in oklab, var(--_nav-hue) 18%, transparent);
-}
-
-.newton-studio__nav-btn_active .newton-studio__nav-label {
-  font-weight: var(--slds-g-font-weight-7, 700);
-  color: var(--newton-studio-ink, #181818);
-}
-
-/* Status pip — only appears when there's an issue (warn/error). Sits at the
-   right edge of the row so it doesn't fight the chapter hue. */
-.newton-studio__nav-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--slds-g-sizing-5, 1rem);
-  height: var(--slds-g-sizing-5, 1rem);
-  border-radius: var(--newton-static-v-999px, 999px);
-  flex: 0 0 auto;
-  position: relative;
-}
-
-.newton-studio__nav-status::before {
-  content: "";
-  width: var(--newton-static-v-0-4375rem, 0.4375rem);
-  height: var(--newton-static-v-0-4375rem, 0.4375rem);
-  border-radius: var(--newton-static-v-50-percent, 50%);
-  background: currentColor;
-  box-shadow: 0 0 0 3px color-mix(in oklab, currentColor 22%, transparent);
-}
-
-.newton-studio__nav-status_warn {
-  color: var(--newton-studio-warn, #b25900);
-}
-.newton-studio__nav-status_error {
-  color: var(--newton-studio-error, #ba0517);
-}
-
-/* When a chapter needs attention, pulse the pip gently to draw the eye. */
-@keyframes newton-nav-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 0.7;
-  }
-}
-
-.newton-studio__nav-status::before {
-  animation: newton-nav-pulse 1.8s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .newton-studio__nav-btn {
-    transition: none;
-  }
-  .newton-studio__nav-stripe,
-  .newton-studio__nav-numeral,
-  .newton-studio__nav-glyph,
-  .newton-studio__nav-label {
-    transition: none;
-  }
-  .newton-studio__nav-status::before {
-    animation: none;
-  }
-}
-
-/* Preview pane (below nav, fills remaining height) */
-.newton-studio__preview {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-4, 1rem);
-}
-
-/* Preview header — title block on the left, state toggle segmented control
-   on the right. Stacks on narrow widths. */
-.newton-studio__preview-head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--slds-g-spacing-3, 0.75rem);
-  flex-wrap: wrap;
-}
-
-.newton-studio__preview-head-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--slds-g-spacing-1, 0.25rem);
-  min-width: 0;
-}
-
-.newton-studio__preview-title {
-  color: var(--newton-studio-ink);
-  margin: 0;
-}
-
-/* State toggle — segmented control, sits in the preview header.
-   Glass-morphism touch so it reads as a control affixed to the preview
-   canvas, not a form field. */
-.newton-studio__preview-states {
-  display: inline-flex;
-  align-items: stretch;
-  padding: var(--newton-static-v-0-1875rem, 0.1875rem);
-  border-radius: var(--newton-static-v-999px, 999px);
-  background: color-mix(
-    in oklab,
-    var(--newton-studio-ink, #181818) 5%,
-    var(--newton-studio-surface, #ffffff)
-  );
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline, #e5e5e5);
-  gap: 0.125rem;
-  flex: 0 0 auto;
-}
-
-.newton-studio__preview-state {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3125rem;
-  padding: var(--slds-g-spacing-1, 0.25rem)
-    var(--newton-static-v-0-625rem, 0.625rem);
-  border: 0;
-  background: transparent;
-  color: var(--newton-studio-ink-weak, #5c5c5c);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  font-weight: var(--slds-g-font-weight-6, 600);
-  letter-spacing: 0.01em;
-  line-height: var(--slds-g-font-line-height-1, 1);
-  border-radius: var(--newton-static-v-999px, 999px);
-  cursor: pointer;
-  white-space: nowrap;
-  transition:
-    background-color 140ms ease,
-    color 140ms ease,
-    box-shadow 140ms ease;
-}
-
-.newton-studio__preview-state c-newton-selector-icon {
-  color: currentColor;
-}
-
-.newton-studio__preview-state:hover {
-  color: var(--newton-studio-ink, #181818);
-  background: color-mix(
-    in oklab,
-    var(--newton-studio-ink, #181818) 4%,
-    transparent
+    var(--newton-studio-brand) 16%,
+    var(--newton-studio-hairline)
   );
 }
 
-.newton-studio__preview-state:focus-visible {
-  outline: var(--slds-g-sizing-border-2, 2px) solid
-    var(--newton-studio-brand, #0176d3);
-  outline-offset: 1px;
-}
-
-/* Active state — the selected segment pops forward with a white chip, sharp
-   shadow. Feels like a physical toggle. */
-.newton-studio__preview-state[aria-selected="true"],
-.newton-studio__preview-state[aria-pressed="true"] {
-  background: var(--newton-studio-surface, #ffffff);
-  color: var(--newton-studio-brand, #0176d3);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.08),
-    0 0 0 1px
-      color-mix(in oklab, var(--newton-studio-brand, #0176d3) 25%, transparent);
-}
-
-/* Specialized tones per state: error goes red when active, empty goes amber.
-   Populated (default/brand) needs no override. */
-.newton-studio__preview-state[data-state="error"][aria-selected="true"],
-.newton-studio__preview-state[data-state="error"][aria-pressed="true"] {
-  color: var(--slds-g-color-error-base-40, #8e030f);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.08),
-    0 0 0 1px
-      color-mix(
-        in oklab,
-        var(--slds-g-color-error-base-40, #8e030f) 30%,
-        transparent
-      );
-}
-
-.newton-studio__preview-state[data-state="empty"][aria-selected="true"],
-.newton-studio__preview-state[data-state="empty"][aria-pressed="true"] {
-  color: var(--slds-g-color-warning-base-30, #7a4500);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.08),
-    0 0 0 1px
-      color-mix(
-        in oklab,
-        var(--slds-g-color-warning-base-50, #b25900) 30%,
-        transparent
-      );
-}
-
-.newton-studio__preview-frame {
-  flex: 1 1 auto;
-  background: var(--newton-studio-surface);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius-lg);
-  padding: var(--slds-g-spacing-4, 1rem);
-  overflow-y: auto;
-  min-height: var(--newton-static-v-14rem, 14rem);
-  box-shadow: var(--newton-studio-shadow);
-  transition: border-color 160ms var(--newton-studio-ease);
-}
-
-.newton-studio__preview-frame:hover,
-.newton-studio__preview-frame:focus-within {
-  border-color: var(--newton-studio-brand-weak);
-}
-
-.newton-studio__preview-frame c-newton-selector-data-selector,
-.newton-studio__preview-frame c-newton-selector-group {
-  --newton-group-min-w: 7rem;
-}
-
-/* Fallback preview (collection mode) — renders the data selector directly so we
-   synthesize the label + help text manually above it. Matches the data selector's
-   baked-in heading styles. */
-.newton-studio__preview-label {
-  font-size: var(--slds-g-font-scale-2, 1rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  color: var(--newton-studio-ink);
-  margin: 0 0 var(--slds-g-spacing-1, 0.25rem);
-  line-height: var(--slds-g-font-line-height-2, 1.25);
-}
-
-.newton-studio__preview-help {
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  color: var(--newton-studio-ink-weak);
-  margin: 0 0 var(--slds-g-spacing-3, 0.75rem);
-  line-height: var(--newton-static-v-1-4, 1.4);
-}
-
 /* =============================================================================
-   FORCE-STATE PREVIEW BUTTONS · inside the Runtime messages card.
-   Click a button to make the live preview pretend it's in that state.
-   Click the same button again to toggle back to the real (populated) state.
+   MODAL SHELL · canvas, chapter stack, issues banner, footer
+   Grouped by proximity: 0.5rem inside a chapter, 1rem between chapters.
    ============================================================================= */
 
-.newton-studio__state-row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--slds-g-spacing-1, 0.25rem);
-  padding-top: var(--slds-g-spacing-2, 0.5rem);
-  border-top: var(--newton-static-v-1px, 1px) dashed
-    var(--newton-studio-hairline);
+.newton-modal {
+  --slds-c-modal-content-color-background: var(--newton-studio-canvas);
 }
 
-.newton-studio__state-eyebrow {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--newton-static-v-0-6875rem, 0.6875rem);
-  font-weight: var(--slds-g-font-weight-6, 600);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--newton-studio-ink-weak);
-}
-
-.newton-studio__state-group {
-  display: inline-flex;
-  gap: 0;
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius);
-  overflow: hidden;
-  background: var(--newton-studio-surface);
-  align-self: flex-start;
-}
-
-.newton-studio__state-btn {
-  all: unset;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: var(--newton-static-v-0-375rem, 0.375rem)
-    var(--newton-static-v-0-625rem, 0.625rem);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  font-weight: var(--slds-g-font-weight-6, 600);
-  color: var(--newton-studio-ink-weak);
-  background: transparent;
-  transition:
-    color 120ms var(--newton-studio-ease),
-    background-color 120ms var(--newton-studio-ease);
-  border-right: var(--newton-static-v-1px, 1px) solid
-    var(--newton-studio-hairline);
-}
-
-.newton-studio__state-group .newton-studio__state-btn:last-child {
-  border-right: 0;
-}
-
-.newton-studio__state-btn:hover {
-  color: var(--newton-studio-ink);
-  background: var(--newton-studio-surface-alt);
-}
-
-.newton-studio__state-btn:focus-visible {
-  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
-  outline-offset: -2px;
-}
-
-.newton-studio__state-btn_active {
-  color: var(--slds-g-color-on-accent-1, #ffffff);
-  background: var(--newton-studio-brand);
-}
-
-.newton-studio__state-btn_active c-newton-selector-icon {
-  color: var(--slds-g-color-neutral-base-100, #ffffff);
-}
-
-/* =============================================================================
-   COLUMN-COUNT CHIP ROW · compact, segmented selector
-   Auto · 1 · 2 · 3 · 4 · 5 · 6
-   ============================================================================= */
-
-.newton-studio__col-row {
-  display: inline-flex;
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius);
-  overflow: hidden;
-  background: var(--newton-studio-surface);
-}
-
-.newton-studio__col-chip {
-  all: unset;
-  cursor: pointer;
-  min-width: var(--newton-static-v-2-5rem, 2.5rem);
-  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  color: var(--newton-studio-ink-weak);
-  text-align: center;
-  border-right: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-  transition:
-    color 120ms var(--newton-studio-ease),
-    background-color 120ms var(--newton-studio-ease);
-}
-
-.newton-studio__col-row .newton-studio__col-chip:last-child {
-  border-right: 0;
-}
-
-.newton-studio__col-chip:hover {
-  color: var(--newton-studio-ink);
-  background: var(--newton-studio-surface-alt);
-}
-
-.newton-studio__col-chip:focus-visible {
-  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
-  outline-offset: calc(-1 * var(--slds-g-sizing-border-2, 2px));
-}
-
-.newton-studio__col-chip_active {
-  color: var(--slds-g-color-on-accent-1, #ffffff);
-  background: var(--newton-studio-brand);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .newton-studio__col-chip {
-    transition: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .newton-studio__state-btn {
-    transition: none;
-  }
-}
-
-.newton-studio__preview-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-  padding: var(--slds-g-spacing-8, 2rem);
-  text-align: center;
-  height: var(--newton-static-v-100-percent, 100%);
-  min-height: var(--newton-static-v-12rem, 12rem);
-}
-
-.newton-studio__preview-caption {
-  margin: 0;
-  font-style: italic;
-}
-
-/* =============================================================================
-   SPLITTER · draggable vertical separator (single splitter now)
-   ============================================================================= */
-
-.newton-studio__splitter {
-  position: relative;
-  cursor: col-resize;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  border: 0;
-  padding: 0;
-}
-
-.newton-studio__splitter-grip {
-  display: block;
-  width: var(--slds-g-sizing-border-1, 1px);
-  height: var(--newton-static-v-100-percent, 100%);
-  background: var(--newton-studio-hairline);
-  transition:
-    background-color 120ms ease,
-    width 120ms ease;
-  pointer-events: none;
-}
-
-.newton-studio__splitter:hover .newton-studio__splitter-grip,
-.newton-studio__splitter:focus-visible .newton-studio__splitter-grip,
-.newton-studio__splitter:active .newton-studio__splitter-grip {
-  background: var(--newton-studio-brand);
-  width: var(--slds-g-sizing-border-2, 2px);
-}
-
-.newton-studio__splitter:focus-visible {
-  outline: none;
-}
-
-.newton-studio__splitter:focus-visible .newton-studio__splitter-grip {
-  box-shadow: 0 0 0 2px var(--newton-studio-brand-weak);
-}
-
-/* Two-dot grip affordance */
-.newton-studio__splitter::before,
-.newton-studio__splitter::after {
-  content: "";
-  position: absolute;
-  left: var(--newton-static-v-50-percent, 50%);
-  width: var(--slds-g-sizing-border-3, 3px);
-  height: var(--slds-g-sizing-border-3, 3px);
-  border-radius: var(--newton-static-v-50-percent, 50%);
-  background: var(--newton-studio-brand);
-  transform: translateX(-50%) scale(0);
-  transition: transform 160ms var(--newton-studio-ease);
-  pointer-events: none;
-}
-.newton-studio__splitter::before {
-  top: calc(50% - 8px);
-}
-.newton-studio__splitter::after {
-  top: calc(50% + 5px);
-}
-
-.newton-studio__splitter:hover::before,
-.newton-studio__splitter:hover::after,
-.newton-studio__splitter:focus-visible::before,
-.newton-studio__splitter:focus-visible::after,
-.newton-studio__splitter:active::before,
-.newton-studio__splitter:active::after {
-  transform: translateX(-50%) scale(1);
-}
-
-/* =============================================================================
-   RIGHT PANEL · section controls (scrollable)
-   Container queries enable tile-group layouts that adapt to pane width.
-   ============================================================================= */
-
-.newton-studio__controls {
-  overflow-y: auto;
-  padding: var(--slds-g-spacing-5, 1.25rem) var(--slds-g-spacing-6, 1.5rem);
+[slot="controls"] {
   display: flex;
   flex-direction: column;
   gap: var(--slds-g-spacing-4, 1rem);
-  min-height: 0;
-  container-type: inline-size;
-  container-name: newton-studio-controls;
 }
 
-/* Section-level header — consistent across all sections */
-.newton-studio__section-head {
+[slot="controls"] > [data-chapter] {
   display: flex;
   flex-direction: column;
-  gap: var(--slds-g-spacing-1, 0.25rem);
-  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
-  border-bottom: var(--newton-static-v-1px, 1px) solid
-    var(--newton-studio-hairline);
-  animation: newton-fade-in 240ms var(--newton-studio-ease);
-}
-
-.newton-studio__eyebrow {
-  color: var(--newton-studio-ink-weak);
-  margin: 0;
-}
-
-.newton-studio__title {
-  color: var(--newton-studio-ink);
-  margin: 0;
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: -0.01em;
-}
-
-.newton-studio__section-sub {
-  margin: 0;
-}
-
-/* =============================================================================
-   CHAPTER DIVIDER · single-page publication rhythm
-   Each chapter opens with a numeral mark + eyebrow + title. The four chapters
-   share the same geometry for symmetry; only the accent hue shifts to signal
-   the chapter you're in (data/content/behavior/appearance).
-   ============================================================================= */
-
-.newton-chapter {
-  --_chapter-accent: var(--newton-studio-brand);
-  --_chapter-accent-soft: color-mix(
-    in oklab,
-    var(--newton-studio-brand) 14%,
-    transparent
-  );
-
-  display: grid;
-  grid-template-columns: 4.25rem minmax(0, 1fr);
-  gap: var(--slds-g-spacing-3, 0.75rem);
-  align-items: start;
-  padding: var(--slds-g-spacing-5, 1.25rem) 0 var(--slds-g-spacing-3, 0.75rem);
-  margin-top: var(--slds-g-spacing-6, 1.5rem);
-  position: relative;
-  scroll-margin-top: var(--slds-g-spacing-3, 0.75rem);
-  animation: newton-fade-in 260ms var(--newton-studio-ease);
-}
-
-.newton-chapter:first-of-type {
-  margin-top: 0;
-  padding-top: var(--slds-g-spacing-2, 0.5rem);
-}
-
-/* Chapter hue rotation — subtle, keeps SLDS brand as the dominant tone but
-   shifts for orientation. */
-.newton-chapter_01 {
-  --_chapter-accent: var(--slds-g-color-brand-base-50, #0176d3);
-  --_chapter-accent-soft: color-mix(
-    in oklab,
-    var(--slds-g-color-brand-base-50, #0176d3) 14%,
-    transparent
-  );
-}
-.newton-chapter_02 {
-  --_chapter-accent: var(--slds-g-color-success-base-50, #3baa6f);
-  --_chapter-accent-soft: color-mix(
-    in oklab,
-    var(--slds-g-color-success-base-50, #3baa6f) 14%,
-    transparent
-  );
-}
-.newton-chapter_03 {
-  --_chapter-accent: var(--slds-g-color-warning-base-50, #b25900);
-  --_chapter-accent-soft: color-mix(
-    in oklab,
-    var(--slds-g-color-warning-base-50, #b25900) 14%,
-    transparent
-  );
-}
-.newton-chapter_04 {
-  --_chapter-accent: #6d42c1;
-  --_chapter-accent-soft: color-mix(in oklab, #6d42c1 14%, transparent);
-}
-
-/* Numeral + rule mark (left column) */
-.newton-chapter__mark {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
-  padding-top: var(--newton-static-v-0-125rem, 0.125rem);
 }
 
-.newton-chapter__numeral {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--newton-static-v-2-25rem, 2.25rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  line-height: var(--slds-g-font-line-height-1, 1);
-  letter-spacing: -0.04em;
-  color: var(--_chapter-accent);
-  font-variant-numeric: tabular-nums;
-}
-
-.newton-chapter__rule {
-  width: var(--slds-g-sizing-border-1, 1px);
-  flex: 1 1 auto;
-  min-height: var(--slds-g-sizing-6, 1.25rem);
-  background: linear-gradient(
-    to bottom,
-    var(--_chapter-accent) 0%,
-    color-mix(in oklab, var(--_chapter-accent) 25%, transparent) 70%,
-    transparent 100%
-  );
-}
-
-/* Heading block (right column) */
-.newton-chapter__head {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding-top: var(--newton-static-v-0-375rem, 0.375rem);
-  position: relative;
-}
-
-.newton-chapter__head::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: var(--slds-g-sizing-border-1, 1px);
-  background: linear-gradient(
-    to right,
-    var(--_chapter-accent) 0%,
-    var(--_chapter-accent-soft) 25%,
-    transparent 90%
-  );
-  transform-origin: left center;
-  transform: scaleX(1);
-  transition: transform 320ms var(--newton-studio-ease);
-}
-
-.newton-chapter__eyebrow {
-  margin: 0;
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--newton-static-v-0-6875rem, 0.6875rem);
-  font-weight: var(--slds-g-font-weight-6, 600);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--_chapter-accent);
-  line-height: var(--slds-g-font-line-height-1, 1);
-}
-
-.newton-chapter__title {
-  margin: 0;
-  font-size: var(--newton-static-v-1-375rem, 1.375rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: -0.015em;
-  color: var(--newton-studio-ink);
-  line-height: var(--newton-static-v-1-2, 1.2);
-  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
-}
-
-/* =============================================================================
-   CARD HEAD · normalized glyph chip + title + help icon
-   Every card follows the same anatomy. The glyph chip is 2.25rem square with
-   a 10% tint of the chapter accent. Info glyph sits at the right edge.
-   ============================================================================= */
-
-.newton-card__head {
-  display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr) 1.25rem;
-  align-items: center;
-  gap: var(--slds-g-spacing-3, 0.75rem);
-}
-
-.newton-card__head_with-action {
-  grid-template-columns: 2.25rem minmax(0, 1fr) auto 1.25rem;
-}
-
-.newton-card__action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  justify-self: end;
-  min-width: max-content;
-}
-
-.newton-card__glyph {
-  width: var(--newton-static-v-2-25rem, 2.25rem);
-  height: var(--newton-static-v-2-25rem, 2.25rem);
-  border-radius: var(--newton-studio-radius);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(
-    in oklab,
-    var(--_card-accent, var(--newton-studio-brand)) 12%,
-    transparent
-  );
-  color: var(--_card-accent, var(--newton-studio-brand));
-  flex: 0 0 auto;
-}
-
-.newton-card__glyph c-newton-selector-icon {
-  color: var(--_card-accent, var(--newton-studio-brand));
-}
-
-/* Chapter-matched accents for each card so the chip hue orients you to its
-   chapter at a glance (symmetry through color-coding). */
-.newton-card__glyph_data {
-  --_card-accent: var(--slds-g-color-brand-base-50, #0176d3);
-}
-.newton-card__glyph_content {
-  --_card-accent: var(--slds-g-color-success-base-50, #3baa6f);
-}
-.newton-card__glyph_behavior {
-  --_card-accent: var(--slds-g-color-warning-base-50, #b25900);
-}
-.newton-card__glyph_appearance {
-  --_card-accent: #6d42c1;
-}
-
-.newton-card__headings {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  min-width: 0;
-}
-
-/* Target by tag — avoids naming a second class on every heading block. */
-.newton-card__headings > h3 {
-  margin: 0;
-  line-height: var(--newton-static-v-1-2, 1.2);
-}
-
-.newton-card__headings > p {
-  margin: 0;
-  line-height: var(--newton-static-v-1-35, 1.35);
-}
-
-/* Help slot — renders an SLDS lightning-helptext component. It brings its own
-   info icon + popover tooltip; we only need to position it in the card-head
-   grid's right-most slot. */
-.newton-card__help {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-}
-
-/* Inline issues banner */
 .newton-studio__issues {
   list-style: none;
   margin: 0;
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
-  background: var(--slds-g-color-warning-base-95, #fef1e1);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-warning-base-60, #9a5b02);
+  background: var(--newton-studio-panel-soft);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--newton-studio-radius);
   display: flex;
   flex-direction: column;
@@ -981,49 +87,239 @@
   gap: var(--slds-g-spacing-2, 0.5rem);
 }
 
-.newton-studio__issues li.error {
+.newton-studio__issue_error {
   color: var(--newton-studio-error);
 }
-.newton-studio__issues li.warn {
+
+.newton-studio__issue_warn {
   color: var(--newton-studio-warn);
 }
 
+.newton-modal__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.newton-modal__status {
+  margin: 0;
+  margin-inline-end: auto;
+  text-align: start;
+  color: var(--newton-studio-error);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+  font-weight: var(--slds-g-font-weight-6, 600);
+}
+
+.newton-discard__message {
+  margin: 0;
+  margin-inline-end: auto;
+  color: var(--newton-studio-ink);
+  font-weight: var(--slds-g-font-weight-7, 700);
+}
+
 /* =============================================================================
-   CARDS · consistent rhythm across every section
+   CHAPTER MASTHEAD · a plain SLDS-style section heading per chapter.
+   The numeral mark is decorative and hidden (the chapter tabs already
+   sequence the chapters); the eyebrow repeats the tab label, so it stays for
+   assistive tech only.
+   ============================================================================= */
+
+.newton-chapter {
+  --_chapter-accent: var(--newton-studio-brand);
+  --_chapter-accent-soft: color-mix(
+    in oklab,
+    var(--newton-studio-brand) 14%,
+    transparent
+  );
+  position: relative;
+  scroll-margin-top: var(--slds-g-spacing-3, 0.75rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  min-block-size: 0;
+  margin: 0;
+  padding: var(--slds-g-spacing-1, 0.25rem) 0 var(--slds-g-spacing-2, 0.5rem);
+  border-block-end: var(--slds-g-sizing-border-1, 1px) solid
+    var(--newton-studio-hairline);
+}
+
+.newton-chapter:first-of-type {
+  padding-top: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.newton-chapter__head {
+  position: relative;
+  display: block;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--slds-g-spacing-2, 0.5rem);
+  row-gap: 0;
+}
+
+.newton-chapter__eyebrow {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  color: var(--newton-studio-brand);
+  font-family: var(--slds-g-font-family-base, inherit);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  line-height: var(--slds-g-font-line-height-1, 1);
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.newton-chapter__title {
+  margin: 0;
+  color: var(--newton-studio-ink);
+  font-size: var(--slds-g-font-scale-2, 1rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+/* =============================================================================
+   CARDS · flat at rest (SLDS 2): hairline border, no resting shadow.
+   Header anatomy: glyph chip · title + description · action · help icon.
    ============================================================================= */
 
 .newton-studio__card {
-  box-shadow: var(--newton-studio-shadow);
+  overflow: visible;
+  margin: 0;
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--newton-studio-radius-lg);
-  animation: newton-rise-in 280ms var(--newton-studio-ease);
+  background: var(--newton-studio-panel);
+  box-shadow: none;
 }
 
-/* Tag + child selectors so the rule doesn't reference SLDS class names. */
+/* Beats SLDS's .slds-card + .slds-card top margin; the host gap spaces cards. */
+.newton-studio__card + .newton-studio__card {
+  margin: 0;
+}
+
+.newton-studio__card:hover,
+.newton-studio__card:focus-within {
+  border-color: var(--newton-studio-hairline);
+}
+
 .newton-studio__card > header {
-  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+  margin-block-end: 0;
+  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+  background: var(--newton-studio-panel-soft);
   border-bottom: var(--slds-g-sizing-border-1, 1px) solid
     var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius-lg) var(--newton-studio-radius-lg) 0
+    0;
+}
+
+/* Header-only cards (the toggle rows: Mode, Auto navigation, None option...):
+   with no body below, the header drops its divider and owns the corners. */
+.newton-studio__card > header:last-child {
+  border-block-end: 0;
+  border-radius: var(--newton-studio-radius-lg);
 }
 
 .newton-studio__card > div {
-  padding: var(--slds-g-spacing-4, 1rem);
+  padding: var(--slds-g-spacing-3, 0.75rem);
+  background: var(--newton-studio-panel);
 }
 
 .newton-studio__card > footer {
-  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
   border-top: var(--slds-g-sizing-border-1, 1px) solid
     var(--newton-studio-hairline);
+  background: var(--newton-studio-panel);
+}
+
+.newton-card__head {
+  display: grid;
+  grid-template-columns: var(--slds-g-sizing-7, 1.5rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.newton-card__head_with-action {
+  grid-template-columns:
+    var(--slds-g-sizing-7, 1.5rem) minmax(0, 1fr)
+    auto var(--slds-g-sizing-6, 1.25rem);
+}
+
+.newton-card__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  justify-self: end;
+  min-width: max-content;
+}
+
+.newton-card__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--slds-g-sizing-7, 1.5rem);
+  height: var(--slds-g-sizing-7, 1.5rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  background: var(--newton-studio-panel-soft);
+  color: var(--newton-studio-ink-weak);
+}
+
+.newton-card__glyph c-newton-selector-icon {
+  color: var(--newton-studio-brand);
+}
+
+/* Title and description share a line when they fit; the description wraps
+   beneath only when it does not, so no copy is lost. */
+.newton-card__headings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--slds-g-spacing-2, 0.5rem);
+  row-gap: 0;
+  min-width: 0;
+}
+
+.newton-card__headings > h3 {
+  flex: 0 0 auto;
+  margin: 0;
+  color: var(--newton-studio-ink);
+  font-size: var(--slds-g-font-scale-1, 0.875rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.newton-card__headings > p {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--newton-studio-ink-weak);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+/* lightning-helptext brings its own icon and tooltip; this only places it in
+   the header grid's last column. */
+.newton-card__help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
 }
 
 .newton-studio__field-block {
   display: flex;
   flex-direction: column;
   gap: var(--slds-g-spacing-3, 0.75rem);
-}
-
-.newton-studio__field-block > *,
-.newton-studio__field-grid > * {
-  min-width: 0;
 }
 
 .newton-studio__field-grid {
@@ -1033,22 +329,164 @@
   gap: var(--slds-g-spacing-3, 0.75rem);
 }
 
-/* 2×2 spacing selector — used for unlinked margin/padding directional comboboxes */
-.newton-studio__spacing-grid {
+.newton-studio__field-block > *,
+.newton-studio__field-grid > * {
+  min-width: 0;
+}
+
+.newton-studio__field-block > lightning-input,
+.newton-studio__field-grid > lightning-input,
+.newton-studio__field-block > c-newton-selector-combobox,
+.newton-studio__field-block > c-newton-selector-flow-cpe-resource-selector,
+.newton-studio__field-block > c-newton-selector-flow-cpe-field-selector,
+.newton-studio__field-block > c-newton-selector-flow-cpe-choice-control,
+.newton-studio__field-grid > c-newton-selector-combobox,
+.newton-studio__field-grid > c-newton-selector-flow-cpe-resource-selector,
+.newton-studio__field-grid > c-newton-selector-flow-cpe-field-selector,
+.newton-studio__field-grid > c-newton-selector-flow-cpe-choice-control {
+  --slds-c-input-color-background: var(--newton-studio-panel);
+  --slds-c-textarea-color-background: var(--newton-studio-panel);
+  --slds-c-select-color-background: var(--newton-studio-panel);
+}
+
+/* =============================================================================
+   APPEARANCE SUB-CHAPTERS · a plain subheading with a hairline rule that
+   groups related cards (04·A–E). Layout: [title] [rule] [optional toggle].
+   ============================================================================= */
+
+.newton-studio__section-card {
+  position: relative;
+}
+
+.newton-studio__subchapter {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--slds-g-spacing-3, 0.75rem);
+  margin: var(--slds-g-spacing-2, 0.5rem) 0 0;
+  padding: var(--slds-g-spacing-1, 0.25rem) 0;
+  border-block-end: var(--slds-g-sizing-border-1, 1px) solid
+    var(--newton-studio-hairline);
+}
+
+.newton-studio__subchapter:first-of-type {
+  margin-top: 0;
+}
+
+.newton-studio__subchapter-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.newton-studio__subchapter-numeral {
+  display: none;
+  padding: 0.125rem var(--slds-g-spacing-2, 0.5rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid
+    var(--newton-studio-depth-border);
+  border-radius: var(--slds-g-radius-border-pill, 999px);
+  background: var(--newton-studio-panel);
+  color: var(--newton-studio-brand);
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  line-height: var(--slds-g-font-line-height-1, 1);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.newton-studio__subchapter-title {
+  color: var(--newton-studio-ink);
+  font-size: var(--slds-g-font-scale-1, 0.875rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  line-height: var(--slds-g-font-line-height-1, 1);
+  letter-spacing: 0;
+}
+
+.newton-studio__subchapter_off .newton-studio__subchapter-title {
+  color: var(--newton-studio-ink-weak);
+}
+
+.newton-studio__subchapter-rule {
+  height: var(--slds-g-sizing-border-1, 1px);
+  border-radius: var(--slds-g-radius-border-1, 0.125rem);
+}
+
+/* "Show icons" / "Show badges" switches on the Icon and Badge sub-chapters. */
+.newton-studio__subchapter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  font-size: 0.6875rem;
+  font-weight: var(--slds-g-font-weight-6, 600);
+  color: var(--newton-studio-ink-weak);
+}
+
+.newton-studio__subchapter-toggle c-newton-selector-flow-cpe-toggle {
+  display: block;
+}
+
+/* Shown in place of a sub-chapter's cards while icons/badges are hidden. */
+.newton-studio__subchapter-off-note {
+  margin: 0 0 var(--slds-g-spacing-3, 0.75rem);
+  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+  border-inline-start: var(--slds-g-sizing-border-1, 1px) solid
+    var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  background: color-mix(
+    in oklab,
+    var(--newton-studio-warn) 6%,
+    var(--newton-studio-surface)
+  );
+  color: var(--newton-studio-ink-weak);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+  line-height: 1.4;
+}
+
+/* Reset appearance, with an Undo notice. */
+.newton-studio__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  white-space: nowrap;
+}
+
+.newton-studio__undo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  margin-block-end: var(--slds-g-spacing-3, 0.75rem);
+  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  background: var(--newton-studio-panel-soft);
+  color: var(--newton-studio-ink);
+  font-size: var(--slds-g-font-scale-base, 0.8125rem);
+}
+
+.newton-studio__undo-btn {
+  font-weight: var(--slds-g-font-weight-7, 700);
 }
 
 /* =============================================================================
    VISUAL TILE SELECTORS · host newtonSelectorChoiceTile.
-   2-tile / 3-tile groups flex-wrap at 7.5rem each.
-   4-tile groups use a grid that flips 4×1 ↔ 2×2 via container query.
+   Every choice-tile group in the editor is one tile family: the same 7.5rem
+   columns and gap, and the same tile box, so groups line up on one left edge
+   and no group reads larger or smaller than another. Inside each tile the
+   visual sits in a fixed 2.5rem row (shape cells are pinned to it) and the text
+   below it, so titles share one line whatever the visual is. The height fits
+   a title plus a two-line description.
    ============================================================================= */
 
 .newton-studio__selectorgroup {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 7.5rem);
+  justify-content: start;
   gap: var(--slds-g-spacing-2, 0.5rem);
   margin: 0;
   padding: 0;
@@ -1056,44 +494,16 @@
 }
 
 .newton-studio__selectorgroup > c-newton-selector-choice-tile {
-  flex: 0 0 7.5rem;
-  max-width: var(--newton-static-v-100-percent, 100%);
+  --newton-tile-visual-size: 2.5rem;
+  --newton-tile-block-size: 6.5rem;
+  --newton-tile-figure-display: grid;
+  --newton-tile-figure-rows: var(--newton-tile-visual-size) auto;
+  inline-size: 100%;
+  min-inline-size: 0;
 }
 
-/* Fixed-width tile grid — fits as many 7.5rem columns as the container allows
-   and wraps naturally when they don't fit. Works for any tile count (4 aspect
-   ratios, 5 data sources, future growth). Previously hardcoded to 4 columns,
-   which caused the 5th tile to wrap to its own row even when there was room. */
-.newton-studio__selectorgroup_2x2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 7.5rem);
-  gap: var(--slds-g-spacing-2, 0.5rem);
-  justify-content: start;
-}
-
-.newton-studio__selectorgroup_2x2 > c-newton-selector-choice-tile {
-  flex: none;
-  width: var(--newton-static-v-100-percent, 100%);
-  max-width: var(--newton-static-v-100-percent, 100%);
-}
-
-/* Compact variant for dense spacing-token grids (11 tiles per row area). */
-.newton-studio__selectorgroup_compact {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr));
-  gap: var(--slds-g-spacing-1, 0.25rem);
-}
-
-.newton-studio__selectorgroup_compact > c-newton-selector-choice-tile {
-  flex: none;
-  width: var(--newton-static-v-100-percent, 100%);
-  max-width: var(--newton-static-v-100-percent, 100%);
-}
-
-/* Axis row = directional header (icon + label) + tile group below. */
-/* Axis = one labeled lane inside a spacing card. Intentionally NOT a nested
-   card — no border, no background, no padding — so its left edge aligns with
-   everything else in the right pane. Think of it as an eyebrow + group. */
+/* Axis = one labeled lane inside a spacing card: an eyebrow (icon + label)
+   over a tile group. Not a nested card, so its edge aligns with the pane. */
 .newton-studio__axis {
   display: flex;
   flex-direction: column;
@@ -1102,7 +512,7 @@
 
 .newton-studio__axis + .newton-studio__axis {
   padding-top: var(--slds-g-spacing-3, 0.75rem);
-  border-top: var(--newton-static-v-1px, 1px) dashed
+  border-top: var(--slds-g-sizing-border-1, 1px) dashed
     var(--newton-studio-hairline);
 }
 
@@ -1110,20 +520,6 @@
   display: flex;
   align-items: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
-}
-
-.newton-studio__axis-head_with-action {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-}
-
-.newton-studio__axis-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  justify-self: end;
-  min-width: max-content;
 }
 
 .newton-studio__axis-head c-newton-selector-icon {
@@ -1151,51 +547,414 @@
   margin: 0;
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   color: var(--newton-studio-ink-weak);
-  line-height: var(--newton-static-v-1-3, 1.3);
-}
-
-/* Card header with a leading icon. */
-.newton-studio__card-head-icon {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--slds-g-spacing-3, 0.75rem);
-}
-
-.newton-studio__card-head-icon c-newton-selector-icon {
-  color: var(--newton-studio-brand);
-  flex: 0 0 auto;
-  margin-top: var(--newton-static-v-0-125rem, 0.125rem);
+  line-height: 1.3;
 }
 
 /* =============================================================================
-   CUSTOM ITEM EDITOR
+   COLUMN-COUNT CHIP ROW · compact segmented selector: Auto · 1 · 2 … 6
    ============================================================================= */
 
+.newton-studio__col-row {
+  display: inline-flex;
+  overflow: hidden;
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  background: var(--newton-studio-panel-soft);
+  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
+    color-mix(in oklab, var(--newton-studio-ink) 3%, transparent);
+}
+
+.newton-studio__col-chip {
+  all: unset;
+  cursor: pointer;
+  min-width: 2.5rem;
+  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: var(--slds-g-font-scale-base, 0.8125rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  color: var(--newton-studio-ink-weak);
+  text-align: center;
+  border-inline-end: var(--slds-g-sizing-border-1, 1px) solid
+    var(--newton-studio-hairline);
+  transition:
+    color 120ms var(--newton-studio-ease),
+    background-color 120ms var(--newton-studio-ease);
+}
+
+.newton-studio__col-chip_active {
+  background: var(--newton-studio-panel);
+  color: var(--newton-studio-brand);
+  box-shadow:
+    inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
+      color-mix(in oklab, var(--newton-studio-brand) 35%, transparent),
+    var(--newton-studio-shadow);
+}
+
+.newton-studio__col-row .newton-studio__col-chip:last-child {
+  border-inline-end: 0;
+}
+
+.newton-studio__col-chip:hover {
+  color: var(--newton-studio-ink);
+  background: var(--newton-studio-surface-alt);
+}
+
+.newton-studio__col-chip:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
+  outline-offset: calc(-1 * var(--slds-g-sizing-border-2, 2px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newton-studio__col-chip {
+    transition: none;
+  }
+}
+
 /* =============================================================================
-   CUSTOM ITEM ROW · mirrors the item-overrides row geometry for consistency.
-   Always-visible editor (no collapse) with left accent stripe (brand-blue —
-   custom items are always "yours").
+   TONE CHIP ROW · under the pattern, corner, surface, icon and badge
+   selectors. Each chip is a color dot + label; rows wrap on narrow panels.
+   ============================================================================= */
+
+.newton-tone-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  margin-top: var(--slds-g-spacing-1, 0.25rem);
+  padding: var(--slds-g-spacing-2, 0.5rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  background: var(--newton-studio-panel-soft);
+}
+
+.newton-tone-state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.newton-tone-row__eyebrow {
+  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  color: var(--slds-g-color-neutral-base-40, #5c5c5c);
+  padding-inline-end: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.newton-tone-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.1875rem var(--slds-g-spacing-2, 0.5rem);
+  background: var(--slds-g-color-neutral-base-100, #ffffff);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  font-size: 0.6875rem;
+  font-weight: var(--slds-g-font-weight-6, 600);
+  color: var(--slds-g-color-neutral-base-20, #2e2e2e);
+  cursor: pointer;
+  line-height: 1.3;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 80ms ease;
+  user-select: none;
+}
+
+.newton-tone-chip:hover:not(.newton-tone-chip_disabled) {
+  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+  border-color: var(--slds-g-color-border-base-1, #c9c9c9);
+}
+
+.newton-tone-chip:active:not(.newton-tone-chip_disabled) {
+  transform: translateY(0.5px);
+}
+
+.newton-tone-chip_active {
+  background: var(--slds-g-color-neutral-base-10, #181818);
+  color: var(--slds-g-color-on-accent-1, #ffffff);
+  border-color: var(--slds-g-color-neutral-base-10, #181818);
+  box-shadow: 0 0 0 var(--slds-g-sizing-border-2, 2px)
+    color-mix(in oklab, var(--newton-studio-brand) 45%, transparent);
+}
+
+.newton-tone-chip_disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.newton-tone-chip:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
+  outline-offset: var(--slds-g-sizing-border-2, 2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newton-tone-chip {
+    transition: none;
+  }
+  .newton-tone-chip:active {
+    transform: none;
+  }
+}
+
+/* Color dot — matches the tone palette exactly. */
+.newton-tone-chip__dot {
+  display: inline-block;
+  width: var(--slds-g-sizing-3, 0.5rem);
+  height: var(--slds-g-sizing-3, 0.5rem);
+  border-radius: var(--slds-g-radius-border-circle, 50%);
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 1px
+    color-mix(
+      in oklab,
+      var(--slds-g-color-neutral-base-10, #181818) 6%,
+      transparent
+    );
+}
+
+.newton-tone-chip__dot_neutral {
+  background: var(--slds-g-color-neutral-base-40, #5c5c5c);
+}
+.newton-tone-chip__dot_brand {
+  background: var(--slds-g-color-brand-base-50, #0176d3);
+}
+.newton-tone-chip__dot_success {
+  background: var(--slds-g-color-success-base-50, #3baa6f);
+}
+.newton-tone-chip__dot_warning {
+  background: var(--slds-g-color-warning-base-50, #b25900);
+}
+.newton-tone-chip__dot_error {
+  background: var(--slds-g-color-error-base-50, #ba0517);
+}
+.newton-tone-chip__dot_violet {
+  background: var(
+    --slds-g-color-palette-purple-50,
+    var(--slds-g-color-brand-base-50, #0176d3)
+  );
+}
+.newton-tone-chip__dot_pink {
+  background: var(--slds-g-color-palette-pink-50, #c9257b);
+}
+.newton-tone-chip__dot_teal {
+  background: var(--slds-g-color-palette-teal-50, #0f7b82);
+}
+/* Inverse — dark chip for dark-mode badges. */
+.newton-tone-chip__dot_inverse {
+  background: var(--slds-g-color-neutral-base-10, #181818);
+}
+/* Glyph-only tones: Auto follows the decoration, Contrast is white on dark. */
+.newton-tone-chip__dot_auto {
+  background: repeating-conic-gradient(
+    from 0deg,
+    var(--slds-g-color-neutral-base-60, #9a9a9a) 0deg 90deg,
+    var(--slds-g-color-neutral-base-100, #ffffff) 90deg 180deg
+  );
+}
+.newton-tone-chip__dot_contrast {
+  background: linear-gradient(
+    135deg,
+    var(--slds-g-color-neutral-base-10, #181818) 0 50%,
+    var(--slds-g-color-on-accent-1, #ffffff) 50% 100%
+  );
+  box-shadow: 0 0 0 1px var(--slds-g-color-border-base-1, #c9c9c9);
+}
+/* Custom — a color wheel reads as "this can be any color". */
+.newton-tone-chip__dot_custom {
+  background: conic-gradient(
+    from 90deg,
+    var(--slds-g-color-error-base-50, #ba0517),
+    var(--slds-g-color-warning-base-50, #b25900),
+    var(--slds-g-color-success-base-50, #3baa6f),
+    var(--slds-g-color-palette-teal-50, #0f7b82),
+    var(--slds-g-color-brand-base-50, #0176d3),
+    var(
+      --slds-g-color-palette-purple-50,
+      var(--slds-g-color-brand-base-50, #0176d3)
+    ),
+    var(--slds-g-color-palette-pink-50, #c9257b),
+    var(--slds-g-color-error-base-50, #ba0517)
+  );
+}
+
+/* =============================================================================
+   CUSTOM HEX ROW · below a tone row when the "Custom" chip is active:
+   color swatch + hex text input, with an inline error for invalid colors.
+   ============================================================================= */
+
+.newton-hex-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  padding: var(--slds-g-spacing-2, 0.5rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  background: var(--newton-studio-panel-soft);
+}
+
+.newton-tone-state .newton-hex-row {
+  padding-top: 0;
+}
+
+.newton-hex-row__label {
+  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  color: var(--slds-g-color-neutral-base-40, #5c5c5c);
+  padding-inline-end: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.newton-hex-row__selector {
+  appearance: none;
+  -webkit-appearance: none;
+  width: var(--slds-g-sizing-9, 2.25rem);
+  height: var(--slds-g-sizing-8, 1.75rem);
+  padding: 0;
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  background: transparent;
+  cursor: pointer;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+/* Strip default swatch chrome in all browsers. */
+.newton-hex-row__selector::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.newton-hex-row__selector::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--slds-g-radius-border-2, 0.25rem) - 1px);
+}
+.newton-hex-row__selector::-moz-color-swatch {
+  border: 0;
+  border-radius: calc(var(--slds-g-radius-border-2, 0.25rem) - 1px);
+}
+
+.newton-hex-row__selector:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
+  outline-offset: var(--slds-g-sizing-border-2, 2px);
+}
+
+.newton-hex-row__input {
+  flex: 1 1 8rem;
+  min-width: 0;
+  padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+  color: var(--slds-g-color-neutral-base-10, #181818);
+  background: var(--slds-g-color-neutral-base-100, #ffffff);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius);
+  line-height: 1.4;
+}
+
+.newton-hex-row__input:focus {
+  outline: none;
+  border-color: var(--newton-studio-brand);
+  box-shadow: 0 0 0 1px var(--newton-studio-brand);
+}
+
+.newton-hex-row__input[aria-invalid="true"] {
+  border-color: var(--newton-studio-error);
+}
+
+.newton-hex-row__error {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--newton-studio-error);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+}
+
+/* =============================================================================
+   BADGE CARD · shared choice tiles own position and shape; tone chips own color.
+   ============================================================================= */
+
+.newton-badge-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-4, 1rem);
+}
+
+.newton-badge-card__control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.newton-badge-card__eyebrow {
+  font-size: var(--slds-g-font-scale-neg-2, 0.6875rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--newton-studio-ink-weak);
+  line-height: var(--slds-g-font-line-height-1, 1);
+}
+
+/* =============================================================================
+   SLIDERS · grid density
+   ============================================================================= */
+
+.newton-studio__slider-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-4, 1rem);
+}
+
+.newton-studio__slider {
+  display: flex;
+  flex-direction: column;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.newton-studio__slider-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.newton-studio__slider-label {
+  font-size: var(--slds-g-font-scale-base, 0.8125rem);
+  font-weight: var(--slds-g-font-weight-6, 600);
+  color: var(--newton-studio-ink);
+}
+
+.newton-studio__slider-value {
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: var(--slds-g-font-scale-base, 0.8125rem);
+  color: var(--newton-studio-brand);
+  background: var(--newton-studio-brand-weak);
+  border-radius: var(--newton-studio-radius);
+  padding: 0.0625rem var(--slds-g-spacing-2, 0.5rem);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.newton-studio__slider-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+  color: var(--newton-studio-ink-weak);
+  font-variant-numeric: tabular-nums;
+  margin-top: calc(-1 * var(--slds-g-spacing-1, 0.25rem));
+}
+
+/* =============================================================================
+   CUSTOM ITEM ROWS · one always-open editor per custom option: icon on top,
+   2-column text grid, help text full width at the bottom.
    ============================================================================= */
 
 .newton-studio__custom-row {
   position: relative;
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius);
-  background: var(--newton-studio-surface);
   overflow: visible;
-  animation: newton-rise-in 220ms var(--newton-studio-ease);
-}
-
-/* Left accent stripe — brand-blue. Matches the override row stripe language. */
-.newton-studio__custom-row::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: var(--slds-g-sizing-border-3, 3px);
-  background: var(--newton-studio-brand);
-  pointer-events: none;
+  padding-inline-start: var(--slds-g-spacing-4, 1rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius-lg);
+  background: var(--newton-studio-panel);
 }
 
 .newton-studio__custom-row-head {
@@ -1203,22 +962,20 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--slds-g-spacing-2, 0.5rem);
-  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem)
-    var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem);
-  border-bottom: var(--newton-static-v-1px, 1px) dashed
+  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+  background: var(--newton-studio-panel-soft);
+  border-bottom: var(--slds-g-sizing-border-1, 1px) solid
     var(--newton-studio-hairline);
-  background: var(--newton-studio-surface-alt);
+  border-radius: var(--newton-studio-radius-lg) var(--newton-studio-radius-lg) 0
+    0;
 }
 
 .newton-studio__custom-row-head h4 {
   margin: 0;
   color: var(--newton-studio-ink-weak);
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
   font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .newton-studio__icon-button {
@@ -1282,73 +1039,38 @@
   gap: var(--slds-g-spacing-1, 0.25rem);
 }
 
-/* Custom item body — icon featured full-width at top, 2×2 text grid middle,
-   help text full-width bottom. Same rhythm as the override row expand panel. */
 .newton-studio__custom-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--slds-g-spacing-4, 1rem);
-  row-gap: var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-4, 1rem)
-    var(--slds-g-spacing-4, 1rem);
-  background: color-mix(
-    in oklab,
-    var(--newton-studio-brand-weak) 25%,
-    var(--newton-studio-surface)
-  );
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  padding: var(--slds-g-spacing-4, 1rem);
+  background: var(--newton-studio-panel);
 }
 
-/* Icon selector + the help-text field span full width as visual bookends.
-   Icon is structurally different (a selector, not text), so it headlines.
-   Help text is the longest content and benefits from full width. */
-.newton-studio__custom-grid > c-newton-selector-flow-cpe-icon-selector {
-  position: relative;
-  z-index: var(--newton-static-v-1, 1);
-  grid-column: 1 / -1;
-}
+/* The icon selector and help text span the full width as visual bookends. */
+.newton-studio__custom-grid > c-newton-selector-flow-cpe-icon-selector,
 .newton-studio__custom-grid
   > c-newton-selector-flow-cpe-resource-selector[name="helpText"] {
   grid-column: 1 / -1;
 }
 
-/* Stagger reveal for each field so the row doesn't pop in all at once. */
+/* Fields with open dropdowns must stack above their neighbors. */
+.newton-studio__custom-grid > c-newton-selector-flow-cpe-icon-selector,
 .newton-studio__custom-grid > c-newton-selector-flow-cpe-resource-selector {
   position: relative;
-  z-index: var(--newton-static-v-1, 1);
-  animation: newton-overrides-field 260ms var(--newton-studio-ease) both;
+  z-index: 1;
 }
+
 .newton-studio__custom-grid
   > c-newton-selector-flow-cpe-resource-selector:focus-within,
 .newton-studio__custom-grid
   > c-newton-selector-flow-cpe-icon-selector:focus-within {
-  z-index: var(--newton-static-v-9000, 9000);
-}
-.newton-studio__custom-grid
-  > c-newton-selector-flow-cpe-resource-selector:nth-of-type(1) {
-  animation-delay: 40ms;
-}
-.newton-studio__custom-grid
-  > c-newton-selector-flow-cpe-resource-selector:nth-of-type(2) {
-  animation-delay: 80ms;
-}
-.newton-studio__custom-grid
-  > c-newton-selector-flow-cpe-resource-selector:nth-of-type(3) {
-  animation-delay: 120ms;
-}
-.newton-studio__custom-grid
-  > c-newton-selector-flow-cpe-resource-selector:nth-of-type(4) {
-  animation-delay: 160ms;
-}
-.newton-studio__custom-grid
-  > c-newton-selector-flow-cpe-resource-selector:nth-of-type(5) {
-  animation-delay: 200ms;
+  z-index: 9000;
 }
 
 /* =============================================================================
-   SPEC SHEET · reusable subsection inside a source-setup card.
-   Used for the collection / sobject field-mapping groups: wraps the 6 field
-   selectors in a 2×2 (×3 rows) grid with an eyebrow label and left accent
-   stripe. Visually echoes the override-row expansion and custom-item body.
+   SPEC SHEET · field-mapping group inside a source-setup card: eyebrow +
+   title over a 2-column grid of field selectors.
    ============================================================================= */
 
 .newton-studio__spec-sheet {
@@ -1357,38 +1079,26 @@
   flex-direction: column;
   gap: var(--slds-g-spacing-3, 0.75rem);
   padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem)
-    var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-5, 1.25rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius);
-  background: color-mix(
-    in oklab,
-    var(--newton-studio-brand-weak) 20%,
-    var(--newton-studio-surface)
-  );
+    var(--slds-g-spacing-4, 1rem);
   overflow: visible;
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius-lg);
+  background: var(--newton-studio-panel);
 }
 
-.newton-studio__spec-sheet::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: var(--slds-g-sizing-border-3, 3px);
-  background: var(--newton-studio-brand);
-  pointer-events: none;
+.newton-studio__spec-sheet-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
 }
 
 .newton-studio__spec-sheet-eyebrow {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  margin: 0;
+  color: var(--newton-studio-brand);
   font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
   font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--newton-studio-brand);
   line-height: var(--slds-g-font-line-height-1, 1);
-  margin: 0;
+  letter-spacing: 0;
 }
 
 .newton-studio__spec-sheet-title {
@@ -1400,57 +1110,27 @@
   letter-spacing: -0.005em;
 }
 
-.newton-studio__spec-sheet-head {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-/* 2×2 grid of fields inside a spec sheet. */
 .newton-studio__spec-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--slds-g-spacing-4, 1rem);
-  row-gap: var(--slds-g-spacing-3, 0.75rem);
+  gap: var(--slds-g-spacing-3, 0.75rem);
 }
 
-/* Stagger reveal for spec-sheet field selectors too. */
+/* Fields with open dropdowns must stack above their neighbors. */
 .newton-studio__spec-grid > * {
   position: relative;
-  z-index: var(--newton-static-v-1, 1);
-  animation: newton-overrides-field 280ms var(--newton-studio-ease) both;
+  z-index: 1;
 }
 
 .newton-studio__spec-grid > *:focus-within {
-  z-index: var(--newton-static-v-9000, 9000);
-}
-.newton-studio__spec-grid > *:nth-of-type(1) {
-  animation-delay: 40ms;
-}
-.newton-studio__spec-grid > *:nth-of-type(2) {
-  animation-delay: 80ms;
-}
-.newton-studio__spec-grid > *:nth-of-type(3) {
-  animation-delay: 120ms;
-}
-.newton-studio__spec-grid > *:nth-of-type(4) {
-  animation-delay: 160ms;
-}
-.newton-studio__spec-grid > *:nth-of-type(5) {
-  animation-delay: 200ms;
-}
-.newton-studio__spec-grid > *:nth-of-type(6) {
-  animation-delay: 240ms;
+  z-index: 9000;
 }
 
 /* =============================================================================
-   OVERRIDES (picklist / sobject)
+   OVERRIDES (picklist / SOQL) · toolbar, bulk edit, and one expandable row
+   per value: header (checkbox · preview · name + value · actions · chevron)
+   over a 2-column grid of override fields.
    ============================================================================= */
-
-.newton-studio__bulk {
-  border-color: var(--newton-studio-brand);
-  background: var(--newton-studio-brand-weak);
-}
 
 .newton-studio__bulk .newton-studio__custom-grid {
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
@@ -1460,36 +1140,6 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--slds-g-spacing-2, 0.5rem);
-}
-
-.newton-studio__mode-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-3, 0.75rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius);
-  background: var(--newton-studio-surface);
-}
-
-.newton-studio__mode-copy {
-  min-width: 0;
-}
-
-.newton-studio__mode-copy h4 {
-  margin: 0;
-  color: var(--newton-studio-ink);
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  line-height: var(--slds-g-font-line-height-2, 1.25);
-}
-
-.newton-studio__mode-copy p {
-  margin: var(--newton-static-v-0-125rem, 0.125rem) 0 0;
-  color: var(--newton-studio-ink-weak);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  line-height: var(--slds-g-font-line-height-2, 1.25);
 }
 
 .newton-studio__mode-control {
@@ -1505,7 +1155,7 @@
 
 .newton-studio__override-loading {
   position: relative;
-  min-block-size: var(--newton-static-v-3rem, 3rem);
+  min-block-size: 3rem;
   grid-column: 1 / -1;
 }
 
@@ -1527,37 +1177,16 @@
   gap: var(--slds-g-spacing-2, 0.5rem);
 }
 
-/* =============================================================================
-   OVERRIDES ROW · printer's spec-sheet aesthetic.
-   Each row opens into a 2×2 grid of text fields with the icon selector featured
-   full-width on top. A left accent stripe lights up when the row is customized
-   or selected, carrying the chapter's color language into the detail view.
-   ============================================================================= */
-
 .newton-overrides__row {
   position: relative;
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius);
-  background: var(--newton-studio-surface);
   overflow: visible;
+  padding-inline-start: var(--slds-g-spacing-4, 1rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius-lg);
+  background: var(--newton-studio-panel);
   transition:
     border-color 180ms var(--newton-studio-ease),
     box-shadow 200ms var(--newton-studio-ease);
-}
-
-/* Left accent stripe — 3px. Transparent by default, brand-blue when
-   customized, warning-amber when selected for bulk. Sits flush with the
-   row edge because the row is `overflow: hidden`. */
-.newton-overrides__row::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: var(--slds-g-sizing-border-3, 3px);
-  background: transparent;
-  transition: background-color 180ms var(--newton-studio-ease);
-  pointer-events: none;
 }
 
 .newton-overrides__row:hover {
@@ -1565,32 +1194,20 @@
 }
 
 .newton-overrides__row_expanded {
-  box-shadow: var(--newton-studio-shadow-lift);
-  border-color: var(--newton-studio-border);
-  z-index: var(--newton-static-v-10, 10);
+  z-index: 10;
 }
 
-.newton-overrides__row_customized::before {
-  background: var(--newton-studio-brand);
-}
-
-.newton-overrides__row_selected::before {
-  background: var(--slds-g-color-warning-base-50, #b25900);
-}
-
-.newton-overrides__row_selected {
-  background: var(--newton-studio-brand-weak);
-  border-color: var(--newton-studio-brand);
-}
-
-/* Header · [checkbox] [name+id stack] [spacer] [actions] [chevron] */
 .newton-studio__overrides-head {
   display: grid;
   grid-template-columns: 1.5rem minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem)
-    var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem);
+  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+  background: var(--newton-studio-panel-soft);
+  border-bottom: var(--slds-g-sizing-border-1, 1px) solid
+    var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius-lg) var(--newton-studio-radius-lg) 0
+    0;
 }
 
 .newton-studio__overrides-trigger {
@@ -1603,7 +1220,7 @@
   border: 0;
   padding: 0;
   cursor: pointer;
-  text-align: left;
+  text-align: start;
 }
 
 .newton-studio__overrides-trigger:focus-visible {
@@ -1618,7 +1235,6 @@
   justify-content: center;
   width: var(--slds-g-sizing-9, 2rem);
   height: var(--slds-g-sizing-9, 2rem);
-  border-radius: var(--newton-studio-radius);
   color: var(--newton-studio-brand);
   background: color-mix(
     in oklab,
@@ -1627,6 +1243,7 @@
   );
   border: var(--slds-g-sizing-border-1, 1px) solid
     color-mix(in oklab, var(--newton-studio-brand) 20%, transparent);
+  border-radius: var(--newton-studio-radius);
 }
 
 .newton-studio__overrides-copy {
@@ -1647,14 +1264,13 @@
 }
 
 .newton-studio__overrides-value {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--slds-g-font-family-base, inherit);
   font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
   font-weight: var(--slds-g-font-weight-6, 600);
-  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--newton-studio-ink-weak);
   line-height: var(--slds-g-font-line-height-1, 1);
+  letter-spacing: 0;
 }
 
 .newton-overrides__row_customized .newton-studio__overrides-value {
@@ -1668,11 +1284,10 @@
 }
 
 .newton-overrides-summary__badge {
-  max-width: var(--newton-static-v-100-percent, 100%);
+  max-width: 100%;
   overflow-wrap: anywhere;
 }
 
-/* Trailing actions — reset button + chevron — sit tight on the right edge. */
 .newton-studio__overrides-actions {
   display: flex;
   align-items: center;
@@ -1706,68 +1321,37 @@
   color: var(--newton-studio-brand);
 }
 
-/* =============================================================================
-   EXPANDED BODY · icon featured on top, 2×2 grid of text fields below.
-   Subtle tinted background distinguishes it from the row header; a dashed
-   hairline separates the two. Fields reveal with a soft slide-in.
-   ============================================================================= */
-
+/* Expanded body: icon selector on top, then a 2-column grid of text fields,
+   separated from the header by a dashed hairline. */
 .newton-studio__overrides-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--slds-g-spacing-4, 1rem);
-  row-gap: var(--slds-g-spacing-3, 0.75rem);
+  gap: var(--slds-g-spacing-3, 0.75rem);
   padding: var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-4, 1rem)
     var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-5, 1.25rem);
-  border-top: var(--newton-static-v-1px, 1px) dashed
+  border-top: var(--slds-g-sizing-border-1, 1px) dashed
     var(--newton-studio-hairline);
-  background: color-mix(
-    in oklab,
-    var(--newton-studio-brand-weak) 35%,
-    var(--newton-studio-surface)
-  );
+  background: var(--newton-studio-panel);
   animation: newton-overrides-reveal 240ms var(--newton-studio-ease);
 }
 
-/* Icon selector spans full width — it's visually different from text fields
-   and deserves the hero slot. */
-.newton-studio__overrides-grid > c-newton-selector-flow-cpe-icon-selector {
-  position: relative;
-  z-index: var(--newton-static-v-1, 1);
-  grid-column: 1 / -1;
-}
-
+.newton-studio__overrides-grid > c-newton-selector-flow-cpe-icon-selector,
 .newton-studio__overrides-grid > c-newton-selector-flow-cpe-toggle {
   grid-column: 1 / -1;
 }
 
-/* Stagger the text fields' fade-in so they don't all pop at once. */
+/* Fields with open dropdowns must stack above their neighbors. */
+.newton-studio__overrides-grid > c-newton-selector-flow-cpe-icon-selector,
 .newton-studio__overrides-grid > c-newton-selector-flow-cpe-resource-selector {
   position: relative;
-  z-index: var(--newton-static-v-1, 1);
-  animation: newton-overrides-field 260ms var(--newton-studio-ease) both;
+  z-index: 1;
 }
+
 .newton-studio__overrides-grid
   > c-newton-selector-flow-cpe-resource-selector:focus-within,
 .newton-studio__overrides-grid
   > c-newton-selector-flow-cpe-icon-selector:focus-within {
-  z-index: var(--newton-static-v-9000, 9000);
-}
-.newton-studio__overrides-grid
-  > c-newton-selector-flow-cpe-resource-selector:nth-of-type(1) {
-  animation-delay: 40ms;
-}
-.newton-studio__overrides-grid
-  > c-newton-selector-flow-cpe-resource-selector:nth-of-type(2) {
-  animation-delay: 80ms;
-}
-.newton-studio__overrides-grid
-  > c-newton-selector-flow-cpe-resource-selector:nth-of-type(3) {
-  animation-delay: 120ms;
-}
-.newton-studio__overrides-grid
-  > c-newton-selector-flow-cpe-resource-selector:nth-of-type(4) {
-  animation-delay: 160ms;
+  z-index: 9000;
 }
 
 @keyframes newton-overrides-reveal {
@@ -1781,787 +1365,25 @@
   }
 }
 
-@keyframes newton-overrides-field {
-  from {
-    opacity: 0;
-    transform: translateY(3px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .newton-studio__overrides-chev,
   .newton-studio__overrides-grid,
-  .newton-studio__overrides-grid
-    > c-newton-selector-flow-cpe-resource-selector {
+  .newton-overrides__row {
     animation: none;
     transition: none;
   }
 }
 
 /* =============================================================================
-   SPACING SLIDERS (Layout tab)
+   SOQL QUERY PREVIEW · highlighted generated query + validation status
    ============================================================================= */
 
-.newton-studio__slider-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--slds-g-spacing-4, 1rem);
-}
-
-.newton-studio__slider {
-  display: flex;
-  flex-direction: column;
-  gap: var(--slds-g-spacing-1, 0.25rem);
-}
-
-.newton-studio__slider-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-}
-
-.newton-studio__slider-label {
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
-  font-weight: var(--slds-g-font-weight-6, 600);
-  color: var(--newton-studio-ink);
-}
-
-.newton-studio__slider-value {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
-  color: var(--newton-studio-brand);
-  background: var(--newton-studio-brand-weak);
-  border-radius: var(--newton-studio-radius);
-  padding: var(--newton-static-v-0-0625rem, 0.0625rem)
-    var(--slds-g-spacing-2, 0.5rem);
-  letter-spacing: -0.01em;
-  font-variant-numeric: tabular-nums;
-}
-
-.newton-studio__slider-scale {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  color: var(--newton-studio-ink-weak);
-  font-variant-numeric: tabular-nums;
-  margin-top: var(--newton-static-v-0-25rem, -0.25rem);
-}
-
-/* =============================================================================
-   MICRO-MOTION · subtle reveal animations for fresh content
-   ============================================================================= */
-
-@keyframes newton-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes newton-rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .newton-studio__card,
-  .newton-studio__section-head,
-  .newton-studio__custom-row,
-  .newton-studio__custom-grid > c-newton-selector-flow-cpe-resource-selector,
-  .newton-studio__spec-grid > * {
-    animation: none;
-  }
-  .newton-studio__nav-btn,
-  .newton-studio__splitter-grip,
-  .newton-overrides__row,
-  .newton-studio__preview-frame {
-    transition: none;
-  }
-}
-
-/* =============================================================================
-   BADGE CARD · editorial precision — the hero card of the Layout section.
-   Shared choice tiles own position/shape controls; tone chips own color.
-   ============================================================================= */
-
-.newton-badge-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--slds-g-spacing-4, 1rem);
-}
-
-/* ── Control lanes ─────────────────────────────────────────────────────── */
-
-.newton-badge-card__control {
-  display: flex;
-  flex-direction: column;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-}
-
-.newton-badge-card__eyebrow {
-  font-size: var(--slds-g-font-scale-neg-2, 0.6875rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--newton-studio-ink-weak);
-  line-height: var(--slds-g-font-line-height-1, 1);
-}
-
-/* ── Variant chips · the actual colored pill IS the chip ────────────────── */
-
-.newton-badge-card__variant-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-}
-
-.newton-badge-variant-chip {
-  all: unset;
-  cursor: pointer;
-  padding: var(--newton-static-v-0-375rem, 0.375rem)
-    var(--slds-g-spacing-3, 0.75rem);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  line-height: var(--slds-g-font-line-height-1, 1);
-  position: relative;
-  transition:
-    box-shadow 160ms var(--newton-studio-ease),
-    transform 160ms var(--newton-studio-ease);
-}
-
-.newton-badge-variant-chip:hover {
-  transform: translateY(-1px);
-}
-
-.newton-badge-variant-chip:focus-visible {
-  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
-  outline-offset: var(--slds-g-sizing-border-2, 2px);
-}
-
-.newton-badge-variant-chip_active {
-  box-shadow:
-    inset 0 0 0 1px var(--_badge-ring),
-    0 0 0 3px var(--newton-studio-brand),
-    0 4px 10px rgba(1, 94, 170, 0.2);
-}
-
-/* Chips reuse the choice tile's badge variant tokens — same source of truth. They're
-   passed the same class names as the real badge element. */
-.newton-badge-variant-chip.newton-selector-choice-tile__badge_variant-neutral {
-  --_badge-bg: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  --_badge-ink: var(--slds-g-color-neutral-base-30, #444444);
-  --_badge-ring: var(--slds-g-color-border-base-1, #e5e5e5);
-  background: var(--_badge-bg);
-  color: var(--_badge-ink);
-  box-shadow: inset 0 0 0 1px var(--_badge-ring);
-}
-.newton-badge-variant-chip.newton-selector-choice-tile__badge_variant-brand {
-  --_badge-bg: var(--slds-g-color-brand-base-95, #eaf3ff);
-  --_badge-ink: var(--slds-g-color-brand-base-30, #014486);
-  --_badge-ring: var(--slds-g-color-brand-base-60, #0b5cab);
-  background: var(--_badge-bg);
-  color: var(--_badge-ink);
-  box-shadow: inset 0 0 0 1px var(--_badge-ring);
-}
-.newton-badge-variant-chip.newton-selector-choice-tile__badge_variant-success {
-  --_badge-bg: var(--slds-g-color-success-base-95, #e8f7ee);
-  --_badge-ink: var(--slds-g-color-success-base-30, #2e7d56);
-  --_badge-ring: var(--slds-g-color-success-base-60, #3baa6f);
-  background: var(--_badge-bg);
-  color: var(--_badge-ink);
-  box-shadow: inset 0 0 0 1px var(--_badge-ring);
-}
-.newton-badge-variant-chip.newton-selector-choice-tile__badge_variant-warning {
-  --_badge-bg: var(--slds-g-color-warning-base-95, #fff6e6);
-  --_badge-ink: var(--slds-g-color-warning-base-30, #7a4500);
-  --_badge-ring: var(--slds-g-color-warning-base-60, #9a5b02);
-  background: var(--_badge-bg);
-  color: var(--_badge-ink);
-  box-shadow: inset 0 0 0 1px var(--_badge-ring);
-}
-.newton-badge-variant-chip.newton-selector-choice-tile__badge_variant-error {
-  --_badge-bg: var(--slds-g-color-error-base-95, #fdeef0);
-  --_badge-ink: var(--slds-g-color-error-base-30, #8e030f);
-  --_badge-ring: var(--slds-g-color-error-base-60, #ba0517);
-  background: var(--_badge-bg);
-  color: var(--_badge-ink);
-  box-shadow: inset 0 0 0 1px var(--_badge-ring);
-}
-.newton-badge-variant-chip.newton-selector-choice-tile__badge_variant-inverse {
-  --_badge-bg: var(--slds-g-color-neutral-base-10, #181818);
-  --_badge-ink: #ffffff;
-  --_badge-ring: var(--slds-g-color-neutral-base-10, #181818);
-  background: var(--_badge-bg);
-  color: var(--_badge-ink);
-  box-shadow: inset 0 0 0 1px var(--_badge-ring);
-}
-
-.newton-badge-variant-chip.newton-selector-choice-tile__badge_shape-pill {
-  border-radius: var(--newton-static-v-999px, 999px);
-}
-
-/* Active ring layers on top of the baseline variant ring. */
-.newton-badge-variant-chip_active.newton-selector-choice-tile__badge_variant-neutral,
-.newton-badge-variant-chip_active.newton-selector-choice-tile__badge_variant-brand,
-.newton-badge-variant-chip_active.newton-selector-choice-tile__badge_variant-success,
-.newton-badge-variant-chip_active.newton-selector-choice-tile__badge_variant-warning,
-.newton-badge-variant-chip_active.newton-selector-choice-tile__badge_variant-error,
-.newton-badge-variant-chip_active.newton-selector-choice-tile__badge_variant-inverse {
-  box-shadow:
-    inset 0 0 0 1px var(--_badge-ring),
-    0 0 0 2px var(--newton-studio-brand),
-    0 4px 10px rgba(1, 94, 170, 0.2);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .newton-badge-variant-chip {
-    transition: none;
-    transform: none;
-  }
-  .newton-badge-variant-chip:hover {
-    transform: none;
-  }
-}
-
-/* =============================================================================
-   STRING COLLECTION · RESOLVED VALUE PREVIEW
-   Read-only pill cluster that surfaces the bound variable's actual strings
-   so the admin can confirm what's flowing in without configuring anything.
-   Mirrors the spec-sheet dieline — left accent stripe + mono eyebrow.
-   ============================================================================= */
-
-.newton-string-preview {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-3, 0.75rem)
-    var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline, #e5e5e5);
-  border-radius: var(--newton-studio-radius, 0.5rem);
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  overflow: hidden;
-}
-
-.newton-string-preview::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: var(--slds-g-sizing-border-2, 2px);
-  background: var(--slds-g-color-success-base-50, #3baa6f);
-  pointer-events: none;
-}
-
-.newton-string-preview__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-}
-
-.newton-string-preview__eyebrow {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--slds-g-color-success-base-40, #2e8855);
-  line-height: var(--slds-g-font-line-height-1, 1);
-}
-
-.newton-string-preview__count {
-  font-size: var(--newton-static-v-0-6875rem, 0.6875rem);
-  color: var(--slds-g-color-neutral-base-40, #5c5c5c);
-  font-variant-numeric: tabular-nums;
-}
-
-.newton-string-preview__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.newton-string-preview__pill {
-  display: inline-block;
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--newton-static-v-0-6875rem, 0.6875rem);
-  font-weight: var(--slds-g-font-weight-6, 600);
-  letter-spacing: 0.01em;
-  padding: var(--newton-static-v-0-1875rem, 0.1875rem)
-    var(--newton-static-v-0-4375rem, 0.4375rem);
-  border-radius: var(--newton-static-v-999px, 999px);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
-  color: var(--slds-g-color-neutral-base-10, #181818);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline, #e5e5e5);
-  line-height: var(--newton-static-v-1-3, 1.3);
-  white-space: nowrap;
-  max-width: var(--newton-static-v-14rem, 14rem);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* =============================================================================
-   TONE CHIP ROW — appears under pattern/corner/surface/icon-decor selectors.
-   Each chip has a color-dot glyph + label. Wraps gracefully on narrow panels.
-   ============================================================================= */
-
-.newton-tone-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-  padding-top: var(--slds-g-spacing-2, 0.5rem);
-  border-top: var(--slds-g-sizing-border-1, 1px) dashed
-    var(--newton-studio-hairline, #e5e5e5);
-  margin-top: var(--slds-g-spacing-1, 0.25rem);
-}
-
-.newton-tone-state {
-  display: flex;
-  flex-direction: column;
-  gap: var(--slds-g-spacing-1, 0.25rem);
-}
-
-.newton-tone-state .newton-hex-row {
-  padding-top: 0;
-}
-
-.newton-tone-row__eyebrow {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--slds-g-color-neutral-base-40, #5c5c5c);
-  padding-right: var(--slds-g-spacing-1, 0.25rem);
-}
-
-.newton-tone-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: var(--newton-static-v-0-1875rem, 0.1875rem)
-    var(--slds-g-spacing-2, 0.5rem);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline, #e5e5e5);
-  border-radius: var(--newton-static-v-999px, 999px);
-  font-size: var(--newton-static-v-0-6875rem, 0.6875rem);
-  font-weight: var(--slds-g-font-weight-6, 600);
-  color: var(--slds-g-color-neutral-base-20, #2e2e2e);
-  cursor: pointer;
-  line-height: var(--newton-static-v-1-3, 1.3);
-  transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    box-shadow 140ms ease,
-    transform 80ms ease;
-  user-select: none;
-}
-
-.newton-tone-chip:hover:not(.newton-tone-chip_disabled) {
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  border-color: var(--slds-g-color-border-base-1, #c9c9c9);
-}
-
-.newton-tone-chip:active:not(.newton-tone-chip_disabled) {
-  transform: translateY(0.5px);
-}
-
-.newton-tone-chip_active {
-  background: var(--slds-g-color-neutral-base-10, #181818);
-  color: var(--slds-g-color-on-accent-1, #ffffff);
-  border-color: var(--slds-g-color-neutral-base-10, #181818);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
-}
-
-.newton-tone-chip_disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.newton-tone-chip:focus-visible {
-  outline: var(--slds-g-sizing-border-2, 2px) solid
-    var(--newton-studio-brand, #0176d3);
-  outline-offset: var(--slds-g-sizing-border-2, 2px);
-}
-
-/* Color dot — matches the tone palette exactly. */
-.newton-tone-chip__dot {
-  display: inline-block;
-  width: var(--slds-g-sizing-3, 0.5rem);
-  height: var(--slds-g-sizing-3, 0.5rem);
-  border-radius: var(--slds-g-radius-border-circle, 50%);
-  flex: 0 0 auto;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
-}
-
-.newton-tone-chip__dot_neutral {
-  background: var(--slds-g-color-neutral-base-40, #5c5c5c);
-}
-.newton-tone-chip__dot_brand {
-  background: var(--slds-g-color-brand-base-50, #0176d3);
-}
-.newton-tone-chip__dot_success {
-  background: var(--slds-g-color-success-base-50, #3baa6f);
-}
-.newton-tone-chip__dot_warning {
-  background: var(--slds-g-color-warning-base-50, #b25900);
-}
-.newton-tone-chip__dot_error {
-  background: var(--slds-g-color-error-base-50, #ba0517);
-}
-.newton-tone-chip__dot_violet {
-  background: var(--slds-g-color-palette-purple-50, #6d42c1);
-}
-.newton-tone-chip__dot_pink {
-  background: var(--slds-g-color-palette-pink-50, #c9257b);
-}
-.newton-tone-chip__dot_teal {
-  background: var(--slds-g-color-palette-teal-50, #0f7b82);
-}
-/* Inverse — dark chip for dark-mode badges. */
-.newton-tone-chip__dot_inverse {
-  background: var(--slds-g-color-neutral-base-10, #181818);
-}
-/* Custom — conic rainbow gradient reads as "this can be any color". */
-/* Glyph-only special tones. Auto = inherit; contrast = white on dark. */
-.newton-tone-chip__dot_auto {
-  background: repeating-conic-gradient(
-    from 0deg,
-    var(--slds-g-color-neutral-base-60, #9a9a9a) 0deg 90deg,
-    var(--slds-g-color-neutral-base-100, #ffffff) 90deg 180deg
-  );
-}
-.newton-tone-chip__dot_contrast {
-  background: linear-gradient(
-    135deg,
-    var(--slds-g-color-neutral-base-10, #181818) 0 50%,
-    var(--slds-g-color-on-accent-1, #ffffff) 50% 100%
-  );
-  box-shadow: 0 0 0 1px var(--slds-g-color-border-base-1, #c9c9c9);
-}
-
-.newton-tone-chip__dot_custom {
-  background: conic-gradient(
-    from 90deg,
-    var(--slds-g-color-error-base-50, #ba0517),
-    var(--slds-g-color-warning-base-50, #b25900),
-    var(--slds-g-color-success-base-50, #3baa6f),
-    var(--slds-g-color-palette-teal-50, #0f7b82),
-    var(--slds-g-color-brand-base-50, #0176d3),
-    var(--slds-g-color-palette-purple-50, #6d42c1),
-    var(--slds-g-color-palette-pink-50, #c9257b),
-    var(--slds-g-color-error-base-50, #ba0517)
-  );
-}
-
-/* =============================================================================
-   CUSTOM HEX ROW — appears below a tone row when "Custom" chip is active.
-   Compact input group: color-selector square + hex text input.
-   ============================================================================= */
-
-.newton-hex-row {
-  display: flex;
-  align-items: center;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-  padding-top: var(--slds-g-spacing-2, 0.5rem);
-  flex-wrap: wrap;
-}
-
-.newton-hex-row__label {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--slds-g-color-neutral-base-40, #5c5c5c);
-  padding-right: var(--slds-g-spacing-1, 0.25rem);
-}
-
-.newton-hex-row__selector {
-  appearance: none;
-  -webkit-appearance: none;
-  width: var(--slds-g-sizing-9, 2.25rem);
-  height: var(--slds-g-sizing-8, 1.75rem);
-  padding: 0;
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline, #e5e5e5);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
-  background: transparent;
-  cursor: pointer;
-  flex: 0 0 auto;
-  overflow: hidden;
-}
-
-/* Strip default swatch chrome in all browsers. */
-.newton-hex-row__selector::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-.newton-hex-row__selector::-webkit-color-swatch {
-  border: 0;
-  border-radius: calc(var(--slds-g-radius-border-2, 0.25rem) - 1px);
-}
-.newton-hex-row__selector::-moz-color-swatch {
-  border: 0;
-  border-radius: calc(var(--slds-g-radius-border-2, 0.25rem) - 1px);
-}
-
-.newton-hex-row__selector:focus-visible {
-  outline: var(--slds-g-sizing-border-2, 2px) solid
-    var(--newton-studio-brand, #0176d3);
-  outline-offset: var(--slds-g-sizing-border-2, 2px);
-}
-
-.newton-hex-row__input {
-  flex: 1 1 8rem;
-  min-width: 0;
-  padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  color: var(--slds-g-color-neutral-base-10, #181818);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline, #e5e5e5);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
-  line-height: var(--newton-static-v-1-4, 1.4);
-}
-
-.newton-hex-row__input:focus {
-  outline: none;
-  border-color: var(--newton-studio-brand, #0176d3);
-  box-shadow: 0 0 0 1px var(--newton-studio-brand, #0176d3);
-}
-
-/* =============================================================================
-   APPEARANCE SUB-CHAPTER DIVIDER
-   Slim banner that groups related cards within the Appearance chapter.
-   Inline layout: [label] ╱╱╱╱╱╱ [optional toggle control]
-   The diagonal-stripe rule signals a section break without dominating the
-   visual rhythm — continues the printer's-spec-sheet dieline aesthetic.
-   ============================================================================= */
-
-.newton-studio__subchapter {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
-  margin: var(--slds-g-spacing-6, 2rem) 0 var(--slds-g-spacing-3, 0.75rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    color-mix(
-      in oklab,
-      var(--_section-accent, var(--newton-studio-brand)) 18%,
-      transparent
-    );
-  border-left-width: var(--slds-g-sizing-border-3, 3px);
-  border-left-color: var(--_section-accent, var(--newton-studio-brand));
-  border-radius: var(--newton-studio-radius-lg, 0.5rem);
-  background: linear-gradient(
-    90deg,
-    color-mix(
-      in oklab,
-      var(--_section-accent, var(--newton-studio-brand)) 7%,
-      transparent
-    ),
-    color-mix(in oklab, var(--newton-studio-surface, #ffffff) 88%, transparent)
-  );
-}
-
-.newton-studio__subchapter:first-of-type {
-  margin-top: 0;
-}
-
-.newton-studio__subchapter-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-}
-
-.newton-studio__subchapter-numeral {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.06em;
-  color: var(--slds-g-color-on-accent-1, #ffffff);
-  background: var(--_section-accent, var(--newton-studio-brand));
-  border-radius: var(--newton-static-v-999px, 999px);
-  padding: var(--newton-static-v-0-125rem, 0.125rem)
-    var(--slds-g-spacing-2, 0.5rem);
-  line-height: var(--slds-g-font-line-height-1, 1);
-  font-variant-numeric: tabular-nums;
-}
-
-.newton-studio__subchapter-title {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--newton-studio-ink, #181818);
-  line-height: var(--slds-g-font-line-height-1, 1);
-}
-
-/* Diagonal stripe rule — gives each sub-chapter divider its own signature. */
-.newton-studio__subchapter-rule {
-  height: var(--slds-g-sizing-border-2, 2px);
-  background: repeating-linear-gradient(
-    -45deg,
-    color-mix(
-        in oklab,
-        var(--_section-accent, var(--newton-studio-brand)) 22%,
-        transparent
-      )
-      0,
-    color-mix(
-        in oklab,
-        var(--_section-accent, var(--newton-studio-brand)) 22%,
-        transparent
-      )
-      4px,
-    transparent 4px,
-    transparent 8px
-  );
-  opacity: 0.9;
-  border-radius: var(--slds-g-radius-border-1, 0.125rem);
-}
-
-.newton-studio__subchapter_layout,
-.newton-studio__section-card_layout {
-  --_section-accent: var(--slds-g-color-brand-base-50, #0176d3);
-}
-
-.newton-studio__subchapter_card,
-.newton-studio__section-card_card {
-  --_section-accent: #6d42c1;
-}
-
-.newton-studio__subchapter_icon,
-.newton-studio__section-card_icon {
-  --_section-accent: var(--newton-studio-brand, #0176d3);
-}
-
-.newton-studio__subchapter_badge,
-.newton-studio__section-card_badge {
-  --_section-accent: var(--slds-g-color-success-base-50, #3baa6f);
-}
-
-.newton-studio__subchapter_spacing,
-.newton-studio__section-card_spacing {
-  --_section-accent: var(--slds-g-color-warning-base-50, #b25900);
-}
-
-.newton-studio__section-card {
-  position: relative;
-  border-left: var(--slds-g-sizing-border-3, 3px) solid
-    var(--_section-accent, transparent);
-}
-
-.newton-studio__section-card::before {
-  content: "";
-  position: absolute;
-  inset-block: var(--slds-g-spacing-3, 0.75rem);
-  inset-inline-start: calc(var(--slds-g-sizing-border-3, 3px) * -1);
-  width: var(--slds-g-sizing-border-3, 3px);
-  border-radius: var(--newton-static-v-999px, 999px);
-  background: var(--_section-accent, transparent);
-}
-
-/* Inline toggle control — used for the "Show icons" / "Show badges" switches
-   on the ICON and BADGE sub-chapter headers. */
-.newton-studio__subchapter-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--slds-g-spacing-2, 0.5rem);
-  font-size: var(--newton-static-v-0-6875rem, 0.6875rem);
-  font-weight: var(--slds-g-font-weight-6, 600);
-  color: var(--newton-studio-ink-weak, #5c5c5c);
-}
-
-.newton-studio__subchapter-toggle lightning-input {
-  --slds-c-input-color-background: var(--newton-studio-surface, #ffffff);
-}
-
-.newton-studio__subchapter-toggle c-newton-selector-flow-cpe-toggle {
-  display: block;
-}
-
-/* When a sub-chapter is globally disabled (icons/badges hidden), fade the
-   title and color the diagonal rule warning-amber so the admin can see at
-   a glance that this group is off. */
-.newton-studio__subchapter_off .newton-studio__subchapter-title {
-  color: var(--newton-studio-ink-weak, #5c5c5c);
-}
-
-.newton-studio__subchapter_off .newton-studio__subchapter-rule {
-  background: repeating-linear-gradient(
-    -45deg,
-    color-mix(in oklab, var(--newton-studio-warn, #b25900) 28%, transparent) 0,
-    color-mix(in oklab, var(--newton-studio-warn, #b25900) 28%, transparent) 4px,
-    transparent 4px,
-    transparent 8px
-  );
-}
-
-/* Empty-state notice shown when a section (icons / badges) is toggled off. */
-.newton-studio__subchapter-off-note {
-  margin: 0 0 var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  color: var(--newton-studio-ink-weak, #5c5c5c);
-  background: color-mix(
-    in oklab,
-    var(--newton-studio-warn, #b25900) 6%,
-    var(--newton-studio-surface, #ffffff)
-  );
-  border-left: var(--slds-g-sizing-border-2, 2px) solid
-    color-mix(in oklab, var(--newton-studio-warn, #b25900) 45%, transparent);
-  border-radius: var(--newton-studio-radius, 0.25rem);
-  line-height: var(--newton-static-v-1-4, 1.4);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .newton-tone-chip {
-    transition: none;
-  }
-  .newton-tone-chip:active {
-    transform: none;
-  }
-}
 .newton-query-preview {
   margin-block: var(--slds-g-spacing-3, 0.75rem);
   padding: var(--slds-g-spacing-4, 1rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
-  border-radius: var(--slds-g-radius-border-1, 0.25rem);
-  background: var(--slds-g-color-surface-1, #ffffff);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
+  border-radius: var(--newton-studio-radius-lg);
+  background: var(--newton-studio-panel);
 }
 
 .newton-query-preview__head {
@@ -2656,906 +1478,17 @@
 .newton-query-preview__status {
   margin: var(--slds-g-spacing-2, 0.5rem) 0 0;
   padding-inline-start: var(--slds-g-spacing-2, 0.5rem);
-  border-inline-start: var(--slds-g-sizing-border-2, 2px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
+  border-inline-start: var(--slds-g-sizing-border-1, 1px) solid
+    var(--newton-studio-hairline);
   color: var(--slds-g-color-on-surface-2, #444444);
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-6, 600);
 }
 
 .newton-query-preview__status_success {
-  border-inline-start-color: var(--slds-g-color-success-base-50, #2e844a);
   color: var(--slds-g-color-success-base-30, #2e844a);
 }
 
 .newton-query-preview__status_error {
-  border-inline-start-color: var(--slds-g-color-error-base-50, #ea001e);
   color: var(--slds-g-color-error-base-30, #ba0517);
-}
-
-/* =============================================================================
-   V1 UNIFIED CPE STUDIO
-   A restrained SLDS 2 builder workspace: one brand accent, layered surfaces,
-   stable card anatomy, and consistent control rhythm across modal sections.
-   ============================================================================= */
-
-:host {
-  --newton-studio-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
-  --newton-studio-panel: var(--slds-g-color-surface-1, #ffffff);
-  --newton-studio-panel-alt: var(--slds-g-color-surface-container-1, #f3f3f3);
-  --newton-studio-panel-sunken: var(
-    --slds-g-color-surface-container-2,
-    #f9f9f9
-  );
-  --newton-studio-border-strong: var(--slds-g-color-border-base-1, #747474);
-  --newton-studio-focus-ring: var(--slds-g-color-brand-base-60, #0b5cab);
-  --newton-studio-shadow-lift: var(
-    --slds-g-shadow-2,
-    0 2px 8px rgba(0, 0, 0, 0.12)
-  );
-}
-
-.newton-modal {
-  --slds-c-modal-content-color-background: var(--newton-studio-canvas);
-}
-
-.newton-studio {
-  background: var(--newton-studio-canvas);
-  border-block-start: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-  border-block-end: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-}
-
-.newton-studio__left {
-  background: var(--newton-studio-panel-alt);
-}
-
-.newton-studio__nav {
-  gap: var(--slds-g-spacing-1, 0.25rem);
-  padding: var(--slds-g-spacing-3, 0.75rem);
-  background: var(--newton-studio-panel);
-  border-bottom-color: var(--newton-studio-hairline);
-}
-
-.newton-studio__nav-btn {
-  --_nav-hue: var(--newton-studio-brand);
-  grid-template-columns:
-    var(--slds-g-sizing-border-2, 2px)
-    var(--slds-g-sizing-6, 1.25rem) var(--slds-g-sizing-7, 1.5rem)
-    minmax(0, 1fr) auto;
-  column-gap: var(--slds-g-spacing-2, 0.5rem);
-  min-block-size: var(--slds-g-sizing-11, 2.75rem);
-  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid transparent;
-  border-radius: var(--newton-studio-radius);
-  background: transparent;
-}
-
-.newton-studio__nav-btn:hover {
-  background: var(--newton-studio-panel-alt);
-  border-color: var(--newton-studio-hairline);
-}
-
-.newton-studio__nav-btn_active {
-  background: var(--newton-studio-brand-weak);
-  border-color: color-mix(
-    in oklab,
-    var(--newton-studio-brand) 30%,
-    transparent
-  );
-}
-
-.newton-studio__nav-stripe {
-  border-radius: var(--newton-static-v-999px, 999px);
-}
-
-.newton-studio__nav-btn:hover .newton-studio__nav-stripe,
-.newton-studio__nav-btn_active .newton-studio__nav-stripe {
-  background: var(--newton-studio-brand);
-  box-shadow: none;
-}
-
-.newton-studio__nav-numeral,
-.newton-studio__nav-label,
-.newton-chapter__eyebrow,
-.newton-chapter__title,
-.newton-card__headings > h3,
-.newton-card__headings > p,
-.newton-studio__subchapter-title,
-.newton-studio__subchapter-numeral {
-  letter-spacing: 0;
-}
-
-.newton-studio__nav-numeral {
-  color: var(--newton-studio-ink-weak);
-}
-
-.newton-studio__nav-glyph {
-  background: var(--newton-studio-panel-alt);
-  color: var(--newton-studio-ink-weak);
-  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-    var(--newton-studio-hairline);
-}
-
-.newton-studio__nav-btn:hover .newton-studio__nav-glyph,
-.newton-studio__nav-btn_active .newton-studio__nav-glyph {
-  background: var(--newton-studio-panel);
-  color: var(--newton-studio-brand);
-  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-    color-mix(in oklab, var(--newton-studio-brand) 30%, transparent);
-}
-
-.newton-studio__nav-btn_active .newton-studio__nav-numeral,
-.newton-studio__nav-btn_active .newton-studio__nav-label {
-  color: var(--newton-studio-ink);
-}
-
-.newton-studio__nav-btn_active .newton-studio__nav-label {
-  font-weight: var(--slds-g-font-weight-7, 700);
-}
-
-.newton-studio__nav-status::before {
-  animation: none;
-}
-
-.newton-studio__preview {
-  padding: var(--slds-g-spacing-4, 1rem);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--newton-studio-brand-weak) 50%, transparent) 0,
-      transparent 12rem
-    ),
-    var(--newton-studio-panel-alt);
-}
-
-.newton-studio__preview-head {
-  align-items: center;
-}
-
-.newton-studio__preview-title,
-.newton-studio__preview-label {
-  letter-spacing: 0;
-}
-
-.newton-studio__preview-frame {
-  background: var(--newton-studio-panel);
-  border-color: var(--newton-studio-hairline);
-  box-shadow: var(--newton-studio-shadow);
-}
-
-.newton-studio__preview-states,
-.newton-studio__state-group,
-.newton-studio__col-row {
-  background: var(--newton-studio-panel-alt);
-  border-color: var(--newton-studio-hairline);
-  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-    color-mix(in oklab, var(--newton-studio-ink) 3%, transparent);
-}
-
-.newton-studio__preview-state[aria-selected="true"],
-.newton-studio__preview-state[aria-pressed="true"],
-.newton-studio__state-btn_active,
-.newton-studio__col-chip_active {
-  background: var(--newton-studio-panel);
-  color: var(--newton-studio-brand);
-  box-shadow:
-    inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-      color-mix(in oklab, var(--newton-studio-brand) 35%, transparent),
-    var(--newton-studio-shadow);
-}
-
-.newton-studio__controls {
-  padding: var(--slds-g-spacing-5, 1.25rem);
-  gap: var(--slds-g-spacing-4, 1rem);
-  background: var(--newton-studio-canvas);
-}
-
-.newton-chapter {
-  display: grid;
-  grid-template-columns: var(--slds-g-sizing-10, 2.5rem) minmax(0, 1fr);
-  gap: var(--slds-g-spacing-3, 0.75rem);
-  align-items: center;
-  margin: var(--slds-g-spacing-2, 0.5rem) 0 0;
-  padding: var(--slds-g-spacing-2, 0.5rem) 0;
-  animation: none;
-}
-
-.newton-chapter:first-of-type {
-  padding-top: var(--slds-g-spacing-2, 0.5rem);
-}
-
-.newton-chapter_01,
-.newton-chapter_02,
-.newton-chapter_03,
-.newton-chapter_04 {
-  --_chapter-accent: var(--newton-studio-brand);
-  --_chapter-accent-soft: color-mix(
-    in oklab,
-    var(--newton-studio-brand) 18%,
-    transparent
-  );
-}
-
-.newton-chapter__mark {
-  align-items: stretch;
-  justify-content: center;
-  padding-top: 0;
-}
-
-.newton-chapter__numeral {
-  inline-size: var(--slds-g-sizing-10, 2.5rem);
-  block-size: var(--slds-g-sizing-8, 1.75rem);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    color-mix(in oklab, var(--newton-studio-brand) 30%, transparent);
-  border-radius: var(--newton-studio-radius);
-  background: var(--newton-studio-brand-weak);
-  color: var(--newton-studio-brand);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  letter-spacing: 0;
-}
-
-.newton-chapter__rule {
-  display: none;
-}
-
-.newton-chapter__head {
-  gap: var(--slds-g-spacing-1, 0.25rem);
-  padding-top: 0;
-}
-
-.newton-chapter__head::before {
-  display: none;
-}
-
-.newton-chapter__eyebrow {
-  color: var(--newton-studio-brand);
-  font-family: var(--slds-g-font-family-base, inherit);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-  text-transform: uppercase;
-}
-
-.newton-chapter__title {
-  padding-bottom: 0;
-  font-size: var(--slds-g-font-scale-3, 1.25rem);
-  line-height: var(--slds-g-font-line-height-2, 1.25);
-}
-
-.newton-studio__card {
-  overflow: visible;
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius-lg);
-  background: var(--newton-studio-panel);
-  box-shadow: var(--newton-studio-shadow);
-  animation: none;
-}
-
-.newton-studio__card:hover,
-.newton-studio__card:focus-within {
-  border-color: color-mix(
-    in oklab,
-    var(--newton-studio-brand) 25%,
-    var(--newton-studio-hairline)
-  );
-}
-
-.newton-card__head,
-.newton-card__head_with-action {
-  grid-template-columns: var(--slds-g-sizing-9, 2rem) minmax(0, 1fr) auto;
-  gap: var(--slds-g-spacing-3, 0.75rem);
-}
-
-.newton-card__head_with-action {
-  grid-template-columns:
-    var(--slds-g-sizing-9, 2rem) minmax(0, 1fr)
-    auto var(--slds-g-sizing-6, 1.25rem);
-}
-
-.newton-card__glyph,
-.newton-card__glyph_data,
-.newton-card__glyph_content,
-.newton-card__glyph_behavior,
-.newton-card__glyph_appearance {
-  --_card-accent: var(--newton-studio-brand);
-  width: var(--slds-g-sizing-9, 2rem);
-  height: var(--slds-g-sizing-9, 2rem);
-  background: var(--newton-studio-brand-weak);
-  color: var(--newton-studio-brand);
-  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-    color-mix(in oklab, var(--newton-studio-brand) 18%, transparent);
-}
-
-.newton-card__glyph c-newton-selector-icon {
-  color: var(--newton-studio-brand);
-}
-
-.newton-card__headings > h3 {
-  color: var(--newton-studio-ink);
-  font-size: var(--slds-g-font-scale-1, 0.875rem);
-}
-
-.newton-card__headings > p {
-  color: var(--newton-studio-ink-weak);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-}
-
-.newton-studio__card > header {
-  background: var(--newton-studio-panel);
-}
-
-.newton-studio__card > div,
-.newton-studio__custom-grid,
-.newton-studio__overrides-grid {
-  background: var(--newton-studio-panel-sunken);
-}
-
-.newton-studio__field-block {
-  gap: var(--slds-g-spacing-4, 1rem);
-}
-
-.newton-studio__field-grid,
-.newton-studio__spec-grid,
-.newton-studio__custom-grid,
-.newton-studio__overrides-grid {
-  column-gap: var(--slds-g-spacing-4, 1rem);
-  row-gap: var(--slds-g-spacing-4, 1rem);
-}
-
-.newton-studio__spec-sheet,
-.newton-studio__custom-row,
-.newton-overrides__row,
-.newton-string-preview,
-.newton-query-preview {
-  border-color: var(--newton-studio-hairline);
-  background: var(--newton-studio-panel-sunken);
-}
-
-.newton-studio__spec-sheet::before,
-.newton-studio__custom-row::before,
-.newton-overrides__row_customized::before {
-  background: var(--newton-studio-brand);
-}
-
-.newton-studio__spec-sheet-eyebrow,
-.newton-studio__custom-row-head h4,
-.newton-studio__overrides-value,
-.newton-string-preview__eyebrow,
-.newton-tone-row__eyebrow,
-.newton-hex-row__label {
-  font-family: var(--slds-g-font-family-base, inherit);
-  letter-spacing: 0;
-}
-
-.newton-studio__custom-grid > c-newton-selector-flow-cpe-resource-selector,
-.newton-studio__overrides-grid > c-newton-selector-flow-cpe-resource-selector,
-.newton-studio__spec-grid > * {
-  animation: none;
-}
-
-.newton-studio__subchapter {
-  margin: var(--slds-g-spacing-5, 1.25rem) 0 var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-2, 0.5rem) 0;
-  border: 0;
-  border-block-end: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-  border-radius: 0;
-  background: transparent;
-}
-
-.newton-studio__subchapter-numeral {
-  color: var(--newton-studio-brand);
-  background: var(--newton-studio-brand-weak);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    color-mix(in oklab, var(--newton-studio-brand) 20%, transparent);
-}
-
-.newton-studio__subchapter-title {
-  font-family: var(--slds-g-font-family-base, inherit);
-  color: var(--newton-studio-ink);
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
-  text-transform: none;
-}
-
-.newton-studio__subchapter-rule {
-  height: var(--slds-g-sizing-border-1, 1px);
-  background: var(--newton-studio-hairline);
-  opacity: 1;
-}
-
-.newton-studio__section-card {
-  border-left: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-  background: var(--newton-studio-panel);
-}
-
-.newton-studio__section-card::before {
-  background: var(--newton-studio-brand);
-}
-
-.newton-studio__icon-button,
-.newton-studio__overrides-chev,
-.newton-studio__overrides-preview,
-.newton-tone-chip,
-.newton-hex-row__input,
-.newton-hex-row__selector {
-  border-radius: var(--newton-studio-radius);
-}
-
-.newton-tone-chip_active,
-.newton-badge-variant-chip_active {
-  box-shadow: 0 0 0 var(--slds-g-sizing-border-2, 2px)
-    color-mix(in oklab, var(--newton-studio-brand) 45%, transparent);
-}
-
-@media (max-width: 56rem) {
-  .newton-studio {
-    grid-template-columns: minmax(0, 1fr);
-    height: auto;
-    min-height: 0;
-  }
-
-  .newton-studio__left {
-    border-right: 0;
-    border-bottom: var(--slds-g-sizing-border-1, 1px) solid
-      var(--newton-studio-hairline);
-  }
-
-  .newton-studio__splitter {
-    display: none;
-  }
-
-  .newton-studio__preview {
-    max-block-size: 30rem;
-  }
-
-  .newton-studio__controls {
-    padding: var(--slds-g-spacing-4, 1rem);
-  }
-}
-
-/* Keep the studio language unified: no side-rail accents competing with card
-   headers, and the preview side uses the same canvas/surface model as controls. */
-.newton-studio__left,
-.newton-studio__preview,
-.newton-studio__nav {
-  background: var(--newton-studio-canvas);
-}
-
-.newton-studio__preview {
-  background-image: none;
-}
-
-.newton-studio__nav {
-  border-bottom-color: var(--newton-studio-hairline);
-}
-
-.newton-studio__nav-btn {
-  grid-template-columns:
-    var(--slds-g-sizing-6, 1.25rem)
-    var(--slds-g-sizing-7, 1.5rem) minmax(0, 1fr) auto;
-}
-
-.newton-studio__nav-stripe {
-  display: none;
-}
-
-.newton-studio__nav-btn_active {
-  background: var(--newton-studio-panel);
-  box-shadow: var(--newton-studio-shadow);
-}
-
-.newton-studio__section-card {
-  border-left: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-}
-
-.newton-studio__section-card::before,
-.newton-studio__spec-sheet::before,
-.newton-studio__custom-row::before,
-.newton-overrides__row::before,
-.newton-string-preview::before {
-  display: none;
-}
-
-.newton-studio__subchapter-off-note,
-.newton-query-preview__status {
-  border-left: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-  border-inline-start: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-}
-
-.newton-studio__spec-sheet,
-.newton-studio__custom-row,
-.newton-overrides__row {
-  padding-inline-start: var(--slds-g-spacing-4, 1rem);
-}
-
-.newton-studio__custom-row-head,
-.newton-studio__overrides-head {
-  padding-inline-start: var(--slds-g-spacing-3, 0.75rem);
-}
-
-.newton-studio__left {
-  border-right-color: var(--newton-studio-hairline);
-}
-
-.newton-studio__nav {
-  padding: var(--slds-g-spacing-3, 0.75rem);
-}
-
-.newton-studio__preview-frame,
-.newton-studio__card,
-.newton-studio__nav-btn_active {
-  background: var(--newton-studio-panel);
-}
-
-.newton-studio__card > header,
-.newton-studio__custom-row-head,
-.newton-studio__overrides-head,
-.newton-studio__mode-row {
-  background: var(--newton-studio-panel);
-}
-
-.newton-studio__card > div,
-.newton-studio__card > footer,
-.newton-studio__custom-grid,
-.newton-studio__overrides-grid,
-.newton-studio__spec-sheet,
-.newton-string-preview,
-.newton-query-preview {
-  background: var(--newton-studio-panel-sunken);
-}
-
-.newton-studio__field-block > lightning-input,
-.newton-studio__field-grid > lightning-input,
-.newton-studio__field-block > c-newton-selector-combobox,
-.newton-studio__field-block > c-newton-selector-flow-cpe-resource-selector,
-.newton-studio__field-block > c-newton-selector-flow-cpe-field-selector,
-.newton-studio__field-block > c-newton-selector-flow-cpe-choice-control,
-.newton-studio__field-grid > c-newton-selector-combobox,
-.newton-studio__field-grid > c-newton-selector-flow-cpe-resource-selector,
-.newton-studio__field-grid > c-newton-selector-flow-cpe-field-selector,
-.newton-studio__field-grid > c-newton-selector-flow-cpe-choice-control {
-  --slds-c-input-color-background: var(--newton-studio-panel);
-  --slds-c-textarea-color-background: var(--newton-studio-panel);
-  --slds-c-select-color-background: var(--newton-studio-panel);
-}
-
-.newton-studio__preview-states,
-.newton-studio__state-group,
-.newton-studio__col-row,
-.newton-studio__selectorgroup_compact,
-.newton-tone-row,
-.newton-hex-row {
-  background: color-mix(
-    in oklab,
-    var(--newton-studio-panel-sunken) 80%,
-    var(--newton-studio-panel)
-  );
-}
-
-.newton-studio__selectorgroup_compact,
-.newton-tone-row,
-.newton-hex-row {
-  border-radius: var(--newton-studio-radius);
-  padding: var(--slds-g-spacing-2, 0.5rem);
-}
-
-/* =============================================================================
-   LIGHTNING STUDIO VISUAL SYSTEM
-   Final V1 design layer. This intentionally supersedes the older editorial
-   treatment with a Salesforce-native builder workspace: shaded canvas, raised
-   panels, quiet mastheads, and consistent card depth on both sides.
-   ============================================================================= */
-
-:host {
-  --newton-studio-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
-  --newton-studio-panel: var(--slds-g-color-surface-1, #ffffff);
-  --newton-studio-panel-soft: var(--slds-g-color-surface-container-2, #f9f9f9);
-  --newton-studio-panel-tint: color-mix(
-    in oklab,
-    var(--newton-studio-brand-weak) 38%,
-    var(--newton-studio-panel)
-  );
-  --newton-studio-depth-border: color-mix(
-    in oklab,
-    var(--newton-studio-brand) 16%,
-    var(--newton-studio-hairline)
-  );
-  --newton-studio-depth-shadow: var(
-    --slds-g-shadow-2,
-    0 2px 8px rgba(0, 0, 0, 0.12)
-  );
-}
-
-.newton-studio {
-  background: var(--newton-studio-canvas);
-}
-
-.newton-studio__left,
-.newton-studio__controls {
-  background: var(--newton-studio-canvas);
-}
-
-.newton-studio__left {
-  padding: var(--slds-g-spacing-4, 1rem);
-  gap: var(--slds-g-spacing-4, 1rem);
-  border-right: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-}
-
-.newton-studio__nav {
-  gap: var(--slds-g-spacing-2, 0.5rem);
-  padding: 0;
-  background: transparent;
-  border-bottom: 0;
-}
-
-.newton-studio__nav-btn {
-  grid-template-columns:
-    var(--slds-g-sizing-6, 1.25rem)
-    var(--slds-g-sizing-8, 1.75rem) minmax(0, 1fr) auto;
-  min-block-size: var(--slds-g-sizing-12, 3rem);
-  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
-  background: var(--newton-studio-panel-soft);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius-lg);
-  box-shadow: none;
-}
-
-.newton-studio__nav-btn:hover {
-  background: var(--newton-studio-panel);
-  border-color: var(--newton-studio-depth-border);
-}
-
-.newton-studio__nav-btn_active {
-  background: var(--newton-studio-panel);
-  border-color: var(--newton-studio-depth-border);
-  box-shadow: var(--newton-studio-depth-shadow);
-}
-
-.newton-studio__nav-stripe {
-  display: none;
-}
-
-.newton-studio__nav-glyph {
-  width: var(--slds-g-sizing-8, 1.75rem);
-  height: var(--slds-g-sizing-8, 1.75rem);
-  background: var(--newton-studio-panel);
-  color: var(--newton-studio-brand);
-  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-    var(--newton-studio-depth-border);
-}
-
-.newton-studio__nav-btn_active .newton-studio__nav-glyph {
-  background: var(--newton-studio-brand);
-  color: var(--slds-g-color-on-accent-1, #ffffff);
-  box-shadow: none;
-}
-
-.newton-studio__nav-numeral {
-  color: var(--newton-studio-ink-weak);
-}
-
-.newton-studio__nav-label {
-  color: var(--newton-studio-ink);
-  font-weight: var(--slds-g-font-weight-6, 600);
-}
-
-.newton-studio__preview {
-  padding: 0;
-  background: transparent;
-}
-
-.newton-studio__preview-head {
-  padding: var(--slds-g-spacing-3, 0.75rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius-lg);
-  background: var(--newton-studio-panel);
-  box-shadow: var(--newton-studio-shadow);
-}
-
-.newton-studio__preview-frame {
-  margin-top: var(--slds-g-spacing-3, 0.75rem);
-  background: var(--newton-studio-panel);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius-lg);
-  box-shadow: var(--newton-studio-depth-shadow);
-}
-
-.newton-studio__preview-states,
-.newton-studio__state-group,
-.newton-studio__col-row {
-  background: var(--newton-studio-panel-soft);
-  border-color: var(--newton-studio-hairline);
-}
-
-.newton-studio__controls {
-  padding: var(--slds-g-spacing-5, 1.25rem);
-  gap: var(--slds-g-spacing-4, 1rem);
-}
-
-.newton-chapter {
-  grid-template-columns: var(--slds-g-sizing-10, 2.5rem) minmax(0, 1fr);
-  align-items: center;
-  margin: 0 0 var(--slds-g-spacing-2, 0.5rem);
-  padding: var(--slds-g-spacing-4, 1rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius-lg);
-  background: var(--newton-studio-panel);
-  box-shadow: var(--newton-studio-shadow);
-}
-
-.newton-chapter__numeral {
-  width: var(--slds-g-sizing-10, 2.5rem);
-  height: var(--slds-g-sizing-10, 2.5rem);
-  border-radius: var(--newton-studio-radius-lg);
-  background: var(--newton-studio-panel-tint);
-  color: var(--newton-studio-brand);
-  border-color: var(--newton-studio-depth-border);
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
-}
-
-.newton-chapter__eyebrow {
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  color: var(--newton-studio-brand);
-}
-
-.newton-chapter__title {
-  font-size: var(--slds-g-font-scale-3, 1.25rem);
-  color: var(--newton-studio-ink);
-}
-
-.newton-chapter__rule,
-.newton-chapter__head::before,
-.newton-studio__section-card::before,
-.newton-studio__spec-sheet::before,
-.newton-studio__custom-row::before,
-.newton-overrides__row::before,
-.newton-string-preview::before {
-  display: none;
-}
-
-.newton-studio__card,
-.newton-studio__section-card,
-.newton-studio__custom-row,
-.newton-overrides__row,
-.newton-studio__spec-sheet,
-.newton-string-preview,
-.newton-query-preview {
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius-lg);
-  background: var(--newton-studio-panel);
-  box-shadow: var(--newton-studio-shadow);
-}
-
-.newton-studio__card > header,
-.newton-studio__custom-row-head,
-.newton-studio__overrides-head {
-  background: var(--newton-studio-panel-soft);
-  border-bottom: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius-lg) var(--newton-studio-radius-lg) 0
-    0;
-}
-
-.newton-studio__card > div,
-.newton-studio__card > footer,
-.newton-studio__custom-grid,
-.newton-studio__overrides-grid {
-  background: var(--newton-studio-panel);
-}
-
-.newton-card__glyph {
-  background: var(--newton-studio-panel);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-depth-border);
-  color: var(--newton-studio-brand);
-  box-shadow: none;
-}
-
-.newton-card__headings > h3 {
-  font-size: var(--slds-g-font-scale-1, 0.875rem);
-  font-weight: var(--slds-g-font-weight-7, 700);
-}
-
-.newton-card__headings > p {
-  color: var(--newton-studio-ink-weak);
-}
-
-.newton-studio__subchapter {
-  margin: var(--slds-g-spacing-5, 1.25rem) 0 var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-3, 0.75rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius-lg);
-  background: var(--newton-studio-panel-soft);
-}
-
-.newton-studio__subchapter-rule {
-  background: var(--newton-studio-hairline);
-}
-
-.newton-studio__subchapter-numeral {
-  background: var(--newton-studio-panel);
-  color: var(--newton-studio-brand);
-  border-color: var(--newton-studio-depth-border);
-}
-
-.newton-studio__selectorgroup_compact,
-.newton-tone-row,
-.newton-hex-row,
-.newton-studio__state-row {
-  background: var(--newton-studio-panel-soft);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
-  border-radius: var(--newton-studio-radius);
-}
-
-.newton-studio__subchapter-off-note,
-.newton-query-preview__status {
-  border-left: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-  border-inline-start: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline);
-}
-
-@media (max-width: 56rem) {
-  .newton-studio__left,
-  .newton-studio__controls {
-    padding: var(--slds-g-spacing-4, 1rem);
-  }
-}
-
-/* Main header alignment: match the preview panel header proportions. */
-.newton-chapter {
-  grid-template-columns: var(--slds-g-sizing-11, 2.75rem) minmax(0, 1fr);
-  min-block-size: var(--newton-static-v-4-5rem, 4.5rem);
-  align-items: center;
-  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
-  scroll-margin-top: var(--slds-g-spacing-4, 1rem);
-}
-
-.newton-chapter__mark {
-  width: var(--slds-g-sizing-11, 2.75rem);
-  height: var(--slds-g-sizing-11, 2.75rem);
-}
-
-.newton-chapter__numeral {
-  width: var(--slds-g-sizing-11, 2.75rem);
-  height: var(--slds-g-sizing-11, 2.75rem);
-  background: color-mix(
-    in oklab,
-    var(--newton-studio-brand-weak) 76%,
-    var(--newton-studio-panel)
-  );
-  border-color: var(--newton-studio-depth-border);
-  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-    color-mix(
-      in oklab,
-      var(--newton-studio-brand) 10%,
-      var(--newton-studio-panel)
-    );
-}
-
-.newton-chapter__head {
-  gap: var(--newton-static-v-0-125rem, 0.125rem);
-}
-
-.newton-chapter__eyebrow {
-  line-height: var(--slds-g-font-line-height-1, 1);
-}
-
-.newton-chapter__title {
-  line-height: var(--newton-static-v-1-2, 1.2);
-}
-
-.newton-card__glyph {
-  background: var(--newton-studio-panel-soft);
-  border-color: var(--newton-studio-hairline);
-  color: var(--newton-studio-ink-weak);
 }

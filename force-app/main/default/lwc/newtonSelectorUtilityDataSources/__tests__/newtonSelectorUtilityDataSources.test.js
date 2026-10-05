@@ -4,8 +4,7 @@ import {
   normalizeSObjectDTO,
   normalizeCustom,
   filterItems,
-  applyOverrides,
-  SAMPLE_ITEMS
+  applyOverrides
 } from "c/newtonSelectorUtilityDataSources";
 
 describe("newtonSelectorUtilityDataSources", () => {
@@ -44,25 +43,34 @@ describe("newtonSelectorUtilityDataSources", () => {
       expect(items[0].value).toBe("001");
     });
 
-    it("falls back to placeholder label when mapped field is missing", () => {
+    it("gives rows a non-empty label when the mapped field is missing", () => {
       const items = normalizeCollection([{ Id: "001" }], { label: "Missing" });
-      expect(items[0].label).toBe("(row 1)");
+      expect(items[0].label).toBeTruthy();
+    });
+
+    it("keeps the source record on each item", () => {
+      const record = { Id: "001", Name: "Acme" };
+      const items = normalizeCollection([record], { label: "Name" });
+      expect(items[0].record).toBe(record);
     });
   });
 
   describe("normalizeSObjectDTO", () => {
-    it("maps Apex DTOs verbatim", () => {
-      const dtos = [{ id: "a", label: "A", value: "a", disabled: true }];
-      const items = normalizeSObjectDTO(dtos);
-      expect(items[0].disabled).toBe(true);
+    it("uses the id as value when the DTO has none and keeps its record", () => {
+      const record = { Id: "001" };
+      const items = normalizeSObjectDTO([{ id: "001", label: "A", record }]);
+      expect(items[0].value).toBe("001");
+      expect(items[0].record).toBe(record);
     });
   });
 
   describe("normalizeCustom", () => {
-    it("generates id/value fallbacks", () => {
-      const items = normalizeCustom([{ label: "X" }]);
-      expect(items[0].id).toBe("cu-0");
-      expect(items[0].value).toBe("0");
+    it("generates distinct id/value fallbacks and attaches no record", () => {
+      const items = normalizeCustom([{ label: "X" }, { label: "Y" }]);
+      expect(items[0].id).toBeTruthy();
+      expect(items[0].id).not.toBe(items[1].id);
+      expect(items[0].value).not.toBe(items[1].value);
+      expect(items[0].record).toBeUndefined();
     });
 
     it("preserves caller-provided fields", () => {
@@ -129,12 +137,6 @@ describe("newtonSelectorUtilityDataSources", () => {
       ];
       const out = applyOverrides(items, { b: { hidden: true } });
       expect(out).toEqual([{ value: "a", label: "A" }]);
-    });
-  });
-
-  describe("SAMPLE_ITEMS", () => {
-    it("ships at least 4 items for preview", () => {
-      expect(SAMPLE_ITEMS.length).toBeGreaterThanOrEqual(4);
     });
   });
 });

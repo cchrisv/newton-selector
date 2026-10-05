@@ -5,36 +5,19 @@ import {
   resolveIconContent
 } from "./lucideIconPaths";
 
-const SIZE_ALIASES = {
-  "xx-small": "xs",
-  "x-small": "sm",
-  small: "md",
-  medium: "lg",
-  large: "xl",
-  xs: "xs",
-  sm: "sm",
-  md: "md",
-  lg: "lg",
-  xl: "xl"
-};
-
-const VALID_VARIANTS = new Set([
-  "error",
-  "warning",
-  "success",
-  "brand",
-  "inverse"
-]);
+const VALID_VARIANTS = new Set(["error", "warning", "success", "inverse"]);
 const VALID_BOXES = new Set(["input", "button", "option", "tile"]);
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
+const ICON_TAG_PATTERN = /<([a-z]+)((?:\s+[a-zA-Z0-9:-]+="[^"]*")*)\s*\/?>/g;
+const ATTR_PATTERN = /([a-zA-Z0-9:-]+)="([^"]*)"/g;
 
 export default class NewtonSelectorIcon extends LightningElement {
   @api name = "";
-  @api size = "md";
+  /** @type {'xx-small'|'x-small'|'small'|'medium'|'large'} */
+  @api size = "small";
   @api alternativeText = "";
-  @api title = "";
   @api box = "";
-  /** @type {'error'|'warning'|'success'|'brand'|'inverse'|undefined} */
+  /** @type {'error'|'warning'|'success'|'inverse'|undefined} */
   @api variant;
 
   _renderedIconContent;
@@ -48,21 +31,23 @@ export default class NewtonSelectorIcon extends LightningElement {
     }
   }
 
+  // Locker rejects DOMParser nodes in importNode and its secure SVG wrapper
+  // lacks replaceChildren, so the flat Lucide markup is rebuilt with
+  // createElementNS and swapped in with removeChild/appendChild.
   replaceIconNodes(svg, iconContent) {
-    const parser = new DOMParser();
-    const parsed = parser.parseFromString(
-      `<svg xmlns="${SVG_NAMESPACE}">${iconContent}</svg>`,
-      "image/svg+xml"
-    );
-    const nodes = Array.from(parsed.documentElement.childNodes).map((node) =>
-      document.importNode(node, true)
-    );
+    const nodes = [];
+    for (const [, tag, attrs] of iconContent.matchAll(ICON_TAG_PATTERN)) {
+      const node = document.createElementNS(SVG_NAMESPACE, tag);
+      for (const [, attrName, attrValue] of attrs.matchAll(ATTR_PATTERN)) {
+        node.setAttribute(attrName, attrValue);
+      }
+      nodes.push(node);
+    }
 
-    svg.replaceChildren(...nodes);
-  }
-
-  get resolvedSize() {
-    return SIZE_ALIASES[this.size] || "md";
+    while (svg.firstChild) {
+      svg.removeChild(svg.firstChild);
+    }
+    nodes.forEach((node) => svg.appendChild(node));
   }
 
   get resolvedIconName() {
@@ -76,7 +61,7 @@ export default class NewtonSelectorIcon extends LightningElement {
   get wrapperClass() {
     const cls = [
       "newton-selector-icon",
-      `newton-selector-icon_size-${this.resolvedSize}`
+      `newton-selector-icon_size-${this.size}`
     ];
     if (VALID_BOXES.has(this.box)) {
       cls.push(`newton-selector-icon_box-${this.box}`);

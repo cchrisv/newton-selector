@@ -1,6 +1,6 @@
 export const ORDER_DIRECTION_OPTIONS = [
-  { label: "Descending", value: "DESC", icon: "arrow-down-z-a" },
-  { label: "Ascending", value: "ASC", icon: "arrow-up-a-z" }
+  { label: "Descending (Z → A)", value: "DESC", icon: "arrow-down-z-a" },
+  { label: "Ascending (A → Z)", value: "ASC", icon: "arrow-up-a-z" }
 ];
 
 export const SOURCE_TILES = [
@@ -19,13 +19,13 @@ export const SOURCE_TILES = [
   {
     value: "sobject",
     label: "SOQL query",
-    sublabel: "Custom WHERE + ordering",
+    sublabel: "Query any object",
     icon: "database"
   },
   {
     value: "custom",
-    label: "Custom items",
-    sublabel: "Typed-in static options",
+    label: "Custom options",
+    sublabel: "Options you type in",
     icon: "square-pen"
   }
 ];
@@ -51,41 +51,26 @@ export const LAYOUT_TILES = [
   },
   {
     value: "picklist",
-    label: "Picklist",
-    sublabel: "Card dropdown",
+    label: "Dropdown",
+    sublabel: "Opens on click",
     icon: "list"
   },
   {
     value: "radio",
     label: "Radio",
-    sublabel: "Card radio group",
+    sublabel: "Radio rows",
     icon: "list-checks"
   },
   {
     value: "columns",
     label: "Columns",
-    sublabel: "Drag/drop card columns",
+    sublabel: "Drag between columns",
     icon: "columns-2"
   },
   {
     value: "dualListbox",
-    label: "Multi-select",
-    sublabel: "Salesforce selector pattern",
-    icon: "list-checks"
-  }
-];
-
-export const SELECTION_TILES = [
-  {
-    value: "single",
-    label: "Single",
-    sublabel: "Exactly one option",
-    icon: "circle"
-  },
-  {
-    value: "multi",
-    label: "Multi",
-    sublabel: "Several options",
+    label: "Dual listbox",
+    sublabel: "Move between two lists",
     icon: "list-checks"
   }
 ];
@@ -100,7 +85,7 @@ export const SIZE_TILES = [
   {
     value: "medium",
     label: "Medium",
-    sublabel: "Default · 12 rem",
+    sublabel: "Balanced · 12 rem",
     shape: { width: "1.875rem", height: "1.875rem" }
   },
   {
@@ -111,10 +96,11 @@ export const SIZE_TILES = [
   }
 ];
 
-export const SIZE_LAYOUT_MAP = {
-  small: { column: "7.5rem", paddingToken: "2" },
-  medium: { column: "12rem", paddingToken: "4" },
-  large: { column: "16rem", paddingToken: "5" }
+// Grid column width that each tile size sets.
+export const SIZE_COLUMN_WIDTHS = {
+  small: "7.5rem",
+  medium: "12rem",
+  large: "16rem"
 };
 
 export const ASPECT_TILES = [
@@ -237,7 +223,7 @@ export const AUTO_SPACING_TILES = [
   {
     value: "",
     label: "Auto",
-    sublabel: "SLDS default",
+    sublabel: "Standard spacing",
     icon: "wand-sparkles"
   },
   ...SPACING_TILES
@@ -253,34 +239,53 @@ export const SIDE_META = [
 ];
 
 export const BADGE_POSITIONS = [
-  { value: "top-left", label: "Top left", icon: "square-arrow-up-left" },
-  { value: "top-right", label: "Top right", icon: "square-arrow-up-right" },
+  {
+    value: "top-left",
+    label: "Top left",
+    sublabel: "On the corner",
+    icon: "square-arrow-up-left"
+  },
+  {
+    value: "top-right",
+    label: "Top right",
+    sublabel: "On the corner",
+    icon: "square-arrow-up-right"
+  },
   {
     value: "bottom-left",
     label: "Bottom left",
+    sublabel: "On the corner",
     icon: "square-arrow-down-left"
   },
   {
     value: "bottom-right",
     label: "Bottom right",
+    sublabel: "On the corner",
     icon: "square-arrow-down-right"
   },
-  { value: "bottom-inline", label: "Inline", icon: "align-center-horizontal" }
+  {
+    value: "bottom-inline",
+    label: "Inline",
+    sublabel: "Under the text",
+    icon: "align-center-horizontal"
+  }
 ];
 
 export const BADGE_SHAPES = [
   {
     value: "pill",
     label: "Pill",
+    sublabel: "Rounded ends",
     shape: {
       width: "2.25rem",
       height: "0.75rem",
-      radius: "var(--newton-static-v-999px, 999px)"
+      radius: "var(--slds-g-radius-border-pill, 999px)"
     }
   },
   {
     value: "square",
     label: "Square",
+    sublabel: "Square corners",
     shape: {
       width: "1.5rem",
       height: "1.5rem",
@@ -347,7 +352,7 @@ export const ELEVATION_TILES = [
   },
   {
     value: "subtle",
-    label: "Soft",
+    label: "Subtle",
     sublabel: "Tinted edge",
     icon: "circle"
   },
@@ -406,6 +411,9 @@ export const SECTIONS = [
   }
 ];
 
+// Keys of a per-value override that count as a customization in the editor.
+// The runtime (newtonSelectorUtilityDataSources) copies only the text fields
+// onto the option; "hidden" is not copied, it removes the option instead.
 export const OVERRIDE_FIELDS = [
   "label",
   "sublabel",
@@ -415,11 +423,7 @@ export const OVERRIDE_FIELDS = [
   "hidden"
 ];
 
-export const GRID_SLIDER_RANGES = {
-  minWidth: { min: 6, max: 32, step: 1, fallback: 7.5 },
-  gapH: { min: 0, max: 4, step: 0.25, fallback: 2 },
-  gapV: { min: 0, max: 4, step: 0.25, fallback: 2 }
-};
+export const GRID_MIN_WIDTH_RANGE = { min: 6, max: 32, step: 1, fallback: 7.5 };
 
 export const PATTERN_TILES = [
   {
@@ -467,7 +471,7 @@ export const PATTERN_TILES = [
   {
     value: "paper",
     label: "Paper",
-    sublabel: "Cross-hatch",
+    sublabel: "Paper texture",
     icon: "sticky-note"
   },
   {
@@ -559,8 +563,8 @@ export const ICON_DECOR_TILES = [
   },
   {
     value: "badge",
-    label: "Badge",
-    sublabel: "Medal glyph",
+    label: "Medal",
+    sublabel: "Medal shape",
     icon: "award"
   },
   {

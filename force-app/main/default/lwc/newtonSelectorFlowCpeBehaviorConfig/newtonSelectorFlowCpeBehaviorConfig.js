@@ -1,10 +1,15 @@
 import { api, LightningElement } from "lwc";
 import { defaultSelectorConfig } from "c/newtonSelectorUtilityConfigDefaults";
+import { readResourceValue } from "c/newtonSelectorFlowCpeUtilityHelpers";
 
 export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElement {
   @api config;
   @api builderContext;
   @api automaticOutputVariables;
+  /** Flow resource bound to the screen component's `value` input (single select). */
+  @api valueRef = "";
+  /** Flow resource bound to the screen component's `values` input (multi select). */
+  @api valuesRef = "";
 
   get _config() {
     return this.config || defaultSelectorConfig();
@@ -24,20 +29,43 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
   get isMultiSelect() {
     return this._config.selectionMode === "multi";
   }
+
+  // Single select pre-selects from a text value, multi select from a text
+  // collection; each mode has its own Flow input.
+  get defaultSelectionRefName() {
+    return this.isMultiSelect ? "valuesRef" : "valueRef";
+  }
+  get defaultSelectionRef() {
+    return this.isMultiSelect ? this.valuesRef : this.valueRef;
+  }
+  handleDefaultSelectionChange(event) {
+    this.dispatchRefChange(
+      this.defaultSelectionRefName,
+      readResourceValue(event)
+    );
+  }
+
   handleSelectionModeToggle(event) {
-    const checked = event.detail?.checked ?? event.target?.checked ?? false;
-    const value = checked ? "multi" : "single";
+    const leaving = this.defaultSelectionRefName;
+    const value = event.detail.checked ? "multi" : "single";
     const next = { ...this._config, selectionMode: value };
     if (value === "multi") {
       next.autoAdvance = false;
     }
     this._config = next;
+    this.dispatchRefChange(leaving, "");
   }
   handleToggleChange(event) {
     const key = event.currentTarget.dataset.key;
-    if (!key) return;
-    const checked = event.detail?.checked ?? event.target?.checked ?? false;
-    this._config = { ...this._config, [key]: Boolean(checked) };
+    this._config = { ...this._config, [key]: event.detail.checked };
+  }
+  get minSelectionsValue() {
+    return Number(this._config.minSelections) > 0
+      ? this._config.minSelections
+      : "";
+  }
+  get maxSelectionsValue() {
+    return this._config.maxSelections ?? "";
   }
   handleMinChange(event) {
     this._config = {
@@ -55,67 +83,31 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
   handleErrorMessageChange(event) {
     this._config = {
       ...this._config,
-      customErrorMessage: this.readValue(event)
+      customErrorMessage: readResourceValue(event)
     };
   }
 
-  get isNoneOptionAvailable() {
-    return true;
-  }
-  get noneOptionValue() {
-    return Boolean(this._config.includeNoneOption);
-  }
-  get noneOptionLabelValue() {
-    return this._config.noneOptionLabel ?? "--None--";
-  }
-  get noneOptionPositionValue() {
-    return this._config.noneOptionPosition === "end" ? "end" : "start";
-  }
-  get isNoneOptionLabelDisabled() {
-    return !this.noneOptionValue;
-  }
-  get manualInputConfig() {
-    return this._config.manualInput || {};
-  }
-  get manualInputValue() {
-    return Boolean(this.manualInputConfig.enabled);
-  }
-  get manualInputLabelValue() {
-    return this.manualInputConfig.label ?? "Other";
-  }
-  get manualInputMinLengthValue() {
-    return this.manualInputConfig.minLength ?? 0;
-  }
-  get manualInputMaxLengthValue() {
-    return this.manualInputConfig.maxLength ?? null;
-  }
-  get isManualInputDisabled() {
-    return !this.manualInputValue;
-  }
   get noneOptionPositionTiles() {
-    const active = this.noneOptionPositionValue;
-    const disabled = this.isNoneOptionLabelDisabled;
+    const active = this._config.noneOptionPosition;
     return [
       {
         value: "start",
         label: "At start",
         sublabel: "Before items",
         icon: "shrink",
-        _selected: active === "start",
-        _disabled: disabled
+        _selected: active === "start"
       },
       {
         value: "end",
         label: "At end",
         sublabel: "After items",
         icon: "expand",
-        _selected: active === "end",
-        _disabled: disabled
+        _selected: active === "end"
       }
     ];
   }
   handleNoneOptionLabelChange(event) {
-    this._config = { ...this._config, noneOptionLabel: this.readValue(event) };
+    this._config = { ...this._config, noneOptionLabel: event.target.value };
   }
   handleNoneOptionPositionChange(event) {
     const value = event.detail?.value;
@@ -123,17 +115,10 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
       this._config = { ...this._config, noneOptionPosition: value };
   }
   handleManualInputToggle(event) {
-    const checked = event.detail?.checked ?? event.target?.checked ?? false;
-    this._config = {
-      ...this._config,
-      manualInput: {
-        ...this.manualInputConfig,
-        enabled: Boolean(checked)
-      }
-    };
+    this.patchManualInput("enabled", event.detail.checked);
   }
   handleManualInputLabelChange(event) {
-    this.patchManualInput("label", this.readValue(event));
+    this.patchManualInput("label", event.target.value);
   }
   handleManualInputMinLengthChange(event) {
     this.patchManualInput("minLength", Number(event.target.value) || 0);
@@ -145,20 +130,13 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
   patchManualInput(key, value) {
     this._config = {
       ...this._config,
-      manualInput: {
-        ...this.manualInputConfig,
-        [key]: value
-      }
+      manualInput: { ...this._config.manualInput, [key]: value }
     };
   }
 
-  readValue(event) {
-    const fromDetail = event?.detail?.newValue;
-    if (fromDetail !== undefined && fromDetail !== null)
-      return String(fromDetail);
-    const fromTarget = event?.target?.value;
-    return fromTarget === undefined || fromTarget === null
-      ? ""
-      : String(fromTarget);
+  dispatchRefChange(name, value) {
+    this.dispatchEvent(
+      new CustomEvent("refchange", { detail: { name, value: value || "" } })
+    );
   }
 }

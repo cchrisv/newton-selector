@@ -15,13 +15,4 @@ public with sharing class NewtonSelectorRecordQuery {
       AccessLevel.USER_MODE
     );
   }
-
-  /**
-   * @description Builds validated preview SOQL without executing the caller's full result query.
-   * @param config Selector query configuration.
-   * @return Preview SOQL text.
-   */
-  public static String previewSoql(NewtonSelectorQueryDTO config) {
-    return NewtonSelectorQueryBuilder.build(config).soql;
-  }
 }

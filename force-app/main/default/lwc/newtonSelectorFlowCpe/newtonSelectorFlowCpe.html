@@ -11,7 +11,7 @@
           alternative-text="Errors"
         ></c-newton-selector-icon>
         <ul class="newton-cpe__errors-list">
-          <template for:each={validationMessages} for:item="msg">
+          <template for:each={_errors} for:item="msg">
             <li key={msg.key}>{msg.message}</li>
           </template>
         </ul>
@@ -19,7 +19,7 @@
     </template>
 
     <!-- Configured state · readable summary -->
-    <template lwc:if={hasDataSource}>
+    <template lwc:if={hasSavedConfig}>
       <button
         type="button"
         class="newton-cpe__cta"
@@ -34,63 +34,77 @@
         <span>Edit configuration</span>
       </button>
 
-      <article
-        class="newton-cpe__card"
-        aria-label="Selector configuration summary"
-      >
-        <header class="newton-cpe__card-head">
-          <p class="newton-cpe__card-eyebrow">Newton Selector</p>
-          <h2 class="newton-cpe__card-title">Current configuration</h2>
-        </header>
+      <template lwc:if={hasDataSource}>
+        <article
+          class="newton-cpe__card"
+          aria-label="Selector configuration summary"
+        >
+          <header class="newton-cpe__card-head">
+            <p class="newton-cpe__card-eyebrow">Newton Selector</p>
+            <h2 class="newton-cpe__card-title">Current configuration</h2>
+          </header>
 
-        <!-- Data source -->
-        <template lwc:if={dataSection}>
+          <!-- Data source -->
+          <template lwc:if={dataSection}>
+            <section class="newton-cpe__section">
+              <h3 class="newton-cpe__section-title">Data source</h3>
+              <p class="newton-cpe__section-kind">{dataSection.kind}</p>
+              <template for:each={dataSection.lines} for:item="line">
+                <p
+                  key={line.key}
+                  class="newton-cpe__line"
+                  data-muted={line.muted}
+                  data-mono={line.mono}
+                >
+                  {line.text}
+                </p>
+              </template>
+            </section>
+          </template>
+
+          <!-- Label -->
           <section class="newton-cpe__section">
-            <h3 class="newton-cpe__section-title">Data source</h3>
-            <p class="newton-cpe__section-kind">{dataSection.kind}</p>
-            <template for:each={dataSection.lines} for:item="line">
+            <h3 class="newton-cpe__section-title">Label</h3>
+            <template for:each={labelSection.lines} for:item="line">
               <p
                 key={line.key}
                 class="newton-cpe__line"
                 data-muted={line.muted}
-                data-mono={line.mono}
               >
                 {line.text}
               </p>
             </template>
           </section>
-        </template>
 
-        <!-- Label -->
-        <section class="newton-cpe__section">
-          <h3 class="newton-cpe__section-title">Label</h3>
-          <template for:each={labelSection.lines} for:item="line">
-            <p key={line.key} class="newton-cpe__line" data-muted={line.muted}>
-              {line.text}
-            </p>
-          </template>
-        </section>
+          <!-- Behavior -->
+          <section class="newton-cpe__section">
+            <h3 class="newton-cpe__section-title">Behavior</h3>
+            <template for:each={behaviorLines} for:item="line">
+              <p
+                key={line.key}
+                class="newton-cpe__line"
+                data-muted={line.muted}
+              >
+                {line.text}
+              </p>
+            </template>
+          </section>
 
-        <!-- Behavior -->
-        <section class="newton-cpe__section">
-          <h3 class="newton-cpe__section-title">Behavior</h3>
-          <template for:each={behaviorLines} for:item="line">
-            <p key={line.key} class="newton-cpe__line" data-muted={line.muted}>
-              {line.text}
-            </p>
-          </template>
-        </section>
-
-        <!-- Appearance -->
-        <section class="newton-cpe__section">
-          <h3 class="newton-cpe__section-title">Appearance</h3>
-          <template for:each={appearanceLines} for:item="line">
-            <p key={line.key} class="newton-cpe__line" data-muted={line.muted}>
-              {line.text}
-            </p>
-          </template>
-        </section>
-      </article>
+          <!-- Appearance -->
+          <section class="newton-cpe__section">
+            <h3 class="newton-cpe__section-title">Appearance</h3>
+            <template for:each={appearanceLines} for:item="line">
+              <p
+                key={line.key}
+                class="newton-cpe__line"
+                data-muted={line.muted}
+              >
+                {line.text}
+              </p>
+            </template>
+          </section>
+        </article>
+      </template>
     </template>
 
     <!-- Empty state · first-use CTA -->
@@ -110,7 +124,7 @@
         </p>
         <button
           type="button"
-          class="newton-cpe__cta newton-cpe__cta_primary"
+          class="newton-cpe__cta"
           onclick={handleOpenConfigure}
         >
           <c-newton-selector-icon

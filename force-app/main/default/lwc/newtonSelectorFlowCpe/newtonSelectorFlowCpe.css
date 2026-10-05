@@ -9,13 +9,13 @@
   display: block;
 
   /* Surface + ink */
-  --newton-cpe-surface: var(--slds-g-color-neutral-base-100, #ffffff);
+  --newton-cpe-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
+  --newton-cpe-panel: var(--slds-g-color-surface-1, #ffffff);
   --newton-cpe-ink-strong: var(--slds-g-color-neutral-base-10, #181818);
   --newton-cpe-ink-body: var(--slds-g-color-neutral-base-20, #2e2e2e);
   --newton-cpe-ink-muted: var(--slds-g-color-neutral-base-50, #747474);
-  --newton-cpe-ink-soft: var(--slds-g-color-neutral-base-60, #9a9a9a);
   --newton-cpe-hairline: var(--slds-g-color-border-base-1, #e5e5e5);
-  --newton-cpe-line: var(--newton-cpe-border-base-2, #d9d9d9);
+  --newton-cpe-line: var(--slds-g-color-border-base-2, #d9d9d9);
 
   /* Brand + status */
   --newton-cpe-brand: var(--slds-g-color-brand-base-50, #0176d3);
@@ -25,7 +25,15 @@
   /* Shape */
   --newton-cpe-radius: var(--slds-g-radius-border-2, 0.25rem);
   --newton-cpe-radius-lg: var(--slds-g-radius-border-3, 0.5rem);
-  --newton-cpe-shadow: var(--slds-g-shadow-1, 0 1px 2px rgba(0, 0, 0, 0.06));
+  --newton-cpe-shadow: var(
+    --slds-g-shadow-1,
+    0 1px 2px
+      color-mix(
+        in oklab,
+        var(--slds-g-color-neutral-base-10, #181818) 6%,
+        transparent
+      )
+  );
 
   /* Mono kept ONLY for API-style strings (Lead.Rating, {!myVar}) — not for
        eyebrows or chips. Makes api-code visually distinct from prose. */
@@ -36,8 +44,10 @@
 .newton-cpe {
   display: flex;
   flex-direction: column;
-  gap: var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-3, 0.75rem);
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  padding: var(--slds-g-spacing-2, 0.5rem);
+  background: var(--newton-cpe-canvas);
+  border-radius: var(--newton-cpe-radius);
 }
 
 /* =============================================================================
@@ -59,9 +69,10 @@
 .newton-cpe__errors-list {
   list-style: disc;
   margin: 0;
-  padding: 0 0 0 var(--slds-g-spacing-4, 1rem);
+  padding: 0;
+  padding-inline-start: var(--slds-g-spacing-4, 1rem);
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  line-height: var(--newton-static-v-1-45, 1.45);
+  line-height: 1.45;
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
@@ -76,79 +87,101 @@
    ============================================================================= */
 
 .newton-cpe__card {
-  background: var(--newton-cpe-surface);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-cpe-hairline);
-  border-radius: var(--newton-cpe-radius-lg);
-  box-shadow: var(--newton-cpe-shadow);
-  padding: var(--slds-g-spacing-4, 1rem);
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--slds-g-spacing-4, 1rem);
+  overflow: hidden;
+  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-cpe-hairline);
+  border-radius: var(--newton-cpe-radius);
+  background: var(--newton-cpe-panel);
 }
 
 .newton-cpe__card-head {
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
-  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
-  border-bottom: var(--newton-static-v-1px, 1px) solid
+  padding: 0 0 var(--slds-g-spacing-2, 0.5rem);
+  border-bottom: var(--slds-g-sizing-border-1, 1px) solid
     var(--newton-cpe-hairline);
 }
 
+/* The component name is already in the panel header; keep it for assistive
+   tech only rather than repeating it as a tracked eyebrow. */
 .newton-cpe__card-eyebrow {
-  margin: 0;
-  font-size: var(--newton-static-v-0-6875rem, 0.6875rem);
-  font-weight: var(--slds-g-font-weight-6, 600);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--newton-cpe-brand);
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .newton-cpe__card-title {
   margin: 0;
-  font-size: var(--newton-static-v-0-9375rem, 0.9375rem);
+  font-size: var(--slds-g-font-scale-base, 0.8125rem);
   font-weight: var(--slds-g-font-weight-7, 700);
   color: var(--newton-cpe-ink-strong);
-  line-height: var(--newton-static-v-1-3, 1.3);
-  letter-spacing: -0.005em;
+  line-height: 1.3;
+  letter-spacing: 0;
 }
 
 /* =============================================================================
-   SECTIONS — heading + stacked plain lines
+   SECTIONS — heading column + stacked plain lines
    ============================================================================= */
 
 .newton-cpe__section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1875rem;
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  column-gap: var(--slds-g-spacing-2, 0.5rem);
+  row-gap: var(--slds-g-spacing-1, 0.25rem);
+  padding: var(--slds-g-spacing-2, 0.5rem) 0;
+  border-bottom: var(--slds-g-sizing-border-1, 1px) solid
+    var(--newton-cpe-hairline);
+}
+
+.newton-cpe__section:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 
 .newton-cpe__section-title {
-  margin: 0 0 var(--newton-static-v-0-1875rem, 0.1875rem) 0;
-  font-size: var(--newton-static-v-0-6875rem, 0.6875rem);
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  margin: 0;
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-7, 700);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--newton-cpe-ink-muted);
+  line-height: var(--slds-g-font-line-height-2, 1.25);
+  letter-spacing: 0;
+  color: var(--newton-cpe-brand);
 }
 
 /* First line in data-source section renders as the "kind" (Picklist, SOQL,
    etc.) with slightly stronger weight — it's the primary identifier. */
 .newton-cpe__section-kind {
+  grid-column: 2;
+  min-width: 0;
   margin: 0;
-  font-size: var(--slds-g-font-scale-1, 0.875rem);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-7, 700);
+  line-height: 1.3;
   color: var(--newton-cpe-ink-strong);
-  line-height: var(--newton-static-v-1-3, 1.3);
 }
 
 .newton-cpe__line {
   margin: 0;
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-4, 400);
+  line-height: 1.3;
   color: var(--newton-cpe-ink-body);
-  line-height: var(--newton-static-v-1-4, 1.4);
   overflow-wrap: anywhere;
+}
+
+.newton-cpe__section > .newton-cpe__line {
+  grid-column: 2;
+  min-width: 0;
 }
 
 /* First line of each non-data section renders stronger — it's the primary
@@ -156,22 +189,19 @@
 .newton-cpe__section > .newton-cpe__line:first-of-type {
   font-weight: var(--slds-g-font-weight-6, 600);
   color: var(--newton-cpe-ink-strong);
-  font-size: var(--slds-g-font-scale-1, 0.875rem);
 }
 
 /* Muted = supporting detail / secondary info */
 .newton-cpe__line[data-muted="true"] {
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-4, 400);
   color: var(--newton-cpe-ink-muted);
-  line-height: var(--newton-static-v-1-4, 1.4);
+  line-height: 1.4;
 }
 
 /* Mono = API reference (Lead.Rating, {!myVariable}). Visually separates code
    from prose without resorting to chip pills. */
 .newton-cpe__line[data-mono="true"] {
   font-family: var(--newton-cpe-mono);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   color: var(--newton-cpe-ink-body);
   word-break: break-all;
 }
@@ -185,15 +215,16 @@
   align-items: center;
   justify-content: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
-  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+  inline-size: 100%;
+  min-height: var(--slds-g-sizing-8, 1.75rem);
+  padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
   background: var(--newton-cpe-brand);
   color: var(--slds-g-color-on-accent-1, #ffffff);
   border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-cpe-brand);
   border-radius: var(--newton-cpe-radius);
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-6, 600);
   cursor: pointer;
-  width: var(--newton-static-v-100-percent, 100%);
   transition:
     background-color 120ms ease,
     box-shadow 120ms ease,
@@ -220,11 +251,6 @@
   color: var(--slds-g-color-neutral-base-100, #ffffff);
 }
 
-.newton-cpe__cta_primary {
-  padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
-  font-size: var(--slds-g-font-scale-1, 0.875rem);
-}
-
 /* =============================================================================
    EMPTY STATE
    ============================================================================= */
@@ -235,16 +261,17 @@
   align-items: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-6, 1.5rem) var(--slds-g-spacing-3, 0.75rem);
-  border: var(--slds-g-sizing-border-1, 1px) dashed var(--newton-cpe-line);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-cpe-line);
   border-radius: var(--newton-cpe-radius-lg);
-  background: var(--newton-cpe-surface);
+  background: var(--newton-cpe-panel);
+  box-shadow: var(--newton-cpe-shadow);
   text-align: center;
 }
 
 .newton-cpe__empty-glyph {
-  width: var(--newton-static-v-2-5rem, 2.5rem);
-  height: var(--newton-static-v-2-5rem, 2.5rem);
-  border-radius: var(--newton-static-v-999px, 999px);
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: var(--slds-g-radius-border-circle, 999px);
   background: var(--newton-cpe-brand-weak);
   display: inline-flex;
   align-items: center;
@@ -259,7 +286,7 @@
 
 .newton-cpe__empty-title {
   margin: 0;
-  font-size: var(--newton-static-v-0-9375rem, 0.9375rem);
+  font-size: 0.9375rem;
   font-weight: var(--slds-g-font-weight-7, 700);
   color: var(--newton-cpe-ink-strong);
 }
@@ -268,8 +295,8 @@
   margin: 0 0 var(--slds-g-spacing-1, 0.25rem);
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
   color: var(--newton-cpe-ink-muted);
-  line-height: var(--newton-static-v-1-45, 1.45);
-  max-width: var(--newton-static-v-16rem, 16rem);
+  line-height: 1.45;
+  max-inline-size: 16rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -279,111 +306,4 @@
   .newton-cpe__cta:active {
     transform: none;
   }
-}
-
-/* V1 unified uncollapsed CPE summary. */
-:host {
-  --newton-cpe-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
-  --newton-cpe-panel: var(--slds-g-color-surface-1, #ffffff);
-  --newton-cpe-panel-alt: var(--slds-g-color-surface-container-2, #f9f9f9);
-}
-
-.newton-cpe {
-  gap: var(--slds-g-spacing-2, 0.5rem);
-  padding: var(--slds-g-spacing-2, 0.5rem);
-  background: var(--newton-cpe-canvas);
-  border-radius: var(--newton-cpe-radius);
-}
-
-.newton-cpe__card {
-  position: relative;
-  overflow: hidden;
-  background: var(--newton-cpe-panel);
-  border-color: var(--newton-cpe-hairline);
-  border-radius: var(--newton-cpe-radius);
-  padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
-  gap: 0;
-  box-shadow: none;
-}
-
-.newton-cpe__card::before {
-  display: none;
-}
-
-.newton-cpe__card-head {
-  padding: 0 0 var(--slds-g-spacing-2, 0.5rem);
-  border-bottom-color: var(--newton-cpe-hairline);
-}
-
-.newton-cpe__card-eyebrow,
-.newton-cpe__card-title,
-.newton-cpe__section-title {
-  letter-spacing: 0;
-}
-
-.newton-cpe__card-eyebrow {
-  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
-  text-transform: none;
-}
-
-.newton-cpe__card-title {
-  font-size: var(--slds-g-font-scale-base, 0.8125rem);
-}
-
-.newton-cpe__section {
-  display: grid;
-  grid-template-columns: var(--newton-static-v-4-5rem, 4.5rem) minmax(0, 1fr);
-  column-gap: var(--slds-g-spacing-2, 0.5rem);
-  row-gap: var(--slds-g-spacing-1, 0.25rem);
-  padding: var(--slds-g-spacing-2, 0.5rem) 0;
-  border-bottom: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-cpe-hairline);
-  border-radius: 0;
-  background: transparent;
-}
-
-.newton-cpe__section:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-
-.newton-cpe__section-title {
-  grid-column: 1;
-  grid-row: 1;
-  align-self: start;
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  text-transform: none;
-  color: var(--newton-cpe-brand);
-  margin: 0;
-  line-height: var(--slds-g-font-line-height-2, 1.25);
-}
-
-.newton-cpe__section-kind,
-.newton-cpe__section > .newton-cpe__line {
-  grid-column: 2;
-  min-width: 0;
-}
-
-.newton-cpe__section-kind,
-.newton-cpe__line,
-.newton-cpe__section > .newton-cpe__line:first-of-type {
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  line-height: var(--newton-static-v-1-3, 1.3);
-}
-
-.newton-cpe__line[data-muted="true"],
-.newton-cpe__line[data-mono="true"] {
-  font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
-}
-
-.newton-cpe__cta {
-  min-height: var(--slds-g-sizing-8, 1.75rem);
-  padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
-  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-}
-
-.newton-cpe__empty {
-  background: var(--newton-cpe-panel);
-  border-style: solid;
-  box-shadow: var(--newton-cpe-shadow);
 }

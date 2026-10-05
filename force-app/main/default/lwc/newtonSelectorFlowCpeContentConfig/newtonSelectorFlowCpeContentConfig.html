@@ -1,129 +1,117 @@
 <template>
-  <section class="newton-chapter newton-chapter_02" data-chapter="content">
-    <aside class="newton-chapter__mark" aria-hidden="true">
-      <span class="newton-chapter__numeral">02</span>
-      <span class="newton-chapter__rule"></span>
-    </aside>
+  <section class="newton-chapter" data-chapter="content">
     <header class="newton-chapter__head">
       <p class="newton-chapter__eyebrow">Content</p>
       <h2 class="newton-chapter__title">What the user reads</h2>
     </header>
   </section>
-  <template lwc:if={isDetailsSection}>
-    <article class="slds-card newton-studio__card">
-      <header class="slds-card__header newton-card__head">
-        <span
-          class="newton-card__glyph newton-card__glyph_content"
-          aria-hidden="true"
+  <article class="slds-card newton-studio__card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="baseline"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Selector header
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
-          <c-newton-selector-icon
-            name="baseline"
-            size="small"
-            alternative-text=""
-          ></c-newton-selector-icon>
-        </span>
-        <div class="newton-card__headings">
-          <h3 class="slds-card__header-title slds-text-heading_small">
-            Selector header
-          </h3>
-          <p
-            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-          >
-            The label and help text shown above the tiles.
-          </p>
-        </div>
-        <lightning-helptext
-          class="newton-card__help"
-          content="Label is shown like a form field label. Help text appears as a small info icon next to the label, expanding on hover."
-        ></lightning-helptext>
-      </header>
-      <div
-        class="slds-card__body slds-card__body_inner newton-studio__field-block"
-      >
-        <c-newton-selector-flow-cpe-resource-selector
-          name="label"
-          label="Selector label"
-          value={_config.label}
-          builder-context={builderContext}
-          automatic-output-variables={automaticOutputVariables}
-          builder-context-filter-type="String"
-          allow-hard-code-reference
-          onvaluechanged={handleLabelChange}
-        ></c-newton-selector-flow-cpe-resource-selector>
-        <c-newton-selector-flow-cpe-resource-selector
-          name="helpText"
-          label="Help text (description under label)"
-          value={_config.helpText}
-          builder-context={builderContext}
-          automatic-output-variables={automaticOutputVariables}
-          builder-context-filter-type="String"
-          allow-hard-code-reference
-          onvaluechanged={handleHelpTextChange}
-        ></c-newton-selector-flow-cpe-resource-selector>
-        <c-newton-selector-flow-cpe-resource-selector
-          name="fieldLevelHelp"
-          label="Label tooltip (info icon)"
-          value={_config.fieldLevelHelp}
-          builder-context={builderContext}
-          automatic-output-variables={automaticOutputVariables}
-          builder-context-filter-type="String"
-          allow-hard-code-reference
-          onvaluechanged={handleFieldLevelHelpChange}
-        ></c-newton-selector-flow-cpe-resource-selector>
+          The label, description, and tooltip above the options.
+        </p>
       </div>
-    </article>
+      <lightning-helptext
+        class="newton-card__help"
+        content="Help text sits under the label as a short description. The tooltip appears when users hover the info icon next to the label."
+      ></lightning-helptext>
+    </header>
+    <div
+      class="slds-card__body slds-card__body_inner newton-studio__field-block"
+    >
+      <c-newton-selector-flow-cpe-resource-selector
+        name="label"
+        label="Selector label"
+        value={config.label}
+        builder-context={builderContext}
+        automatic-output-variables={automaticOutputVariables}
+        builder-context-filter-type="String"
+        allow-hard-code-reference
+        onvaluechanged={handleValueChange}
+      ></c-newton-selector-flow-cpe-resource-selector>
+      <c-newton-selector-flow-cpe-resource-selector
+        name="helpText"
+        label="Help text (description under label)"
+        value={config.helpText}
+        builder-context={builderContext}
+        automatic-output-variables={automaticOutputVariables}
+        builder-context-filter-type="String"
+        allow-hard-code-reference
+        onvaluechanged={handleValueChange}
+      ></c-newton-selector-flow-cpe-resource-selector>
+      <c-newton-selector-flow-cpe-resource-selector
+        name="fieldLevelHelp"
+        label="Label tooltip (info icon)"
+        value={config.fieldLevelHelp}
+        builder-context={builderContext}
+        automatic-output-variables={automaticOutputVariables}
+        builder-context-filter-type="String"
+        allow-hard-code-reference
+        onvaluechanged={handleValueChange}
+      ></c-newton-selector-flow-cpe-resource-selector>
+    </div>
+  </article>
 
-    <article class="slds-card newton-studio__card">
-      <header class="slds-card__header newton-card__head">
-        <span
-          class="newton-card__glyph newton-card__glyph_content"
-          aria-hidden="true"
+  <article class="slds-card newton-studio__card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="megaphone"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h3 class="slds-card__header-title slds-text-heading_small">
+          Runtime messages
+        </h3>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
-          <c-newton-selector-icon
-            name="megaphone"
-            size="small"
-            alternative-text=""
-          ></c-newton-selector-icon>
-        </span>
-        <div class="newton-card__headings">
-          <h3 class="slds-card__header-title slds-text-heading_small">
-            Runtime messages
-          </h3>
-          <p
-            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-          >
-            What users see when there's nothing to pick or the load fails.
-          </p>
-        </div>
-        <lightning-helptext
-          class="newton-card__help"
-          content="These texts appear in the selector at runtime when the data source returns zero rows (empty) or throws (error)."
-        ></lightning-helptext>
-      </header>
-      <div
-        class="slds-card__body slds-card__body_inner newton-studio__field-block"
-      >
-        <c-newton-selector-flow-cpe-resource-selector
-          name="emptyStateMessage"
-          label="Empty-state message"
-          value={_config.emptyStateMessage}
-          builder-context={builderContext}
-          automatic-output-variables={automaticOutputVariables}
-          builder-context-filter-type="String"
-          allow-hard-code-reference
-          onvaluechanged={handleEmptyStateChange}
-        ></c-newton-selector-flow-cpe-resource-selector>
-        <c-newton-selector-flow-cpe-resource-selector
-          name="errorStateMessage"
-          label="Error-state message"
-          value={_config.errorStateMessage}
-          builder-context={builderContext}
-          automatic-output-variables={automaticOutputVariables}
-          builder-context-filter-type="String"
-          allow-hard-code-reference
-          onvaluechanged={handleErrorStateChange}
-        ></c-newton-selector-flow-cpe-resource-selector>
+          What users see when there's nothing to pick or the load fails.
+        </p>
       </div>
-    </article>
-  </template>
+      <lightning-helptext
+        class="newton-card__help"
+        content="The empty message shows when the data source has no options. The error message shows when the options can't be loaded."
+      ></lightning-helptext>
+    </header>
+    <div
+      class="slds-card__body slds-card__body_inner newton-studio__field-block"
+    >
+      <c-newton-selector-flow-cpe-resource-selector
+        name="emptyStateMessage"
+        label="No options message"
+        value={config.emptyStateMessage}
+        builder-context={builderContext}
+        automatic-output-variables={automaticOutputVariables}
+        builder-context-filter-type="String"
+        allow-hard-code-reference
+        onvaluechanged={handleValueChange}
+      ></c-newton-selector-flow-cpe-resource-selector>
+      <c-newton-selector-flow-cpe-resource-selector
+        name="errorStateMessage"
+        label="Load error message"
+        value={config.errorStateMessage}
+        builder-context={builderContext}
+        automatic-output-variables={automaticOutputVariables}
+        builder-context-filter-type="String"
+        allow-hard-code-reference
+        onvaluechanged={handleValueChange}
+      ></c-newton-selector-flow-cpe-resource-selector>
+    </div>
+  </article>
 </template>
