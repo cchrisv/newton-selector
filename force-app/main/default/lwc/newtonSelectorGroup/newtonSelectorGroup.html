@@ -10,10 +10,10 @@
         <input
           type="search"
           class="newton-search-bar__input"
-          placeholder="Search"
+          placeholder={labels.search}
           value={_searchTerm}
           oninput={handleSearch}
-          aria-label="Filter items"
+          aria-label={labels.filterItems}
         />
       </div>
     </template>
@@ -25,14 +25,14 @@
           class="slds-button slds-button_neutral newton-toolbar__btn"
           onclick={handleSelectAll}
         >
-          Select all
+          {labels.selectAll}
         </button>
         <button
           type="button"
           class="slds-button slds-button_neutral newton-toolbar__btn"
           onclick={handleClearAll}
         >
-          Clear all
+          {labels.clearAll}
         </button>
       </div>
     </template>
@@ -59,7 +59,7 @@
               size="x-small"
               box="tile"
             ></c-newton-selector-icon>
-            <p>No items to display.</p>
+            <p>{labels.noItems}</p>
           </div>
         </template>
       </div>
@@ -137,11 +137,11 @@
                       <input
                         type="search"
                         class="slds-input newton-picklist__search-input"
-                        placeholder="Search options"
+                        placeholder={labels.searchOptions}
                         value={_searchTerm}
                         oninput={handleSearch}
                         onkeydown={handlePicklistKeydown}
-                        aria-label="Filter picklist options"
+                        aria-label={labels.filterPicklistOptions}
                         aria-controls={picklistListboxId}
                         aria-activedescendant={picklistActiveDescendant}
                       />
@@ -153,7 +153,7 @@
                     id={picklistListboxId}
                     class="slds-listbox slds-listbox_vertical newton-picklist__listbox"
                     role="listbox"
-                    aria-label="Picklist options"
+                    aria-label={labels.picklistOptions}
                     aria-multiselectable={picklistAriaMultiselectable}
                     onmousedown={handlePicklistOptionMouseDown}
                   >
@@ -179,7 +179,9 @@
                   </ul>
                 </template>
                 <template lwc:else>
-                  <p class="newton-picklist__empty">No options to display.</p>
+                  <p class="newton-picklist__empty">
+                    {labels.noOptionsToDisplay}
+                  </p>
                 </template>
               </div>
             </template>
@@ -212,7 +214,7 @@
               size="x-small"
               box="tile"
             ></c-newton-selector-icon>
-            <p>No items to display.</p>
+            <p>{labels.noItems}</p>
           </div>
         </template>
       </div>
@@ -244,10 +246,10 @@
               <input
                 type="search"
                 class="newton-search-bar__input"
-                placeholder="Filter available"
+                placeholder={labels.filterAvailable}
                 value={_searchTerm}
                 oninput={handleSearch}
-                aria-label="Filter available options"
+                aria-label={labels.filterAvailableOptions}
               />
             </div>
           </template>
@@ -285,12 +287,12 @@
           <div
             class="newton-transfer__controls"
             role="group"
-            aria-label="Move options"
+            aria-label={labels.moveOptions}
           >
             <button
               type="button"
               class="slds-button slds-button_icon slds-button_icon-border newton-transfer__control"
-              title="Move selected to chosen"
+              title={labels.moveSelectedToChosen}
               disabled={dualAddDisabled}
               onclick={handleDualAdd}
             >
@@ -299,12 +301,14 @@
                 size="x-small"
                 box="button"
               ></c-newton-selector-icon>
-              <span class="slds-assistive-text">Move selected to chosen</span>
+              <span class="slds-assistive-text"
+                >{labels.moveSelectedToChosen}</span
+              >
             </button>
             <button
               type="button"
               class="slds-button slds-button_icon slds-button_icon-border newton-transfer__control"
-              title="Move all to chosen"
+              title={labels.moveAllToChosen}
               disabled={dualAddAllDisabled}
               onclick={handleDualAddAll}
             >
@@ -313,12 +317,12 @@
                 size="x-small"
                 box="button"
               ></c-newton-selector-icon>
-              <span class="slds-assistive-text">Move all to chosen</span>
+              <span class="slds-assistive-text">{labels.moveAllToChosen}</span>
             </button>
             <button
               type="button"
               class="slds-button slds-button_icon slds-button_icon-border newton-transfer__control"
-              title="Remove selected"
+              title={labels.removeSelected}
               disabled={dualRemoveDisabled}
               onclick={handleDualRemove}
             >
@@ -327,12 +331,12 @@
                 size="x-small"
                 box="button"
               ></c-newton-selector-icon>
-              <span class="slds-assistive-text">Remove selected</span>
+              <span class="slds-assistive-text">{labels.removeSelected}</span>
             </button>
             <button
               type="button"
               class="slds-button slds-button_icon slds-button_icon-border newton-transfer__control"
-              title="Remove all"
+              title={labels.removeAll}
               disabled={dualRemoveAllDisabled}
               onclick={handleDualRemoveAll}
             >
@@ -341,7 +345,7 @@
                 size="x-small"
                 box="button"
               ></c-newton-selector-icon>
-              <span class="slds-assistive-text">Remove all</span>
+              <span class="slds-assistive-text">{labels.removeAll}</span>
             </button>
           </div>
         </template>

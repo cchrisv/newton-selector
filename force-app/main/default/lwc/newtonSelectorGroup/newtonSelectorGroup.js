@@ -1,10 +1,66 @@
 import { LightningElement, api } from "lwc";
 import template from "./newtonSelectorGroup.html";
+import search from "@salesforce/label/c.Newton_Selector_Search";
+import filterItemsLabel from "@salesforce/label/c.Newton_Selector_FilterItems";
+import selectAll from "@salesforce/label/c.Newton_Selector_SelectAll";
+import clearAll from "@salesforce/label/c.Newton_Selector_ClearAll";
+import noItems from "@salesforce/label/c.Newton_Selector_NoItems";
+import searchOptions from "@salesforce/label/c.Newton_Selector_SearchOptions";
+import filterPicklistOptions from "@salesforce/label/c.Newton_Selector_FilterPicklistOptions";
+import picklistOptions from "@salesforce/label/c.Newton_Selector_PicklistOptions";
+import noOptionsToDisplay from "@salesforce/label/c.Newton_Selector_NoOptionsToDisplay";
+import filterAvailable from "@salesforce/label/c.Newton_Selector_FilterAvailable";
+import filterAvailableOptions from "@salesforce/label/c.Newton_Selector_FilterAvailableOptions";
+import moveOptions from "@salesforce/label/c.Newton_Selector_MoveOptions";
+import moveSelectedToChosen from "@salesforce/label/c.Newton_Selector_MoveSelectedToChosen";
+import moveAllToChosen from "@salesforce/label/c.Newton_Selector_MoveAllToChosen";
+import removeSelected from "@salesforce/label/c.Newton_Selector_RemoveSelected";
+import removeAll from "@salesforce/label/c.Newton_Selector_RemoveAll";
+import availableCountFormat from "@salesforce/label/c.Newton_Selector_AvailableCount";
+import selectedCountFormat from "@salesforce/label/c.Newton_Selector_SelectedCount";
+import availableCards from "@salesforce/label/c.Newton_Selector_AvailableCards";
+import available from "@salesforce/label/c.Newton_Selector_Available";
+import selectedCards from "@salesforce/label/c.Newton_Selector_SelectedCards";
+import chosen from "@salesforce/label/c.Newton_Selector_Chosen";
+import availableCardColumn from "@salesforce/label/c.Newton_Selector_AvailableCardColumn";
+import availableOptions from "@salesforce/label/c.Newton_Selector_AvailableOptions";
+import selectedCardColumn from "@salesforce/label/c.Newton_Selector_SelectedCardColumn";
+import chosenOptions from "@salesforce/label/c.Newton_Selector_ChosenOptions";
+import noAvailableCards from "@salesforce/label/c.Newton_Selector_NoAvailableCards";
+import noAvailableOptions from "@salesforce/label/c.Newton_Selector_NoAvailableOptions";
+import dropSelectedCardsHere from "@salesforce/label/c.Newton_Selector_DropSelectedCardsHere";
+import moveChoicesHere from "@salesforce/label/c.Newton_Selector_MoveChoicesHere";
+import moreSelected from "@salesforce/label/c.Newton_Selector_MoreSelected";
+import chooseAnOption from "@salesforce/label/c.Newton_Selector_ChooseAnOption";
+import characterRange from "@salesforce/label/c.Newton_Selector_CharacterRange";
+import manualInputMin from "@salesforce/label/c.Newton_Selector_ManualInputMin";
+import manualInputMax from "@salesforce/label/c.Newton_Selector_ManualInputMax";
 import {
   filterItems,
+  formatLabel,
   tokenToCss,
   MANUAL_INPUT_VALUE
 } from "c/newtonSelectorUtilityDataSources";
+
+// Labels the template renders as-is.
+const LABELS = {
+  search,
+  filterItems: filterItemsLabel,
+  selectAll,
+  clearAll,
+  noItems,
+  searchOptions,
+  filterPicklistOptions,
+  picklistOptions,
+  noOptionsToDisplay,
+  filterAvailable,
+  filterAvailableOptions,
+  moveOptions,
+  moveSelectedToChosen,
+  moveAllToChosen,
+  removeSelected,
+  removeAll
+};
 
 const MODE_MULTI = "multi";
 
@@ -155,6 +211,7 @@ export default class NewtonSelectorGroup extends LightningElement {
   _activeIndex = -1;
   _dragValue = "";
   _groupName = `newton-group-${++GROUP_COUNTER}`;
+  labels = LABELS;
 
   @api
   get selectedValues() {
@@ -264,7 +321,7 @@ export default class NewtonSelectorGroup extends LightningElement {
               .filter(Boolean)
               .join(" "),
             _optionClass: active
-              ? "slds-listbox__option newton-picklist__option slds-has-focus"
+              ? "slds-listbox__option newton-picklist__option newton-picklist__option_active slds-has-focus"
               : "slds-listbox__option newton-picklist__option"
           };
         })
@@ -343,27 +400,30 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   get availableCountLabel() {
-    return `${this.transferAvailableItems.length} available`;
+    return formatLabel(
+      availableCountFormat,
+      this.transferAvailableItems.length
+    );
   }
 
   get selectedCountLabel() {
-    return `${this.transferSelectedItems.length} selected`;
+    return formatLabel(selectedCountFormat, this.transferSelectedItems.length);
   }
 
   get availablePanelLabel() {
-    return this.isColumns ? "Available cards" : "Available";
+    return this.isColumns ? availableCards : available;
   }
 
   get selectedPanelLabel() {
-    return this.isColumns ? "Selected cards" : "Chosen";
+    return this.isColumns ? selectedCards : chosen;
   }
 
   get availablePanelAriaLabel() {
-    return this.isColumns ? "Available card column" : "Available options";
+    return this.isColumns ? availableCardColumn : availableOptions;
   }
 
   get selectedPanelAriaLabel() {
-    return this.isColumns ? "Selected card column" : "Chosen options";
+    return this.isColumns ? selectedCardColumn : chosenOptions;
   }
 
   get availableLabelId() {
@@ -375,11 +435,11 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   get availableEmptyMessage() {
-    return this.isColumns ? "No available cards." : "No available options.";
+    return this.isColumns ? noAvailableCards : noAvailableOptions;
   }
 
   get selectedEmptyMessage() {
-    return this.isColumns ? "Drop selected cards here." : "Move choices here.";
+    return this.isColumns ? dropSelectedCardsHere : moveChoicesHere;
   }
 
   decorateCardItem(item, isSelected, maxReached, active = false) {
@@ -524,7 +584,7 @@ export default class NewtonSelectorGroup extends LightningElement {
       .filter(Boolean);
     const visible = labels.slice(0, 2).join(", ");
     const extra = labels.length - 2;
-    return extra > 0 ? `${visible} +${extra} more` : visible;
+    return extra > 0 ? formatLabel(moreSelected, visible, extra) : visible;
   }
 
   get picklistClass() {
@@ -596,7 +656,7 @@ export default class NewtonSelectorGroup extends LightningElement {
   }
 
   get picklistPlaceholder() {
-    return "Choose an option";
+    return chooseAnOption;
   }
 
   get showManualInput() {
@@ -606,9 +666,9 @@ export default class NewtonSelectorGroup extends LightningElement {
   get manualInputHelpText() {
     const min = Number(this.manualInputMinLength || 0);
     const max = this.manualInputMaxLength;
-    if (min > 0 && max) return `${min}-${max} characters`;
-    if (min > 0) return `At least ${min} characters`;
-    if (max) return `Up to ${max} characters`;
+    if (min > 0 && max) return formatLabel(characterRange, min, max);
+    if (min > 0) return formatLabel(manualInputMin, min);
+    if (max) return formatLabel(manualInputMax, max);
     return "";
   }
 

@@ -42,7 +42,7 @@ Set up the repo, run the checks that guard every commit, and run the end-to-end 
    npm run test:unit
    ```
 
-   Variants: `npm run test:unit:watch`, `npm run test:unit:debug`, `npm run test:unit:coverage`. Tests live in `__tests__/` folders inside each component and never deploy (`.forceignore` excludes them). The Jest config maps `lightning/flowSupport` and the config-styles helper to mocks in `force-app/test/jest-mocks/`.
+   Variants: `npm run test:unit:watch`, `npm run test:unit:debug`, `npm run test:unit:coverage`. Tests live in `__tests__/` folders inside each component and never deploy (`.forceignore` excludes them). The Jest config maps `lightning/flowSupport` and the two CSS-only modules (the config styles and the studio tokens) to mocks in `force-app/test/jest-mocks/`.
 
 4. Run the Apex tests.
 
@@ -60,6 +60,13 @@ Set up the repo, run the checks that guard every commit, and run the end-to-end 
    ```
 
    `lint` runs ESLint on LWC JavaScript. `lint:slds` runs the SLDS linter (`@salesforce-ux/slds-linter`) over `force-app/main/default/lwc`. `prettier` rewrites files; `prettier:verify` only checks.
+
+   `lint:slds` runs the linter's default rules. Fix every warning that names a styling hook (`Consider replacing … with … --slds-g-…`); there are none today. The `no-hardcoded-values-slds2` warnings that remain (`There's no replacement styling hook for the <value> static value`) are expected, because SLDS 2 has no hook for them:
+   - percentages used for layout (`100%`, `50%`);
+   - negative 1px offsets that overlap a neighbour's border (`-1px`);
+   - fixed component dimensions and the sizes DESIGN.md specifies (panel and column widths such as `34rem` or `38ch`, the `0.6875rem` and `0.9375rem` type sizes, and fine spacing such as `0.375rem`) whose nearest hook is 2px or more away.
+
+   `0` and values inside functions (`calc()`, `translate()`, `color-mix()`) are never reported. Any other warning is a finding: move the value to a hook, or remove it. Before adding a value of the third kind, check the hooks in `node_modules/@salesforce-ux/sds-metadata/current/SLDSStylingHooks.csv`; use a hook when one is within 1px. The linter cannot be set to accept only the two kinds above: the rule's options are `reportNumericValue` (`always`, `hasReplacement`, `never`), `customMapping` and `preferPaletteHook`, and `hasReplacement` silences every number without a hook, so a new arbitrary `px` or `rem` would pass unnoticed. The project keeps the default configuration and reads the warnings by kind instead.
 
 6. Check Apex complexity (optional).
 
@@ -134,7 +141,7 @@ Deploy the change, capture `after.json` the same way, then:
 node scripts/e2e/style-snapshot-diff.mjs output/style-snapshots/before.json output/style-snapshots/after.json output/style-snapshots/report.json
 ```
 
-It prints `IDENTICAL` (exit 0) or lists each element whose computed style, `::before`/`::after` style or design tokens changed (exit 1). Hover and focus states aren't captured.
+It prints `IDENTICAL` (exit 0) or, per captured state, how many elements were compared and how many element parts (element, `::before`, `::after`) differ, how many of those differ beyond inherited design tokens, how many elements are missing or new, then the most changed properties and the number of changed tokens (exit 1). The report file lists the first 200 differing parts per state with their changed properties (set `STYLE_DIFF_LIMIT` to change that), plus missing and new element paths and the full property and token counts. Snapshots run to hundreds of MB, so the tool parses one state at a time. A capture from an org with a different theme differs in every `--lwc-brand*` token; read `topChangedProperties` for real style changes. Hover and focus states aren't captured.
 
 ## Verification
 

@@ -25,7 +25,7 @@ Without a custom message the user sees **Please make a selection.** Choosing the
 ## Offer a "None" option
 
 1. Turn **None option** on.
-2. Set **None option label** (default `--None--`).
+2. Set **None option label**, or leave it blank to show `--None--` translated for each user.
 3. Choose **At start** or **At end**.
 
 Picking None clears the answer. In multi mode it clears every selection.
@@ -33,7 +33,7 @@ Picking None clears the answer. In multi mode it clears every selection.
 ## Let people type their own answer ("Other")
 
 1. Turn **Manual input** on.
-2. Set **Manual option label** (default `Other`).
+2. Set **Manual option label**, or leave it blank to show `Other` translated for each user.
 3. Optional: set **Minimum characters** and **Maximum characters**.
 
 The option always appears last in the list. When chosen, a text box appears and the typed text becomes the output value and label.
@@ -60,12 +60,12 @@ Debug the Flow and confirm each rule:
 
 ## Troubleshooting
 
-| Symptom                                    | Fix                                                                             |
-| ------------------------------------------ | ------------------------------------------------------------------------------- |
-| Auto-advance turned itself off             | Expected in Multi mode. Switch back to Single to use it.                        |
-| Custom error shows for every problem       | That is how it works. Clear it to get specific messages.                        |
-| Save is disabled with a manual-input error | Fill **Manual option label**, and make Maximum characters at least the Minimum. |
-| The 03 Behavior chapter is missing         | Choose a data source in 01 Data first.                                          |
+| Symptom                                    | Fix                                                                 |
+| ------------------------------------------ | ------------------------------------------------------------------- |
+| Auto-advance turned itself off             | Expected in Multi mode. Switch back to Single to use it.            |
+| Custom error shows for every problem       | That is how it works. Clear it to get specific messages.            |
+| Save is disabled with a manual-input error | Make Maximum characters at least the Minimum, and neither negative. |
+| The 03 Behavior chapter is missing         | Choose a data source in 01 Data first.                              |
 
 ## Related
 

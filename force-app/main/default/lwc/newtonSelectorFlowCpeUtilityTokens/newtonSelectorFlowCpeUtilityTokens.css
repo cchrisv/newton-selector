@@ -1,0 +1,48 @@
+/* =============================================================================
+   Newton Selector Flow CPE — studio design tokens
+   The single source of the --newton-studio-* variables. Every studio
+   stylesheet that reads them @imports this module, so each shadow root gets
+   the same definitions. Change a token here, never in a component.
+   ============================================================================= */
+
+:host {
+  --newton-studio-surface: var(--slds-g-color-neutral-base-100, #ffffff);
+  --newton-studio-surface-alt: var(--slds-g-color-neutral-base-95, #f3f3f3);
+  --newton-studio-ink: var(--slds-g-color-neutral-base-10, #181818);
+  --newton-studio-ink-weak: var(--slds-g-color-neutral-base-40, #5c5c5c);
+  --newton-studio-border: var(--slds-g-color-border-1, #c9c9c9);
+  --newton-studio-hairline: var(--slds-g-color-neutral-base-90, #e5e5e5);
+  --newton-studio-brand: var(--slds-g-color-brand-base-50, #0176d3);
+  --newton-studio-brand-weak: var(--slds-g-color-brand-base-95, #eaf3ff);
+  --newton-studio-radius: var(--slds-g-radius-border-2, 0.5rem);
+  --newton-studio-radius-lg: var(--slds-g-radius-border-3, 0.75rem);
+  --newton-studio-shadow: var(
+    --slds-g-shadow-1,
+    0 1px 2px
+      color-mix(
+        in oklab,
+        var(--slds-g-color-neutral-base-10, #181818) 6%,
+        transparent
+      )
+  );
+  --newton-studio-shadow-lift: var(
+    --slds-g-shadow-2,
+    0 2px 8px
+      color-mix(
+        in oklab,
+        var(--slds-g-color-neutral-base-10, #181818) 12%,
+        transparent
+      )
+  );
+  --newton-studio-error: var(--slds-g-color-error-base-50, #ba0517);
+  --newton-studio-warn: var(--slds-g-color-warning-base-60, #9a5b02);
+  --newton-studio-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --newton-studio-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
+  --newton-studio-panel: var(--slds-g-color-surface-1, #ffffff);
+  --newton-studio-panel-soft: var(--slds-g-color-surface-container-2, #f9f9f9);
+  --newton-studio-depth-border: color-mix(
+    in oklab,
+    var(--newton-studio-brand) 16%,
+    var(--newton-studio-hairline)
+  );
+}

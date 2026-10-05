@@ -72,7 +72,8 @@ Pure-JS utility bundles (no template)
   newtonSelectorFlowCpeUtilityConfigOptions     Option metadata (labels, values) for editor controls
   newtonSelectorFlowCpeUtilityConfigState       Immutable path-patch helpers; query config mapping
   newtonSelectorFlowCpeUtilityConfigValidation  Issue generation; what blocks Save
-  newtonSelectorFlowCpeUtilityConfigStyles      Style token helpers (CSS-only bundle)
+  newtonSelectorFlowCpeUtilityConfigStyles      Shared chapter styles (CSS-only bundle)
+  newtonSelectorFlowCpeUtilityTokens            The --newton-studio-* design tokens, defined once (CSS-only bundle)
   newtonSelectorFlowCpeUtilityHelpers           Flow Builder context helpers (types, merge fields)
   newtonSelectorFlowCpeUtilitySearchHighlight   Search match highlighting
 ```
@@ -158,7 +159,7 @@ panel dispatches:
 - **The preview never queries data.** It uses neutral sample options, or your real items for the Custom source. Only the **Validate query** button and the SOQL field pickers call Apex from the editor.
 - **Generic type `T`.** The component is declared with `<propertyType name="T" extends="SObject">` so Flow knows the record type of `selectedRecord` and `sourceRecords`. The CPE sets `T` from the chosen object (picklist object, SOQL object or collection object), falling back to `Account` for Custom options.
 - **Re-hydration.** On reopen the CPE reads `selectorConfigJson` and `sourceRecords` and deep-merges over the defaults. This is what lets a Flow saved with an older config pick up options added later. Saved JSON that does not parse shows an error in the panel instead of being replaced with defaults.
-- **Default selection.** The Behavior chapter's **Default selection** writes a Flow resource reference into the component's `value` (single) or `values` (multi) input, so the selector opens with those options selected.
+- **Default selection.** The Behavior chapter's **Default selection** writes a Flow resource reference into the component's `value` (single) or `values` (multi) input, so the selector opens with those options selected. In multi mode only a text collection variable is accepted; typed text is refused with an inline error.
 
 ## Apex layer
 

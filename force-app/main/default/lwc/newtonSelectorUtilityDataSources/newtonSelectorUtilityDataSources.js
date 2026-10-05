@@ -1,7 +1,19 @@
+import rowFallbackLabel from "@salesforce/label/c.Newton_Selector_RowFallback";
+
 const EMPTY = "";
 export const MANUAL_INPUT_VALUE = "__newton_manual_input__";
 // Picklist values for objects without record types come from the master record type.
 export const MASTER_RECORD_TYPE_ID = "012000000000000AAA";
+
+/**
+ * Fills the {0}, {1}… placeholders of a Custom Label, so a translation can
+ * put the values wherever its grammar needs them.
+ */
+export function formatLabel(label, ...values) {
+  return label.replace(/\{(\d+)\}/g, (placeholder, index) => {
+    return index < values.length ? String(values[index]) : placeholder;
+  });
+}
 
 function safeGet(record, fieldPath) {
   if (!record || !fieldPath) return EMPTY;
@@ -32,7 +44,8 @@ export function normalizeCollection(records, fieldMap) {
   const map = fieldMap || {};
   return records.map((record, index) => ({
     id: safeGet(record, "Id") || `col-${index}`,
-    label: safeGet(record, map.label) || `(row ${index + 1})`,
+    label:
+      safeGet(record, map.label) || formatLabel(rowFallbackLabel, index + 1),
     sublabel: safeGet(record, map.sublabel),
     icon: safeGet(record, map.icon),
     badge: safeGet(record, map.badge),

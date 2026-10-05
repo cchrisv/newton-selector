@@ -5,7 +5,7 @@
     <template lwc:if={hasLabel}>
       <legend class="slds-form-element__label newton-data-selector__label">
         <template lwc:if={required}>
-          <abbr title="required" class="slds-required">*</abbr>
+          <abbr title={labels.required} class="slds-required">*</abbr>
         </template>
         <span class="newton-data-selector__label-text">{label}</span>
         <template lwc:if={hasFieldHelp}>
@@ -35,7 +35,7 @@
           <div class="newton-skeleton newton-skeleton_card"></div>
           <div class="newton-skeleton newton-skeleton_card"></div>
           <div class="newton-skeleton newton-skeleton_card"></div>
-          <span class="slds-assistive-text">Loading options</span>
+          <span class="slds-assistive-text">{labels.loadingOptions}</span>
         </div>
       </template>
 
@@ -58,7 +58,7 @@
               <c-newton-selector-icon
                 name="circle-alert"
                 size="small"
-                alternative-text="Error"
+                alternative-text={labels.errorIconAlt}
               ></c-newton-selector-icon>
             </span>
           </div>
@@ -73,7 +73,7 @@
               size="xx-small"
               alternative-text=""
             ></c-newton-selector-icon>
-            <span>Try again</span>
+            <span>{labels.tryAgain}</span>
           </button>
         </div>
       </template>

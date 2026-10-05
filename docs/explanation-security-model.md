@@ -44,7 +44,7 @@ config JSON (from Flow)
 
 **Execution runs in user mode.** All classes are `with sharing`, and the query runs with `AccessLevel.USER_MODE`. Salesforce enforces sharing, object CRUD and field-level security on the actual query. The describe checks run first only to give friendlier error messages.
 
-**Errors reveal little to end users.** Expected problems (unknown field, inaccessible object, WHERE syntax, a value that does not fit its field) produce specific messages. At runtime anything unexpected becomes `Unable to load selector options.` with no stack trace or system text. `validateQuery` runs only from the editor, so it returns the real error message to the admin.
+**Errors name the problem, not the internals.** Expected problems (unknown field, inaccessible object, WHERE syntax, a value that does not fit its field) produce specific messages. An unexpected database error is reported with the database's own message, never a stack trace. `validateQuery` runs only from the editor, so the admin sees the same message before saving.
 
 ## What you get
 

@@ -67,7 +67,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-8, 3rem) var(--slds-g-spacing-5, 1.25rem);
   border-radius: var(--slds-g-radius-border-3, 0.75rem);
   text-align: center;
@@ -94,7 +94,7 @@
   );
   color: var(--slds-g-color-neutral-base-30, #444444);
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #e5e5e5);
+    var(--slds-g-color-neutral-base-90, #e5e5e5);
 }
 
 /* Subtle dotted grid — signals "empty territory" without yelling. */
@@ -185,7 +185,7 @@
   z-index: 1;
   width: var(--slds-g-sizing-11, 4rem);
   height: var(--slds-g-sizing-11, 4rem);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
   box-shadow:
     var(--slds-g-shadow-1, 0 2px 2px 0 #0000001a),
@@ -208,26 +208,26 @@
 .newton-state__plate-corner_tl {
   top: calc(var(--slds-g-spacing-1, 0.25rem) * -1);
   inset-inline-start: calc(var(--slds-g-spacing-1, 0.25rem) * -1);
-  border-top-width: 1.5px;
-  border-inline-start-width: 1.5px;
+  border-top-width: var(--slds-g-sizing-border-1, 1px);
+  border-inline-start-width: var(--slds-g-sizing-border-1, 1px);
 }
 .newton-state__plate-corner_tr {
   top: calc(var(--slds-g-spacing-1, 0.25rem) * -1);
   inset-inline-end: calc(var(--slds-g-spacing-1, 0.25rem) * -1);
-  border-top-width: 1.5px;
-  border-inline-end-width: 1.5px;
+  border-top-width: var(--slds-g-sizing-border-1, 1px);
+  border-inline-end-width: var(--slds-g-sizing-border-1, 1px);
 }
 .newton-state__plate-corner_bl {
   bottom: calc(var(--slds-g-spacing-1, 0.25rem) * -1);
   inset-inline-start: calc(var(--slds-g-spacing-1, 0.25rem) * -1);
-  border-bottom-width: 1.5px;
-  border-inline-start-width: 1.5px;
+  border-bottom-width: var(--slds-g-sizing-border-1, 1px);
+  border-inline-start-width: var(--slds-g-sizing-border-1, 1px);
 }
 .newton-state__plate-corner_br {
   bottom: calc(var(--slds-g-spacing-1, 0.25rem) * -1);
   inset-inline-end: calc(var(--slds-g-spacing-1, 0.25rem) * -1);
-  border-bottom-width: 1.5px;
-  border-inline-end-width: 1.5px;
+  border-bottom-width: var(--slds-g-sizing-border-1, 1px);
+  border-inline-end-width: var(--slds-g-sizing-border-1, 1px);
 }
 
 /* Glyph — sized for the plate; inherits color from the state wrapper. */
@@ -315,7 +315,7 @@
   align-items: center;
   gap: 0.375rem;
   margin-top: var(--slds-g-spacing-2, 0.5rem);
-  padding: 0.4375rem 0.875rem;
+  padding: var(--slds-g-spacing-2, 0.5rem) 0.875rem;
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
   font-weight: var(--slds-g-font-weight-6, 600);
   letter-spacing: 0.01em;
@@ -327,12 +327,12 @@
       var(--slds-g-color-error-base-50, #ba0517) 45%,
       transparent
     );
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
   cursor: pointer;
   transition:
-    background-color 140ms ease,
-    box-shadow 140ms ease,
-    transform 80ms ease;
+    background-color 140ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 140ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 80ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .newton-state__retry c-newton-selector-icon {
@@ -381,6 +381,10 @@
   );
   background-size: 200% 100%;
   animation: newton-shimmer 1.4s linear infinite;
+}
+/* The shimmer sweeps in the reading direction. */
+.newton-skeleton:dir(rtl) {
+  animation-direction: reverse;
 }
 .newton-skeleton_card {
   height: 5.25rem;

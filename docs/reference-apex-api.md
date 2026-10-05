@@ -24,7 +24,7 @@ For how these classes cooperate, read [Architecture](architecture.md). For the s
 | Blank config, or the JSON literal `null` | `Selector configuration is required.` |
 | Malformed JSON                           | `Invalid selector configuration.`     |
 | A `NewtonSelectorException` (see below)  | That exception's message              |
-| Any other exception                      | `Unable to load selector options.`    |
+| A database error                         | The database's own error message      |
 
 **`validateQuery`** never throws. It forces `queryLimit = 1` and runs the query once, so permission and query problems surface while the admin is still in the CPE.
 
@@ -58,6 +58,7 @@ Notes:
 - Field options carry `type`, the field's `Schema.DisplayType` name (for example `STRING`, `CURRENCY`, `BOOLEAN`). The WHERE builder uses it to choose operators, value inputs and quoting.
 - Icons come back as Lucide icon names for the field type (for example `type`, `hash`, `calendar`), defaulting to `type`. The type-to-icon map lives in `NewtonSelectorFlowCpeDescribeService`; `npm run audit:lucide-icons` checks that every name in it exists.
 - Single-target reference fields carry `relationshipName`. Polymorphic references do not.
+- An unexpected database error while searching or describing reaches the editor as an `AuraHandledException` with a clear message, which the picker shows in place of results.
 - `searchLookupDatasetFieldsForObject` does not check that the object itself is accessible or queryable. `searchSObjectTypes` does.
 
 ## Data shapes
@@ -152,16 +153,15 @@ These are the messages an admin can see from `validateQuery` or a failed `queryI
 | `Unterminated string in WHERE clause.`                           | Missing closing quote                                             |
 | `Expected "<token>" in WHERE clause.`                            | Missing `)` or similar                                            |
 | `Unsupported WHERE clause near: <rest>`                          | Trailing text the parser cannot consume                           |
-| `Unable to load selector options.`                               | Any unexpected failure in `queryItems` (no detail is leaked)      |
 
-`validateQuery` reports any other failure, such as a database error, with its real message.
+`queryItems` and `validateQuery` report a database error (an unexpected failure while running the query) with the database's own message, never a stack trace. That includes objects served by a platform data source, which reject some queries: FlexQueueItem, for example, fails with `data.api.DataSourceUnsupportedQueryException: The WHERE clause must contain a JobType field expression.` until the filter names a JobType.
 
 ## Tests
 
 | Class                                 | Methods | Covers                                                                                                                                                                                 |
 | ------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NewtonSelectorRecordQueryTest`       | 27      | Ordering, every WHERE operator, grouped AND/OR clauses, INCLUDES, `NOT LIKE` rejection, bare and quoted `null`, type errors, sort errors, limits, access errors, sharing, 251-row bulk |
-| `NewtonSelectorRuntimeControllerTest` | 13      | `queryItems` and `validateQuery` success and error paths, exact error messages, database errors reported by `validateQuery`                                                            |
+| `NewtonSelectorRuntimeControllerTest` | 15      | `queryItems` and `validateQuery` success and error paths, exact error messages, database and platform data-source errors reported by both                                              |
 | `NewtonSelectorServiceTest`           | 3       | DTO mapping, null config, bulk                                                                                                                                                         |
 | `NewtonSelectorFlowCpeControllerTest` | 13      | Object search, field search, `getObjectFields`, reference metadata                                                                                                                     |
 

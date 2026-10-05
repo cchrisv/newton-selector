@@ -1118,8 +1118,9 @@ async function exerciseInvalidBuilderStates(page) {
 }
 
 // Every text field in the editor (inputs, pickers, search boxes, the
-// resource picker, the filter builder) is drawn as the same box. Returns the
-// box each visible field draws: the nearest element with an outline.
+// resource picker, the filter builder, the option icon picker's trigger) is
+// drawn as the same box. Returns the box each visible field draws: the
+// nearest element with an outline.
 async function measureTextFields(page) {
   return page.evaluate(() => {
     const all = [];
@@ -1137,10 +1138,17 @@ async function measureTextFields(page) {
     const area = scroller.getBoundingClientRect();
     const parentOf = (node) =>
       node.parentElement || node.getRootNode?.().host || null;
+    // The icon picker opens from a button, but it sits in the option row
+    // among text boxes and must look like one.
+    const isIconPickerTrigger = (node) =>
+      node.tagName === "BUTTON" &&
+      node.hasAttribute("aria-haspopup") &&
+      node.getRootNode?.().host?.tagName ===
+        "C-NEWTON-SELECTOR-FLOW-CPE-ICON-SELECTOR";
     const isField = (node) =>
       node.matches?.(
         'input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="range"]):not([type="hidden"]), textarea, select, button[role="combobox"]'
-      );
+      ) || isIconPickerTrigger(node);
     const visible = (node) => {
       const box = node.getBoundingClientRect();
       const style = getComputedStyle(node);
@@ -1170,6 +1178,7 @@ async function measureTextFields(page) {
       return node;
     };
     const labelOf = (node) =>
+      (isIconPickerTrigger(node) ? "Icon picker" : "") ||
       node.getAttribute("aria-label") ||
       node.getAttribute("placeholder") ||
       node.getAttribute("name") ||
@@ -1202,6 +1211,89 @@ async function measureTextFields(page) {
   });
 }
 
+// A resource picker (Selector label, option Label/Value/…, Default selection)
+// holds a plain value or a Flow resource; it is not a search box, so it shows
+// no magnifier. Returns every visible resource picker in the open chapter with
+// the search icons drawn inside it.
+async function findResourceFieldSearchIcons(page) {
+  return page.evaluate(() => {
+    const descendants = (root) => {
+      const found = [];
+      root.querySelectorAll("*").forEach((node) => {
+        found.push(node);
+        if (node.shadowRoot) found.push(...descendants(node.shadowRoot));
+      });
+      return found;
+    };
+    const all = descendants(document);
+    const scroller = all.find((node) =>
+      node.classList?.contains("newton-studio__scroll")
+    );
+    if (!scroller) return [];
+    const area = scroller.getBoundingClientRect();
+    const shown = (node) => {
+      const box = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      return (
+        box.width > 0 &&
+        box.height > 0 &&
+        style.visibility !== "hidden" &&
+        style.display !== "none" &&
+        box.right > area.left &&
+        box.left < area.right
+      );
+    };
+    const searchIcon =
+      'svg[data-key="search"], .slds-input__icon_left, lightning-icon[icon-name$=":search"], c-newton-selector-icon[name="search"]';
+    return all
+      .filter(
+        (node) =>
+          node.tagName === "C-NEWTON-SELECTOR-FLOW-CPE-RESOURCE-SELECTOR" &&
+          shown(node)
+      )
+      .map((field) => {
+        const inside = [
+          ...field.querySelectorAll("*"),
+          ...(field.shadowRoot ? descendants(field.shadowRoot) : [])
+        ];
+        return {
+          field:
+            field.getAttribute("label") ||
+            field.label ||
+            field.getAttribute("name") ||
+            "resource picker",
+          searchIcons: inside
+            .filter((node) => node.matches(searchIcon) && shown(node))
+            .map((node) =>
+              [
+                node.tagName.toLowerCase(),
+                node.getAttribute("data-key") ||
+                  node.getAttribute("name") ||
+                  node.getAttribute("class") ||
+                  ""
+              ].join(" ")
+            )
+        };
+      });
+  });
+}
+
+function recordResourceFieldSearchIconCheck(passes) {
+  const fields = passes.flat();
+  const withIcon = fields.filter((f) => f.searchIcons.length);
+  recordCheck(
+    "plain value fields show no search icon",
+    fields.length > 5 && withIcon.length === 0,
+    {
+      resourceFieldsChecked: fields.length,
+      fieldsWithSearchIcon: withIcon
+        .slice(0, 8)
+        .map((f) => `${f.field}: ${f.searchIcons.join(", ")}`),
+      fieldsWithSearchIconCount: withIcon.length
+    }
+  );
+}
+
 function recordTextFieldChecks(passes) {
   const fields = passes.flat();
   const looks = {};
@@ -1212,11 +1304,13 @@ function recordTextFieldChecks(passes) {
     join(ARTIFACT_DIR, "text-fields.json"),
     JSON.stringify({ fields, looks }, null, 2)
   );
+  const iconPickers = fields.filter((f) => f.field === "Icon picker").length;
   recordCheck(
     "every text field in the editor is the same box",
-    fields.length > 10 && Object.keys(looks).length === 1,
+    fields.length > 10 && iconPickers > 0 && Object.keys(looks).length === 1,
     {
       fieldCount: fields.length,
+      iconPickers,
       looks: Object.fromEntries(
         Object.entries(looks).map(([look, names]) => [look, names.slice(0, 5)])
       )
@@ -1326,6 +1420,10 @@ async function exerciseClarity(page) {
   await dispatchToggle(overrideToggle, false);
 
   await clickTile(page, "Data source", "Custom options");
+  const customFields = await measureTextFields(page);
+  const searchIconPasses = [await findResourceFieldSearchIcons(page)];
+  await activateStudioSection(page, "content");
+  searchIconPasses.push(await findResourceFieldSearchIcons(page));
 
   await activateStudioSection(page, "behavior");
   await dispatchSelectionMode(page, "multi");
@@ -1357,11 +1455,18 @@ async function exerciseClarity(page) {
       saveRestored,
     { minMaxStatus, saveBlocked, saveRestored }
   );
-  recordTextFieldChecks([soqlFields, await measureTextFields(page)]);
+  recordTextFieldChecks([
+    soqlFields,
+    customFields,
+    await measureTextFields(page)
+  ]);
+  searchIconPasses.push(await findResourceFieldSearchIcons(page));
+  recordResourceFieldSearchIconCheck(searchIconPasses);
   await minField.fill("");
   await minField.press("Tab");
   await maxField.fill("");
   await maxField.press("Tab");
+  await exerciseMultiDefaultSelectionLiteral(page);
   await dispatchSelectionMode(page, "single");
 
   await activateStudioSection(page, "appearance");
@@ -1381,6 +1486,56 @@ async function exerciseClarity(page) {
     { titles }
   );
   await activateStudioSection(page, "data");
+}
+
+// Multi select pre-selects from the component's `values` input, a text
+// collection. A typed literal can't fill a collection, so the field says so
+// and the literal is not bound to `values`. Leaves the field empty.
+const MULTI_DEFAULT_LITERAL_ERROR =
+  "Pick a text collection variable for multiple default selections.";
+async function exerciseMultiDefaultSelectionLiteral(page) {
+  const behavior = page
+    .locator("c-newton-selector-flow-cpe-behavior-config")
+    .first();
+  const field = resourceField(
+    page,
+    "c-newton-selector-flow-cpe-behavior-config",
+    "Default selection"
+  ).first();
+  await dispatchValueChanged(field, "custom-beta");
+  await page.waitForTimeout(400);
+  // innerText holds only rendered text, so a line equal to the message means
+  // the field shows it. Only the refusal shows; the field is not also
+  // reported as a bad reference.
+  const fieldText = (await field.innerText().catch(() => "")).trim();
+  const errorShown = fieldText
+    .split("\n")
+    .some((line) => line.trim() === MULTI_DEFAULT_LITERAL_ERROR);
+  const otherErrors = fieldText.includes("no resource with that name") ? 1 : 0;
+  // The text box itself is invalid, so assistive tech announces the error.
+  const inputInvalid = await field
+    .locator("input")
+    .first()
+    .getAttribute("aria-invalid")
+    .catch(() => null);
+  const valuesRef = await behavior.evaluate((node) => node.valuesRef ?? null);
+  recordCheck(
+    "a typed literal in multi-select Default selection is refused with an error",
+    errorShown &&
+      otherErrors === 0 &&
+      inputInvalid === "true" &&
+      !String(valuesRef || "").includes("custom-beta"),
+    {
+      typed: "custom-beta",
+      expectedError: MULTI_DEFAULT_LITERAL_ERROR,
+      errorShown,
+      otherErrors,
+      inputInvalid,
+      fieldText,
+      valuesInputInEditor: valuesRef
+    }
+  );
+  await dispatchValueChanged(field, "");
 }
 
 // The resource picker (text box + Flow resource menu) whose label reads

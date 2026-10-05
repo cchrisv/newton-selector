@@ -14,17 +14,16 @@
   --newton-cpe-ink-strong: var(--slds-g-color-neutral-base-10, #181818);
   --newton-cpe-ink-body: var(--slds-g-color-neutral-base-20, #2e2e2e);
   --newton-cpe-ink-muted: var(--slds-g-color-neutral-base-50, #747474);
-  --newton-cpe-hairline: var(--slds-g-color-border-base-1, #e5e5e5);
-  --newton-cpe-line: var(--slds-g-color-border-base-2, #d9d9d9);
+  --newton-cpe-hairline: var(--slds-g-color-neutral-base-90, #e5e5e5);
 
   /* Brand + status */
   --newton-cpe-brand: var(--slds-g-color-brand-base-50, #0176d3);
-  --newton-cpe-brand-deep: var(--slds-g-color-brand-base-40, #014486);
+  --newton-cpe-brand-deep: var(--slds-g-color-brand-base-40, #0b5cab);
   --newton-cpe-brand-weak: var(--slds-g-color-brand-base-95, #eaf3ff);
 
   /* Shape */
-  --newton-cpe-radius: var(--slds-g-radius-border-2, 0.25rem);
-  --newton-cpe-radius-lg: var(--slds-g-radius-border-3, 0.5rem);
+  --newton-cpe-radius: var(--slds-g-radius-border-2, 0.5rem);
+  --newton-cpe-radius-lg: var(--slds-g-radius-border-3, 0.75rem);
   --newton-cpe-shadow: var(
     --slds-g-shadow-1,
     0 1px 2px
@@ -72,7 +71,7 @@
   padding: 0;
   padding-inline-start: var(--slds-g-spacing-4, 1rem);
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  line-height: 1.45;
+  line-height: var(--slds-g-font-line-height-4, 1.5);
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
@@ -123,7 +122,7 @@
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
   font-weight: var(--slds-g-font-weight-7, 700);
   color: var(--newton-cpe-ink-strong);
-  line-height: 1.3;
+  line-height: var(--slds-g-font-line-height-2, 1.25);
   letter-spacing: 0;
 }
 
@@ -166,7 +165,7 @@
   margin: 0;
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-7, 700);
-  line-height: 1.3;
+  line-height: var(--slds-g-font-line-height-2, 1.25);
   color: var(--newton-cpe-ink-strong);
 }
 
@@ -174,7 +173,7 @@
   margin: 0;
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-4, 400);
-  line-height: 1.3;
+  line-height: var(--slds-g-font-line-height-2, 1.25);
   color: var(--newton-cpe-ink-body);
   overflow-wrap: anywhere;
 }
@@ -195,7 +194,7 @@
 .newton-cpe__line[data-muted="true"] {
   font-weight: var(--slds-g-font-weight-4, 400);
   color: var(--newton-cpe-ink-muted);
-  line-height: 1.4;
+  line-height: var(--slds-g-font-line-height-3, 1.375);
 }
 
 /* Mono = API reference (Lead.Rating, {!myVariable}). Visually separates code
@@ -226,9 +225,9 @@
   font-weight: var(--slds-g-font-weight-6, 600);
   cursor: pointer;
   transition:
-    background-color 120ms ease,
-    box-shadow 120ms ease,
-    transform 120ms ease;
+    background-color 120ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 120ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .newton-cpe__cta:hover {
@@ -242,8 +241,7 @@
 }
 
 .newton-cpe__cta:focus-visible {
-  outline: var(--slds-g-sizing-border-2, 2px) solid
-    var(--slds-g-color-brand-base-60, #0b5cab);
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-cpe-brand);
   outline-offset: var(--slds-g-sizing-border-2, 2px);
 }
 
@@ -261,7 +259,7 @@
   align-items: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-6, 1.5rem) var(--slds-g-spacing-3, 0.75rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-cpe-line);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-cpe-hairline);
   border-radius: var(--newton-cpe-radius-lg);
   background: var(--newton-cpe-panel);
   box-shadow: var(--newton-cpe-shadow);
@@ -295,7 +293,7 @@
   margin: 0 0 var(--slds-g-spacing-1, 0.25rem);
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
   color: var(--newton-cpe-ink-muted);
-  line-height: 1.45;
+  line-height: var(--slds-g-font-line-height-4, 1.5);
   max-inline-size: 16rem;
 }
 

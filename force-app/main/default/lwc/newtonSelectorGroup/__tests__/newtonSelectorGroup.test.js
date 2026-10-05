@@ -2,6 +2,24 @@ import { createElement } from "lwc";
 import NewtonSelectorGroup from "c/newtonSelectorGroup";
 import { MANUAL_INPUT_VALUE } from "c/newtonSelectorUtilityDataSources";
 
+// Jest resolves Custom Labels to their names; these tests find panels by
+// their accessible names, so give those labels their English text.
+jest.mock(
+  "@salesforce/label/c.Newton_Selector_AvailableCardColumn",
+  () => ({ default: "Available card column" }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/label/c.Newton_Selector_SelectedCardColumn",
+  () => ({ default: "Selected card column" }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/label/c.Newton_Selector_AvailableOptions",
+  () => ({ default: "Available options" }),
+  { virtual: true }
+);
+
 const ITEMS = [
   {
     id: "1",
