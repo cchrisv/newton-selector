@@ -8,8 +8,7 @@ const SAMPLE_ITEM = {
   icon: "building-2",
   badge: "New",
   helpText: "Hover for info",
-  value: "first",
-  disabled: false
+  value: "first"
 };
 
 function mount({ item, ...props } = {}) {
@@ -30,18 +29,13 @@ describe("c-newton-selector-choice-tile", () => {
 
   it("renders title, sub, and badge in grid variant", () => {
     const el = mount();
-    const title = el.shadowRoot.querySelector(
-      ".newton-selector-choice-tile__title"
+    const label = el.shadowRoot.querySelector("label");
+    const texts = Array.from(label.querySelectorAll("span")).map((node) =>
+      node.textContent.trim()
     );
-    const sub = el.shadowRoot.querySelector(
-      ".newton-selector-choice-tile__sub"
+    expect(texts).toEqual(
+      expect.arrayContaining(["First option", "Helpful subtitle", "New"])
     );
-    const badge = el.shadowRoot.querySelector(
-      ".newton-selector-choice-tile__badge"
-    );
-    expect(title.textContent).toBe("First option");
-    expect(sub.textContent).toBe("Helpful subtitle");
-    expect(badge.textContent).toBe("New");
   });
 
   it("renders a radio input with groupName in single-select mode", () => {
@@ -58,7 +52,7 @@ describe("c-newton-selector-choice-tile", () => {
     expect(input.name).toBe("");
   });
 
-  it("dispatches cardselect on change with value and id", () => {
+  it("dispatches cardselect on change with the item value", () => {
     const el = mount();
     const handler = jest.fn();
     el.addEventListener("cardselect", handler);
@@ -67,18 +61,8 @@ describe("c-newton-selector-choice-tile", () => {
     expect(handler).toHaveBeenCalledTimes(1);
     expect(handler.mock.calls[0][0].detail).toEqual({
       value: "first",
-      id: "i-1"
+      fromArrowKey: false
     });
-  });
-
-  it("disables the input and suppresses events when disabled", () => {
-    const el = mount({ disabled: true });
-    const input = el.shadowRoot.querySelector("input");
-    expect(input.disabled).toBe(true);
-    const handler = jest.fn();
-    el.addEventListener("cardselect", handler);
-    input.dispatchEvent(new CustomEvent("change"));
-    expect(handler).not.toHaveBeenCalled();
   });
 
   it("renders helpText with aria-describedby target", () => {

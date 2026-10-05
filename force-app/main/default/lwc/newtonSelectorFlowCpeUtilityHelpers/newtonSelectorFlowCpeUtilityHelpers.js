@@ -1,75 +1,20 @@
 /**
  * Newton Selector Flow CPE | Helpers
  *
- *   1. Field metadata cache — getObjectFields results, shared per object
- *   2. Type icons           — the one field/resource type → Lucide icon map
+ *   1. Load errors          — "Couldn't load …" messages for Apex and wire failures
+ *   2. Field types          — the one field/resource type → Lucide icon map,
+ *                             type labels, and field picker options
  *   3. Merge-field helpers  — {!...} reference detection and formatting
  *
  * Attribution: merge-field helpers adapted from UnofficialSF fsc_flowComboboxUtils
  * (Apache-2.0). See repo LICENSE and NOTICE.
  */
 
-import getObjectFields from "@salesforce/apex/NewtonSelectorFlowCpeController.getObjectFields";
+import { errorMessageOf } from "c/newtonSelectorUtilityDataSources";
 
 // ═════════════════════════════════════════════════════════════════
-// 1. FIELD METADATA CACHE
+// 1. LOAD ERRORS
 // ═════════════════════════════════════════════════════════════════
-
-const MAX_CACHE_SIZE = 10;
-
-/** @type {Map<string, {name:string, label:string, type:string, relationshipName:string}[]>} */
-const _fieldCache = new Map();
-
-/** @type {Map<string, Promise>} */
-const _fieldInflight = new Map();
-
-/** @type {string[]} LRU order — most-recent at end */
-const _fieldLru = [];
-
-function touchLru(key) {
-  const idx = _fieldLru.indexOf(key);
-  if (idx > -1) {
-    _fieldLru.splice(idx, 1);
-  }
-  _fieldLru.push(key);
-  while (_fieldLru.length > MAX_CACHE_SIZE) {
-    const evict = _fieldLru.shift();
-    _fieldCache.delete(evict);
-  }
-}
-
-/**
- * Fetch fields for an SObject, returning cached results when available.
- * Dedupes concurrent callers by returning the same in-flight Promise.
- * Rejects when Apex fails, so callers can tell the admin why the list is empty.
- * @param {string} objectApiName
- * @returns {Promise<{name:string, label:string, type:string, relationshipName:string}[]>}
- */
-export function fetchFields(objectApiName) {
-  if (!objectApiName) {
-    return Promise.resolve([]);
-  }
-  const key = objectApiName.trim().toLowerCase();
-  if (_fieldCache.has(key)) {
-    touchLru(key);
-    return Promise.resolve(_fieldCache.get(key));
-  }
-  if (_fieldInflight.has(key)) {
-    return _fieldInflight.get(key);
-  }
-  const p = getObjectFields({ objectName: objectApiName.trim() })
-    .then((fields) => {
-      const result = Array.isArray(fields) ? fields : [];
-      _fieldCache.set(key, result);
-      touchLru(key);
-      return result;
-    })
-    .finally(() => {
-      _fieldInflight.delete(key);
-    });
-  _fieldInflight.set(key, p);
-  return p;
-}
 
 /**
  * "Couldn't load <what>: <reason>" for an Apex or wire error.
@@ -78,15 +23,11 @@ export function fetchFields(objectApiName) {
  * @returns {string}
  */
 export function loadErrorMessage(what, error) {
-  const reason =
-    error?.body?.message ||
-    error?.message ||
-    "Try again or reload Flow Builder.";
-  return `Couldn't load ${what}: ${reason}`;
+  return `Couldn't load ${what}: ${errorMessageOf(error, "Try again or reload Flow Builder.")}`;
 }
 
 // ═════════════════════════════════════════════════════════════════
-// 2. TYPE ICONS
+// 2. FIELD TYPES
 // ═════════════════════════════════════════════════════════════════
 
 /**
@@ -134,13 +75,11 @@ const FIELD_TYPE_LABELS = Object.freeze({
   ENCRYPTEDSTRING: "Encrypted Text",
   TEXTAREA: "Text Area",
   DATETIME: "Date/Time",
-  COMBOBOX: "Combobox",
   BOOLEAN: "Checkbox",
   REFERENCE: "Lookup",
   INTEGER: "Number",
   DOUBLE: "Number",
-  LONG: "Number",
-  BASE64: "Base64"
+  LONG: "Number"
 });
 
 // "MULTIPICKLIST" → "Multi-Picklist", "CURRENCY" → "Currency".
@@ -153,20 +92,23 @@ function formatFieldType(fieldType) {
 }
 
 /**
- * Transform raw Field[] from Apex into lookup-compatible option objects.
+ * Transform raw Field[] from Apex into lookup-compatible option objects,
+ * sorted by label.
  * @param {Array} fields — from getObjectFields
- * @returns {{id:string, title:string, subtitle:string, icon:string, type:string, relationshipName:string}[]}
+ * @returns {{id:string, title:string, subtitle:string, icon:string, type:string, sortable:boolean, filterable:boolean}[]}
  */
 export function fieldsToOptions(fields) {
-  if (!Array.isArray(fields)) return [];
-  return fields.map((f) => ({
-    id: f.name || "",
-    title: f.label || f.name || "",
-    subtitle: `${f.name || ""} — ${formatFieldType(f.type)}`,
-    icon: iconForFieldType(f.type),
-    type: f.type || "",
-    relationshipName: f.relationshipName || ""
-  }));
+  return fields
+    .map((f) => ({
+      id: f.name || "",
+      title: f.label || f.name || "",
+      subtitle: `${f.name || ""} — ${formatFieldType(f.type)}`,
+      icon: iconForFieldType(f.type),
+      type: f.type || "",
+      sortable: f.sortable === true,
+      filterable: f.filterable === true
+    }))
+    .sort((a, b) => a.title.localeCompare(b.title));
 }
 
 /**
@@ -197,7 +139,6 @@ export const flowComboboxDefaults = Object.freeze({
   defaultGlobalVariableKeyPrefix: "flowCombobox-globalVariable-",
   recordLookupsType: "recordLookups",
   recordCreatesType: "recordCreates",
-  recordUpdatesType: "recordUpdates",
   dataTypeSObject: "SObject",
   isCollectionField: "isCollection",
   actionType: "actionCalls",
@@ -249,14 +190,4 @@ export function removeFormatting(value) {
   if (!value) return value;
   if (!isReference(value)) return value;
   return value.substring(0, value.lastIndexOf("}")).replace("{!", "");
-}
-
-/**
- * The value a resource selector reported in its `valuechanged` event: plain
- * text as typed, or a Flow resource as "{!Name}".
- * @param {CustomEvent} event
- * @returns {string}
- */
-export function readResourceValue(event) {
-  return event.detail.newValue;
 }

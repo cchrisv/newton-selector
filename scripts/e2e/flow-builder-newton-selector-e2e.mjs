@@ -21,6 +21,9 @@ const SOFT = process.env.NEWTON_E2E_SOFT === "1";
 const FLOW_API_NAME = "Newton_Selector_E2E";
 const FLOW_LABEL = "Newton Selector E2E";
 const SCREEN_LABEL = "Newton Selector E2E Screen";
+// A screen the Debug run never reaches: selectors saved with a WHERE clause
+// the filter builder must refuse to save (hand-written in Manual mode).
+const SAVED_WHERE_SCREEN_LABEL = "Newton Selector E2E Saved Filters";
 const RUN_ID =
   process.env.NEWTON_E2E_RUN_ID ||
   new Date().toISOString().replace(/\D/g, "").slice(0, 14);
@@ -28,6 +31,15 @@ const COMPANY = "NewtonE2ECompany";
 const EDITED_LABEL = "E2E Custom Selector Edited";
 const LABEL_RESOURCE = "E2E_Label_Text";
 const DEFAULT_RESOURCE = "E2E_Default_Value";
+// A Number variable (never a text resource) and a single Lead record variable
+// (a text picker opens it to pick a text field).
+const NUMBER_RESOURCE = "E2E_Min_Employees";
+const RECORD_RESOURCE = "E2E_Lead_Record";
+const DATETIME_VALUE = "2026-01-01T00:00:00Z";
+const DATA = "c-newton-selector-flow-cpe-data-config";
+const CONTENT = "c-newton-selector-flow-cpe-content-config";
+const BEHAVIOR = "c-newton-selector-flow-cpe-behavior-config";
+const APPEARANCE = "c-newton-selector-flow-cpe-appearance-config";
 // Optional: reuse existing Leads (comma-separated LastNames, two or more) instead
 // of creating temporary ones, e.g. when the org has no free data storage.
 const EXISTING_LEADS = (process.env.NEWTON_E2E_EXISTING_LEADS || "")
@@ -69,7 +81,8 @@ const screenshots = {
   invalidModal: join(ARTIFACT_DIR, "03a-invalid-config-modal.png"),
   afterSave: join(ARTIFACT_DIR, "04-builder-after-save.png"),
   debugRuntime: join(ARTIFACT_DIR, "05-debug-runtime.png"),
-  done: join(ARTIFACT_DIR, "06-debug-done.png")
+  done: join(ARTIFACT_DIR, "06-debug-done.png"),
+  fatal: join(ARTIFACT_DIR, "99-fatal-error.png")
 };
 const diagnosticsPath = join(ARTIFACT_DIR, "diagnostics.json");
 
@@ -122,14 +135,23 @@ function writeResults(error) {
   );
 }
 
+// execFileSync throws on a non-zero exit (sf's JSON status is its exit code),
+// so a returned result always succeeded. A failure is rethrown with the CLI's
+// own JSON error text and the subcommand that failed.
 function runSf(args) {
-  const output = execFileSync(SF_COMMAND, args, {
-    encoding: "utf8",
-    shell: process.platform === "win32",
-    stdio: ["ignore", "pipe", "pipe"],
-    windowsHide: true
-  });
-  return parseFirstJson(output);
+  try {
+    const output = execFileSync(SF_COMMAND, args, {
+      encoding: "utf8",
+      shell: process.platform === "win32",
+      stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true
+    });
+    return parseFirstJson(output);
+  } catch (error) {
+    throw new Error(
+      `sf ${args.slice(0, 3).join(" ")} failed: ${error.stdout || error.stderr || error.message}`
+    );
+  }
 }
 
 function parseFirstJson(raw) {
@@ -195,7 +217,7 @@ function assert(condition, message) {
 }
 
 function isProductDiagnosticText(text) {
-  return /newton|professor flow|Newton selector|custom_selector|newtonselectorflowscreen|Newton_Selector|c-newton|TypeError|ReferenceError|Unhandled|Cannot read|undefined is not|is not a function/i.test(
+  return /newton|custom_selector|TypeError|ReferenceError|Unhandled|Cannot read|undefined is not|is not a function/i.test(
     text || ""
   );
 }
@@ -246,15 +268,11 @@ const OWN_CODE = /newton/i;
 
 function actionableDiagnostics() {
   const consoleErrors = diagnostics.console.filter(
-    (entry) =>
-      entry.type === "error" &&
-      isProductDiagnosticText(entry.text) &&
-      OWN_CODE.test(entry.text)
+    (entry) => entry.type === "error" && OWN_CODE.test(entry.text)
   );
-  const pageErrors = diagnostics.pageErrors.filter((entry) => {
-    const text = `${entry.message}\n${entry.stack}`;
-    return isProductDiagnosticText(text) && OWN_CODE.test(text);
-  });
+  const pageErrors = diagnostics.pageErrors.filter((entry) =>
+    OWN_CODE.test(`${entry.message}\n${entry.stack}`)
+  );
   const requestFailures = diagnostics.requestFailures.filter(
     (entry) =>
       /newton|Newton_Selector|flowruntime|flowbuilder/i.test(entry.url) &&
@@ -361,7 +379,7 @@ function defaultConfig(overrides = {}) {
       whereClause: "",
       orderByField: "CreatedDate",
       orderByDirection: "DESC",
-      limit: 10,
+      queryLimit: 10,
       labelField: "LastName",
       valueField: "Id",
       sublabelField: "Company",
@@ -493,7 +511,7 @@ function sobjectConfig() {
       whereClause: LEAD_WHERE_CLAUSE,
       orderByField: "CreatedDate",
       orderByDirection: "DESC",
-      limit: 10,
+      queryLimit: 10,
       labelField: "LastName",
       valueField: "Id",
       sublabelField: "Company",
@@ -503,6 +521,30 @@ function sobjectConfig() {
     }
   });
 }
+
+// A SOQL selector saved with `whereClause`, for the Saved Filters screen.
+function savedWhereConfig(label, whereClause) {
+  const config = sobjectConfig();
+  return { ...config, label, sobject: { ...config.sobject, whereClause } };
+}
+
+const SAVED_WHERE_SELECTORS = [
+  {
+    field: "Saved_In_Flow_Value_Selector",
+    label: "E2E Saved IN Flow Value",
+    whereClause: `LastName IN ('{!${LABEL_RESOURCE}}')`,
+    message: /need typed values/,
+    check: "reopening a saved IN filter with a Flow value blocks Save at once"
+  },
+  {
+    field: "Saved_Invalid_Number_Selector",
+    label: "E2E Saved Invalid Number",
+    whereClause: "NumberOfEmployees = abc",
+    message: /\bnumber\b/i,
+    check:
+      'reopening a saved filter with "abc" on a number field blocks Save at once'
+  }
+];
 
 function collectionConfig() {
   return defaultConfig({
@@ -662,6 +704,9 @@ function buildFlowXml() {
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
         <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Saved_Where_Screen</targetReference>
+        </connector>
         <fields>
             <name>Done_Text</name>
             <fieldText>&lt;p&gt;E2E Flow completed.&lt;/p&gt;&lt;p&gt;Custom: {!Custom_Selector.selectedLabel}&lt;/p&gt;&lt;p&gt;Rating: {!Picklist_Selector.selectedLabel}&lt;/p&gt;&lt;p&gt;SOQL: {!SObject_Selector.selectedLabel}&lt;/p&gt;&lt;p&gt;Collection: {!Collection_Selector.selectedLabel}&lt;/p&gt;</fieldText>
@@ -678,6 +723,20 @@ function buildFlowXml() {
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
     </screens>
+    <screens>
+        <name>Saved_Where_Screen</name>
+        <label>${SAVED_WHERE_SCREEN_LABEL}</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>${SAVED_WHERE_SELECTORS.map(
+          ({ field, label, whereClause }) =>
+            componentFieldXml(field, savedWhereConfig(label, whereClause))
+        ).join("")}
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
@@ -689,6 +748,25 @@ function buildFlowXml() {
       DEFAULT_RESOURCE,
       "custom-beta"
     )}
+    <variables>
+        <name>${NUMBER_RESOURCE}</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+        <value>
+            <numberValue>5.0</numberValue>
+        </value>
+    </variables>
+    <variables>
+        <name>${RECORD_RESOURCE}</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Lead</objectType>
+    </variables>
 </Flow>
 `;
 }
@@ -731,7 +809,6 @@ function createLead(lastName, rating) {
     process.platform === "win32" ? `"${values}"` : values,
     "--json"
   ]);
-  assert(result.status === 0, `Lead create failed: ${JSON.stringify(result)}`);
   temporaryLeadIds.push(result.result.id);
   return result.result.id;
 }
@@ -758,7 +835,7 @@ function deleteTemporaryLeads() {
 }
 
 function deployFlowFixture() {
-  const result = runSf([
+  runSf([
     "project",
     "deploy",
     "start",
@@ -768,10 +845,6 @@ function deployFlowFixture() {
     FLOW_SOURCE_FILE,
     "--json"
   ]);
-  assert(
-    result.status === 0,
-    `Flow fixture deploy failed: ${JSON.stringify(result)}`
-  );
 }
 
 function openFlowBuilderUrl() {
@@ -785,10 +858,6 @@ function openFlowBuilderUrl() {
     "--url-only",
     "--json"
   ]);
-  assert(
-    result.status === 0,
-    `Could not open Flow Builder: ${JSON.stringify(result)}`
-  );
   return result.result.url;
 }
 
@@ -846,7 +915,7 @@ function extractSelectorConfigFromFlowXml(xml, fieldName) {
 function retrieveAndAssertPersistedConfig() {
   const retrieveDir = join(ARTIFACT_DIR, "retrieved");
   rmSync(retrieveDir, { recursive: true, force: true });
-  const result = runSf([
+  const retrieved = runSf([
     "project",
     "retrieve",
     "start",
@@ -858,13 +927,14 @@ function retrieveAndAssertPersistedConfig() {
     retrieveDir,
     "--json"
   ]);
-  assert(
-    result.status === 0,
-    `Flow retrieve after Builder save failed: ${JSON.stringify(result)}`
-  );
 
   const flowXmlPath = findFile(retrieveDir, `${FLOW_API_NAME}.flow-meta.xml`);
-  assert(flowXmlPath, `Retrieved Flow XML was not found under ${retrieveDir}.`);
+  assert(
+    flowXmlPath,
+    `Retrieved Flow XML was not found under ${retrieveDir}. Retrieve result: ${JSON.stringify(
+      retrieved?.result?.files ?? retrieved
+    )}`
+  );
   const xml = readFileSync(flowXmlPath, "utf8");
   const config = extractSelectorConfigFromFlowXml(xml, "Custom_Selector");
 
@@ -887,123 +957,250 @@ function retrieveAndAssertPersistedConfig() {
       defaultSelectionField: observed.defaultSelectionField
     }
   );
-  assert(
-    config.dataSource === "custom",
-    `Saved Selector dataSource did not persist. Got ${config.dataSource}`
+  // Every value here differs from the deployed fixture, so a lost modal or
+  // Builder Save fails the check.
+  const grid = config.gridConfig || {};
+  const expectedSettings = {
+    helpText: [config.helpText, "Edited help text from Playwright."],
+    fieldLevelHelp: [config.fieldLevelHelp, "Edited tooltip from Playwright."],
+    emptyStateMessage: [config.emptyStateMessage, "E2E empty state"],
+    errorStateMessage: [config.errorStateMessage, "E2E error state"],
+    required: [config.required, true],
+    customErrorMessage: [config.customErrorMessage, "None of these"],
+    noneOptionPosition: [config.noneOptionPosition, "end"],
+    columns: [grid.columns == null ? null : String(grid.columns), "3"],
+    size: [grid.size, "large"],
+    aspectRatio: [grid.aspectRatio, "4:3"],
+    iconDecor: [grid.iconDecor, "ring"],
+    patternSelectedTone: [grid.patternSelectedTone, "success"],
+    cornerTone: [grid.cornerTone, "success"],
+    surfaceHoverTone: [grid.surfaceHoverTone, "teal"],
+    iconTone: [grid.iconTone, "warning"],
+    iconGlyphTone: [grid.iconGlyphTone, "contrast"],
+    badgeVariant: [grid.badge?.variant, "brand"],
+    badgePosition: [grid.badge?.position, "top-right"],
+    badgeShape: [grid.badge?.shape, "square"]
+  };
+  const mismatches = Object.fromEntries(
+    Object.entries(expectedSettings)
+      .filter(([, [saved, expected]]) => saved !== expected)
+      .map(([key, [saved, expected]]) => [key, { saved, expected }])
   );
-  assert(
-    config.layout === "grid",
-    `Saved Selector layout did not persist. Got ${config.layout}`
+  recordCheck(
+    "the saved Flow keeps every setting the sweep changed",
+    Object.keys(mismatches).length === 0,
+    { checked: Object.keys(expectedSettings).length, mismatches }
   );
-  assert(
-    config.selectionMode === "single",
-    `Saved Selector selectionMode did not persist. Got ${config.selectionMode}`
+
+  recordCheck(
+    'the "Select all and Clear all buttons" toggle saves showSelectAll',
+    config.showSelectAll === true,
+    { savedShowSelectAll: config.showSelectAll ?? null }
   );
-  assert(
-    config.gridConfig?.size === "medium",
-    `Saved Selector tile size did not persist. Got ${config.gridConfig?.size}`
+
+  const sourceRecords = extractComponentInput(
+    xml,
+    "Custom_Selector",
+    "sourceRecords"
   );
-  assert(
-    config.gridConfig?.aspectRatio === "1:1",
-    `Saved Selector aspect ratio did not persist. Got ${config.gridConfig?.aspectRatio}`
+  recordCheck(
+    "a source switched away from Collection saves without a sourceRecords binding",
+    sourceRecords === null,
+    {
+      savedDataSource: config.dataSource,
+      savedSourceRecords: sourceRecords,
+      collectionPickedInEditor: observed.collectionBinding ?? null
+    }
   );
-  assert(
-    config.gridConfig?.iconDecor === "ring",
-    `Saved Selector icon decoration did not persist. Got ${config.gridConfig?.iconDecor}`
+
+  recordCheck(
+    "option overrides do not survive a data-source change",
+    Object.keys(config.overrides || {}).length === 0,
+    {
+      savedOverrides: config.overrides ?? null,
+      overridesModeBackOnSoql: observed.overridesModeBackOnSoql ?? null
+    }
   );
-  assert(
-    config.gridConfig?.patternSelectedTone === "brand",
-    `Saved Selector selected pattern color did not persist. Got ${config.gridConfig?.patternSelectedTone}`
-  );
-  assert(
-    config.gridConfig?.surfaceHoverTone === "teal",
-    `Saved Selector hover surface color did not persist. Got ${config.gridConfig?.surfaceHoverTone}`
+
+  const savedWhere = config.sobject?.whereClause || "";
+  recordCheck(
+    "the WHERE builder saves a text Flow value quoted and an ISO 8601 datetime",
+    savedWhere.includes(`LastName = '{!${LABEL_RESOURCE}}'`) &&
+      new RegExp(`CreatedDate < '?${DATETIME_VALUE}'?`).test(savedWhere),
+    {
+      expectedFragments: [
+        `LastName = '{!${LABEL_RESOURCE}}'`,
+        `CreatedDate < ${DATETIME_VALUE} (quoted or not)`
+      ],
+      savedWhereClause: savedWhere,
+      previewInEditor: observed.whereWithTextMerge ?? null
+    }
   );
 
   return { flowXmlPath, config };
 }
 
-// Dispatches an event only. Never write properties or styles onto components
-// from here: foreign writes into Lightning-managed DOM make every later
-// re-render slower, which is what stalled this script in the Appearance sweep.
-async function dispatchCustomEvent(locator, eventName, detail) {
-  await locator.evaluate(
-    (node, payload) => {
-      node.dispatchEvent(
-        new CustomEvent(payload.eventName, {
-          detail: payload.detail,
-          bubbles: true,
-          composed: true
-        })
-      );
-    },
-    { eventName, detail }
+// Every step below goes through the control an admin uses: a click on a
+// tile, a toggle option, a tab or a menu option, typing, or a key press.
+// Never dispatch component events or write properties onto components from
+// here: that skips the controls under test and slows every later re-render.
+
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Polls read() until ok(value) holds or the timeout passes. Returns what it
+// last read, so a check records the real state instead of throwing.
+async function waitUntil(read, ok, timeout = 15000) {
+  const deadline = Date.now() + timeout;
+  let value = await read();
+  while (!ok(value) && Date.now() < deadline) {
+    await pause(250);
+    value = await read();
+  }
+  return { met: Boolean(ok(value)), value };
+}
+
+// Reads until two consecutive reads are equal, so a measurement is taken
+// after transitions and re-renders have finished. Throws if it never settles.
+async function readSettled(read, label, timeout = 10000) {
+  const deadline = Date.now() + timeout;
+  let previous = await read();
+  while (Date.now() < deadline) {
+    await pause(250);
+    const current = await read();
+    if (JSON.stringify(current) === JSON.stringify(previous)) return current;
+    previous = current;
+  }
+  throw new Error(`${label} kept changing for ${timeout} ms`);
+}
+
+// Whether the locator reaches the state within the timeout.
+async function reaches(locator, state, timeout = 15000) {
+  return locator.waitFor({ state, timeout }).then(
+    () => true,
+    () => false
   );
 }
 
-async function dispatchCardSelect(page, ariaLabel, value) {
-  const label = ariaLabel.includes(" - ")
-    ? `${ariaLabel}, ${ariaLabel.replace(" - ", " \u2014 ")}`
-    : ariaLabel;
-  const selector = label
-    .split(", ")
-    .map((entry) => `.newton-studio__selectorgroup[aria-label="${entry}"]`)
-    .join(", ");
-  const group = page.locator(selector).first();
-  await assertVisible(group, `selector group "${ariaLabel}"`);
-  await dispatchCustomEvent(group, "cardselect", { value });
+async function bodyText(page) {
+  return page
+    .locator("body")
+    .innerText({ timeout: 5000 })
+    .catch(() => "");
 }
 
-async function activateStudioSection(page, key) {
-  const studio = page.locator("c-newton-selector-flow-cpe-studio").first();
-  await assertVisible(studio, "Newton Selector studio");
-  await dispatchCustomEvent(studio, "sectionclick", key);
-  await page.waitForTimeout(250);
-}
-
-// Types the value into the field and tabs out, as a user would. Writing
-// `value` onto the component from outside (the old approach) makes Lightning's
-// component framework do more work on every later re-render, until each config
-// change in the modal takes minutes.
-async function dispatchValueChanged(locator, newValue) {
-  await assertVisible(locator, "value editor");
-  const input = locator.locator("input, textarea").first();
-  await input.fill(newValue, { timeout: 15000 });
-  // Merge-field fields open a suggestion menu as you type, and a menu left
-  // open covers later controls. Commit with Tab, then dismiss the menu the way
-  // a user does: click somewhere neutral (the field closes it on an outside
-  // click). Escape is not used: with no menu open it would close the modal.
-  const page = locator.page();
-  await page.waitForTimeout(400);
-  await input.press("Tab");
+async function neutralClick(page) {
   await page.getByText("Component preview", { exact: true }).first().click();
-  await page.waitForTimeout(250);
 }
 
-// Clicks the toggle's real On/Off option, as a user would. Assigning `checked`
-// onto the component and firing a synthetic event instead leaves the host and
-// its template out of step, and every later config change in the modal then
-// takes twice as long as the one before (minutes by the Appearance sweep).
-async function dispatchToggle(locator, checked) {
-  await assertVisible(locator, "toggle");
-  await locator
-    .locator(`button[data-checked="${checked ? "true" : "false"}"]`)
+const CHAPTER_LABELS = {
+  data: "Data",
+  content: "Content",
+  behavior: "Behavior",
+  appearance: "Appearance"
+};
+
+function chapterTab(page, key) {
+  return page
+    .getByRole("navigation", { name: "Configuration chapters" })
+    .getByRole("button", { name: new RegExp(`^${CHAPTER_LABELS[key]}`) });
+}
+
+async function openChapter(page, key) {
+  const tab = chapterTab(page, key);
+  await tab.click({ timeout: 15000 });
+  const { met } = await waitUntil(
+    () => tab.getAttribute("aria-current"),
+    (current) => current === "page",
+    10000
+  );
+  assert(met, `Chapter tab "${key}" did not become current`);
+}
+
+// Clicks the tile whose radio holds `value` in the radio group named
+// `groupLabel`, and waits until that radio is checked. Returns how long the
+// click took to show as selected, and whether it did.
+async function selectTile(page, groupLabel, value, timeout = 10000) {
+  const group = page.getByRole("radiogroup", { name: groupLabel, exact: true });
+  const radios = group.getByRole("radio");
+  await radios.first().waitFor({ state: "attached", timeout: 30000 });
+  const values = await radios.evaluateAll((nodes) =>
+    nodes.map((node) => node.value)
+  );
+  const index = values.indexOf(value);
+  assert(
+    index >= 0,
+    `No "${value}" tile in "${groupLabel}" (tiles: ${values.join(", ")})`
+  );
+  const started = Date.now();
+  await group
+    .locator("c-newton-selector-choice-tile")
+    .nth(index)
+    .locator("label")
     .first()
-    .click({ timeout: 15000 });
+    .click({ timeout });
+  const { met } = await waitUntil(
+    () => radios.nth(index).isChecked(),
+    Boolean,
+    timeout
+  );
+  return { ms: Date.now() - started, selected: met };
 }
 
-async function dispatchSelectionMode(page, mode) {
-  const toggle = page
-    .locator(
-      "c-newton-selector-flow-cpe-behavior-config c-newton-selector-flow-cpe-toggle"
-    )
+async function selectTileOrThrow(page, groupLabel, value) {
+  const { selected } = await selectTile(page, groupLabel, value);
+  assert(selected, `Tile "${value}" in "${groupLabel}" did not select`);
+}
+
+// Clicks the option named `option` of the toggle labelled `label` and waits
+// until it is the checked one.
+async function setToggle(scope, label, option) {
+  const radio = scope
+    .getByRole("radiogroup", { name: label, exact: true })
+    .getByRole("radio", { name: option, exact: true });
+  await radio.click({ timeout: 15000 });
+  const { met } = await waitUntil(
+    () => radio.getAttribute("aria-checked"),
+    (checked) => checked === "true",
+    10000
+  );
+  assert(met, `Toggle "${label}" did not switch to ${option}`);
+}
+
+// Presses the chip for `value` in the chip row named `label` and waits until
+// it reads as pressed. A disabled or covered chip fails here.
+async function pressChip(scope, label, value) {
+  const chip = scope
+    .getByRole("group", { name: label, exact: true })
+    .locator(`[data-value="${value}"]`)
     .first();
-  await dispatchToggle(toggle, mode === "multi");
+  await chip.click({ timeout: 15000 });
+  const { met } = await waitUntil(
+    () => chip.getAttribute("aria-pressed"),
+    (pressed) => pressed === "true",
+    10000
+  );
+  assert(met, `Chip "${value}" in "${label}" did not become pressed`);
 }
 
-async function dispatchConfigPatch(locator, path, value) {
-  await assertVisible(locator, "config component");
-  await dispatchCustomEvent(locator, "configpatch", { path, value });
+// Types the value into the field and tabs out, as a user would. Typing opens
+// the field's resource menu; Tab on a closed menu would open it instead of
+// committing, so wait for the menu first. Then dismiss it the way a user
+// does: click somewhere neutral (Escape would close the modal).
+async function typeIntoField(field, text) {
+  await assertVisible(field, "value editor");
+  const input = field.locator("input, textarea").first();
+  await input.fill(text, { timeout: 15000 });
+  const menu = field.getByRole("listbox").first();
+  assert(
+    await reaches(menu, "visible", 3000),
+    `Typing "${text}" did not open the field's resource menu`
+  );
+  await input.press("Tab");
+  await neutralClick(field.page());
+  assert(
+    await reaches(menu, "hidden", 5000),
+    `The resource menu stayed open after typing "${text}"`
+  );
 }
 
 async function assertVisible(locator, label, timeout = 30000) {
@@ -1023,7 +1220,7 @@ async function clickFirstVisible(locator, label, timeout = 30000) {
         return;
       }
     }
-    await locator.page().waitForTimeout(500);
+    await pause(500);
   }
   throw new Error(`${label} was not visible`);
 }
@@ -1032,6 +1229,16 @@ async function modalSaveButton(page) {
   const saveButton = page.getByRole("button", { name: /^Save$/ }).last();
   await assertVisible(saveButton, "modal save button");
   return saveButton;
+}
+
+async function readModalStatus(page) {
+  return (
+    await page
+      .locator(".newton-modal__status")
+      .first()
+      .textContent({ timeout: 5000 })
+      .catch(() => "")
+  ).trim();
 }
 
 async function assertModalSaveDisabled(page, issuePattern, label) {
@@ -1046,48 +1253,137 @@ async function assertModalSaveDisabled(page, issuePattern, label) {
 async function assertModalSaveEnabled(page, label) {
   const saveButton = await modalSaveButton(page);
   assert(
-    !(await saveButton.isDisabled().catch(() => false)),
+    !(await saveButton.isDisabled()),
     `Modal Save button was disabled after restoring valid state: ${label}`
   );
 }
 
-async function exerciseInvalidBuilderStates(page) {
-  const dataConfig = page.locator("c-newton-selector-flow-cpe-data-config");
+const studio = (page) => page.locator("c-newton-selector-flow-cpe-studio");
 
-  await dispatchCardSelect(page, "Data source", "collection");
+const discardPrompt = (page) =>
+  page.getByText("Discard your unsaved changes?", { exact: false }).first();
+
+// Opens the configuration modal from the Flow Builder panel and waits until
+// every chapter has rendered its config.
+async function openModalFromPanel(page) {
+  await page
+    .getByRole("button", { name: /Edit configuration|Configure selector/i })
+    .first()
+    .click({ timeout: 30000 });
+  await studio(page).first().waitFor({ state: "attached", timeout: 60000 });
+  const { met, value } = await waitUntil(
+    () => appearanceSelection(page).catch(() => ({})),
+    (selection) =>
+      Boolean(selection.layout && selection.pattern && selection.size),
+    30000
+  );
+  assert(
+    met,
+    `The configuration modal opened without a selected Layout, Pattern and Tile size: ${JSON.stringify(value)}`
+  );
+}
+
+// Cancel, confirm the discard, and open the modal again on the saved config.
+async function discardAndReopen(page) {
+  await page
+    .getByRole("button", { name: /^Cancel$/ })
+    .last()
+    .click();
+  await discardPrompt(page).waitFor({ state: "visible", timeout: 15000 });
+  await page.getByRole("button", { name: "Discard changes" }).first().click();
+  await studio(page).first().waitFor({ state: "detached", timeout: 60000 });
+  await openModalFromPanel(page);
+}
+
+// Invalid configurations block Save and say why: a Collection source with no
+// record collection, then with no label field, then Custom with no options.
+// Recovers by discarding the session.
+async function exerciseInvalidBuilderStates(page) {
+  const data = page.locator(DATA);
+  await openChapter(page, "data");
+
+  // Duplicating an option copies its value: Save waits until the copy gets
+  // a value of its own.
+  const repeatMessage = "Option 2 repeats an earlier option's value.";
+  const repeatState = async () => ({
+    messageShown: (await bodyText(page)).includes(repeatMessage),
+    saveDisabled: await (await modalSaveButton(page)).isDisabled(),
+    saveStatusText: await readModalStatus(page)
+  });
+  await data
+    .getByRole("button", { name: "Duplicate E2E Custom Alpha", exact: true })
+    .click({ timeout: 15000 });
+  const { value: whileRepeated } = await waitUntil(
+    repeatState,
+    (state) => state.messageShown && state.saveDisabled,
+    10000
+  );
+  await typeIntoField(
+    resourceField(page, DATA, "Value").nth(1),
+    "custom-alpha-copy"
+  );
+  const { value: onceUnique } = await waitUntil(
+    repeatState,
+    (state) => !state.messageShown && !state.saveDisabled,
+    10000
+  );
+  recordCheck(
+    "a duplicated option's repeated value blocks Save until it is unique",
+    whileRepeated.messageShown &&
+      whileRepeated.saveDisabled &&
+      !onceUnique.messageShown &&
+      !onceUnique.saveDisabled,
+    { expectedMessage: repeatMessage, whileRepeated, onceUnique }
+  );
+  await data
+    .getByRole("button", { name: "Delete E2E Custom Alpha", exact: true })
+    .nth(1)
+    .click({ timeout: 15000 });
+
+  await selectTileOrThrow(page, "Data source", "collection");
   await assertModalSaveDisabled(
     page,
     /Choose the record collection variable\./,
     "collection mode missing Flow record binding"
   );
 
-  await dispatchCustomEvent(dataConfig, "refchange", {
-    name: "sourceRecordsRef",
-    value: "{!Get_E2E_Leads}"
-  });
-  await dispatchConfigPatch(
-    dataConfig,
-    ["collection", "fieldMap", "label"],
-    ""
+  await pickFlowResource(
+    resourceField(page, DATA, "Flow record collection"),
+    "Get_E2E_Leads"
   );
+  const bound = await waitUntil(
+    () => bodyText(page),
+    (text) => !/Choose the record collection variable\./.test(text),
+    30000
+  );
+  assert(bound.met, "Picking Get_E2E_Leads left the missing-collection error");
   await assertModalSaveDisabled(
     page,
     /Choose the field to show as each option's label\./,
     "collection mode missing label field mapping"
   );
 
-  await dispatchCardSelect(page, "Data source", "custom");
-  await dispatchConfigPatch(dataConfig, ["custom", "items"], []);
+  await selectTileOrThrow(page, "Data source", "custom");
+  for (const label of [
+    "E2E Custom Alpha",
+    "E2E Custom Beta",
+    "E2E Custom Gamma"
+  ]) {
+    await data
+      .getByRole("button", { name: `Delete ${label}`, exact: true })
+      .click({ timeout: 15000 });
+  }
   await assertModalSaveDisabled(
     page,
     /Add at least one option\./,
     "custom mode missing custom items"
   );
   await page.screenshot({ path: screenshots.invalidModal, fullPage: true });
-  const saveStatus = page.locator(".newton-modal__status").first();
-  const saveStatusText = (
-    await saveStatus.textContent({ timeout: 10000 }).catch(() => "")
-  ).trim();
+  const { value: saveStatusText } = await waitUntil(
+    () => readModalStatus(page),
+    (text) => /^1 error to fix · Data: Add at least one option\.$/.test(text),
+    10000
+  );
   recordCheck(
     "a disabled Save says why, next to the button",
     /^1 error to fix · Data: Add at least one option\.$/.test(saveStatusText),
@@ -1105,15 +1401,7 @@ async function exerciseInvalidBuilderStates(page) {
     { errorRowColor }
   );
 
-  await dispatchCustomEvent(dataConfig, "refchange", {
-    name: "sourceRecordsRef",
-    value: ""
-  });
-  await dispatchConfigPatch(
-    dataConfig,
-    ["custom", "items"],
-    customConfig("E2E Custom Selector").custom.items
-  );
+  await discardAndReopen(page);
   await assertModalSaveEnabled(page, "invalid-state recovery");
 }
 
@@ -1337,19 +1625,291 @@ function recordTextFieldChecks(passes) {
   });
 }
 
-// Copy and behavior an admin relies on to understand and fix the setup:
-// named option controls, recoverable override clearing, an honest query
-// limit, a quiet blank filter, reachable min/max limits, and layout names
-// that don't collide with data sources or selection modes.
-async function exerciseClarity(page) {
-  const dataConfig = page.locator("c-newton-selector-flow-cpe-data-config");
-  await activateStudioSection(page, "data");
+const queryPreview = (page) =>
+  page.locator(DATA).locator(".newton-query-preview__code code").first();
 
-  const deleteAlpha = page.getByRole("button", {
+async function readPreview(page) {
+  return (
+    await queryPreview(page)
+      .textContent({ timeout: 10000 })
+      .catch(() => "")
+  ).trim();
+}
+
+async function previewMatches(page, pattern, timeout = 15000) {
+  return waitUntil(
+    () => readPreview(page),
+    (text) => pattern.test(text),
+    timeout
+  );
+}
+
+// The SOQL source's Object lookup.
+const objectLookup = (page) =>
+  page
+    .locator(DATA)
+    .getByRole("combobox", { name: /\bObject\b/ })
+    .first();
+
+async function pickSoqlObject(page, apiName) {
+  const box = objectLookup(page);
+  await box.click({ timeout: 15000 });
+  await box.fill(apiName, { timeout: 15000 });
+  await page
+    .locator(DATA)
+    .locator(`[role="option"][data-id="${apiName}"]`)
+    .first()
+    .click({ timeout: 20000 });
+  const { met, value } = await previewMatches(
+    page,
+    new RegExp(`\\bFROM ${apiName}\\b`)
+  );
+  assert(met, `Picking ${apiName} in Object did not reach the query: ${value}`);
+}
+
+// Esc in an open lookup list closes the list and is handled there: the modal
+// must not also ask to discard the (unsaved) changes. Once with no matches,
+// once with matches.
+async function exerciseLookupEscape(page) {
+  const data = page.locator(DATA);
+  const box = objectLookup(page);
+  const cases = [];
+  for (const [term, shown] of [
+    ["zzzqqq", data.getByText("No results found.").first()],
+    ["Lead", data.locator('[role="option"][data-id="Lead"]').first()]
+  ]) {
+    await box.click({ timeout: 15000 });
+    await box.fill(term, { timeout: 15000 });
+    await shown.waitFor({ state: "visible", timeout: 20000 });
+    await box.press("Escape");
+    const { value: listState } = await waitUntil(
+      async () => ({
+        expanded: await box.getAttribute("aria-expanded"),
+        prompt: await discardPrompt(page).isVisible()
+      }),
+      (state) => state.expanded !== "true" || state.prompt,
+      3000
+    );
+    // A discard prompt can follow the closing list by a render.
+    const prompt =
+      listState.prompt || (await reaches(discardPrompt(page), "visible", 1500));
+    cases.push({
+      term,
+      listClosed: listState.expanded !== "true",
+      discardPrompt: prompt,
+      modalOpen: (await studio(page).count()) > 0
+    });
+    if (prompt) {
+      await page.getByRole("button", { name: "Keep editing" }).first().click();
+      await reaches(discardPrompt(page), "hidden", 10000);
+    }
+    if (listState.expanded === "true") await neutralClick(page);
+    await box.fill("", { timeout: 15000 });
+  }
+  await neutralClick(page);
+  recordCheck(
+    "Esc in an open lookup closes its list without the discard prompt",
+    cases.every((c) => c.listClosed && !c.discardPrompt && c.modalOpen),
+    { cases }
+  );
+}
+
+// Text pickers on a scratch option (a copy of Gamma, deleted afterwards):
+// the menu lists text resources and record variables to open for a text
+// field, Back returns to the list without touching the field, and the menu
+// works from the keyboard.
+async function exerciseTextResourcePickers(page) {
+  const data = page.locator(DATA);
+  await data
+    .getByRole("button", { name: "Duplicate E2E Custom Gamma", exact: true })
+    .click({ timeout: 15000 });
+  const copyField = (label) => resourceField(page, DATA, label).nth(3);
+  await copyField("Badge").waitFor({ state: "visible", timeout: 15000 });
+  const optionValues = (field) =>
+    field
+      .locator('[role="option"]')
+      .evaluateAll((nodes) => nodes.map((node) => node.dataset.value));
+  const option = (field, value) =>
+    field.locator(`[role="option"][data-value="${value}"]`).first();
+
+  // 1. What a text picker lists, and opening a record variable for a field.
+  const badge = copyField("Badge");
+  await badge.locator("input").first().click({ timeout: 15000 });
+  const { value: listed } = await waitUntil(
+    () => optionValues(badge),
+    (values) => values.length > 0,
+    10000
+  );
+  let drilledToLastName = false;
+  let fieldAfterPick = "";
+  if (listed.includes(RECORD_RESOURCE)) {
+    await option(badge, RECORD_RESOURCE)
+      .getByTitle("Open object fields")
+      .click({ timeout: 15000 });
+    drilledToLastName = await reaches(
+      option(badge, "LastName"),
+      "visible",
+      15000
+    );
+    if (drilledToLastName) {
+      await option(badge, "LastName").click({ timeout: 15000 });
+      fieldAfterPick = (
+        await waitUntil(
+          () => badge.innerText().catch(() => ""),
+          (text) => /Last ?Name/.test(text),
+          10000
+        )
+      ).value;
+    }
+  }
+  await neutralClick(page);
+  recordCheck(
+    "a text picker lists text resources and opens a record variable for a text field",
+    listed.includes(LABEL_RESOURCE) &&
+      listed.includes(RECORD_RESOURCE) &&
+      !listed.includes(NUMBER_RESOURCE) &&
+      drilledToLastName &&
+      /Last ?Name/.test(fieldAfterPick),
+    {
+      listedOnOpen: listed,
+      expectListed: [LABEL_RESOURCE, RECORD_RESOURCE],
+      expectNotListed: [NUMBER_RESOURCE],
+      drilledToLastName,
+      fieldAfterPick: fieldAfterPick.replace(/\s+/g, " ").trim()
+    }
+  );
+
+  // 2. Back after opening a record variable.
+  const help = copyField("Help text");
+  const helpInput = help.locator("input").first();
+  const before = await helpInput.inputValue();
+  await helpInput.click({ timeout: 15000 });
+  await option(help, RECORD_RESOURCE)
+    .getByTitle("Open object fields")
+    .click({ timeout: 15000 });
+  await option(help, "LastName").waitFor({ state: "visible", timeout: 15000 });
+  const back = help.getByRole("button", { name: "Back" }).first();
+  const backShown = await reaches(back, "visible", 5000);
+  if (backShown) await back.click({ timeout: 15000 });
+  const listedAgain = await reaches(
+    option(help, LABEL_RESOURCE),
+    "visible",
+    5000
+  );
+  await neutralClick(page);
+  await reaches(help.locator('[role="option"]').first(), "hidden", 5000);
+  const after = await helpInput
+    .inputValue({ timeout: 5000 })
+    .catch(() => "(no text box)");
+  recordCheck(
+    "Back in a resource picker returns to the list without clearing the field",
+    backShown && listedAgain && after === before,
+    { before, after, backShown, rootListShownAfterBack: listedAgain }
+  );
+
+  // 3. Keyboard: filter by typing, ArrowDown to the match, Enter to pick.
+  const sublabel = copyField("Sublabel");
+  const comboboxes = await sublabel.getByRole("combobox").count();
+  const subInput = sublabel.locator("input").first();
+  await subInput.click({ timeout: 15000 });
+  await subInput.fill(LABEL_RESOURCE.slice(0, 8), { timeout: 15000 });
+  await option(sublabel, LABEL_RESOURCE).waitFor({
+    state: "visible",
+    timeout: 10000
+  });
+  await subInput.press("ArrowDown");
+  const activeOption =
+    comboboxes > 0
+      ? await sublabel
+          .getByRole("combobox")
+          .first()
+          .getAttribute("aria-activedescendant")
+      : null;
+  await subInput.press("Enter");
+  const picked = await waitUntil(
+    () => sublabel.innerText().catch(() => ""),
+    (text) => text.includes(LABEL_RESOURCE),
+    5000
+  );
+  await neutralClick(page);
+  recordCheck(
+    "a resource picker menu can be used from the keyboard",
+    comboboxes > 0 && picked.met,
+    {
+      comboboxRoles: comboboxes,
+      activeOptionAfterArrowDown: activeOption,
+      keys: `typed "${LABEL_RESOURCE.slice(0, 8)}", ArrowDown, Enter`,
+      fieldAfterEnter: picked.value.replace(/\s+/g, " ").trim()
+    }
+  );
+
+  const deleteGamma = data.getByRole("button", {
+    name: "Delete E2E Custom Gamma",
+    exact: true
+  });
+  await deleteGamma.last().click({ timeout: 15000 });
+  const { met } = await waitUntil(
+    () => deleteGamma.count(),
+    (count) => count === 1,
+    10000
+  );
+  assert(met, "The scratch copy of E2E Custom Gamma was not deleted");
+}
+
+// Option overrides edited through the overrides card: a label override on a
+// sample row, Default clears it, Undo brings it back.
+async function exerciseOverrideUndo(page) {
+  const data = page.locator(DATA);
+  await setToggle(data, "Option overrides", "Advanced");
+  await data
+    .getByRole("button", { name: /^(Re)?load sample rows$/i })
+    .first()
+    .click({ timeout: 15000 });
+  const firstRow = data
+    .getByRole("button", { name: /^Edit overrides for / })
+    .first();
+  await firstRow.waitFor({ state: "visible", timeout: 30000 });
+  await firstRow.click();
+  await typeIntoField(
+    resourceField(page, DATA, "Label override").first(),
+    "Override Alpha"
+  );
+  const overrideLabel = data.getByText("Override Alpha", { exact: true });
+  const overrideShown = await reaches(overrideLabel.first(), "visible", 10000);
+  await setToggle(data, "Option overrides", "Default");
+  const clearedVisible = await reaches(
+    data.getByText("Overrides cleared.", { exact: false }).first(),
+    "visible",
+    10000
+  );
+  if (clearedVisible) {
+    await data
+      .getByRole("button", { name: "Undo", exact: true })
+      .first()
+      .click({ timeout: 10000 });
+  }
+  const restored = await reaches(overrideLabel.first(), "visible", 10000);
+  recordCheck(
+    "switching overrides to Default can be undone",
+    overrideShown && clearedVisible && restored,
+    { overrideShown, clearedVisible, restored }
+  );
+}
+
+// Copy and behavior an admin relies on to understand and fix the setup:
+// named option controls, text pickers, recoverable override clearing, an
+// honest query limit, a quiet blank filter, reachable min/max limits, the
+// multi-only Select all toggle, and layout names that don't collide with
+// data sources or selection modes.
+async function exerciseClarity(page) {
+  const data = page.locator(DATA);
+  await openChapter(page, "data");
+
+  const deleteAlpha = data.getByRole("button", {
     name: "Delete E2E Custom Alpha",
     exact: true
   });
-  const moveBetaUp = page.getByRole("button", {
+  const moveBetaUp = data.getByRole("button", {
     name: "Move E2E Custom Beta up",
     exact: true
   });
@@ -1361,98 +1921,99 @@ async function exerciseClarity(page) {
       moveBetaUp: await moveBetaUp.count()
     }
   );
+  await exerciseTextResourcePickers(page);
 
-  await clickTile(page, "Data source", "SOQL query");
-  await dispatchConfigPatch(dataConfig, ["sobject", "sObjectApiName"], "Lead");
-  await dispatchConfigPatch(dataConfig, ["sobject", "limit"], "");
-  await page.waitForTimeout(600);
-  const queryPreview = (
-    await page
-      .locator('code[aria-label="Generated SOQL preview"]')
-      .first()
-      .textContent({ timeout: 10000 })
-      .catch(() => "")
-  ).trim();
+  await selectTileOrThrow(page, "Data source", "sobject");
+  await exerciseLookupEscape(page);
+  await pickSoqlObject(page, "Lead");
+  const rowsToLoad = data.getByLabel("Rows to load");
+  await rowsToLoad.fill("25");
+  await rowsToLoad.press("Tab");
+  const limitTyped = await previewMatches(page, /LIMIT 25$/, 10000);
+  assert(
+    limitTyped.met,
+    `Rows to load 25 did not reach the query: ${limitTyped.value}`
+  );
+  await rowsToLoad.fill("");
+  await rowsToLoad.press("Tab");
+  const { value: limitPreview } = await previewMatches(
+    page,
+    /LIMIT 50$/,
+    10000
+  );
   recordCheck(
     "an empty Limit previews the 50 rows the runtime loads",
-    /LIMIT 50$/.test(queryPreview),
-    { queryPreview }
+    /LIMIT 50$/.test(limitPreview),
+    { typed: "25, then cleared", queryPreview: limitPreview }
   );
   const soqlFields = await measureTextFields(page);
-  const blankFilterNagging = await page
-    .getByText(/Finish this condition|Complete field, operator/)
-    .first()
-    .isVisible()
-    .catch(() => false);
+
+  const whereBuilder = page
+    .locator("c-newton-selector-flow-cpe-where-builder")
+    .first();
+  const removeButtons = whereBuilder.getByRole("button", {
+    name: "Remove condition",
+    exact: true
+  });
+  await removeButtons.first().waitFor({ state: "visible", timeout: 15000 });
+  const conditionCount = await removeButtons.count();
+  const blankFilterErrors = await whereBuilder
+    .getByText(/Finish this condition/)
+    .count();
   recordCheck(
     "an untouched blank filter condition shows no error",
-    !blankFilterNagging
+    conditionCount === 1 && blankFilterErrors === 0,
+    { conditionCount, blankFilterErrors }
   );
-  const overrideToggle = page.locator(
-    ".newton-studio__override-mode c-newton-selector-flow-cpe-toggle"
-  );
-  await dispatchToggle(overrideToggle, true);
-  await dispatchConfigPatch(dataConfig, ["overrides"], {
-    "custom-alpha": { label: "Override Alpha" }
-  });
-  await dispatchToggle(overrideToggle, false);
-  const clearedVisible = await page
-    .getByText("Overrides cleared.", { exact: false })
-    .first()
-    .isVisible()
-    .catch(() => false);
-  await page
-    .getByRole("button", { name: "Undo", exact: true })
-    .first()
-    .click({ timeout: 10000 })
-    .catch(() => {});
-  await page.waitForTimeout(400);
-  const restored = await dataConfig
-    .first()
-    .evaluate((node) => JSON.parse(JSON.stringify(node.config || {})))
-    .then((config) => config.overrides?.["custom-alpha"]?.label || "");
-  recordCheck(
-    "switching overrides to Default can be undone",
-    clearedVisible && restored === "Override Alpha",
-    { clearedVisible, restored }
-  );
-  await dispatchConfigPatch(dataConfig, ["overrides"], {});
-  await dispatchToggle(overrideToggle, false);
 
-  await clickTile(page, "Data source", "Custom options");
+  await exerciseOverrideUndo(page);
+  // With the override still set, a new data source starts without it
+  // (checked in the saved Flow).
+  await selectTileOrThrow(page, "Data source", "custom");
   const customFields = await measureTextFields(page);
   const searchIconPasses = [await findResourceFieldSearchIcons(page)];
-  await activateStudioSection(page, "content");
+  await openChapter(page, "content");
   searchIconPasses.push(await findResourceFieldSearchIcons(page));
 
-  await activateStudioSection(page, "behavior");
-  await dispatchSelectionMode(page, "multi");
+  await openChapter(page, "behavior");
+  const behavior = page.locator(BEHAVIOR);
+  await setToggle(behavior, "Selection mode", "Multi");
+  const selectAllToggle = behavior.getByRole("radiogroup", {
+    name: "Select all and Clear all buttons",
+    exact: true
+  });
+  const selectAllInMulti = await reaches(selectAllToggle, "visible", 5000);
+  if (selectAllInMulti) {
+    await setToggle(behavior, "Select all and Clear all buttons", "On");
+    await selectAllToggle.scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: join(ARTIFACT_DIR, "09-select-all-toggle.png")
+    });
+  }
   const minField = page.getByLabel("Minimum selections", { exact: true });
   const maxField = page.getByLabel("Maximum selections", { exact: true });
   await minField.fill("3");
   await minField.press("Tab");
   await maxField.fill("2");
   await maxField.press("Tab");
-  await page.waitForTimeout(400);
-  const minMaxStatus = (
-    await page
-      .locator(".newton-modal__status")
-      .first()
-      .textContent({ timeout: 5000 })
-      .catch(() => "")
-  ).trim();
+  const minMaxPattern =
+    /Behavior: Maximum selections must be at least the minimum, and at least 1\./;
+  const { value: minMaxStatus } = await waitUntil(
+    () => readModalStatus(page),
+    (text) => minMaxPattern.test(text),
+    10000
+  );
   const saveBlocked = await (await modalSaveButton(page)).isDisabled();
   await maxField.fill("4");
   await maxField.press("Tab");
-  await page.waitForTimeout(400);
-  const saveRestored = !(await (await modalSaveButton(page)).isDisabled());
+  const { value: saveRestored } = await waitUntil(
+    async () => !(await (await modalSaveButton(page)).isDisabled()),
+    Boolean,
+    10000
+  );
   recordCheck(
     "min and max selections can be set and their error fixed in the editor",
-    /Behavior: Maximum selections must be at least the minimum, and at least 1\./.test(
-      minMaxStatus
-    ) &&
-      saveBlocked &&
-      saveRestored,
+    minMaxPattern.test(minMaxStatus) && saveBlocked && saveRestored,
     { minMaxStatus, saveBlocked, saveRestored }
   );
   recordTextFieldChecks([
@@ -1467,15 +2028,29 @@ async function exerciseClarity(page) {
   await maxField.fill("");
   await maxField.press("Tab");
   await exerciseMultiDefaultSelectionLiteral(page);
-  await dispatchSelectionMode(page, "single");
+  await setToggle(behavior, "Selection mode", "Single");
+  const selectAllHiddenInSingle = await reaches(
+    selectAllToggle,
+    "hidden",
+    5000
+  );
+  recordCheck(
+    'the "Select all and Clear all buttons" toggle shows only in Multi mode',
+    selectAllInMulti && selectAllHiddenInSingle,
+    {
+      shownInMulti: selectAllInMulti,
+      hiddenInSingle: selectAllHiddenInSingle
+    }
+  );
 
-  await activateStudioSection(page, "appearance");
+  await openChapter(page, "appearance");
   const titles = (
     await page
-      .locator(
-        '.newton-studio__selectorgroup[aria-label="Layout"] .newton-selector-choice-tile__title'
+      .getByRole("radiogroup", { name: "Layout", exact: true })
+      .getByRole("radio")
+      .evaluateAll((nodes) =>
+        nodes.map((node) => (node.labels?.[0]?.innerText || "").split("\n")[0])
       )
-      .allTextContents()
   ).map((title) => title.trim());
   recordCheck(
     "layout names don't reuse data source or selection mode words",
@@ -1485,7 +2060,7 @@ async function exerciseClarity(page) {
       !titles.includes("Multi-select"),
     { titles }
   );
-  await activateStudioSection(page, "data");
+  await openChapter(page, "data");
 }
 
 // Multi select pre-selects from the component's `values` input, a text
@@ -1502,12 +2077,15 @@ async function exerciseMultiDefaultSelectionLiteral(page) {
     "c-newton-selector-flow-cpe-behavior-config",
     "Default selection"
   ).first();
-  await dispatchValueChanged(field, "custom-beta");
-  await page.waitForTimeout(400);
+  await typeIntoField(field, "custom-beta");
   // innerText holds only rendered text, so a line equal to the message means
   // the field shows it. Only the refusal shows; the field is not also
   // reported as a bad reference.
-  const fieldText = (await field.innerText().catch(() => "")).trim();
+  const { value: fieldText } = await waitUntil(
+    async () => (await field.innerText().catch(() => "")).trim(),
+    (text) => text.includes(MULTI_DEFAULT_LITERAL_ERROR),
+    5000
+  );
   const errorShown = fieldText
     .split("\n")
     .some((line) => line.trim() === MULTI_DEFAULT_LITERAL_ERROR);
@@ -1535,67 +2113,113 @@ async function exerciseMultiDefaultSelectionLiteral(page) {
       valuesInputInEditor: valuesRef
     }
   );
-  await dispatchValueChanged(field, "");
+  await typeIntoField(field, "");
 }
 
 // The resource picker (text box + Flow resource menu) whose label reads
-// exactly `label`, inside the editor chapter `chapterTag`.
+// exactly `label`, inside the editor chapter `chapterTag`. A required picker's
+// label starts with the "*" required marker.
 function resourceField(page, chapterTag, label) {
   return page
     .locator(`${chapterTag} c-newton-selector-flow-cpe-resource-selector`)
     .filter({
       has: page.locator("label", {
-        hasText: new RegExp(`^\\s*${label.replace(/[()]/g, "\\$&")}\\s*$`)
+        hasText: new RegExp(
+          `^\\s*\\*?\\s*${label.replace(/[()]/g, "\\$&")}\\s*$`
+        )
       })
     });
 }
 
-// Picks a Flow variable from a resource picker the way an admin does: click
-// the box, clear any text in it, click the variable in the menu.
+// Picks a Flow resource from a resource picker the way an admin does: click
+// the box, type part of the name to filter the list, click the resource.
+// The typed filter text must not be saved instead of the picked resource.
 async function pickFlowResource(field, apiName) {
-  const page = field.page();
   const input = field.locator("input").first();
   await input.click({ timeout: 15000 });
-  // Filter the list the way an admin does, by typing part of the name: the
-  // typed filter text must not be saved instead of the picked resource.
   await input.fill(apiName.slice(0, 8), { timeout: 15000 });
-  await page.waitForTimeout(800);
   const option = field
     .locator(`[role="option"][data-value="${apiName}"]`)
     .first();
   await option.waitFor({ state: "visible", timeout: 15000 });
   await option.click({ timeout: 15000 });
-  await page.waitForTimeout(600);
+  await reaches(field.locator('[role="option"]').first(), "hidden", 10000);
   return (await field.innerText().catch(() => "")).trim();
 }
 
-// The SOQL source's visual filter builder, driven with real clicks and typing:
-// an unfinished condition blocks Save without dropping the finished ones from
-// the query, and number fields compare unquoted.
+// Sentences shown in a filter condition row: its error messages. The row's
+// other text is the condition number, the operator and the value.
+async function conditionMessages(condition) {
+  return (await condition.innerText().catch(() => ""))
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.split(/\s+/).length >= 4);
+}
+
+function isValidQueryMessage(message) {
+  return (
+    /\bvalid/i.test(message) &&
+    !/\binvalid\b|\berror\b|unable|fail|couldn/i.test(message)
+  );
+}
+
+// Clicks Validate query and returns the message it shows.
+async function validateQuery(page) {
+  const section = page
+    .locator(DATA)
+    .locator("section", {
+      has: page.getByRole("button", { name: /Validate query|Validating/ })
+    })
+    .first();
+  await section
+    .getByRole("button", { name: "Validate query" })
+    .click({ timeout: 15000 });
+  const { value } = await waitUntil(
+    async () =>
+      (
+        await section
+          .getByRole("status")
+          .first()
+          .innerText()
+          .catch(() => "")
+      ).trim(),
+    (text) => text && !/^Not checked yet/.test(text),
+    30000
+  );
+  return value;
+}
+
+// The SOQL source's visual filter builder, driven with real clicks, typing
+// and keys: an unfinished condition blocks Save without dropping the
+// finished ones, number fields compare unquoted, invalid typed values block
+// Save, Flow values validate and are quoted for text fields, and IN refuses
+// a Flow value. Leaves `CreatedDate < <datetime> AND LastName = '{!label}'`.
 async function exerciseWhereBuilder(page) {
-  const dataConfig = page.locator("c-newton-selector-flow-cpe-data-config");
+  const data = page.locator(DATA);
   const whereBuilder = page
     .locator("c-newton-selector-flow-cpe-where-builder")
     .first();
-  const conditions = whereBuilder.locator(".cc-where-condition");
-  const preview = page
-    .locator('code[aria-label="Generated SOQL preview"]')
-    .first();
-  const readPreview = async () =>
-    (await preview.textContent({ timeout: 10000 }).catch(() => "")).trim();
-  const readStatus = async () =>
-    (
-      await page
-        .locator(".newton-modal__status")
-        .first()
-        .textContent({ timeout: 5000 })
-        .catch(() => "")
-    ).trim();
+  const removeCondition = (condition) =>
+    condition
+      .getByRole("button", { name: "Remove condition", exact: true })
+      .click({ timeout: 15000 });
+  const conditions = whereBuilder.locator("article").filter({
+    has: page.getByRole("button", { name: "Remove condition", exact: true })
+  });
+  const valueField = (condition) =>
+    condition.locator("c-newton-selector-flow-cpe-resource-selector").first();
+  const operatorBox = (condition) =>
+    condition
+      .locator(
+        'c-newton-selector-flow-cpe-choice-control button[role="combobox"]'
+      )
+      .first();
+  const saveDisabled = async () => (await modalSaveButton(page)).isDisabled();
   const builderState = async () => ({
     conditionCount: await conditions.count(),
     manualMode:
       (await whereBuilder.getByText("Manual WHERE clause").count()) > 0,
-    queryPreview: await readPreview()
+    queryPreview: await readPreview(page)
   });
   const chooseField = async (condition, apiName) => {
     const fieldInput = condition.locator('input[role="combobox"]').first();
@@ -1605,45 +2229,106 @@ async function exerciseWhereBuilder(page) {
       .locator('[role="option"]', { hasText: apiName })
       .first()
       .click({ timeout: 20000 });
-    await page.waitForTimeout(600);
+    const { met } = await waitUntil(
+      () => fieldInput.inputValue(),
+      (value) => value.length > 0,
+      10000
+    );
+    assert(met, `Field ${apiName} was not chosen in the filter condition`);
   };
-  const neutralClick = () =>
-    page.getByText("Component preview", { exact: true }).first().click();
+  const chooseOperator = async (condition, operator) => {
+    await operatorBox(condition).click({ timeout: 15000 });
+    await condition
+      .locator(`[role="option"][data-value="${operator}"]`)
+      .first()
+      .click({ timeout: 15000 });
+    const { met } = await waitUntil(
+      async () => (await operatorBox(condition).innerText()).trim(),
+      (text) => text === operator,
+      10000
+    );
+    assert(met, `Operator ${operator} was not chosen`);
+  };
+  const addCondition = async () => {
+    const before = await conditions.count();
+    await whereBuilder
+      .getByRole("button", { name: "Add condition" })
+      .click({ timeout: 15000 });
+    await conditions.nth(before).waitFor({ state: "visible", timeout: 10000 });
+    return conditions.nth(before);
+  };
+  // Save disabled plus a message in the row containing `pattern`.
+  const blockedWithMessage = (condition, pattern) =>
+    waitUntil(
+      async () => ({
+        saveDisabled: await saveDisabled(),
+        messages: await conditionMessages(condition),
+        queryPreview: await readPreview(page)
+      }),
+      (state) =>
+        state.saveDisabled && state.messages.some((m) => pattern.test(m)),
+      8000
+    );
 
-  await activateStudioSection(page, "data");
-  await clickTile(page, "Data source", "SOQL query");
-  await dispatchConfigPatch(dataConfig, ["sobject", "sObjectApiName"], "Lead");
-  await page.waitForTimeout(2500);
+  await openChapter(page, "data");
+  await selectTileOrThrow(page, "Data source", "sobject");
+  const advancedChecked = await data
+    .getByRole("radiogroup", { name: "Option overrides", exact: true })
+    .getByRole("radio", { name: "Advanced", exact: true })
+    .getAttribute("aria-checked");
+  observed.overridesModeBackOnSoql =
+    advancedChecked === "true" ? "Advanced" : "Default";
+  const objectKept = await previewMatches(page, /\bFROM Lead\b/);
+  assert(objectKept.met, `SOQL object Lead was not kept: ${objectKept.value}`);
+  await conditions.first().waitFor({ state: "visible", timeout: 15000 });
 
-  // A saved filter with one finished condition, then the admin adds a second
-  // condition and picks its field but no value yet.
-  await dispatchConfigPatch(
-    dataConfig,
-    ["sobject", "whereClause"],
-    "Rating = 'Hot'"
+  // A finished condition typed in the builder, then a second condition with
+  // a field but no value yet.
+  await chooseField(conditions.nth(0), "Rating");
+  await typeIntoField(valueField(conditions.nth(0)), "Hot");
+  const finished = await previewMatches(page, /\bWHERE Rating = 'Hot'/);
+  assert(finished.met, `Rating = 'Hot' did not preview: ${finished.value}`);
+  const unfinished = await addCondition();
+  await chooseField(unfinished, "LastName");
+  await neutralClick(page);
+  const expectedStatus =
+    "1 error to fix · Data: Finish or remove the highlighted filter condition.";
+  const { value: incompleteStatus } = await waitUntil(
+    () => readModalStatus(page),
+    (text) => text === expectedStatus,
+    10000
   );
-  await page.waitForTimeout(1000);
-  await whereBuilder.locator("button.cc-where-add").first().click();
-  await page.waitForTimeout(600);
-  await chooseField(conditions.nth(1), "LastName");
-  await neutralClick();
-  await page.waitForTimeout(800);
   const incomplete = await builderState();
   recordCheck(
     "an unfinished filter condition keeps the finished ones in the query",
     /\bWHERE Rating = 'Hot'/.test(incomplete.queryPreview),
     { expectedFragment: "WHERE Rating = 'Hot'", ...incomplete }
   );
-  const expectedStatus =
-    "1 error to fix · Data: Finish or remove the highlighted filter condition.";
-  const incompleteStatus = await readStatus();
-  const saveDisabledWhileIncomplete = await (
-    await modalSaveButton(page)
-  ).isDisabled();
+  const saveDisabledWhileIncomplete = await saveDisabled();
   await page.screenshot({
     path: join(ARTIFACT_DIR, "03b-incomplete-filter.png"),
     fullPage: true
   });
+  // The row's message must read as a sentence under the fields, not wrap
+  // word by word in a narrow column.
+  const rowMessage = await unfinished
+    .getByText(/^Finish this condition/)
+    .first()
+    .evaluate((node) => {
+      const box = node.getBoundingClientRect();
+      return {
+        widthPx: Math.round(box.width),
+        lines: Math.round(
+          box.height / parseFloat(getComputedStyle(node).lineHeight)
+        )
+      };
+    })
+    .catch((error) => ({ error: error.message }));
+  recordCheck(
+    "a filter condition's message reads as a sentence under its fields",
+    rowMessage.lines <= 2 && rowMessage.widthPx >= 200,
+    rowMessage
+  );
   recordCheck(
     "an unfinished filter condition blocks Save and says why",
     saveDisabledWhileIncomplete && incompleteStatus === expectedStatus,
@@ -1654,281 +2339,376 @@ async function exerciseWhereBuilder(page) {
     }
   );
 
-  await whereBuilder
-    .getByRole("button", { name: "Remove condition", exact: true })
-    .nth(1)
-    .click({ timeout: 15000 });
-  await page.waitForTimeout(800);
-  const saveEnabledAfterRemove = !(await (
-    await modalSaveButton(page)
-  ).isDisabled());
-  const afterRemove = await builderState();
+  await removeCondition(unfinished);
+  const { value: afterRemove } = await waitUntil(
+    async () => ({
+      ...(await builderState()),
+      saveDisabled: await saveDisabled()
+    }),
+    (state) => state.conditionCount === 1 && !state.saveDisabled,
+    10000
+  );
   recordCheck(
     "removing the unfinished filter condition re-enables Save",
-    saveEnabledAfterRemove &&
+    !afterRemove.saveDisabled &&
       afterRemove.conditionCount === 1 &&
       /\bWHERE Rating = 'Hot'/.test(afterRemove.queryPreview),
-    {
-      saveEnabled: saveEnabledAfterRemove,
-      saveStatusText: await readStatus(),
-      ...afterRemove
-    }
+    { saveStatusText: await readModalStatus(page), ...afterRemove }
   );
 
-  // From a blank filter (removing the last condition leaves a blank one):
-  // NumberOfEmployees = 5, typed as an admin would.
-  await whereBuilder
-    .getByRole("button", { name: "Remove condition", exact: true })
-    .first()
-    .click({ timeout: 15000 });
-  await page.waitForTimeout(1000);
-  const first = conditions.nth(0);
-  await chooseField(first, "NumberOfEmployees");
-  await first
-    .locator(
-      'c-newton-selector-flow-cpe-choice-control button[role="combobox"]'
-    )
-    .first()
-    .click({ timeout: 15000 });
-  await first
-    .locator('[role="option"][data-value="="]')
-    .first()
-    .click({ timeout: 15000 });
-  const valueInput = first
-    .locator("c-newton-selector-flow-cpe-resource-selector input")
-    .first();
-  await valueInput.fill("5", { timeout: 15000 });
-  await page.waitForTimeout(400);
-  // The value box must survive its own typing; if it is gone, the builder
-  // replaced the condition and the detail below says how.
-  const valueBoxKept = (await valueInput.count()) === 1;
-  if (valueBoxKept) {
-    await valueInput.press("Tab");
-    await neutralClick();
-  }
-  await page.waitForTimeout(600);
-  const numberState = await builderState();
+  // Removing the last condition leaves a blank one.
+  await removeCondition(conditions.nth(0));
+  const noWhereAfterLast = await previewMatches(
+    page,
+    /^(?![\s\S]*\bWHERE\b)/,
+    10000
+  );
+  assert(
+    noWhereAfterLast.met,
+    `Removing the last condition left a WHERE clause: ${noWhereAfterLast.value}`
+  );
+  const numberCondition = conditions.nth(0);
+  await chooseField(numberCondition, "NumberOfEmployees");
+
+  // The operator is a select-mode combobox: Enter opens it, ArrowDown moves
+  // to the next operator, Enter picks it.
+  const operator = operatorBox(numberCondition);
+  const operatorBefore = (await operator.innerText()).trim();
+  await operator.focus();
+  await page.keyboard.press("Enter");
+  const listOpened = await reaches(
+    numberCondition.getByRole("option").first(),
+    "visible",
+    5000
+  );
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  const { value: operatorAfter } = await waitUntil(
+    async () => (await operator.innerText()).trim(),
+    (text) => text !== operatorBefore,
+    5000
+  );
+  const listClosed = (await operator.getAttribute("aria-expanded")) !== "true";
   recordCheck(
-    "a number filter value previews unquoted",
-    /\bWHERE NumberOfEmployees = 5\b/.test(numberState.queryPreview),
+    "a select-mode combobox picks an option with the keyboard",
+    operatorBefore === "=" && operatorAfter === "!=" && listClosed,
     {
-      expectedFragment: "WHERE NumberOfEmployees = 5",
-      valueBoxKept,
-      ...numberState
+      keys: "Enter, ArrowDown, Enter on the Operator",
+      operatorBefore,
+      operatorAfter,
+      listOpened,
+      listClosed
+    }
+  );
+  if (!listClosed) await neutralClick(page);
+
+  await chooseOperator(numberCondition, "=");
+  await typeIntoField(valueField(numberCondition), "5");
+  const numberState = await previewMatches(
+    page,
+    /\bWHERE NumberOfEmployees = 5\b/
+  );
+  recordCheck("a number filter value previews unquoted", numberState.met, {
+    expectedFragment: "WHERE NumberOfEmployees = 5",
+    queryPreview: numberState.value
+  });
+
+  await typeIntoField(valueField(numberCondition), "abc");
+  const invalidNumber = await blockedWithMessage(
+    numberCondition,
+    /\bnumber\b/i
+  );
+
+  // A Flow value on a number field: Validate query checks it with a stand-in
+  // number, and sample rows say they skipped the WHERE clause.
+  await pickFlowResource(valueField(numberCondition), NUMBER_RESOURCE);
+  const numberMerge = await previewMatches(
+    page,
+    new RegExp(`NumberOfEmployees = \\{!${NUMBER_RESOURCE}\\}`)
+  );
+  const numberMergeValidation = await validateQuery(page);
+  recordCheck(
+    "Validate query accepts a Flow value on a number field",
+    numberMerge.met && isValidQueryMessage(numberMergeValidation),
+    {
+      queryPreview: numberMerge.value,
+      validationMessage: numberMergeValidation
+    }
+  );
+  await setToggle(data, "Option overrides", "Advanced");
+  await data
+    .getByRole("button", { name: /^(Re)?load sample rows$/i })
+    .first()
+    .click({ timeout: 15000 });
+  const { value: sample } = await waitUntil(
+    async () => {
+      const lines = (await data.innerText().catch(() => "")).split("\n");
+      return {
+        note: lines.find((l) => /\bWHERE\b/.test(l) && /ignor/i.test(l)) || "",
+        loadError:
+          lines.find((l) => /couldn'?t load sample rows/i.test(l)) || "",
+        sampleRows: await data
+          .getByRole("button", { name: /^Edit overrides for / })
+          .count()
+      };
+    },
+    (state) => Boolean(state.note || state.loadError),
+    30000
+  );
+  recordCheck(
+    "Load sample rows says it ignored a WHERE clause that uses Flow values",
+    Boolean(sample.note) && !sample.loadError,
+    { whereClause: numberMerge.value, ...sample }
+  );
+
+  // A typed date that is not a date, then an ISO 8601 datetime.
+  await removeCondition(numberCondition);
+  const noWhereAfterNumber = await previewMatches(
+    page,
+    /^(?![\s\S]*\bWHERE\b)/,
+    10000
+  );
+  assert(
+    noWhereAfterNumber.met,
+    `Removing the number condition left a WHERE clause: ${noWhereAfterNumber.value}`
+  );
+  const dateCondition = conditions.nth(0);
+  await chooseField(dateCondition, "CreatedDate");
+  await chooseOperator(dateCondition, "<");
+  await typeIntoField(valueField(dateCondition), "yesterday");
+  const invalidDate = await blockedWithMessage(dateCondition, /\bdate\b/i);
+  recordCheck(
+    "an invalid number or date value blocks Save with a message",
+    invalidNumber.met && invalidDate.met,
+    {
+      number: { typed: "abc", ...invalidNumber.value },
+      date: { typed: "yesterday", ...invalidDate.value }
+    }
+  );
+  await typeIntoField(valueField(dateCondition), DATETIME_VALUE);
+  const datetime = await previewMatches(
+    page,
+    new RegExp(`CreatedDate < '?${DATETIME_VALUE}'?`)
+  );
+  const datetimeValidation = await validateQuery(page);
+  recordCheck(
+    "a DATETIME value typed as ISO 8601 passes Validate query",
+    datetime.met && isValidQueryMessage(datetimeValidation),
+    {
+      typed: DATETIME_VALUE,
+      queryPreview: datetime.value,
+      validationMessage: datetimeValidation
     }
   );
 
-  // Leave the selector as it was: no filter, Custom options.
-  await dispatchConfigPatch(dataConfig, ["sobject", "whereClause"], "");
-  await page.waitForTimeout(600);
-  await clickTile(page, "Data source", "Custom options");
+  // A text Flow value, kept (checked quoted in the saved Flow).
+  const textCondition = await addCondition();
+  await chooseField(textCondition, "LastName");
+  await pickFlowResource(valueField(textCondition), LABEL_RESOURCE);
+  observed.whereWithTextMerge = (
+    await previewMatches(page, new RegExp(`\\{!${LABEL_RESOURCE}\\}`))
+  ).value;
+
+  // IN needs typed values: a Flow value there blocks Save with a message.
+  const inCondition = await addCondition();
+  await chooseField(inCondition, "LastName");
+  await chooseOperator(inCondition, "IN");
+  await pickFlowResource(valueField(inCondition), LABEL_RESOURCE);
+  const inBlocked = await blockedWithMessage(inCondition, /need typed values/);
+  recordCheck(
+    "IN with a Flow value is blocked with a message",
+    inBlocked.met,
+    inBlocked.value
+  );
+  await removeCondition(inCondition);
+  const { met: inRemoved } = await waitUntil(
+    async () => (await conditions.count()) === 2 && !(await saveDisabled()),
+    Boolean,
+    10000
+  );
+  assert(inRemoved, "Removing the IN condition did not re-enable Save");
+
+  await selectTileOrThrow(page, "Data source", "custom");
 }
 
-// Diagnostic: NEWTON_E2E_SKIP=invalid,sources,content,behavior skips those
-// phases of the config sweep so a slowdown can be bisected.
-const SKIP_PHASES = new Set(
-  (process.env.NEWTON_E2E_SKIP || "").split(",").filter(Boolean)
-);
+const APPEARANCE_SWEEP = [
+  ["Layout", "grid"],
+  ["Layout", "list"],
+  ["Layout", "horizontal"],
+  ["Layout", "picklist"],
+  ["Layout", "radio"],
+  ["Layout", "columns"],
+  ["Layout", "dualListbox"],
+  ["Layout", "grid"],
+  ["Tile size", "small"],
+  ["Tile size", "medium"],
+  ["Tile size", "large"],
+  ["Aspect ratio", "1:1"],
+  ["Aspect ratio", "4:3"],
+  ["Aspect ratio", "16:9"],
+  ["Aspect ratio", "3:4"],
+  ["Tile elevation", "outlined"],
+  ["Tile elevation", "plain"],
+  ["Tile elevation", "raised"],
+  ["Pattern", "none"],
+  ["Pattern", "dots"],
+  ["Pattern", "lines"],
+  ["Pattern", "diagonal"],
+  ["Pattern", "grid"],
+  ["Pattern", "glow"],
+  ["Pattern", "noise"],
+  ["Pattern", "paper"],
+  ["Pattern", "waves"],
+  ["Corner style", "none"],
+  ["Corner style", "trim"],
+  ["Corner style", "brackets"],
+  ["Corner style", "dots"],
+  ["Surface style", "solid"],
+  ["Surface style", "gradient-top"],
+  ["Surface style", "gradient-radial"],
+  ["Surface style", "gradient-diagonal"],
+  ["Surface style", "tint"],
+  ["Icon decoration", "none"],
+  ["Icon decoration", "ring"],
+  ["Icon decoration", "halo"],
+  ["Icon decoration", "badge"],
+  ["Icon decoration", "square"],
+  ["Icon style", "filled"],
+  ["Icon style", "outlined"],
+  ["Icon style", "soft"],
+  ["Icon style", "glow"],
+  ["Icon style", "filled"],
+  ["Icon shading", "flat"],
+  ["Icon shading", "gradient"],
+  ["Icon shading", "emboss"],
+  ["Icon size", "xx-small"],
+  ["Icon size", "x-small"],
+  ["Icon size", "small"],
+  ["Icon size", "medium"],
+  ["Icon size", "large"],
+  ["Selection indicator", "checkmark"],
+  ["Selection indicator", "fill"],
+  ["Selection indicator", "bar"],
+  ["Horizontal gap", "none"],
+  ["Horizontal gap", "1"],
+  ["Horizontal gap", "4"],
+  ["Horizontal gap", "7"],
+  ["Vertical gap", "none"],
+  ["Vertical gap", "1"],
+  ["Vertical gap", "4"],
+  ["Vertical gap", "7"],
+  ["Margin — all sides", "none"],
+  ["Margin — all sides", "2"],
+  ["Padding — all sides", ""],
+  ["Padding — all sides", "3"]
+];
 
 async function exerciseAllConfigChapters(page) {
   await assertPageText(page, /Configure Newton Selector/i, "config modal");
   await page.screenshot({ path: screenshots.modal, fullPage: true });
 
-  if (!SKIP_PHASES.has("invalid")) {
-    console.log(JSON.stringify({ step: "invalid-states" }));
-    await exerciseInvalidBuilderStates(page);
-    await exerciseClarity(page);
-    await exerciseWhereBuilder(page);
-    console.log(JSON.stringify({ step: "chapters" }));
-  }
+  console.log(JSON.stringify({ step: "invalid-states" }));
+  await exerciseInvalidBuilderStates(page);
+  await exerciseClarity(page);
+  await exerciseWhereBuilder(page);
+  console.log(JSON.stringify({ step: "chapters" }));
 
-  if (!SKIP_PHASES.has("sources")) {
-    const sourceModes = ["picklist", "collection", "sobject", "custom"];
-    for (const value of sourceModes) {
-      await dispatchCardSelect(page, "Data source", value);
+  // Sources: every data source tile; Collection is bound to a record
+  // collection on the way (the saved Flow must drop that binding).
+  await openChapter(page, "data");
+  for (const value of ["picklist", "collection", "sobject", "custom"]) {
+    await selectTileOrThrow(page, "Data source", value);
+    if (value === "collection") {
+      observed.collectionBinding = await pickFlowResource(
+        resourceField(page, DATA, "Flow record collection"),
+        "Get_E2E_Leads"
+      );
     }
   }
 
-  if (!SKIP_PHASES.has("content")) {
-    await activateStudioSection(page, "content");
-    const contentFields = page.locator(
-      "c-newton-selector-flow-cpe-content-config c-newton-selector-flow-cpe-resource-selector"
-    );
-    await dispatchValueChanged(contentFields.nth(0), EDITED_LABEL);
-    // Then bind the label to a Flow text variable through the picker; the
-    // saved config must keep the merge-field wrapper (checked after Save).
-    await pickFlowResource(
-      resourceField(
-        page,
-        "c-newton-selector-flow-cpe-content-config",
-        "Selector label"
-      ),
-      LABEL_RESOURCE
-    );
-    observed.labelInEditorAfterPick = await page
-      .locator("c-newton-selector-flow-cpe-content-config")
-      .first()
-      .evaluate((node) => node.config?.label ?? null);
-    await page.getByText("Component preview", { exact: true }).first().click();
-    await dispatchValueChanged(
-      contentFields.nth(1),
-      "Edited help text from Playwright."
-    );
-    await dispatchValueChanged(
-      contentFields.nth(2),
-      "Edited tooltip from Playwright."
-    );
-    await dispatchValueChanged(contentFields.nth(3), "E2E empty state");
-    await dispatchValueChanged(contentFields.nth(4), "E2E error state");
-  }
-  if (!SKIP_PHASES.has("behavior")) {
-    await activateStudioSection(page, "behavior");
-    await dispatchSelectionMode(page, "multi");
-    await dispatchToggle(
-      page.locator(
-        'c-newton-selector-flow-cpe-behavior-config c-newton-selector-flow-cpe-toggle[data-key="required"]'
-      ),
-      true
-    );
-    await dispatchSelectionMode(page, "single");
-    await dispatchToggle(
-      page.locator(
-        'c-newton-selector-flow-cpe-behavior-config c-newton-selector-flow-cpe-toggle[data-key="autoAdvance"]'
-      ),
-      false
-    );
-    await dispatchToggle(
-      page.locator(
-        'c-newton-selector-flow-cpe-behavior-config c-newton-selector-flow-cpe-toggle[data-key="includeNoneOption"]'
-      ),
-      true
-    );
-    await dispatchValueChanged(
-      resourceField(
-        page,
-        "c-newton-selector-flow-cpe-behavior-config",
-        "Error message (optional)"
-      ).first(),
-      "None of these"
-    );
-    await dispatchCardSelect(page, "None option position", "end");
-    await dispatchToggle(
-      page.locator(
-        'c-newton-selector-flow-cpe-behavior-config c-newton-selector-flow-cpe-toggle[data-key="enableSearch"]'
-      ),
-      true
-    );
-    await dispatchToggle(
-      page.locator(
-        'c-newton-selector-flow-cpe-behavior-config c-newton-selector-flow-cpe-toggle[data-key="includeNoneOption"]'
-      ),
-      false
-    );
-  }
-  await activateStudioSection(page, "appearance");
-  const appearanceSelections = [
-    ["Layout", "grid"],
-    ["Layout", "list"],
-    ["Layout", "horizontal"],
-    ["Layout", "picklist"],
-    ["Layout", "radio"],
-    ["Layout", "columns"],
-    ["Layout", "dualListbox"],
-    ["Layout", "grid"],
-    ["Tile size", "small"],
-    ["Tile size", "medium"],
-    ["Tile size", "large"],
-    ["Aspect ratio", "1:1"],
-    ["Aspect ratio", "4:3"],
-    ["Aspect ratio", "16:9"],
-    ["Aspect ratio", "3:4"],
-    ["Tile elevation", "outlined"],
-    ["Tile elevation", "plain"],
-    ["Tile elevation", "raised"],
-    ["Pattern", "none"],
-    ["Pattern", "dots"],
-    ["Pattern", "lines"],
-    ["Pattern", "diagonal"],
-    ["Pattern", "grid"],
-    ["Pattern", "glow"],
-    ["Pattern", "noise"],
-    ["Pattern", "paper"],
-    ["Pattern", "waves"],
-    ["Corner style", "none"],
-    ["Corner style", "trim"],
-    ["Corner style", "brackets"],
-    ["Corner style", "dots"],
-    ["Surface style", "solid"],
-    ["Surface style", "gradient-top"],
-    ["Surface style", "gradient-radial"],
-    ["Surface style", "gradient-diagonal"],
-    ["Surface style", "tint"],
-    ["Icon decoration", "none"],
-    ["Icon decoration", "ring"],
-    ["Icon decoration", "halo"],
-    ["Icon decoration", "badge"],
-    ["Icon decoration", "square"],
-    ["Icon style", "filled"],
-    ["Icon style", "outlined"],
-    ["Icon style", "soft"],
-    ["Icon style", "glow"],
-    ["Icon style", "filled"],
-    ["Icon shading", "flat"],
-    ["Icon shading", "gradient"],
-    ["Icon shading", "emboss"],
-    ["Icon size", "xx-small"],
-    ["Icon size", "x-small"],
-    ["Icon size", "small"],
-    ["Icon size", "medium"],
-    ["Icon size", "large"],
-    ["Selection indicator", "checkmark"],
-    ["Selection indicator", "fill"],
-    ["Selection indicator", "bar"],
-    ["Horizontal gap", "none"],
-    ["Horizontal gap", "1"],
-    ["Horizontal gap", "4"],
-    ["Horizontal gap", "7"],
-    ["Vertical gap", "none"],
-    ["Vertical gap", "1"],
-    ["Vertical gap", "4"],
-    ["Vertical gap", "7"],
-    ["Margin - all sides", "none"],
-    ["Margin - all sides", "2"],
-    ["Padding - all sides", ""],
-    ["Padding - all sides", "3"]
-  ];
-  const limit = Number(process.env.NEWTON_E2E_APPEARANCE_LIMIT || 0);
-  for (const [label, value] of limit
-    ? appearanceSelections.slice(0, limit)
-    : appearanceSelections) {
-    const started = Date.now();
-    await dispatchCardSelect(page, label, value);
-    const elapsed = Date.now() - started;
-    results.configChangeTimingsMs.push({ label, value, ms: elapsed });
+  await openChapter(page, "content");
+  const contentFields = page.locator(
+    `${CONTENT} c-newton-selector-flow-cpe-resource-selector`
+  );
+  await typeIntoField(contentFields.nth(0), EDITED_LABEL);
+  // Then bind the label to a Flow text variable through the picker; the
+  // saved config must keep the merge-field wrapper (checked after Save).
+  await pickFlowResource(
+    resourceField(page, CONTENT, "Selector label"),
+    LABEL_RESOURCE
+  );
+  observed.labelInEditorAfterPick = await page
+    .locator(CONTENT)
+    .first()
+    .evaluate((node) => node.config?.label ?? null);
+  await neutralClick(page);
+  await typeIntoField(
+    contentFields.nth(1),
+    "Edited help text from Playwright."
+  );
+  await typeIntoField(contentFields.nth(2), "Edited tooltip from Playwright.");
+  await typeIntoField(contentFields.nth(3), "E2E empty state");
+  await typeIntoField(contentFields.nth(4), "E2E error state");
+
+  await openChapter(page, "behavior");
+  const behavior = page.locator(BEHAVIOR);
+  await setToggle(behavior, "Selection mode", "Multi");
+  await setToggle(behavior, "Required", "Required");
+  await setToggle(behavior, "Selection mode", "Single");
+  await setToggle(behavior, "Auto-advance", "Off");
+  await setToggle(behavior, "Include a --None-- option", "On");
+  await typeIntoField(
+    resourceField(page, BEHAVIOR, "Error message (optional)").first(),
+    "None of these"
+  );
+  await selectTileOrThrow(page, "None option position", "end");
+  await setToggle(behavior, "Show a search filter", "On");
+  await setToggle(behavior, "Include a --None-- option", "Off");
+
+  // Appearance sweep: every tile clicked as an admin would. Each click must
+  // select its tile, stay under the latency budget (the config-proxy bug
+  // doubled the cost of each edit), and raise no error dialog.
+  await openChapter(page, "appearance");
+  const notSelected = [];
+  const errorDialogSteps = [];
+  for (const [label, value] of APPEARANCE_SWEEP) {
+    const { ms, selected } = await selectTile(page, label, value);
+    results.configChangeTimingsMs.push({ label, value, ms, selected });
+    if (!selected) notSelected.push(`${label}=${value}`);
+    if (label === "Icon decoration") {
+      // Evidence for the distinct decoration looks: the preview after each.
+      await page
+        .locator("c-newton-selector-flow-cpe-config-preview")
+        .first()
+        .screenshot({
+          path: join(ARTIFACT_DIR, `10-icon-decoration-${value}.png`)
+        });
+    }
     const dialogs = await page.getByText("Something went wrong").count();
+    if (dialogs) {
+      errorDialogSteps.push(`${label}=${value}`);
+      await page.screenshot({
+        path: join(
+          ARTIFACT_DIR,
+          `error-dialog-${label.replace(/\W+/g, "_")}.png`
+        ),
+        fullPage: true
+      });
+    }
     console.log(
       JSON.stringify({
         t: new Date().toISOString().slice(11, 19),
         step: "appearance-select",
         label,
         value,
-        ms: elapsed,
+        ms,
+        selected,
         errorDialogs: dialogs,
         consoleErrors: diagnostics.console.length,
         pageErrors: diagnostics.pageErrors.length
       })
     );
-    if (elapsed > 20000 || dialogs) {
-      await page.screenshot({
-        path: join(ARTIFACT_DIR, `slow-${label.replace(/\W+/g, "_")}.png`),
-        fullPage: true
-      });
-    }
   }
-
-  // Every config change must stay responsive across the whole sweep. A
-  // per-change cost that grows (the config-proxy bug doubled it each edit)
-  // fails this long before the sweep ends.
   const budgetMs = Number(process.env.NEWTON_E2E_STEP_BUDGET_MS || 2000);
   const slowest = results.configChangeTimingsMs.reduce(
     (max, entry) => (entry.ms > max.ms ? entry : max),
@@ -1936,70 +2716,66 @@ async function exerciseAllConfigChapters(page) {
   );
   recordCheck(
     "config changes stay under the latency budget",
-    slowest.ms <= budgetMs,
+    slowest.ms <= budgetMs && notSelected.length === 0,
     {
       changes: results.configChangeTimingsMs.length,
       budgetMs,
       slowestMs: slowest.ms,
-      slowestStep: slowest.label ? `${slowest.label}=${slowest.value}` : null
+      slowestStep: slowest.label ? `${slowest.label}=${slowest.value}` : null,
+      notSelected
     }
   );
-
-  const appearance = page.locator(
-    "c-newton-selector-flow-cpe-appearance-config"
+  recordCheck(
+    "no Flow Builder error dialog during the Appearance sweep",
+    errorDialogSteps.length === 0,
+    { errorDialogSteps }
   );
+
+  const appearance = page.locator(APPEARANCE);
   for (const [label, value] of [
     ["Columns", "3"],
-    ["Pattern selected color", "brand"],
+    ["Pattern selected color", "success"],
     ["Corner color", "success"],
     ["Surface hover color", "teal"],
     ["Icon color", "warning"],
     ["Icon glyph color", "contrast"],
     ["Badge color", "brand"]
   ]) {
-    await appearance
-      .locator(`[aria-label="${label}"] [data-value="${value}"]`)
-      .first()
-      .click({ force: true, timeout: 15000 });
+    await pressChip(appearance, label, value);
   }
-  // Badge position and shape are tile pickers: click them by title.
-  await clickTile(page, "Badge position", "Top right");
-  await clickTile(page, "Badge shape", "Square");
+  await selectTileOrThrow(page, "Badge position", "top-right");
+  await selectTileOrThrow(page, "Badge shape", "square");
+  await setToggle(appearance, "Show icons", "Hidden");
+  await setToggle(appearance, "Show icons", "Shown");
+  await setToggle(appearance, "Show badges", "Hidden");
+  await setToggle(appearance, "Show badges", "Shown");
 
-  await dispatchConfigPatch(appearance, ["gridConfig", "showIcons"], false);
-  await dispatchConfigPatch(appearance, ["gridConfig", "showIcons"], true);
-  await dispatchConfigPatch(appearance, ["gridConfig", "showBadges"], false);
-  await dispatchConfigPatch(appearance, ["gridConfig", "showBadges"], true);
-
-  await activateStudioSection(page, "data");
-  await dispatchCardSelect(page, "Data source", "custom");
-  await activateStudioSection(page, "appearance");
-  await dispatchCardSelect(page, "Layout", "grid");
-  await activateStudioSection(page, "behavior");
-  await dispatchSelectionMode(page, "single");
-  await activateStudioSection(page, "appearance");
-  await dispatchCardSelect(page, "Tile size", "medium");
-  await dispatchCardSelect(page, "Aspect ratio", "1:1");
-  await dispatchCardSelect(page, "Tile elevation", "outlined");
-  await dispatchCardSelect(page, "Pattern", "none");
-  await dispatchCardSelect(page, "Surface style", "solid");
-  await dispatchCardSelect(page, "Corner style", "none");
-  await dispatchCardSelect(page, "Icon decoration", "ring");
-  await dispatchCardSelect(page, "Selection indicator", "checkmark");
-  await dispatchConfigPatch(
-    appearance,
-    ["gridConfig", "surfaceHoverTone"],
-    "teal"
-  );
+  // The Debug run needs Custom options, Grid and Single select. The other
+  // values end away from the fixture's, so the saved Flow proves the save.
+  await openChapter(page, "data");
+  await selectTileOrThrow(page, "Data source", "custom");
+  await openChapter(page, "appearance");
+  await selectTileOrThrow(page, "Layout", "grid");
+  await openChapter(page, "behavior");
+  await setToggle(behavior, "Selection mode", "Single");
+  await openChapter(page, "appearance");
+  for (const [label, value] of [
+    ["Tile size", "large"],
+    ["Aspect ratio", "4:3"],
+    ["Tile elevation", "outlined"],
+    ["Pattern", "none"],
+    ["Surface style", "solid"],
+    ["Corner style", "none"],
+    ["Icon decoration", "ring"],
+    ["Selection indicator", "checkmark"]
+  ]) {
+    await selectTileOrThrow(page, label, value);
+  }
 
   // Default selection (single mode): a Flow text variable whose value is the
   // option to preselect. Saved metadata and the debug run are checked later.
-  await activateStudioSection(page, "behavior");
-  const defaultField = resourceField(
-    page,
-    "c-newton-selector-flow-cpe-behavior-config",
-    "Default selection"
-  );
+  await openChapter(page, "behavior");
+  const defaultField = resourceField(page, BEHAVIOR, "Default selection");
   const defaultFieldCount = await defaultField.count();
   observed.defaultSelectionField = {
     found: defaultFieldCount === 1,
@@ -2010,7 +2786,7 @@ async function exerciseAllConfigChapters(page) {
       defaultField,
       DEFAULT_RESOURCE
     );
-    await page.getByText("Component preview", { exact: true }).first().click();
+    await neutralClick(page);
   }
   recordCheck(
     'Behavior has a "Default selection" Flow resource picker',
@@ -2021,12 +2797,17 @@ async function exerciseAllConfigChapters(page) {
   await page.screenshot({ path: screenshots.modal, fullPage: true });
 }
 
-// Opens the screen, selects the Newton Selector field and clicks "Edit
-// configuration". Right after a deploy (including this script's own flow
+// Opens the screen, selects the Newton Selector field (Custom_Selector on the
+// main screen unless told otherwise) and clicks "Edit configuration". Right after a deploy (including this script's own flow
 // fixture deploy), Flow Builder sometimes loads without the custom component's
 // metadata: the canvas shows the raw `c:newtonSelectorFlowScreen` name and the
 // CPE never appears. A reload fixes it, so retry a few times.
-async function openCpeModal(page, builderUrl) {
+async function openCpeModal(
+  page,
+  builderUrl,
+  screenLabel = SCREEN_LABEL,
+  fieldName = "Custom_Selector"
+) {
   const configureButton = page
     .getByRole("button", { name: /Edit configuration|Configure selector/i })
     .first();
@@ -2044,17 +2825,12 @@ async function openCpeModal(page, builderUrl) {
       .waitForLoadState("networkidle", { timeout: 45000 })
       .catch(() => {});
     await dismissTransientUi(page);
-    await assertPageText(
-      page,
-      new RegExp(`${FLOW_LABEL}|Flow Builder|Auto-Layout|Run|Debug`, "i"),
-      "Flow Builder shell",
-      120000
-    );
+    // The canvas has loaded once the screen element is drawn on it.
+    const screenElement = page.getByText(screenLabel, { exact: true }).first();
+    await screenElement.waitFor({ state: "visible", timeout: 120000 });
     await page.screenshot({ path: screenshots.builderLoaded, fullPage: true });
 
-    await page.getByText(SCREEN_LABEL, { exact: true }).first().click({
-      timeout: 90000
-    });
+    await screenElement.click({ timeout: 90000 });
     await assertPageText(
       page,
       /Edit Screen|Screen Properties/i,
@@ -2063,7 +2839,7 @@ async function openCpeModal(page, builderUrl) {
     await page.screenshot({ path: screenshots.screenEditor, fullPage: true });
 
     await page
-      .getByText("Custom_Selector", { exact: true })
+      .getByText(fieldName, { exact: true })
       .last()
       .click({ force: true, timeout: 60000 });
     const ready = await configureButton
@@ -2080,88 +2856,88 @@ async function openCpeModal(page, builderUrl) {
   );
 }
 
-// Clicks each chapter tab the way an admin does and checks that the tab
-// becomes current and its chapter is scrolled to the top of the controls.
 // Every choice tile in the studio's controls (layouts, sizes, patterns, gaps,
 // data sources...) should read as one family: same outer size, the visual
 // centered on the same line, and the title starting at the same offset.
 async function exerciseTileUniformity(page) {
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(300);
-  const tiles = await page
-    .locator('div[slot="controls"] c-newton-selector-choice-tile')
-    .evaluateAll((nodes) =>
-      nodes
-        .map((node) => {
-          const root = node.shadowRoot || node;
-          const label = root.querySelector(
-            ".newton-selector-choice-tile__label"
-          );
-          const title = root.querySelector(
-            ".newton-selector-choice-tile__title"
-          );
-          const visual = root.querySelector(
-            ".newton-selector-choice-tile__icon-wrap, .newton-selector-choice-tile__shape-wrap"
-          );
-          if (!label || !title) return null;
-          const box = label.getBoundingClientRect();
-          if (box.width === 0 || box.height === 0) return null;
-          const titleBox = title.getBoundingClientRect();
-          const visualBox = visual?.getBoundingClientRect();
-          const input = root.querySelector("input");
-          const figure = root.querySelector(
-            ".newton-selector-choice-tile__figure"
-          );
-          const sub = root.querySelector(".newton-selector-choice-tile__sub");
-          const group = node.closest("[role=radiogroup]");
-          const pick = (element, props) => {
-            if (!element) return null;
-            const style = getComputedStyle(element);
-            return props.map((prop) => style[prop]).join(" ");
-          };
-          return {
-            group: group?.getAttribute("aria-label") || "?",
-            selected: Boolean(input?.checked),
-            disabled: Boolean(input?.disabled),
-            // Everything an admin sees as "the tile's styling": surface,
-            // edge, shadow, padding, the visual cell, type, and the spacing
-            // between tiles.
-            styling: JSON.stringify({
-              surface: pick(figure, [
-                "backgroundColor",
-                "backgroundImage",
-                "borderTopColor",
-                "borderTopWidth",
-                "borderTopLeftRadius",
-                "boxShadow",
-                "paddingTop",
-                "paddingRight",
-                "paddingBottom",
-                "paddingLeft"
-              ]),
-              visual: pick(visual, [
-                "width",
-                "height",
-                "backgroundColor",
-                "borderTopColor",
-                "borderTopWidth",
-                "borderTopLeftRadius",
-                "color"
-              ]),
-              title: pick(title, ["color", "fontSize", "fontWeight"]),
-              sub: pick(sub, ["color", "fontSize", "fontWeight"]),
-              spacing: pick(group, ["rowGap", "columnGap"])
-            }),
-            title: title.textContent.trim(),
-            size: `${Math.round(box.width)}x${Math.round(box.height)}`,
-            titleTop: Math.round(titleBox.top - box.top),
-            visualMid: visualBox
-              ? Math.round(visualBox.top + visualBox.height / 2 - box.top)
-              : null
-          };
-        })
-        .filter(Boolean)
-    );
+  // Measured once the hover styling has transitioned away.
+  const measureTiles = () =>
+    page
+      .locator('div[slot="controls"] c-newton-selector-choice-tile')
+      .evaluateAll((nodes) =>
+        nodes
+          .map((node) => {
+            const root = node.shadowRoot || node;
+            const label = root.querySelector(
+              ".newton-selector-choice-tile__label"
+            );
+            const title = root.querySelector(
+              ".newton-selector-choice-tile__title"
+            );
+            const visual = root.querySelector(
+              ".newton-selector-choice-tile__icon-wrap, .newton-selector-choice-tile__shape-wrap"
+            );
+            if (!label || !title) return null;
+            const box = label.getBoundingClientRect();
+            if (box.width === 0 || box.height === 0) return null;
+            const titleBox = title.getBoundingClientRect();
+            const visualBox = visual?.getBoundingClientRect();
+            const input = root.querySelector("input");
+            const figure = root.querySelector(
+              ".newton-selector-choice-tile__figure"
+            );
+            const sub = root.querySelector(".newton-selector-choice-tile__sub");
+            const group = node.closest("[role=radiogroup]");
+            const pick = (element, props) => {
+              if (!element) return null;
+              const style = getComputedStyle(element);
+              return props.map((prop) => style[prop]).join(" ");
+            };
+            return {
+              group: group?.getAttribute("aria-label") || "?",
+              selected: Boolean(input?.checked),
+              disabled: Boolean(input?.disabled),
+              // Everything an admin sees as "the tile's styling": surface,
+              // edge, shadow, padding, the visual cell, type, and the spacing
+              // between tiles.
+              styling: JSON.stringify({
+                surface: pick(figure, [
+                  "backgroundColor",
+                  "backgroundImage",
+                  "borderTopColor",
+                  "borderTopWidth",
+                  "borderTopLeftRadius",
+                  "boxShadow",
+                  "paddingTop",
+                  "paddingRight",
+                  "paddingBottom",
+                  "paddingLeft"
+                ]),
+                visual: pick(visual, [
+                  "width",
+                  "height",
+                  "backgroundColor",
+                  "borderTopColor",
+                  "borderTopWidth",
+                  "borderTopLeftRadius",
+                  "color"
+                ]),
+                title: pick(title, ["color", "fontSize", "fontWeight"]),
+                sub: pick(sub, ["color", "fontSize", "fontWeight"]),
+                spacing: pick(group, ["rowGap", "columnGap"])
+              }),
+              title: title.textContent.trim(),
+              size: `${Math.round(box.width)}x${Math.round(box.height)}`,
+              titleTop: Math.round(titleBox.top - box.top),
+              visualMid: visualBox
+                ? Math.round(visualBox.top + visualBox.height / 2 - box.top)
+                : null
+            };
+          })
+          .filter(Boolean)
+      );
+  const tiles = await readSettled(measureTiles, "Choice tile measurements");
   const byGroup = {};
   for (const tile of tiles) {
     const entry = (byGroup[tile.group] ||= {
@@ -2271,189 +3047,201 @@ async function exerciseTileUniformity(page) {
   );
 }
 
+// Distance from the top of the controls' scroll area to the chapter's top.
+async function chapterOffset(page, key) {
+  return page.evaluate((chapterKey) => {
+    const deep = (root, sel, out = []) => {
+      root.querySelectorAll(sel).forEach((n) => out.push(n));
+      root.querySelectorAll("*").forEach((n) => {
+        if (n.shadowRoot) deep(n.shadowRoot, sel, out);
+      });
+      return out;
+    };
+    const scroller = deep(document, ".newton-studio__scroll")[0];
+    const host = deep(document, `[data-chapter="${chapterKey}"]`).find((n) =>
+      n.tagName.startsWith("C-")
+    );
+    if (!scroller || !host) return null;
+    return Math.round(
+      host.getBoundingClientRect().top - scroller.getBoundingClientRect().top
+    );
+  }, key);
+}
+
+// Clicks each chapter tab the way an admin does and checks that the tab
+// becomes current and its chapter is scrolled to the top of the controls.
 async function exerciseChapterTabs(page) {
   for (const key of ["content", "behavior", "appearance", "data"]) {
-    await page
-      .locator(`button.newton-studio__tab[data-key="${key}"]`)
-      .first()
-      .click({ timeout: 15000 });
-    await page.waitForTimeout(1000);
-    const state = await page.evaluate((chapterKey) => {
-      const deep = (root, sel, out = []) => {
-        root.querySelectorAll(sel).forEach((n) => out.push(n));
-        root.querySelectorAll("*").forEach((n) => {
-          if (n.shadowRoot) deep(n.shadowRoot, sel, out);
-        });
-        return out;
-      };
-      const scroller = deep(document, ".newton-studio__scroll")[0];
-      const host = deep(document, `[data-chapter="${chapterKey}"]`).find((n) =>
-        n.tagName.startsWith("C-")
-      );
-      const active = deep(document, "button.newton-studio__tab_active")[0];
-      if (!scroller || !host) return null;
-      return {
-        activeTab: active ? active.dataset.key : null,
-        offsetPx: Math.round(
-          host.getBoundingClientRect().top -
-            scroller.getBoundingClientRect().top
-        )
-      };
-    }, key);
+    const tab = chapterTab(page, key);
+    await tab.click({ timeout: 15000 });
+    // Smooth scrolling has no end event: wait until the offset settles in
+    // range.
+    const { value: state } = await waitUntil(
+      async () => ({
+        current: await tab.getAttribute("aria-current"),
+        offsetPx: await chapterOffset(page, key)
+      }),
+      (s) =>
+        s.current === "page" &&
+        s.offsetPx !== null &&
+        s.offsetPx >= -4 &&
+        s.offsetPx <= 80,
+      5000
+    );
     recordCheck(
       `chapter tab "${key}" makes its chapter current and scrolls to it`,
-      Boolean(state) &&
-        state.activeTab === key &&
+      state.current === "page" &&
+        state.offsetPx !== null &&
         state.offsetPx >= -4 &&
         state.offsetPx <= 80,
-      state || { error: "studio not found" }
+      state
     );
   }
 }
 
-// Reads the Appearance chapter's current config. Read-only: never write
-// properties onto components from here.
-async function appearanceConfig(page) {
-  return page
-    .locator("c-newton-selector-flow-cpe-appearance-config")
-    .first()
-    .evaluate((node) => JSON.parse(JSON.stringify(node.config || {})));
+// The Layout, Pattern and Tile size the admin sees selected: the checked
+// radio in each of those tile groups ("" when none is checked).
+async function appearanceSelection(page) {
+  const checked = (groupLabel) =>
+    page
+      .locator(APPEARANCE)
+      .first()
+      .getByRole("radiogroup", { name: groupLabel, exact: true })
+      .getByRole("radio")
+      .evaluateAll((nodes) => nodes.find((node) => node.checked)?.value || "");
+  return {
+    layout: await checked("Layout"),
+    pattern: await checked("Pattern"),
+    size: await checked("Tile size")
+  };
 }
 
-async function clickTile(page, groupLabel, tileLabel) {
-  await page
-    .locator(
-      `.newton-studio__selectorgroup[aria-label="${groupLabel}"] .newton-selector-choice-tile__title`,
-      { hasText: new RegExp(`^\\s*${tileLabel}\\s*$`) }
-    )
-    .first()
-    .click({ timeout: 15000 });
-  await page.waitForTimeout(400);
+// Polls the visible selection until it matches `expected` (a subset of
+// layout/pattern/size) and returns the last selection read.
+async function appearanceSelectionReaches(page, expected) {
+  const { value } = await waitUntil(
+    () => appearanceSelection(page),
+    (selection) =>
+      Object.entries(expected).every(([key, want]) => selection[key] === want),
+    5000
+  );
+  return value;
 }
 
-const studioIsOpen = async (page) =>
-  (await page.locator("c-newton-selector-flow-cpe-studio").count()) > 0;
-
-const discardPrompt = (page) =>
-  page.getByText("Discard your unsaved changes?", { exact: false }).first();
+const studioIsOpen = async (page) => (await studio(page).count()) > 0;
 
 // Appearance work must never be lost by accident: switching layouts keeps
 // style and remembers each layout's geometry, Reset can be undone, and
 // Cancel/Esc ask before discarding unsaved changes. All through real clicks
 // and keys, as an admin would.
 async function exerciseAppearanceSafety(page) {
-  await page
-    .locator('button.newton-studio__tab[data-key="appearance"]')
-    .first()
-    .click();
-  await page.waitForTimeout(800);
-  const initial = await appearanceConfig(page);
+  await openChapter(page, "appearance");
+  const initial = await appearanceSelection(page);
 
-  await clickTile(page, "Pattern", "Dots");
-  await clickTile(page, "Tile size", "Large");
+  await selectTileOrThrow(page, "Pattern", "dots");
+  await selectTileOrThrow(page, "Tile size", "large");
 
-  await clickTile(page, "Layout", "List");
-  let config = await appearanceConfig(page);
+  await selectTileOrThrow(page, "Layout", "list");
+  let shown = await appearanceSelectionReaches(page, {
+    layout: "list",
+    pattern: "dots",
+    size: "small"
+  });
   recordCheck(
     "switching layout keeps style settings",
-    config.layout === "list" && config.gridConfig.pattern === "dots",
-    {
-      layout: config.layout,
-      pattern: config.gridConfig.pattern
-    }
+    shown.layout === "list" && shown.pattern === "dots",
+    { layout: shown.layout, pattern: shown.pattern }
   );
   recordCheck(
     "switching layout applies the new layout's geometry",
-    config.gridConfig.size === "small",
-    {
-      size: config.gridConfig.size
-    }
+    shown.size === "small",
+    { size: shown.size }
   );
 
-  await clickTile(page, "Layout", "Grid");
-  config = await appearanceConfig(page);
+  await selectTileOrThrow(page, "Layout", "grid");
+  shown = await appearanceSelectionReaches(page, {
+    layout: "grid",
+    size: "large"
+  });
   recordCheck(
     "switching back restores that layout's remembered geometry",
-    config.layout === "grid" && config.gridConfig.size === "large",
-    {
-      layout: config.layout,
-      size: config.gridConfig.size
-    }
+    shown.layout === "grid" && shown.size === "large",
+    { layout: shown.layout, size: shown.size }
   );
 
+  const undoButton = page
+    .locator(APPEARANCE)
+    .getByRole("button", { name: "Undo" })
+    .first();
   await page.getByRole("button", { name: "Reset appearance" }).first().click();
-  await page.waitForTimeout(400);
-  config = await appearanceConfig(page);
-  const undoButton = page.getByRole("button", { name: "Undo" }).first();
+  const undoOffered = await reaches(undoButton, "visible", 10000);
+  shown = await appearanceSelectionReaches(page, {
+    pattern: "none",
+    size: "small"
+  });
   await page.screenshot({
     path: join(ARTIFACT_DIR, "07-reset-undo.png"),
     fullPage: true
   });
   recordCheck(
     "Reset appearance restores defaults and offers Undo",
-    config.gridConfig.pattern === "none" &&
-      config.gridConfig.size === "small" &&
-      (await undoButton.isVisible()),
-    {
-      pattern: config.gridConfig.pattern,
-      size: config.gridConfig.size
-    }
+    shown.pattern === "none" && shown.size === "small" && undoOffered,
+    { pattern: shown.pattern, size: shown.size, undoOffered }
   );
 
   await undoButton.click();
-  await page.waitForTimeout(400);
-  config = await appearanceConfig(page);
+  const undoWithdrawn = await reaches(undoButton, "hidden", 10000);
+  shown = await appearanceSelectionReaches(page, {
+    pattern: "dots",
+    size: "large"
+  });
   recordCheck(
     "Undo restores exactly what Reset replaced",
-    config.gridConfig.pattern === "dots" &&
-      config.gridConfig.size === "large" &&
-      !(await undoButton.isVisible().catch(() => false)),
-    {
-      pattern: config.gridConfig.pattern,
-      size: config.gridConfig.size
-    }
+    shown.pattern === "dots" && shown.size === "large" && undoWithdrawn,
+    { pattern: shown.pattern, size: shown.size, undoWithdrawn }
   );
 
   await page.getByRole("button", { name: "Reset appearance" }).first().click();
-  await page.waitForTimeout(400);
-  await clickTile(page, "Pattern", "Lines");
+  await reaches(undoButton, "visible", 10000);
+  await selectTileOrThrow(page, "Pattern", "lines");
   recordCheck(
     "Undo is withdrawn once the admin makes another change",
-    !(await undoButton.isVisible().catch(() => false))
+    await reaches(undoButton, "hidden", 10000)
   );
 
   await page
     .getByRole("button", { name: /^Cancel$/ })
     .last()
     .click();
-  await page.waitForTimeout(400);
+  const askedOnCancel = await reaches(discardPrompt(page), "visible", 10000);
   await page.screenshot({
     path: join(ARTIFACT_DIR, "08-discard-question.png"),
     fullPage: true
   });
   recordCheck(
     "Cancel with unsaved changes asks before discarding",
-    (await discardPrompt(page).isVisible()) && (await studioIsOpen(page))
+    askedOnCancel && (await studioIsOpen(page))
   );
   await page.getByRole("button", { name: "Keep editing" }).first().click();
-  await page.waitForTimeout(400);
-  config = await appearanceConfig(page);
+  const promptGone = await reaches(discardPrompt(page), "hidden", 10000);
+  shown = await appearanceSelection(page);
   recordCheck(
     "Keep editing leaves the work intact",
-    !(await discardPrompt(page)
-      .isVisible()
-      .catch(() => false)) && config.gridConfig.pattern === "lines",
-    {
-      pattern: config.gridConfig.pattern
-    }
+    promptGone && shown.pattern === "lines",
+    { pattern: shown.pattern }
   );
 
-  const focusedLabel = await page.evaluate(() => {
-    let node = document.activeElement;
-    while (node?.shadowRoot?.activeElement)
-      node = node.shadowRoot.activeElement;
-    return (node?.textContent || "").trim();
-  });
+  const { value: focusedLabel } = await waitUntil(
+    () =>
+      page.evaluate(() => {
+        let node = document.activeElement;
+        while (node?.shadowRoot?.activeElement)
+          node = node.shadowRoot.activeElement;
+        return (node?.textContent || "").trim();
+      }),
+    (label) => label === "Cancel",
+    5000
+  );
   recordCheck(
     "Keep editing returns focus to Cancel",
     focusedLabel === "Cancel",
@@ -2464,9 +3252,8 @@ async function exerciseAppearanceSafety(page) {
 
   await page.locator(".newton-chapter__title").first().click();
   await page.keyboard.press("Escape");
-  await page.waitForTimeout(400);
   const afterEsc = {
-    promptVisible: await discardPrompt(page).isVisible(),
+    promptVisible: await reaches(discardPrompt(page), "visible", 10000),
     studioOpen: await studioIsOpen(page)
   };
   recordCheck(
@@ -2475,42 +3262,31 @@ async function exerciseAppearanceSafety(page) {
     afterEsc
   );
   await page.keyboard.press("Escape");
-  await page.waitForTimeout(400);
   recordCheck(
     "a second Esc dismisses the question and keeps the modal open",
-    !(await discardPrompt(page)
-      .isVisible()
-      .catch(() => false)) && (await studioIsOpen(page))
+    (await reaches(discardPrompt(page), "hidden", 10000)) &&
+      (await studioIsOpen(page))
   );
 
   await page
     .getByRole("button", { name: /^Cancel$/ })
     .last()
     .click();
-  await page.waitForTimeout(400);
+  await discardPrompt(page).waitFor({ state: "visible", timeout: 10000 });
   await page.getByRole("button", { name: "Discard changes" }).first().click();
-  await page.waitForTimeout(1500);
-  recordCheck("Discard changes closes the modal", !(await studioIsOpen(page)));
+  recordCheck(
+    "Discard changes closes the modal",
+    await reaches(studio(page).first(), "detached", 30000)
+  );
 
-  await page
-    .getByRole("button", { name: /Edit configuration|Configure selector/i })
-    .first()
-    .click({ timeout: 30000 });
-  await page.waitForSelector("c-newton-selector-flow-cpe-studio", {
-    timeout: 60000
-  });
-  await page.waitForTimeout(1500);
-  config = await appearanceConfig(page);
+  await openModalFromPanel(page);
+  shown = await appearanceSelection(page);
   recordCheck(
     "after discarding, reopening shows the original configuration",
-    config.layout === initial.layout &&
-      config.gridConfig.pattern === initial.gridConfig.pattern &&
-      config.gridConfig.size === initial.gridConfig.size,
-    {
-      layout: config.layout,
-      pattern: config.gridConfig.pattern,
-      size: config.gridConfig.size
-    }
+    shown.layout === initial.layout &&
+      shown.pattern === initial.pattern &&
+      shown.size === initial.size,
+    { initial, reopened: shown }
   );
 
   // No changes: Cancel must close straight away, without a needless prompt.
@@ -2518,49 +3294,144 @@ async function exerciseAppearanceSafety(page) {
     .getByRole("button", { name: /^Cancel$/ })
     .last()
     .click();
-  await page.waitForTimeout(1500);
+  const closed = await reaches(studio(page).first(), "detached", 30000);
   recordCheck(
     "Cancel with no changes closes without asking",
-    !(await studioIsOpen(page)) &&
+    closed &&
       !(await discardPrompt(page)
         .isVisible()
         .catch(() => false))
   );
-  await page
-    .getByRole("button", { name: /Edit configuration|Configure selector/i })
-    .first()
-    .click({ timeout: 30000 });
-  await page.waitForSelector("c-newton-selector-flow-cpe-studio", {
-    timeout: 60000
-  });
-  await page.waitForTimeout(1500);
+  await openModalFromPanel(page);
 }
 
-async function openBuilderAndConfigure(page, builderUrl) {
+// A custom Minimum column width survives a click on the Size tile that is
+// already selected: only picking another size resets it.
+async function exerciseSizeRepickKeepsWidth(page) {
+  await openChapter(page, "appearance");
+  const appearance = page.locator(APPEARANCE);
+  const slider = appearance.getByRole("slider", {
+    name: "Minimum column width"
+  });
+  await assertVisible(slider, "Minimum column width slider");
+  // The width the card shows next to its "Minimum column width" heading.
+  const shownWidth = async () => {
+    const text = await appearance.innerText().catch(() => "");
+    const match = text.match(/Minimum column width\s*\n\s*(\d+(?:\.\d+)? rem)/);
+    return match ? match[1] : "";
+  };
+  const { size } = await appearanceSelection(page);
+  const before = await shownWidth();
+  await slider.focus();
+  for (let i = 0; i < 4; i += 1) await page.keyboard.press("ArrowRight");
+  const { value: custom } = await waitUntil(
+    shownWidth,
+    (width) => width && width !== before,
+    5000
+  );
+  const { selected } = await selectTile(page, "Tile size", size);
+  // A reset shows within a moment; give it time to happen.
+  const { value: after } = await waitUntil(
+    shownWidth,
+    (width) => width !== custom,
+    3000
+  );
+  recordCheck(
+    "clicking the selected Size tile keeps a custom Minimum column width",
+    Boolean(size && before && custom) &&
+      custom !== before &&
+      selected &&
+      after === custom &&
+      (await slider.inputValue()) === custom.replace(/ rem$/, ""),
+    {
+      size,
+      widthBefore: before,
+      customWidth: custom,
+      widthAfterSizeClick: after,
+      sliderValue: await slider.inputValue()
+    }
+  );
+}
+
+// Selectors saved with a WHERE clause the filter builder refuses (typed in
+// Manual mode before it did) must block Save as soon as the editor opens,
+// before the admin touches anything. Closes each modal without changes.
+// `loginUrl` signs in only once, so later loads use the Flow Builder URL it
+// led to, which this returns.
+async function exerciseSavedWhereBlocksSave(page, loginUrl) {
+  let builderUrl = loginUrl;
+  for (const { field, whereClause, message, check } of SAVED_WHERE_SELECTORS) {
+    await openCpeModal(page, builderUrl, SAVED_WHERE_SCREEN_LABEL, field);
+    builderUrl = page.url();
+    await studio(page).first().waitFor({ state: "attached", timeout: 60000 });
+    const whereBuilder = page
+      .locator("c-newton-selector-flow-cpe-where-builder")
+      .first();
+    const condition = whereBuilder
+      .locator("article")
+      .filter({
+        has: page.getByRole("button", {
+          name: "Remove condition",
+          exact: true
+        })
+      })
+      .first();
+    const { met, value } = await waitUntil(
+      async () => ({
+        saveDisabled: await (await modalSaveButton(page)).isDisabled(),
+        saveStatusText: await readModalStatus(page),
+        manualMode:
+          (await whereBuilder.getByText("Manual WHERE clause").count()) > 0,
+        conditionMessages: await conditionMessages(condition)
+      }),
+      (state) =>
+        state.saveDisabled &&
+        state.conditionMessages.some((line) => message.test(line)),
+      30000
+    );
+    await page.screenshot({
+      path: join(ARTIFACT_DIR, `00-saved-filter-${field}.png`),
+      fullPage: true
+    });
+    recordCheck(check, met, { savedWhereClause: whereClause, ...value });
+
+    await page
+      .getByRole("button", { name: /^Cancel$/ })
+      .last()
+      .click();
+    if (await reaches(discardPrompt(page), "visible", 3000)) {
+      await page
+        .getByRole("button", { name: "Discard changes" })
+        .first()
+        .click();
+    }
+    await studio(page).first().waitFor({ state: "detached", timeout: 60000 });
+  }
+  return builderUrl;
+}
+
+async function openBuilderAndConfigure(page, loginUrl) {
+  const builderUrl = await exerciseSavedWhereBlocksSave(page, loginUrl);
   await openCpeModal(page, builderUrl);
   await exerciseChapterTabs(page);
   await exerciseTileUniformity(page);
+  await exerciseSizeRepickKeepsWidth(page);
   await exerciseAppearanceSafety(page);
   await exerciseAllConfigChapters(page);
 
-  const saveButton = page.getByRole("button", { name: /^Save$/ }).last();
-  await assertVisible(saveButton, "modal save button");
+  const saveButton = await modalSaveButton(page);
   assert(
-    !(await saveButton.isDisabled().catch(() => false)),
+    !(await saveButton.isDisabled()),
     "Config modal Save button is disabled after option sweep."
   );
   await saveButton.click();
-  await assertPageText(
-    page,
-    /E2E Custom Selector Edited|Custom items|Current configuration/i,
-    "CPE summary after modal save",
-    60000
-  );
-  const summaryText = await page
-    .locator("c-newton-selector-flow-cpe")
+  await studio(page).first().waitFor({ state: "detached", timeout: 60000 });
+  const panel = page.locator("c-newton-selector-flow-cpe").first();
+  await panel
+    .getByText("Current configuration")
     .first()
-    .innerText()
-    .catch(() => "");
+    .waitFor({ state: "visible", timeout: 60000 });
+  const summaryText = await panel.innerText();
   const leakedValues = summaryText.match(
     /at below|none icon|\b(top|radial|diagonal) surface|subtle elevation|hidden globally|selected brand\)|\(neutral/gi
   );
@@ -2570,18 +3441,53 @@ async function openBuilderAndConfigure(page, builderUrl) {
     { leakedValues, summaryText: summaryText.slice(0, 600) }
   );
 
-  const doneButton = page.getByRole("button", { name: /^Done$/ }).last();
-  await clickFirstVisible(doneButton, "screen editor Done button", 60000);
-  await assertPageText(page, /Run|Debug|Save/i, "Flow Builder toolbar");
+  const doneButtons = page.getByRole("button", { name: /^Done$/ });
+  await clickFirstVisible(doneButtons, "screen editor Done button", 60000);
+  const { met: editorClosed } = await waitUntil(
+    async () => {
+      const count = await doneButtons.count();
+      for (let i = 0; i < count; i += 1) {
+        if (
+          await doneButtons
+            .nth(i)
+            .isVisible()
+            .catch(() => false)
+        ) {
+          return false;
+        }
+      }
+      return true;
+    },
+    Boolean,
+    60000
+  );
+  assert(editorClosed, "The screen editor did not close after Done");
 
+  // Flow Builder disables Save while it saves ("Saving...") and after; the
+  // save has gone through once "Last saved" shows instead.
   const builderSaveButton = page
     .getByRole("button", { name: /^Save$/ })
     .first();
-  if (await builderSaveButton.isVisible().catch(() => false)) {
-    await builderSaveButton.click({ timeout: 30000 }).catch(() => {});
-    await page.waitForTimeout(8000);
-  }
+  await builderSaveButton.click({ timeout: 30000 });
+  const { met: saved } = await waitUntil(
+    async () =>
+      (await builderSaveButton.isDisabled()) &&
+      !(await page
+        .getByText(/^Saving/)
+        .first()
+        .isVisible()) &&
+      (await page
+        .getByText(/^Last saved/)
+        .first()
+        .isVisible()),
+    Boolean,
+    120000
+  );
   await page.screenshot({ path: screenshots.afterSave, fullPage: true });
+  assert(
+    saved,
+    `Flow Builder Save did not complete. See ${screenshots.afterSave}`
+  );
   const persisted = retrieveAndAssertPersistedConfig();
   console.log(
     JSON.stringify({
@@ -2593,24 +3499,35 @@ async function openBuilderAndConfigure(page, builderUrl) {
 }
 
 async function clickDebugRunButton(page) {
-  const debugButton = page.getByRole("button", { name: /^Debug$/ }).first();
-  await clickFirstVisible(debugButton, "Flow Builder Debug button", 60000);
-  await assertPageText(
-    page,
-    /Select Debug Options|Debug|Input Variables/i,
-    "debug panel"
+  await clickFirstVisible(
+    page.getByRole("button", { name: /^Debug$/ }),
+    "Flow Builder Debug button",
+    60000
   );
-
+  // The Debug options panel adds its own Run button after the toolbar's.
   const runButtons = page.getByRole("button", { name: /^Run$/ });
-  const count = await runButtons.count();
-  for (let i = count - 1; i >= 0; i -= 1) {
-    const button = runButtons.nth(i);
-    if (await button.isVisible().catch(() => false)) {
-      await button.click({ timeout: 30000 });
-      return;
+  const visibleRunButtons = async () => {
+    const visible = [];
+    const count = await runButtons.count();
+    for (let i = 0; i < count; i += 1) {
+      if (
+        await runButtons
+          .nth(i)
+          .isVisible()
+          .catch(() => false)
+      ) {
+        visible.push(runButtons.nth(i));
+      }
     }
-  }
-  throw new Error("No visible Run button found in the Debug panel.");
+    return visible;
+  };
+  const { met, value } = await waitUntil(
+    visibleRunButtons,
+    (visible) => visible.length >= 2,
+    60000
+  );
+  assert(met, "The Debug options panel did not show its Run button");
+  await value[value.length - 1].click({ timeout: 30000 });
 }
 
 async function runtimeContextAfterDebug(page, context) {
@@ -2627,10 +3544,10 @@ async function runtimeContextAfterDebug(page, context) {
       .catch(() => {});
   }
 
-  const contexts = [candidate, ...candidate.frames()];
   const deadline = Date.now() + 120000;
   while (Date.now() < deadline) {
-    for (const frameOrPage of contexts) {
+    // Re-listed each pass: the runtime's frame may attach after the first.
+    for (const frameOrPage of [candidate, ...candidate.frames()]) {
       const text = await frameOrPage
         .locator("body")
         .innerText({ timeout: 3000 })
@@ -2638,8 +3555,16 @@ async function runtimeContextAfterDebug(page, context) {
       if (/E2E Rating Selector/i.test(text)) {
         return { page: candidate, context: frameOrPage };
       }
+      // Flow refuses to run a screen whose saved inputs don't validate
+      // (for example sourceRecords bound to a collection of another type).
+      const invalid = text.match(
+        /The "[^"]+" element in your flow has validation errors\./
+      );
+      if (invalid) {
+        throw new Error(`Debug run stopped before the screen: ${invalid[0]}`);
+      }
     }
-    await candidate.waitForTimeout(1000);
+    await pause(1000);
   }
 
   const body = await candidate
@@ -2685,6 +3610,17 @@ async function runDebugFlow(page, browserContext) {
     fullPage: true
   });
 
+  // The selector whose label reads exactly `label`, and its option tile.
+  const selectorNamed = (label) =>
+    runtimeScope.locator("c-newton-selector-data-selector").filter({
+      has: runtimeScope.getByText(label, { exact: true })
+    });
+  const tileIn = (label, text) =>
+    selectorNamed(label)
+      .locator("c-newton-selector-choice-tile")
+      .filter({ hasText: text })
+      .first();
+
   // E2E_Default_Value holds "custom-beta", so Beta starts selected.
   const startingSelection = {};
   for (const label of [
@@ -2692,11 +3628,8 @@ async function runDebugFlow(page, browserContext) {
     "E2E Custom Beta",
     "E2E Custom Gamma"
   ]) {
-    startingSelection[label] = await runtimeScope
-      .locator("c-newton-selector-choice-tile")
-      .filter({ hasText: label })
-      .first()
-      .locator("input")
+    startingSelection[label] = await tileIn(EDITED_LABEL, label)
+      .getByRole("radio")
       .isChecked({ timeout: 10000 })
       .catch((error) => `not found: ${error.message.split("\n")[0]}`);
   }
@@ -2708,34 +3641,58 @@ async function runDebugFlow(page, browserContext) {
     { defaultResourceValue: "custom-beta", startingSelection }
   );
 
-  for (const text of ["E2E Custom Alpha", "Hot", LEAD_ALPHA, LEAD_BETA]) {
-    await runtimeScope
-      .getByText(text, { exact: true })
-      .first()
-      .click({ force: true, timeout: 30000 })
-      .catch(async () => {
-        await runtimeScope.getByText(text).first().click({
-          force: true,
-          timeout: 30000
-        });
-      });
+  // One pick per selector (two in the SOQL one, so the last pick wins).
+  const picks = [
+    [EDITED_LABEL, "E2E Custom Alpha"],
+    ["E2E Rating Selector", "Hot"],
+    ["E2E SOQL Lead Selector", LEAD_ALPHA],
+    ["E2E SOQL Lead Selector", LEAD_BETA],
+    ["E2E Collection Lead Selector", LEAD_ALPHA]
+  ];
+  for (const [label, text] of picks) {
+    const tile = tileIn(label, text);
+    await tile.locator("label").first().click({ timeout: 30000 });
+    const { met } = await waitUntil(
+      () => tile.getByRole("radio").isChecked(),
+      Boolean,
+      10000
+    );
+    assert(met, `Picking "${text}" in "${label}" did not select it`);
   }
 
   const nextButton = runtimeScope
     .getByRole("button", { name: /^Next$/ })
     .last();
   await clickFirstVisible(nextButton, "Flow runtime Next button", 60000);
-  await assertPageText(
+  const doneText = await assertPageText(
     runtimeScope,
     /E2E Flow completed/i,
     "debug completion screen"
   );
   await runtimePage.screenshot({ path: screenshots.done, fullPage: true });
+  const lines = doneText.split("\n").map((line) => line.trim());
+  const expectedLines = [
+    "Custom: E2E Custom Alpha",
+    "Rating: Hot",
+    `SOQL: ${LEAD_BETA}`,
+    `Collection: ${LEAD_ALPHA}`
+  ];
+  recordCheck(
+    "the debug run's Done screen shows the label picked in each selector",
+    expectedLines.every((line) => lines.includes(line)),
+    {
+      expectedLines,
+      shownLines: lines.filter((line) =>
+        /^(Custom|Rating|SOQL|Collection):/.test(line)
+      )
+    }
+  );
 }
 
 mkdirSync(ARTIFACT_DIR, { recursive: true });
 
 let browser;
+let page;
 try {
   console.log(
     JSON.stringify({
@@ -2782,7 +3739,7 @@ try {
           : undefined
     });
     attachDiagnosticsToContext(context);
-    const page = await context.newPage();
+    page = await context.newPage();
     attachDiagnosticsToPage(page);
     page.setDefaultTimeout(60000);
     page.setDefaultNavigationTimeout(120000);
@@ -2815,6 +3772,11 @@ try {
 } catch (error) {
   console.error(error.stack || error.message || error);
   process.exitCode = 1;
+  if (page) {
+    await page
+      .screenshot({ path: screenshots.fatal, fullPage: true })
+      .catch(() => {});
+  }
   writeResults(error);
 } finally {
   writeDiagnostics();

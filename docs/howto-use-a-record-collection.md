@@ -12,7 +12,7 @@ Turn records you already have in a Flow variable (for example the result of a Ge
 
 1. Add a **Get Records** element before the screen. Choose the object (for example `Contact`), **All records**, and **Automatically store all fields** (or at least the fields you will show). Name it `Get_Contacts`.
 
-2. Open the selector editor with **Configure selector** and, in **01 Data**, click **Collection**.
+2. Open the selector editor with **Configure selector** and, in **Data**, click **Collection**.
 
 3. Under **Flow record collection**, pick `{!Get_Contacts}`. Only record collections are offered. Changing it to a different object later blanks the field map.
 
@@ -46,8 +46,8 @@ Debug the Flow. The tiles should show your records. Pick one and check the `valu
 
 | Symptom                                            | Fix                                                                                               |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| "Bind a Flow record collection variable."          | Pick a collection in **Flow record collection**.                                                  |
-| "Map at least the Label field for the collection." | Set **Label** in the field map.                                                                   |
+| "Choose the record collection variable."           | Pick a collection in **Flow record collection**.                                                  |
+| "Choose the field to show as each option's label." | Set **Label** in the field map.                                                                   |
 | The collection picker is empty                     | The collection must be a record collection (`{T[]}`), and its element must run before the screen. |
 | Tiles are blank                                    | The Get Records element did not store the mapped fields. Store all fields.                        |
 

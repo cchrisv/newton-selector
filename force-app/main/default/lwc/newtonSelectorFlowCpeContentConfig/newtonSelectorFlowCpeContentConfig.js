@@ -1,5 +1,4 @@
 import { api, LightningElement } from "lwc";
-import { readResourceValue } from "c/newtonSelectorFlowCpeUtilityHelpers";
 
 export default class NewtonSelectorFlowCpeContentConfig extends LightningElement {
   @api config;
@@ -10,8 +9,10 @@ export default class NewtonSelectorFlowCpeContentConfig extends LightningElement
     this.dispatchEvent(
       new CustomEvent("configpatch", {
         detail: {
-          path: [event.currentTarget.name],
-          value: readResourceValue(event)
+          value: {
+            ...this.config,
+            [event.currentTarget.name]: event.detail.newValue
+          }
         }
       })
     );

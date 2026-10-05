@@ -5,26 +5,25 @@ colors:
   brand: "#0176d3"
   brand-strong: "#0b5cab"
   brand-deep: "#014486"
-  brand-weak: "#eaf3ff"
-  success: "#3baa6f"
-  warning: "#b25900"
-  error: "#ba0517"
-  error-weak: "#fdeef0"
-  violet: "#6d42c1"
-  pink: "#c9257b"
-  teal: "#0f7b82"
+  brand-weak: "#eef4ff"
+  success: "#2e844a"
+  warning: "#a96404"
+  error: "#ea001e"
+  error-weak: "#fef1ee"
+  violet: "#9050e9"
+  pink: "#e3066a"
+  teal: "#0b827c"
   ink: "#181818"
   ink-body: "#2e2e2e"
   ink-soft: "#444444"
   ink-weak: "#5c5c5c"
-  ink-muted: "#747474"
-  ink-disabled: "#9a9a9a"
+  ink-muted: "#757575"
+  ink-disabled: "#939393"
   border: "#c9c9c9"
   hairline: "#e5e5e5"
   surface: "#ffffff"
-  surface-soft: "#f9f9f9"
+  surface-soft: "#f3f3f3"
   canvas: "#f3f3f3"
-  surface-sunk: "#ececec"
   on-accent: "#ffffff"
 typography:
   tile-title:
@@ -68,7 +67,7 @@ typography:
     lineHeight: 1.25
     letterSpacing: "0"
   api-string:
-    fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace"
+    fontFamily: "var(--slds-g-font-family-monospace) (SLDS monospace stack)"
     fontSize: "0.75rem"
     fontWeight: 400
     lineHeight: 1.375
@@ -76,7 +75,7 @@ rounded:
   sm: "0.25rem"
   md: "0.5rem"
   lg: "0.75rem"
-  pill: "999px"
+  pill: "15rem"
   round: "50%"
 spacing:
   xs: "0.25rem"
@@ -90,7 +89,7 @@ components:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
-    padding: "1rem"
+    padding: "0.5rem"
   choice-tile-hover:
     backgroundColor: "{colors.surface}"
   choice-tile-selected:
@@ -117,10 +116,10 @@ components:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink-body}"
     rounded: "{rounded.md}"
-    padding: "0.1875rem 0.5rem"
+    padding: "0.25rem 0.5rem"
   tone-chip-active:
     backgroundColor: "{colors.ink}"
-    textColor: "{colors.on-accent}"
+    textColor: "{colors.surface}"
   studio-card:
     backgroundColor: "{colors.surface}"
     rounded: "{rounded.lg}"
@@ -142,7 +141,7 @@ Newton Selector is what SLDS 2 choice controls would be if they had been designe
 
 There are two surfaces and one voice. The **runtime selector** (a grid, list, ribbon, picklist, radio-card, column or transfer layout of `ChoiceTile`s) is the product. The **Custom Property Editor studio** (a live preview beside four chapters of controls) is the tool an admin uses to dial it in, and it is built from the same hooks and the same tiles, so what the admin sees is what the user gets. Both are quiet and flat at rest: white surface, neutral ink, one brand-blue accent. Color is a _setting the admin chooses_ (nine tones, four states), never decoration the system imposes.
 
-The feel is crisp and confident. Borders are one pixel, corners are 8px on tiles and inputs and 12px on studio cards, transitions run 120-240ms on a single ease, and a selected tile announces itself unmistakably (brand border, brand-tinted surface, a check badge) without moving the layout.
+The feel is crisp and confident. Borders are one pixel, corners are 8px on tiles and inputs and 12px on studio cards, transitions run 120-240ms on a single ease (the one exception is the checkmark's 280ms spring scale-in), and a selected tile announces itself unmistakably (brand border, brand-tinted surface and, by default, an inset frame) without moving the layout.
 
 **Key Characteristics:**
 
@@ -170,7 +169,7 @@ A neutral SLDS ink-and-paper palette with a single brand blue; semantic and deco
 ### Primary
 
 - **Brand Blue** (#0176d3, `--slds-g-color-brand-base-50`): The only accent in chrome. Selected tile border, selection check, focus outlines in the studio, active segmented option, active chapter tab, splitter hover, section labels in the Flow Builder sidebar. Always read from the hook so org branding re-colors it.
-- **Brand Wash** (#eaf3ff, `brand-base-95`): The selected-tile surface and the quiet background behind brand glyphs and icon buttons.
+- **Brand Wash** (#eef4ff, `brand-base-95`): The selected-tile surface and the quiet background behind brand glyphs and icon buttons.
 - **Brand Strong** (#0b5cab, `brand-base-40`): The pressed and emphasis step. Sidebar button hover, the On toggle's edge ring and the toggle focus outline, the SOQL preview label and keyword tokens.
 - **Brand Deep** (#014486, `brand-base-30`): Brand ink on light brand surfaces. Brand-toned tile badges, the selected icon-catalog cell, the SOQL filter builder's selected segment and count. Every file uses the same fallback for a given brand hook.
 
@@ -178,9 +177,9 @@ A neutral SLDS ink-and-paper palette with a single brand blue; semantic and deco
 
 Each tone is a hue the admin can assign per tile state (normal, hover, selected, disabled) and to badges, icons, patterns and surfaces.
 
-- **Success Green** (#3baa6f), **Warning Amber** (#b25900), **Error Red** (#ba0517): Semantic tones, from `success|warning|error-base-50`.
-- **Violet** (#6d42c1), **Pink** (#c9257b), **Teal** (#0f7b82): Decorative tones from `palette-purple|pink|teal-50`.
-- **Neutral** (#747474): The default tone. Quiet, never competes with content.
+- **Success Green** (#2e844a), **Warning Amber** (#a96404), **Error Red** (#ea001e): Semantic tones, from `success|warning|error-base-50`.
+- **Violet** (#9050e9), **Pink** (#e3066a), **Teal** (#0b827c): Decorative tones from `palette-purple|pink|teal-50`.
+- **Neutral** (#757575, `neutral-base-50`): The default tone. Quiet, never competes with content.
 - **Custom**: Any hex, entered with a color picker. The only place a literal color enters the system; it does not follow dark mode.
 
 ### Neutral
@@ -189,20 +188,20 @@ Each tone is a hue the admin can assign per tile state (normal, hover, selected,
 - **Ink Body** (#2e2e2e): Sidebar summary lines, tone chip labels, the active Off option.
 - **Ink Soft** (#444444, `neutral-base-30`): Neutral badge ink, inactive segmented options, icon catalog copy.
 - **Ink Weak** (#5c5c5c): Tile subtitles, hints, secondary studio copy.
-- **Ink Muted** (#747474) and **Ink Disabled** (#9a9a9a): Muted supporting lines in the sidebar summary, and the tone disabled tiles take (disabled tiles are also dimmed to 62% opacity).
+- **Ink Muted** (#757575, `neutral-base-50`) and **Ink Disabled** (#939393, `neutral-base-60`): Muted supporting lines in the sidebar summary, and the tone disabled tiles take (disabled tiles are also dimmed to 62% opacity).
 - **Border** (#c9c9c9, `--slds-g-color-border-1`; #444 in dark mode): Tile and input borders, the segmented well, row edges on hover. **Hairline** (#e5e5e5, `neutral-base-90`; #181818 in dark mode): Dividers, card outlines, splitter.
-- **Surface** (#ffffff), **Surface Soft** (#f9f9f9), **Canvas** (#f3f3f3), **Sunk** (#ececec): The studio's layered grounds; cards sit on canvas, card headers and wells use the soft surface.
+- **Surface** (#ffffff, `surface-1`), **Surface Soft** (#f3f3f3, `surface-container-2`) and **Canvas** (#f3f3f3, `surface-container-2`): The studio's grounds. Cards sit on the grey canvas; card header bands are white and separated from the body by a hairline; wells, override row heads, hex and tone rows and the issues banner use the soft surface.
 
 ### Named Rules
 
 **The Hook-First Rule.** Never write a literal color where an `--slds-g-*` hook exists. A literal hex is permitted only for admin-chosen Custom tones and for hues SLDS has no hook for.
 **The One Accent Rule.** In chrome, brand blue is the only accent. Hue variety belongs to the tile content an admin configures, not to the editor's own furniture.
-**The One-Token-Source Rule.** Studio tokens (`--newton-studio-*`) are defined once, in the CSS-only module `newtonSelectorFlowCpeUtilityTokens`; every studio stylesheet `@import`s it. Change a token there, never redeclare it in a component.
+**The One-Token-Source Rule.** Studio tokens (`--newton-studio-*`) are defined once, in the CSS-only module `newtonSelectorFlowCpeUtilityTokens`; every studio stylesheet `@import`s it. Change a token there, never redeclare it in a component. The one exception is `--newton-studio-splitter-w`, which `newtonSelectorFlowCpeStudio.css` declares on its own host because only the studio grid uses it.
 **The Tint-Not-Fill Rule.** State surfaces are `color-mix(in oklab)` tints of the tone (3% rest, 6% hover, 12% selected) over the base surface. Full-strength fills are reserved for the Fill selection style and for check badges.
 
 ## Typography
 
-**Display Font:** none. **Body Font:** inherited SLDS stack (Salesforce Sans), never declared. **Mono:** system monospace stack, only for machine values (`Lead.Rating`, `{!myVar}`, SOQL, hex codes, numeric setting readouts) so code reads as code.
+**Display Font:** none. **Body Font:** inherited SLDS stack (Salesforce Sans), never declared. **Mono:** the SLDS monospace hook (`--slds-g-font-family-monospace`), only for machine values (`Lead.Rating`, `{!myVar}`, SOQL, hex codes, numeric setting readouts) so code reads as code.
 
 **Character:** Utilitarian and compact. Hierarchy comes from weight (400/600/700) and a tight size scale, not from a second typeface. Sizes are SLDS font-scale hooks, which scale with the user's density setting.
 
@@ -210,7 +209,7 @@ Each tone is a hue the admin can assign per tile state (normal, hover, selected,
 
 - **Chapter Title** (700, 1rem, 1.25): The four studio chapter headings and the live preview title.
 - **Card Title** (700, 0.875rem, 1.25): Studio section card titles and Appearance sub-chapter headings. The Flow Builder summary card title is one step smaller (0.8125rem).
-- **Tile Title** (600, 0.875rem, 1.25): The option label. Wraps with `overflow-wrap: anywhere`; never truncates silently.
+- **Tile Title** (600, 0.875rem, 1.25; 0.8125rem on small tiles): The option label. Wraps with `overflow-wrap: anywhere`; never truncates silently.
 - **Control Label** (700, 0.8125rem, 1, +0.02em): Axis and field labels in the studio.
 - **Tile Subtitle** (400, 0.75rem, 1.25, ink-weak; 0.6875rem on small tiles): Secondary line under a tile title.
 - **Badge** (700, 0.6875rem, 1, +0.06em, uppercase; 0.625rem on small tiles): Corner and inline badges.
@@ -226,7 +225,7 @@ Each tone is a hue the admin can assign per tile state (normal, hover, selected,
 
 Runtime layouts are driven by CSS variables the editor writes (`--newton-group-gap-x|y`, `--newton-group-min-w`, `--newton-tile-pad-*`, margins per side). The Grid uses fixed-width columns (`repeat(auto-fill, minmax(min(100%, W), W))`), left-aligned: tiles keep their chosen size (Small 7.5rem, Medium 12rem, Large 16rem) and leftover space stays on the right rather than stretching tiles. `min(100%, W)` keeps very narrow containers from overflowing. Aspect ratios (1:1, 4:3, 16:9, 3:4) apply to Grid and Horizontal only; List is full-width rows with auto height. Gap inside a tile is half the top padding with a 0.25rem floor, so padding is the single dial.
 
-Spacing follows SLDS tokens 1-9 (4px to 48px); the default tile gap is 0.5rem and default padding 1rem. The editor studio is a two-pane grid: live preview (45-50%) beside controls (50-55%), separated by a 0.375rem draggable splitter, 78vh tall with a 34rem floor. Controls scroll in a single column and query their own width (`container-type: inline-size`). Every choice-tile picker in the studio (data source, layout, sizes, patterns, gaps, padding...) uses one tile box, 7.5rem by 6.5rem, in left-aligned 7.5rem columns with a 0.5rem gap; inside, the visual sits in a fixed 2.5rem row and the title and up to two lines of description sit below it. Every picker draws its visual in the same framed cell, neutral at rest and brand when selected, with the same surface, padding and selection state; only the Icon style and Icon shading pickers show the icon treatment itself in that cell, because the treatment is the option. Below 56rem the studio stacks, preview over controls, and the splitter disappears. The runtime Group collapses its multi-panel layouts at 48rem.
+Spacing follows SLDS tokens 1-9 (4px to 56px). Tiles default to Small, with 0.5rem padding (1rem on Medium, 1.5rem on Large); the default gap between tiles is 0.5rem in Grid and Horizontal and 0.25rem between rows in the stacked layouts. The editor studio is a two-pane grid: live preview beside controls, split 50/50 by default and adjustable from 0 to 100% with a 0.375rem draggable splitter, 78vh tall with a 34rem floor. Controls scroll in a single column and query their own width (`container-type: inline-size`). Every choice-tile picker in the studio (data source, layout, sizes, patterns, gaps, padding...) uses one tile box, 7.5rem by 6.5rem, in left-aligned 7.5rem columns with a 0.5rem gap; inside, the visual sits in a fixed 2.5rem row and the title and up to two lines of description sit below it. Every picker draws its visual in the same framed cell, neutral at rest and brand when selected, with the same surface, padding and selection state; only the Icon style and Icon shading pickers show the icon treatment itself in that cell, because the treatment is the option. Below 56rem the studio stacks, preview over controls, and the splitter disappears. The runtime Group collapses its multi-panel layouts at 48rem.
 
 ### Named Rules
 
@@ -236,15 +235,15 @@ Spacing follows SLDS tokens 1-9 (4px to 48px); the default tile gap is 0.5rem an
 
 ## Elevation & Depth
 
-Flat by default, with a hybrid for options. At rest the tile is a white surface with a 1px border; depth is an admin choice among six elevation styles. Studio chrome is flat at rest: cards, override rows and wells carry a hairline and no resting shadow. The hook shadow (`--slds-g-shadow-1`, fallback `0 1px 2px` ink at 6%) marks only the preview head, an expanded override row, the active column chip and the sidebar button on hover; the preview frame sits one step up on `--slds-g-shadow-2` (fallback `0 2px 8px` ink at 12%).
+Flat by default, with a hybrid for options. At rest the tile is a white surface with a 1px border; depth is an admin choice among six elevation styles. Studio chrome is flat at rest: cards, override rows and wells carry a hairline and no resting shadow. The hook shadow (`--slds-g-shadow-1`, fallback `0 1px 2px` ink at 6%) marks only the preview head, an expanded override row, the active column chip and the sidebar button on hover; the WHERE builder's selected segment and hovered (or focused) condition row use the same hook with an 8% fallback; the preview frame sits one step up on `--slds-g-shadow-2` (fallback `0 2px 8px` ink at 12%).
 
 ### Shadow Vocabulary
 
 - **Plain**: No border, no shadow; surface only.
 - **Subtle**: Base tinted to neutral-95 with an 18% neutral hairline.
 - **Outlined**: Border only; on hover `0 2px 12px` ink at 8% and a 1px lift.
-- **Raised**: Rest `0 2px 12px` ink at 10%; hover `0 8px 20px` at 13%; 1px lift.
-- **Floating**: Rest `0 12px 24px` ink at 14%; hover `0 16px 40px` at 16%; 2px lift.
+- **Raised**: Rest `0 2px 12px` ink at 10%; hover `0 8px 24px` at 13%; 1px lift.
+- **Floating**: Rest `0 12px 32px` ink at 14%; hover `0 16px 40px` at 16%; 2px lift.
 - **Inset**: Rest 1px inset ring at 18%; hover 2px at 22%; no lift.
 - **Selection indicator shadow** (layered above elevation): Frame is a 2px inset ring at 74% plus a 4px inset halo at 10%.
 
@@ -255,7 +254,7 @@ Flat by default, with a hybrid for options. At rest the tile is a white surface 
 
 ## Shapes
 
-Rectilinear with small, consistent radii. Tiles, inputs, square badges and the studio's small controls (glyph chips, tone chips, tone rows, icon buttons) use 8px (`radius-border-2`); studio cards, override rows, spec sheets, the query preview, the preview head and frame, the runtime empty and error panels, and the segmented control use 12px (`radius-border-3`); 4px (`radius-border-1`) is kept for small inner marks such as a tile's geometric shape outline, the SOQL code block and the filter builder. Pill badges use the pill hook; the selection check is a circle. Borders are 1px (hairline) and thicken to 2px for focus, hover on Inset, and the frame selection style. The only decorative geometry lives in admin-optional layers: corner flourishes (trim, brackets, dots), the ribbon's folded triangular corner (`clip-path`), and eight tile patterns (dots, lines, diagonal, grid, glow, noise, paper, waves). A 3px brand rule on the leading edge marks the bulk-edit card in the studio.
+Rectilinear with small, consistent radii. Tiles, inputs, square badges and the studio's small controls (glyph chips, tone chips, tone rows, icon buttons) use 8px (`radius-border-2`); studio cards, override rows, spec sheets, the query preview, the preview head and frame, the runtime empty and error panels, and the segmented control use 12px (`radius-border-3`); 4px (`radius-border-1`) is kept for small inner marks such as a tile's geometric shape outline, the SOQL code block and the filter builder. Pill badges use the pill hook (fallback 15rem); the selection check and every other circle use the circle hook (fallback 50%). Borders are 1px (hairline) and thicken to 2px for focus, hover on Inset, and the frame selection style. The only decorative geometry lives in admin-optional layers: corner flourishes (trim, brackets, dots), the ribbon's folded triangular corner (`clip-path`), and eight tile patterns (dots, lines, diagonal, grid, glow, noise, paper, waves). A 3px brand rule on the leading edge marks the bulk-edit card in the studio.
 
 ## Components
 
@@ -263,13 +262,15 @@ Rectilinear with small, consistent radii. Tiles, inputs, square badges and the s
 
 Character: a flat card you tap, not a control you aim at.
 
-- **Shape:** 8px radius, 1px border (#c9c9c9), 1rem padding, center-aligned stack of icon, title, subtitle.
+- **Shape:** 8px radius, 1px border (#c9c9c9), 0.5rem padding on the default Small size (1rem Medium, 1.5rem Large), center-aligned stack of icon, title, subtitle.
 - **Hover:** border to ink-muted, tone tint to 6%, elevation shadow shifts to its hover value (160-200ms, `cubic-bezier(.2,.8,.2,1)`).
-- **Selected:** border to brand, surface tinted 12% toward the selected tone, and the chosen indicator: Checkmark (default, 1.5rem circle, top-right, scales in), Fill, Bar (4px leading edge), Frame (inset ring), Ribbon (folded corner, 1.5-2.5rem), or Pulse (1.8s breathing halo, off under reduced motion).
-- **Direction:** in right-to-left languages the layout mirrors: the Ribbon indicator's folded corner, the Dropdown layout's inset selection shadow and directional gradient surfaces flip to the other side with the text.
+- **Selected:** border to brand, surface tinted 12% toward the selected tone, and the chosen indicator: Frame (default, inset ring), Checkmark (1.5rem circle, 1.25rem on small tiles, 1.75rem on large tiles, top-right, scales in on a 280ms spring), Fill (on a solid surface with no pattern the tile fills with the selected tone and its text turns white; otherwise the surface keeps its own selected treatment), Bar (4px leading edge), Ribbon (folded corner, 1.5-2.5rem), or Pulse (1.8s breathing halo, off under reduced motion).
+- **Direction:** in right-to-left languages the layout mirrors: the Ribbon indicator's folded corner and directional gradient surfaces flip to the other side with the text.
+- **In every layout:** Dropdown options and Dual listbox rows are Choice Tiles too, so the selector's Appearance (selection indicator, icons, badges) applies there; the Dual listbox row highlighted for a move shows the tile's selected state.
 - **Focus:** the native radio/checkbox is visually hidden; `:focus-visible` draws a 2px outline at 2px offset on the tile surface.
 - **Disabled:** 62% opacity, ink-disabled, no pointer events.
-- **Parts:** optional icon in four decorations (ring, halo, medal, square) and four styles (filled, outlined, soft, glow), drawn in a 2.5rem decoration (3rem for halo and soft, 3.5rem for glow); badge in corner or inline, pill or square; optional geometric shape in place of an icon, in a 2.5rem cell (3rem on large tiles).
+- **Parts:** optional icon in four decorations (ring, halo, medal, square) and four styles (filled, outlined, soft, glow), drawn in a decoration 0.5rem larger than the auto glyph (2rem small, 2.5rem medium, 3.5rem large), one step larger for Soft and two for Glow (step 0.25rem on small tiles, 0.5rem otherwise). Ring adds a thin concentric outline, Halo a soft aura and Medal a notched rosette rim, each extending 0.25rem past the circle; Square is a rounded square. A badge sits in a corner or inline, pill or square; an optional geometric shape takes the icon's place in a 2.5rem cell (3rem on large tiles).
+- **Large tiles:** title 1rem/700, subtitle 0.875rem, checkmark 1.75rem.
 - **Framed visual** (`framed-visual`): draws the icon in the plain shape cell instead of an icon decoration, so icon and shape tiles match.
 - **Host hooks:** `--newton-tile-block-size` fixes the tile height over its aspect ratio; `--newton-tile-figure-display: grid` with `--newton-tile-figure-rows` puts the visual in a fixed row and the text below it. `--newton-tile-visual-size` pins the shape cell. Unset, the tile is the runtime's centered stack.
 
@@ -277,7 +278,7 @@ Character: a flat card you tap, not a control you aim at.
 
 - **Style:** every text field, picker trigger and search box in the editor is the SLDS 2 standard input: white fill, 1px neutral border, 8px radius, 2rem tall, 0.8125rem text. Components never restyle a field's edge, fill or height, so a dropdown trigger, a resource picker, the option icon picker and a plain input look identical. Fields placed side by side share a top edge. The runtime search bar above a tile group matches: 8px radius, 1px border, 0.5rem by 0.75rem padding.
 - **Search icon:** only a box that searches a list (object search, field search, the overrides filter, the icon catalog filter) leads with a magnifier. A resource picker holds a value or a Flow resource, so it is a plain text input with none; once a resource is chosen it shows that resource's icon in a small brand cell with a trailing chevron. The icon picker trigger shows the chosen icon in a brand-outlined cell.
-- **Focus / Error:** inherits SLDS focus behavior; errors use the error hook pair (50 border, 95 wash, 30 ink).
+- **Focus / Error:** inherits SLDS focus behavior; runtime search bars show a brand border and a 1px brand ring on focus; errors use the error hook pair (50 border, 95 wash, 30 ink).
 
 ### Segmented Toggle (On/Off)
 
@@ -289,7 +290,7 @@ An 8px-radius chip (0.6875rem, 600) with a leading color dot, white surface and 
 
 ### Studio Card and Chapter Header
 
-Cards sit on the canvas flat at rest: white, hairline, 12px radius, no resting shadow and no entrance animation; hover and focus leave the edge unchanged. The header is a soft-surface band with a 1.5rem glyph chip, the title and description sharing a line when they fit, and a hairline divider; the body pads 0.75rem. A chapter opens with a plain heading: a 1rem bold title over a hairline, with the chapter name kept for screen readers only. Appearance sub-chapters are a 0.875rem bold title over a hairline, with an optional Show icons or Show badges toggle at the end.
+Cards sit on the canvas flat at rest: white, hairline, 12px radius, no resting shadow and no entrance animation; hover and focus leave the edge unchanged. The header is a white band with a hairline divider, holding a 1.5rem glyph chip and the title and description, which share a line when they fit; the body pads 0.75rem. A chapter opens with a plain heading: a 1rem bold title over a hairline, with the chapter name kept for screen readers only. Appearance sub-chapters are a 0.875rem bold title over a hairline, with an optional Show icons or Show badges toggle at the end.
 
 ### Override Rows and Bulk Edit
 
@@ -308,7 +309,7 @@ Not a mockup: it renders the real `DataSelector` with neutral sample options (or
 
 ### Flow Builder Sidebar Summary
 
-A single white card (hairline, 8px radius) in a 0.5rem-padded stack on the canvas: a title, then sections of plain-language lines divided by hairlines, each with a brand section label in a narrow leading column. The component name is kept for screen readers only. No numerals, no chapter colors. Brand blue is the only accent.
+A single white card (hairline, 8px radius) in a 0.5rem-padded stack on the canvas: a title, then sections of plain-language lines divided by hairlines, each with a brand section label in a narrow leading column. Gap and badge lines appear only when they differ from the layout preset, and the None option line appears in both selection modes. The component name is kept for screen readers only. No numerals, no chapter colors. Brand blue is the only accent.
 
 ## Do's and Don'ts
 
@@ -317,7 +318,7 @@ A single white card (hairline, 8px radius) in a 0.5rem-padded stack on the canva
 - **Do** read every color, radius, space and size from an `--slds-g-*` hook with a literal fallback; keep literals only for admin-chosen Custom tones.
 - **Do** express appearance as BEM modifier classes plus CSS variables; keep new options on the same state model (normal, hover, selected, disabled).
 - **Do** keep selected state dimension-stable and visible without color alone (a check, bar, frame, ribbon or fill shape accompanies the tint).
-- **Do** use 1px hairlines, 8px tile and input radius and 12px card radius, and the single ease `cubic-bezier(0.2, 0.8, 0.2, 1)` at 120-240ms.
+- **Do** use 1px hairlines, 8px tile and input radius and 12px card radius, and the single ease `cubic-bezier(0.2, 0.8, 0.2, 1)` at 120-240ms. The one exception is the selection checkmark, which scales in on a 280ms spring (`cubic-bezier(0.175, 0.885, 0.32, 1.275)`).
 - **Do** wrap every animation in `prefers-reduced-motion` and give interactive tiles a `:focus-visible` outline.
 - **Do** use monospace only for machine values: API names, merge fields, SOQL, hex codes and numeric readouts.
 
@@ -332,4 +333,4 @@ A single white card (hairline, 8px radius) in a 0.5rem-padded stack on the canva
 
 ## Known Drift
 
-None open. When a scan finds drift from this document, record it here so future work resolves it rather than copying it.
+When a scan finds drift from this document, record it here so future work resolves it rather than copying it.

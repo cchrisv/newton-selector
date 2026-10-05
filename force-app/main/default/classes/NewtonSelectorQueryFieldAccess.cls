@@ -9,6 +9,26 @@ public with sharing class NewtonSelectorQueryFieldAccess {
    * @param objectApiName Source object API name.
    */
   public NewtonSelectorQueryFieldAccess(String objectApiName) {
+    Schema.DescribeSObjectResult describe = describeAccessibleObject(
+      objectApiName
+    );
+    if (!describe.isQueryable()) {
+      throw new NewtonSelectorException(
+        'Object not queryable: ' + objectApiName
+      );
+    }
+    objectName = describe.getName();
+    fieldMap = describe.fields.getMap();
+  }
+
+  /**
+   * @description Describes an object the running user can read.
+   * @param objectApiName Object API name (case-insensitive).
+   * @return Object describe result.
+   */
+  public static Schema.DescribeSObjectResult describeAccessibleObject(
+    String objectApiName
+  ) {
     if (String.isBlank(objectApiName)) {
       throw new NewtonSelectorException('Object API name is required.');
     }
@@ -21,13 +41,12 @@ public with sharing class NewtonSelectorQueryFieldAccess {
     Schema.DescribeSObjectResult describe = type.getDescribe(
       SObjectDescribeOptions.DEFERRED
     );
-    if (!describe.isQueryable() || !describe.isAccessible()) {
+    if (!describe.isAccessible()) {
       throw new NewtonSelectorException(
         'Object not accessible: ' + objectApiName
       );
     }
-    objectName = describe.getName();
-    fieldMap = describe.fields.getMap();
+    return describe;
   }
 
   /**

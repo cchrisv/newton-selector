@@ -13,8 +13,7 @@ const PREVIEW_SAMPLE_ITEMS = Object.freeze([
     icon: "circle",
     badge: "Sample",
     helpText: "",
-    value: "preview-option-a",
-    disabled: false
+    value: "preview-option-a"
   },
   {
     id: "preview-option-b",
@@ -23,8 +22,7 @@ const PREVIEW_SAMPLE_ITEMS = Object.freeze([
     icon: "square",
     badge: "Sample",
     helpText: "",
-    value: "preview-option-b",
-    disabled: false
+    value: "preview-option-b"
   },
   {
     id: "preview-option-c",
@@ -33,8 +31,7 @@ const PREVIEW_SAMPLE_ITEMS = Object.freeze([
     icon: "triangle",
     badge: "Sample",
     helpText: "",
-    value: "preview-option-c",
-    disabled: false
+    value: "preview-option-c"
   },
   {
     id: "preview-option-d",
@@ -43,8 +40,7 @@ const PREVIEW_SAMPLE_ITEMS = Object.freeze([
     icon: "star",
     badge: "Sample",
     helpText: "",
-    value: "preview-option-d",
-    disabled: false
+    value: "preview-option-d"
   }
 ]);
 
@@ -52,33 +48,13 @@ function sampleAt(index) {
   return PREVIEW_SAMPLE_ITEMS[index % PREVIEW_SAMPLE_ITEMS.length];
 }
 
-function previewValue(value, fallback) {
-  return value === undefined || value === null || value === ""
-    ? fallback
-    : String(value);
-}
-
-// Custom options render as configured (gaps filled from the samples); every
-// other source shows sample options keyed by the configured overrides.
+// Custom options go through as configured; DataSelector normalizes them
+// exactly as at runtime, hidden rows and blank fields included. Other
+// sources, and a Custom source with no options yet, show sample options
+// keyed by the configured overrides.
 function previewItems(config) {
-  const customItems = config.custom.items.filter(
-    (item) => item?.hidden !== true
-  );
-  if (config.dataSource === "custom" && customItems.length > 0) {
-    return customItems.map((item, index) => {
-      const sample = sampleAt(index);
-      return {
-        ...sample,
-        ...item,
-        id: item.id || `preview-custom-${index}`,
-        label: item.label || sample.label,
-        sublabel: item.sublabel || sample.sublabel,
-        icon: item.icon || sample.icon,
-        badge: item.badge || sample.badge,
-        value: previewValue(item.value, sample.value),
-        disabled: Boolean(item.disabled)
-      };
-    });
+  if (config.dataSource === "custom" && config.custom.items.length > 0) {
+    return config.custom.items;
   }
   const values = [
     ...new Set([
@@ -94,8 +70,8 @@ function previewItems(config) {
 }
 
 export default class NewtonSelectorFlowCpeConfigPreview extends LightningElement {
-  @api forcedState = "";
-
+  // The Populated / Empty / Error state the admin forces on the preview.
+  forcedState = "";
   _config = mergeSelectorConfig();
   _rawConfig;
   // Built once per config change so the preview selector reloads only then.
@@ -128,11 +104,8 @@ export default class NewtonSelectorFlowCpeConfigPreview extends LightningElement
   }
 
   handlePreviewStateChange(event) {
-    this.dispatchEvent(
-      new CustomEvent("previewstatechange", {
-        detail: event.currentTarget.dataset.state
-      })
-    );
+    const state = event.currentTarget.dataset.state;
+    this.forcedState = this.forcedState === state ? "" : state;
   }
 
   get previewStateButtons() {
@@ -156,23 +129,21 @@ export default class NewtonSelectorFlowCpeConfigPreview extends LightningElement
     return !this._config.dataSource;
   }
 
-  // The empty state already says to pick a data source, so no caption then.
+  // The empty state already says to pick a data source, and real Custom
+  // options need no caption.
   get previewCaption() {
     if (this.previewEmpty) return "";
-    if (
-      this._config.dataSource === "custom" &&
-      this._config.custom.items.length === 0
-    ) {
-      return "Sample options until you add your own.";
+    if (this._config.dataSource === "custom") {
+      return this._config.custom.items.length === 0
+        ? "Sample options until you add your own."
+        : "";
     }
     return "Sample data. Your real options load when the flow runs.";
   }
 
   get previewLayoutLabel() {
-    return (
-      LAYOUT_TILES.find((tile) => tile.value === this._config.layout)?.label ||
-      "Grid"
-    );
+    return LAYOUT_TILES.find((tile) => tile.value === this._config.layout)
+      .label;
   }
 
   get previewSelectionLabel() {

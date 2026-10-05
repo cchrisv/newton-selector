@@ -3,5 +3,5 @@
     <apiVersion>66.0</apiVersion>
     <isExposed>false</isExposed>
     <description
-  >Newton Selector Flow CPE | Helpers — shared utility module for the Flow CPE. Exposes a field-metadata LRU cache, merge-field helpers, and data-source mode resolvers.</description>
+  >Newton Selector Flow CPE | Helpers — shared utility module for the Flow CPE: load-error messages, field-type icons and options, and merge-field helpers.</description>
 </LightningComponentBundle>

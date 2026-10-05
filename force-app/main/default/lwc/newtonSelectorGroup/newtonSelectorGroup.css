@@ -1,11 +1,7 @@
 :host {
   display: block;
 
-  --newton-group-gap-x: var(--slds-g-spacing-2, 0.5rem);
-  --newton-group-gap-y: var(--slds-g-spacing-2, 0.5rem);
-  --newton-group-min-w: 7.5rem;
   --newton-transfer-transition-duration: 0.1s;
-  --newton-z-index-dropdown: 7000;
 }
 
 .newton-group-wrapper {
@@ -24,7 +20,7 @@
   border: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-2, 0.5rem);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
+  background: var(--slds-g-color-surface-container-1, #ffffff);
 }
 
 .newton-search-bar__input {
@@ -33,6 +29,17 @@
   outline: none;
   background: transparent;
   font-size: var(--slds-g-font-scale-1, 0.875rem);
+}
+
+/* The inner input is borderless, so its wrapper shows keyboard focus. The
+   transparent outline stays visible in forced-colors mode, which drops
+   box-shadow. */
+.newton-search-bar:focus-within,
+.newton-transfer__search:focus-within {
+  border-color: var(--slds-g-color-brand-base-50, #0176d3);
+  box-shadow: 0 0 0 var(--slds-g-sizing-border-1, 1px)
+    var(--slds-g-color-brand-base-50, #0176d3);
+  outline: var(--slds-g-sizing-border-2, 2px) solid transparent;
 }
 
 /* Multi-select toolbar */
@@ -73,6 +80,17 @@
   margin-inline-start: var(--newton-group-margin-l, 0);
 }
 
+/* A fixed column count keeps tiles at their configured width instead of
+   stretching them to fill the container, so "columns" means how many per
+   row. A container narrower than cols x min-width overflows; that is the
+   deliberate consequence of pinning a column count. */
+.newton-group_grid.newton-group_fixed-cols {
+  grid-template-columns: repeat(
+    var(--newton-group-cols),
+    var(--newton-group-min-w)
+  );
+}
+
 /* List layout: single column flex */
 .newton-group_list {
   display: flex;
@@ -82,32 +100,6 @@
   margin-inline-end: var(--newton-group-margin-r, 0);
   margin-bottom: var(--newton-group-margin-b, 0);
   margin-inline-start: var(--newton-group-margin-l, 0);
-}
-
-.newton-group_list c-newton-selector-choice-tile {
-  display: block;
-  width: 100%;
-}
-
-/* Fixed-column override: when --newton-group-cols is set (1–6), force an
-   equal-fraction grid regardless of container width. Leaves the auto-fill
-   behavior intact when the variable is absent. */
-.newton-group_grid {
-  grid-template-columns: repeat(
-    var(--newton-group-cols, auto-fill),
-    minmax(min(100%, var(--newton-group-min-w)), var(--newton-group-min-w))
-  );
-}
-/* Fixed column count — tiles keep their configured width (size setting)
-   rather than stretching to fill the container (\`minmax(0, 1fr)\` would let
-   the column count dominate tile size); "columns" means how many per row. If
-   the container is narrower than cols × min-width, tiles overflow — that's
-   the deliberate consequence of pinning a column count. */
-.newton-group_grid[style*="--newton-group-cols:"] {
-  grid-template-columns: repeat(
-    var(--newton-group-cols),
-    var(--newton-group-min-w)
-  );
 }
 
 /* =============================================================================
@@ -141,7 +133,7 @@
   height: var(--slds-g-sizing-3, 0.5rem);
 }
 .newton-group_horizontal::-webkit-scrollbar-thumb {
-  background: var(--slds-g-color-neutral-base-80, #d4d4d4);
+  background: var(--slds-g-color-neutral-base-80, #c9c9c9);
   border-radius: var(--slds-g-radius-border-pill, 15rem);
 }
 .newton-group_horizontal::-webkit-scrollbar-thumb:hover {
@@ -170,9 +162,7 @@
 }
 
 .newton-radio-card c-newton-selector-choice-tile {
-  display: block;
   min-width: 0;
-  width: 100%;
 }
 
 .newton-radio-card__marker {
@@ -182,13 +172,13 @@
   border: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-circle, 50%);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
+  background: var(--slds-g-color-surface-container-1, #ffffff);
 }
 
 .newton-radio-card_selected .newton-radio-card__marker {
   border-color: var(--slds-g-color-brand-base-50, #0176d3);
   box-shadow: inset 0 0 0 var(--slds-g-spacing-1, 0.25rem)
-    var(--slds-g-color-neutral-base-100, #ffffff);
+    var(--slds-g-color-surface-container-1, #ffffff);
   background: var(--slds-g-color-brand-base-50, #0176d3);
 }
 
@@ -205,7 +195,7 @@
   .newton-radio-card__marker::after {
   content: "";
   position: absolute;
-  top: 2px;
+  top: var(--slds-g-sizing-1, 0.125rem);
   inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
   width: var(--slds-g-sizing-2, 0.25rem);
   height: var(--slds-g-sizing-3, 0.5rem);
@@ -222,7 +212,7 @@
   background: var(--slds-g-color-neutral-base-95, #f3f3f3);
 }
 
-/* Picklist layout: field-like trigger, card-backed option menu. */
+/* Picklist layout: field-like trigger, menu of option tiles. */
 .newton-picklist {
   position: relative;
   margin-top: var(--newton-group-margin-t, 0);
@@ -260,7 +250,15 @@
   overflow-y: auto;
   border-color: var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-3, 0.75rem);
-  box-shadow: var(--slds-g-shadow-2, 0 2px 8px #0000001f);
+  box-shadow: var(
+    --slds-g-shadow-2,
+    0 2px 8px
+      color-mix(
+        in oklab,
+        var(--slds-g-color-neutral-base-10, #181818) 12%,
+        transparent
+      )
+  );
 }
 
 .newton-picklist__search {
@@ -271,22 +269,14 @@
 .newton-picklist__listbox {
   display: flex;
   flex-direction: column;
-  gap: var(--newton-group-gap-y, var(--slds-g-spacing-1, 0.25rem));
+  gap: var(--newton-group-gap-y);
   padding: 0 var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-1, 0.25rem);
 }
 
+/* The option tile draws the surface and the selected state. */
 .newton-picklist__option {
-  display: block;
-  padding: 0;
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-2, 0.5rem);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
   cursor: pointer;
-}
-
-.newton-picklist__option:hover {
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
 }
 
 /* The keyboard-active option (aria-activedescendant). */
@@ -294,30 +284,6 @@
   outline: var(--slds-g-sizing-border-2, 2px) solid
     var(--slds-g-color-brand-base-50, #0176d3);
   outline-offset: calc(-1 * var(--slds-g-sizing-border-2, 2px));
-}
-
-.newton-picklist__item_selected .newton-picklist__option {
-  /* The accent rule sits on the leading edge, so its offset flips in RTL. */
-  --_leading-rule: var(--slds-g-sizing-border-2, 2px);
-  background: var(--slds-g-color-brand-base-95, #eef4ff);
-  box-shadow:
-    inset var(--_leading-rule) 0 0 var(--slds-g-color-brand-base-50, #0176d3),
-    inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
-      var(--slds-g-color-brand-base-50, #0176d3);
-}
-
-.newton-picklist__item_selected .newton-picklist__option:dir(rtl) {
-  --_leading-rule: calc(var(--slds-g-sizing-border-2, 2px) * -1);
-}
-
-.newton-picklist__item c-newton-selector-choice-tile {
-  display: block;
-  width: 100%;
-  --newton-tile-pad-base: var(--slds-g-spacing-2, 0.5rem);
-  --newton-tile-pad-l: var(--slds-g-spacing-2, 0.5rem);
-  --newton-tile-pad-r: var(--slds-g-spacing-2, 0.5rem);
-  --newton-tile-pad-t: var(--slds-g-spacing-2, 0.5rem);
-  --newton-tile-pad-b: var(--slds-g-spacing-2, 0.5rem);
 }
 
 .newton-transfer__search {
@@ -330,13 +296,13 @@
   border: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-2, 0.5rem);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
+  background: var(--slds-g-color-surface-container-1, #ffffff);
 }
 
 .newton-picklist__empty {
   margin: 0;
   padding: var(--slds-g-spacing-4, 1rem);
-  color: var(--slds-g-color-neutral-base-50, #747474);
+  color: var(--slds-g-color-neutral-base-50, #757575);
   text-align: center;
 }
 
@@ -360,7 +326,7 @@
   border: var(--slds-g-sizing-border-1, 1px) solid
     var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-2, 0.5rem);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
+  background: var(--slds-g-color-surface-container-1, #ffffff);
   transition:
     border-color var(--newton-transfer-transition-duration)
       cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -368,12 +334,14 @@
       cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.newton-transfer_columns .newton-transfer__panel {
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+@media (prefers-reduced-motion: reduce) {
+  .newton-transfer__panel {
+    transition: none;
+  }
 }
 
-.newton-transfer_dualListbox .newton-transfer__panel {
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
+.newton-transfer_columns .newton-transfer__panel {
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
 }
 
 .newton-transfer_has-controls {
@@ -436,7 +404,7 @@
 
 .newton-transfer__count {
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  color: var(--slds-g-color-neutral-base-50, #747474);
+  color: var(--slds-g-color-neutral-base-50, #757575);
   white-space: nowrap;
 }
 
@@ -461,14 +429,22 @@
   cursor: grabbing;
 }
 
-.newton-transfer__item_active {
-  box-shadow: 0 0 0 var(--slds-g-sizing-border-2, 2px)
-    var(--slds-g-color-brand-base-60, #1b96ff);
+/* Dual listbox: a listbox of option tiles. The tile shows the "highlighted
+   for move" state; the focused row gets the focus ring. */
+.newton-transfer__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--newton-group-gap-y);
 }
 
-.newton-transfer__item c-newton-selector-choice-tile {
-  display: block;
-  width: 100%;
+.newton-transfer__option {
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
+}
+
+.newton-transfer__option:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid
+    var(--slds-g-color-brand-base-50, #0176d3);
+  outline-offset: var(--slds-g-sizing-border-1, 1px);
 }
 
 .newton-transfer__empty {
@@ -479,7 +455,7 @@
   min-height: 6rem;
   margin: 0;
   padding: var(--slds-g-spacing-4, 1rem);
-  color: var(--slds-g-color-neutral-base-50, #747474);
+  color: var(--slds-g-color-neutral-base-50, #757575);
   text-align: center;
 }
 
@@ -498,7 +474,7 @@
   align-items: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-6, 2rem) var(--slds-g-spacing-4, 1rem);
-  color: var(--slds-g-color-neutral-base-50, #747474);
+  color: var(--slds-g-color-neutral-base-50, #757575);
   text-align: center;
 }
 

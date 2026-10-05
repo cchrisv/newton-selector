@@ -29,8 +29,9 @@
 }
 
 .newton-studio__issues {
+  flex: 0 0 auto;
   list-style: none;
-  margin: 0;
+  margin: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-3, 0.75rem) 0;
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
   background: var(--newton-studio-panel-soft);
   border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
@@ -87,20 +88,15 @@
 
 .newton-chapter {
   position: relative;
-  scroll-margin-top: var(--slds-g-spacing-3, 0.75rem);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: var(--slds-g-spacing-3, 0.75rem);
   min-block-size: 0;
   margin: 0;
-  padding: var(--slds-g-spacing-1, 0.25rem) 0 var(--slds-g-spacing-2, 0.5rem);
+  padding: var(--slds-g-spacing-2, 0.5rem) 0;
   border-block-end: var(--slds-g-sizing-border-1, 1px) solid
     var(--newton-studio-hairline);
-}
-
-.newton-chapter:first-of-type {
-  padding-top: var(--slds-g-spacing-2, 0.5rem);
 }
 
 .newton-chapter__head {
@@ -137,7 +133,7 @@
   --_card-border: var(--newton-studio-hairline);
   --_card-rule: var(--_card-border);
   --_card-surface: var(--newton-studio-panel);
-  --_card-head-surface: var(--newton-studio-panel-soft);
+  --_card-head-surface: var(--newton-studio-panel);
   overflow: visible;
   margin: 0;
   border: var(--slds-g-sizing-border-1, 1px) solid var(--_card-border);
@@ -218,7 +214,6 @@
   border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--newton-studio-radius);
   background: var(--newton-studio-panel-soft);
-  color: var(--newton-studio-ink-weak);
 }
 
 .newton-card__glyph c-newton-selector-icon {
@@ -236,7 +231,8 @@
   min-width: 0;
 }
 
-.newton-card__headings > h3 {
+.newton-card__headings > h3,
+.newton-card__headings > h4 {
   flex: 0 0 auto;
   margin: 0;
   color: var(--newton-studio-ink);
@@ -289,9 +285,6 @@
 .newton-studio__field-block > c-newton-selector-flow-cpe-resource-selector,
 .newton-studio__field-block > c-newton-selector-flow-cpe-field-selector,
 .newton-studio__field-block > c-newton-selector-flow-cpe-choice-control,
-.newton-studio__field-grid > c-newton-selector-combobox,
-.newton-studio__field-grid > c-newton-selector-flow-cpe-resource-selector,
-.newton-studio__field-grid > c-newton-selector-flow-cpe-field-selector,
 .newton-studio__field-grid > c-newton-selector-flow-cpe-choice-control {
   --slds-c-input-color-background: var(--newton-studio-panel);
   --slds-c-textarea-color-background: var(--newton-studio-panel);
@@ -351,10 +344,6 @@
   font-size: 0.6875rem;
   font-weight: var(--slds-g-font-weight-6, 600);
   color: var(--newton-studio-ink-weak);
-}
-
-.newton-studio__subchapter-toggle c-newton-selector-flow-cpe-toggle {
-  display: block;
 }
 
 /* Shown in place of a sub-chapter's cards while icons/badges are hidden. */
@@ -492,8 +481,7 @@
   cursor: pointer;
   min-width: 2.5rem;
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--slds-g-font-family-monospace, Consolas, monospace);
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
   font-weight: var(--slds-g-font-weight-7, 700);
   color: var(--newton-studio-ink-weak);
@@ -518,7 +506,7 @@
   border-inline-end: 0;
 }
 
-.newton-studio__col-chip:hover {
+.newton-studio__col-chip:hover:not(.newton-studio__col-chip_active) {
   color: var(--newton-studio-ink);
   background: var(--newton-studio-surface-alt);
 }
@@ -560,7 +548,7 @@
 .newton-tone-row__eyebrow {
   font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
   font-weight: var(--slds-g-font-weight-7, 700);
-  color: var(--slds-g-color-neutral-base-40, #5c5c5c);
+  color: var(--newton-studio-ink-weak);
   padding-inline-end: var(--slds-g-spacing-1, 0.25rem);
 }
 
@@ -568,8 +556,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.1875rem var(--slds-g-spacing-2, 0.5rem);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
+  padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
+  background: var(--newton-studio-surface);
   border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--newton-studio-radius);
   font-size: 0.6875rem;
@@ -585,19 +573,23 @@
   user-select: none;
 }
 
-.newton-tone-chip:hover:not(.newton-tone-chip_disabled) {
-  background: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  border-color: var(--slds-g-color-border-1, #c9c9c9);
+.newton-tone-chip:hover:not(.newton-tone-chip_disabled):not(
+    .newton-tone-chip_active
+  ) {
+  background: var(--newton-studio-surface-alt);
+  border-color: var(--newton-studio-border);
 }
 
-.newton-tone-chip:active:not(.newton-tone-chip_disabled) {
-  transform: translateY(0.5px);
+@media (prefers-reduced-motion: no-preference) {
+  .newton-tone-chip:active:not(.newton-tone-chip_disabled) {
+    transform: translateY(0.5px);
+  }
 }
 
 .newton-tone-chip_active {
-  background: var(--slds-g-color-neutral-base-10, #181818);
-  color: var(--slds-g-color-on-accent-1, #ffffff);
-  border-color: var(--slds-g-color-neutral-base-10, #181818);
+  background: var(--newton-studio-ink);
+  color: var(--newton-studio-surface);
+  border-color: var(--newton-studio-ink);
   box-shadow: 0 0 0 var(--slds-g-sizing-border-2, 2px)
     color-mix(in oklab, var(--newton-studio-brand) 45%, transparent);
 }
@@ -616,9 +608,6 @@
   .newton-tone-chip {
     transition: none;
   }
-  .newton-tone-chip:active {
-    transform: none;
-  }
 }
 
 /* Color dot — matches the tone palette exactly. */
@@ -628,7 +617,7 @@
   height: var(--slds-g-sizing-3, 0.5rem);
   border-radius: var(--slds-g-radius-border-circle, 50%);
   flex: 0 0 auto;
-  box-shadow: 0 0 0 1px
+  box-shadow: 0 0 0 var(--slds-g-sizing-border-1, 1px)
     color-mix(
       in oklab,
       var(--slds-g-color-neutral-base-10, #181818) 6%,
@@ -643,25 +632,22 @@
   background: var(--slds-g-color-brand-base-50, #0176d3);
 }
 .newton-tone-chip__dot_success {
-  background: var(--slds-g-color-success-base-50, #3baa6f);
+  background: var(--slds-g-color-success-base-50, #2e844a);
 }
 .newton-tone-chip__dot_warning {
-  background: var(--slds-g-color-warning-base-50, #b25900);
+  background: var(--slds-g-color-warning-base-50, #a96404);
 }
 .newton-tone-chip__dot_error {
-  background: var(--slds-g-color-error-base-50, #ba0517);
+  background: var(--slds-g-color-error-base-50, #ea001e);
 }
 .newton-tone-chip__dot_violet {
-  background: var(
-    --slds-g-color-palette-purple-50,
-    var(--slds-g-color-brand-base-50, #0176d3)
-  );
+  background: var(--slds-g-color-palette-purple-50, #9050e9);
 }
 .newton-tone-chip__dot_pink {
-  background: var(--slds-g-color-palette-pink-50, #c9257b);
+  background: var(--slds-g-color-palette-pink-50, #e3066a);
 }
 .newton-tone-chip__dot_teal {
-  background: var(--slds-g-color-palette-teal-50, #0f7b82);
+  background: var(--slds-g-color-palette-teal-50, #0b827c);
 }
 /* Inverse — dark chip for dark-mode badges. */
 .newton-tone-chip__dot_inverse {
@@ -671,7 +657,7 @@
 .newton-tone-chip__dot_auto {
   background: repeating-conic-gradient(
     from 0deg,
-    var(--slds-g-color-neutral-base-60, #9a9a9a) 0deg 90deg,
+    var(--slds-g-color-neutral-base-60, #939393) 0deg 90deg,
     var(--slds-g-color-neutral-base-100, #ffffff) 90deg 180deg
   );
 }
@@ -681,23 +667,21 @@
     var(--slds-g-color-neutral-base-10, #181818) 0 50%,
     var(--slds-g-color-on-accent-1, #ffffff) 50% 100%
   );
-  box-shadow: 0 0 0 1px var(--slds-g-color-border-1, #c9c9c9);
+  box-shadow: 0 0 0 var(--slds-g-sizing-border-1, 1px)
+    var(--slds-g-color-border-1, #c9c9c9);
 }
 /* Custom — a color wheel reads as "this can be any color". */
 .newton-tone-chip__dot_custom {
   background: conic-gradient(
     from 90deg,
-    var(--slds-g-color-error-base-50, #ba0517),
-    var(--slds-g-color-warning-base-50, #b25900),
-    var(--slds-g-color-success-base-50, #3baa6f),
-    var(--slds-g-color-palette-teal-50, #0f7b82),
+    var(--slds-g-color-error-base-50, #ea001e),
+    var(--slds-g-color-warning-base-50, #a96404),
+    var(--slds-g-color-success-base-50, #2e844a),
+    var(--slds-g-color-palette-teal-50, #0b827c),
     var(--slds-g-color-brand-base-50, #0176d3),
-    var(
-      --slds-g-color-palette-purple-50,
-      var(--slds-g-color-brand-base-50, #0176d3)
-    ),
-    var(--slds-g-color-palette-pink-50, #c9257b),
-    var(--slds-g-color-error-base-50, #ba0517)
+    var(--slds-g-color-palette-purple-50, #9050e9),
+    var(--slds-g-color-palette-pink-50, #e3066a),
+    var(--slds-g-color-error-base-50, #ea001e)
   );
 }
 
@@ -717,14 +701,10 @@
   background: var(--newton-studio-panel-soft);
 }
 
-.newton-tone-state .newton-hex-row {
-  padding-top: 0;
-}
-
 .newton-hex-row__label {
   font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
   font-weight: var(--slds-g-font-weight-7, 700);
-  color: var(--slds-g-color-neutral-base-40, #5c5c5c);
+  color: var(--newton-studio-ink-weak);
   padding-inline-end: var(--slds-g-spacing-1, 0.25rem);
 }
 
@@ -748,11 +728,11 @@
 }
 .newton-hex-row__selector::-webkit-color-swatch {
   border: 0;
-  border-radius: calc(var(--slds-g-radius-border-2, 0.5rem) - 1px);
+  border-radius: calc(var(--newton-studio-radius) - 1px);
 }
 .newton-hex-row__selector::-moz-color-swatch {
   border: 0;
-  border-radius: calc(var(--slds-g-radius-border-2, 0.5rem) - 1px);
+  border-radius: calc(var(--newton-studio-radius) - 1px);
 }
 
 .newton-hex-row__selector:focus-visible {
@@ -764,11 +744,10 @@
   flex: 1 1 8rem;
   min-width: 0;
   padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--slds-g-font-family-monospace, Consolas, monospace);
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-  color: var(--slds-g-color-neutral-base-10, #181818);
-  background: var(--slds-g-color-neutral-base-100, #ffffff);
+  color: var(--newton-studio-ink);
+  background: var(--newton-studio-surface);
   border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--newton-studio-radius);
   line-height: var(--slds-g-font-line-height-3, 1.375);
@@ -777,7 +756,8 @@
 .newton-hex-row__input:focus {
   outline: none;
   border-color: var(--newton-studio-brand);
-  box-shadow: 0 0 0 1px var(--newton-studio-brand);
+  box-shadow: 0 0 0 var(--slds-g-sizing-border-1, 1px)
+    var(--newton-studio-brand);
 }
 
 .newton-hex-row__input[aria-invalid="true"] {
@@ -846,8 +826,7 @@
 }
 
 .newton-studio__slider-value {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--slds-g-font-family-monospace, Consolas, monospace);
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
   color: var(--newton-studio-brand);
   background: var(--newton-studio-brand-weak);
@@ -874,7 +853,6 @@
 .newton-studio__custom-row {
   position: relative;
   overflow: visible;
-  padding-inline-start: var(--slds-g-spacing-4, 1rem);
   border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--newton-studio-radius-lg);
   background: var(--newton-studio-panel);
@@ -972,23 +950,10 @@
 
 /* The icon selector and help text span the full width as visual bookends. */
 .newton-studio__custom-grid > c-newton-selector-flow-cpe-icon-selector,
-.newton-studio__custom-grid
-  > c-newton-selector-flow-cpe-resource-selector[name="helpText"] {
+.newton-studio__custom-row
+  > .newton-studio__custom-grid
+  > c-newton-selector-flow-cpe-resource-selector[data-field="helpText"] {
   grid-column: 1 / -1;
-}
-
-/* Fields with open dropdowns must stack above their neighbors. */
-.newton-studio__custom-grid > c-newton-selector-flow-cpe-icon-selector,
-.newton-studio__custom-grid > c-newton-selector-flow-cpe-resource-selector {
-  position: relative;
-  z-index: 1;
-}
-
-.newton-studio__custom-grid
-  > c-newton-selector-flow-cpe-resource-selector:focus-within,
-.newton-studio__custom-grid
-  > c-newton-selector-flow-cpe-icon-selector:focus-within {
-  z-index: 9000;
 }
 
 /* =============================================================================
@@ -1039,16 +1004,6 @@
   gap: var(--slds-g-spacing-3, 0.75rem);
 }
 
-/* Fields with open dropdowns must stack above their neighbors. */
-.newton-studio__spec-grid > * {
-  position: relative;
-  z-index: 1;
-}
-
-.newton-studio__spec-grid > *:focus-within {
-  z-index: 9000;
-}
-
 /* =============================================================================
    OVERRIDES (picklist / SOQL) · toolbar, bulk edit, and one expandable row
    per value: header (checkbox · preview · name + value · actions · chevron)
@@ -1088,21 +1043,11 @@
   gap: var(--slds-g-spacing-2, 0.5rem);
 }
 
-.newton-studio__mode-control {
-  inline-size: auto;
-}
-
 .newton-studio__override-mode {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: var(--slds-g-spacing-1, 0.25rem);
-}
-
-.newton-studio__override-loading {
-  position: relative;
-  min-block-size: 3rem;
-  grid-column: 1 / -1;
 }
 
 .newton-studio__overrides-toolbar {
@@ -1129,7 +1074,6 @@
   --_row-head-surface: var(--newton-studio-panel-soft);
   position: relative;
   overflow: visible;
-  padding-inline-start: var(--slds-g-spacing-4, 1rem);
   border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--newton-studio-radius-lg);
   background: var(--_row-surface);
@@ -1167,7 +1111,7 @@
 
 .newton-studio__overrides-head {
   display: grid;
-  grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+  grid-template-columns: var(--slds-g-sizing-7, 1.5rem) minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--slds-g-spacing-3, 0.75rem);
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
@@ -1295,8 +1239,8 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--slds-g-spacing-3, 0.75rem);
-  padding: var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-4, 1rem)
-    var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-5, 1.25rem);
+  padding-block: var(--slds-g-spacing-4, 1rem);
+  padding-inline: var(--slds-g-spacing-5, 1.5rem) var(--slds-g-spacing-4, 1rem);
   border-block-start: var(--slds-g-sizing-border-1, 1px) dashed
     var(--newton-studio-hairline);
   background: var(--_row-surface);
@@ -1306,20 +1250,6 @@
 .newton-studio__overrides-grid > c-newton-selector-flow-cpe-icon-selector,
 .newton-studio__overrides-grid > c-newton-selector-flow-cpe-toggle {
   grid-column: 1 / -1;
-}
-
-/* Fields with open dropdowns must stack above their neighbors. */
-.newton-studio__overrides-grid > c-newton-selector-flow-cpe-icon-selector,
-.newton-studio__overrides-grid > c-newton-selector-flow-cpe-resource-selector {
-  position: relative;
-  z-index: 1;
-}
-
-.newton-studio__overrides-grid
-  > c-newton-selector-flow-cpe-resource-selector:focus-within,
-.newton-studio__overrides-grid
-  > c-newton-selector-flow-cpe-icon-selector:focus-within {
-  z-index: 9000;
 }
 
 @keyframes newton-overrides-reveal {
@@ -1334,6 +1264,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .newton-studio__icon-button,
   .newton-studio__overrides-chev,
   .newton-studio__overrides-grid,
   .newton-overrides__row {
@@ -1377,7 +1308,7 @@
 
 .newton-query-preview__title {
   margin: var(--slds-g-spacing-1, 0.25rem) 0 0;
-  color: var(--slds-g-color-on-surface-1, #181818);
+  color: var(--newton-studio-ink);
   font-size: var(--slds-g-font-scale-1, 0.875rem);
   font-weight: var(--slds-g-font-weight-7, 700);
 }
@@ -1385,11 +1316,10 @@
 .newton-query-preview__code {
   margin: 0;
   padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-neutral-base-90, #e5e5e5);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--slds-g-radius-border-1, 0.25rem);
-  background: var(--slds-g-color-surface-container-2, #fafafa);
-  color: var(--slds-g-color-on-surface-1, #181818);
+  background: var(--newton-studio-panel-soft);
+  color: var(--newton-studio-ink);
   font-family: var(--slds-g-font-family-monospace, Consolas, monospace);
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   line-height: var(--slds-g-font-line-height-3, 1.375);
@@ -1410,7 +1340,7 @@
 
 .newton-query-preview__token_field,
 .newton-query-preview__token_identifier {
-  color: var(--slds-g-color-on-surface-1, #181818);
+  color: var(--newton-studio-ink);
 }
 
 .newton-query-preview__token_function {
@@ -1420,11 +1350,11 @@
 
 .newton-query-preview__token_operator,
 .newton-query-preview__token_punctuation {
-  color: var(--slds-g-color-neutral-base-40, #5c5c5c);
+  color: var(--newton-studio-ink-weak);
 }
 
 .newton-query-preview__token_string {
-  color: var(--slds-g-color-success-base-30, #2e844a);
+  color: var(--slds-g-color-success-base-30, #194e31);
 }
 
 .newton-query-preview__token_number,
@@ -1434,12 +1364,12 @@
 
 .newton-query-preview__token_boolean,
 .newton-query-preview__token_null {
-  color: var(--slds-g-color-warning-base-40, #8c4b02);
+  color: var(--slds-g-color-warning-base-40, #825101);
   font-weight: var(--slds-g-font-weight-6, 600);
 }
 
 .newton-query-preview__token_comment {
-  color: var(--slds-g-color-neutral-base-50, #747474);
+  color: var(--slds-g-color-neutral-base-50, #757575);
   font-style: italic;
 }
 
@@ -1448,17 +1378,17 @@
   padding-inline-start: var(--slds-g-spacing-2, 0.5rem);
   border-inline-start: var(--slds-g-sizing-border-1, 1px) solid
     var(--newton-studio-hairline);
-  color: var(--slds-g-color-on-surface-2, #444444);
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-6, 600);
 }
 
 .newton-query-preview__status_success {
   border-inline-start-color: var(--slds-g-color-border-success-1, #2e844a);
-  color: var(--slds-g-color-success-base-30, #2e844a);
+  color: var(--slds-g-color-success-base-30, #194e31);
 }
 
 .newton-query-preview__status_error {
   border-inline-start-color: var(--slds-g-color-border-error-1, #ba0517);
-  color: var(--slds-g-color-error-base-30, #ba0517);
+  color: var(--slds-g-color-error-base-30, #8e030f);
 }

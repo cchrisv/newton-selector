@@ -90,6 +90,16 @@
         <value>Clear all</value>
     </labels>
     <labels>
+        <fullName>Newton_Selector_ConfigUnreadable</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Error when the saved config is not valid JSON; {0} is the parse error</shortDescription>
+        <value
+    >This selector's saved configuration can't be read ({0}). A Flow value merged into it may contain a quote, backslash or line break. Ask your admin to check the selector in Flow Builder.</value>
+    </labels>
+    <labels>
         <fullName>Newton_Selector_DropSelectedCardsHere</fullName>
         <categories>NewtonSelector</categories>
         <language>en_US</language>
@@ -106,15 +116,6 @@
         <shortDescription
     >Default empty-state message when the admin sets none</shortDescription>
         <value>No options available.</value>
-    </labels>
-    <labels>
-        <fullName>Newton_Selector_ErrorIconAlt</fullName>
-        <categories>NewtonSelector</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription
-    >Accessible name of the error-state icon</shortDescription>
-        <value>Error</value>
     </labels>
     <labels>
         <fullName>Newton_Selector_ErrorStateDefault</fullName>
@@ -269,6 +270,15 @@
         <value>Move choices here.</value>
     </labels>
     <labels>
+        <fullName>Newton_Selector_MovedTo</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox move announcement; {0} is the moved labels, {1} the target list</shortDescription>
+        <value>{0} moved to {1}.</value>
+    </labels>
+    <labels>
         <fullName>Newton_Selector_MoveOptions</fullName>
         <categories>NewtonSelector</categories>
         <language>en_US</language>
@@ -331,13 +341,14 @@
         <value>No options to display.</value>
     </labels>
     <labels>
-        <fullName>Newton_Selector_PicklistOptions</fullName>
+        <fullName>Newton_Selector_PicklistNotConfigured</fullName>
         <categories>NewtonSelector</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription
-    >Accessible name of the Dropdown layout option list</shortDescription>
-        <value>Picklist options</value>
+    >Picklist source missing object or field; {0} is the object, {1} the field</shortDescription>
+        <value
+    >The Picklist source needs an object and a picklist field (object: {0}, field: {1}).</value>
     </labels>
     <labels>
         <fullName>Newton_Selector_RemoveAll</fullName>

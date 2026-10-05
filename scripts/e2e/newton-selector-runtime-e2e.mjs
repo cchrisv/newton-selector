@@ -15,9 +15,15 @@ import { chromium } from "playwright";
 // NEWTON_E2E_SOFT=1 (record failed checks and keep going instead of stopping
 // at the first one).
 //
+// Before driving the page it reads the Lead.Rating picklist values and the
+// newest Accounts through the sf CLI; the data-source checks compare what the
+// selectors render with them. The SOQL selector's 5-row limit is only
+// exercised when the org has more than 5 Accounts.
+//
 // Artifacts in output/playwright/newton-selector-runtime-e2e/<runId>/:
 // results.json (every check with its outcome, detail and duration),
-// diagnostics.json (browser errors) and a screenshot per screen.
+// diagnostics.json (browser errors), a screenshot per screen, and close-ups of
+// the open Dropdown (01a) and the highlighted Dual listbox row (01b).
 
 const TARGET_ORG = process.env.SF_TARGET_ORG;
 if (!TARGET_ORG) {
@@ -45,6 +51,8 @@ const ARTIFACT_DIR = resolve(
   "newton-selector-runtime-e2e",
   RUN_ID
 );
+// The generic load-error text (Custom Label Newton_Selector_ErrorStateDefault).
+const GENERIC_LOAD_ERROR = "Could not load options.";
 
 // ---------------------------------------------------------------------------
 // Flow fixture
@@ -73,7 +81,7 @@ function baseConfig(overrides) {
     helpText: "",
     fieldLevelHelp: "",
     emptyStateMessage: "No options available.",
-    errorStateMessage: "Could not load options.",
+    errorStateMessage: GENERIC_LOAD_ERROR,
     picklist: {
       objectApiName: "",
       fieldApiName: "",
@@ -95,7 +103,7 @@ function baseConfig(overrides) {
       whereClause: "",
       orderByField: "",
       orderByDirection: "ASC",
-      limit: 10,
+      queryLimit: 10,
       labelField: "",
       valueField: "Id",
       sublabelField: "",
@@ -129,6 +137,42 @@ const items = (...labels) =>
 
 const ABC = () => items("Alpha", "Bravo", "Gamma");
 
+// Dropdown options with a sublabel, a badge and a None row, so the Dropdown
+// rendering check can tell label, sublabel and badge from raw values and ids.
+const DROPDOWN_ITEMS = [
+  { label: "Alpha", value: "alpha", icon: "circle" },
+  {
+    label: "Bravo",
+    value: "bravo",
+    icon: "circle",
+    sublabel: "Second pick",
+    badge: "Hot"
+  },
+  { label: "Gamma", value: "gamma", icon: "circle" }
+];
+const DROPDOWN_NONE_LABEL = "No letter";
+const DUAL_NONE_LABEL = "No choice";
+
+const SOQL_LIMIT = 5;
+const SOQL_DATE_LIMIT = 3;
+const COLLECTION_LIMIT = 4;
+
+const stringInput = (name, value) => `
+            <inputParameters>
+                <name>${name}</name>
+                <value>
+                    <stringValue>${escapeXml(value)}</stringValue>
+                </value>
+            </inputParameters>`;
+
+const referenceInput = (name, reference) => `
+            <inputParameters>
+                <name>${name}</name>
+                <value>
+                    <elementReference>${reference}</elementReference>
+                </value>
+            </inputParameters>`;
+
 function field(name, config, { type = "Account", extraInputs = "" } = {}) {
   return `
         <fields>
@@ -138,13 +182,10 @@ function field(name, config, { type = "Account", extraInputs = "" } = {}) {
                 <typeValue>${type}</typeValue>
             </dataTypeMappings>
             <extensionName>c:newtonSelectorFlowScreen</extensionName>
-            <fieldType>ComponentInstance</fieldType>
-            <inputParameters>
-                <name>selectorConfigJson</name>
-                <value>
-                    <stringValue>${escapeXml(JSON.stringify(config))}</stringValue>
-                </value>
-            </inputParameters>${extraInputs}
+            <fieldType>ComponentInstance</fieldType>${stringInput(
+              "selectorConfigJson",
+              JSON.stringify(config)
+            )}${extraInputs}
             <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
             <isRequired>false</isRequired>
             <storeOutputAutomatically>true</storeOutputAutomatically>
@@ -180,6 +221,15 @@ function screen(name, label, fields, next) {
     </screens>`;
 }
 
+function assignment(reference, operator, valueXml) {
+  return `
+        <assignmentItems>
+            <assignToReference>${reference}</assignToReference>
+            <operator>${operator}</operator>
+            <value>${valueXml}</value>
+        </assignmentItems>`;
+}
+
 const RESULT_LINES = [
   "grid={!L_Grid.value}",
   "list={!L_List.value}",
@@ -194,10 +244,20 @@ const RESULT_LINES = [
   "none=[{!B_None.value}] noneCount={!B_None.selectionCount}",
   "overrides={!B_Overrides.value} overridesLabel={!B_Overrides.selectedLabel}",
   "displayLabels={!B_Display.allLabels}",
+  "defaultsAllValues={!B_Defaults.allValues}",
+  "defaultsAllLabels={!B_Defaults.allLabels}",
+  "preset={!B_Preset.value} presetLabel={!B_Preset.selectedLabel} presetCount={!B_Preset.selectionCount}",
+  "presetMultiCount={!B_PresetMulti.selectionCount} presetMultiLabels={!B_PresetMulti.selectedLabels}",
+  "staleOpt=[{!B_StaleOpt.value}] staleOptCount={!B_StaleOpt.selectionCount}",
   "ratingLabel={!S_Picklist.selectedLabel}",
   "soqlCount={!S_Soql.selectionCount} soqlLabel={!S_Soql.selectedLabel}",
   "collectionCount={!S_Collection.selectionCount} collectionLabel={!S_Collection.selectedLabel}",
-  "auto={!A_Auto.value}"
+  "collectionNumber={!S_CollectionNumber.value}",
+  "presetRecord={!S_PresetRecord.selectedRecord.Name}",
+  "presetRecordCount={!S_PresetRecord.selectionCount}",
+  "newestAccount={!Get_Newest_Account.Name}",
+  "auto={!A_Auto.value}",
+  "repick={!A_Repick.value}"
 ];
 
 function buildFlowXml() {
@@ -233,7 +293,9 @@ function buildFlowXml() {
       baseConfig({
         label: "L Picklist",
         layout: "picklist",
-        custom: { items: ABC() }
+        includeNoneOption: true,
+        noneOptionLabel: DROPDOWN_NONE_LABEL,
+        custom: { items: DROPDOWN_ITEMS }
       })
     ),
     field(
@@ -258,6 +320,28 @@ function buildFlowXml() {
         label: "L Dual",
         layout: "dualListbox",
         selectionMode: "multi",
+        custom: { items: ABC() }
+      })
+    ),
+    field(
+      "L_Dual_Single",
+      baseConfig({
+        label: "L Dual Single",
+        layout: "dualListbox",
+        selectionMode: "single",
+        custom: { items: ABC() }
+      })
+    ),
+    // A multi-select Dual listbox whose None option (value "") is the first
+    // row, for the Shift-click range check.
+    field(
+      "L_Dual_None",
+      baseConfig({
+        label: "L Dual None",
+        layout: "dualListbox",
+        selectionMode: "multi",
+        includeNoneOption: true,
+        noneOptionLabel: DUAL_NONE_LABEL,
         custom: { items: ABC() }
       })
     ),
@@ -361,18 +445,80 @@ function buildFlowXml() {
         custom: { items: [] }
       })
     ),
+    // Select all / Clear all next to a search filter, a None option and an
+    // Other (manual input) option.
     field(
-      "B_Disabled",
+      "B_SelectAll",
       baseConfig({
-        label: "B Disabled",
-        layout: "radio",
-        custom: {
-          items: [
-            { label: "Open", value: "open", icon: "circle" },
-            { label: "Locked", value: "locked", icon: "lock", disabled: true }
-          ]
-        }
+        label: "B Select All",
+        layout: "list",
+        selectionMode: "multi",
+        showSelectAll: true,
+        enableSearch: true,
+        includeNoneOption: true,
+        noneOptionLabel: "No colour",
+        noneOptionPosition: "end",
+        manualInput: {
+          enabled: true,
+          label: "Something else",
+          minLength: 0,
+          maxLength: null
+        },
+        custom: { items: items("Red", "Blue", "Green") }
       })
+    ),
+    // A None option in a transfer layout.
+    field(
+      "B_NoneColumns",
+      baseConfig({
+        label: "B None Columns",
+        layout: "columns",
+        selectionMode: "multi",
+        includeNoneOption: true,
+        noneOptionLabel: "No fruit",
+        custom: { items: items("Kiwi", "Lime") }
+      })
+    ),
+    // Default selections (the value / values inputs) the user never touches.
+    field(
+      "B_Preset",
+      baseConfig({
+        label: "B Preset",
+        layout: "list",
+        custom: { items: ABC() }
+      }),
+      { extraInputs: stringInput("value", "bravo") }
+    ),
+    field(
+      "B_PresetMulti",
+      baseConfig({
+        label: "B Preset Multi",
+        layout: "list",
+        selectionMode: "multi",
+        custom: { items: ABC() }
+      }),
+      { extraInputs: referenceInput("values", "PresetValues") }
+    ),
+    // Default selections that match no option.
+    field(
+      "B_StaleOpt",
+      baseConfig({
+        label: "B Stale Optional",
+        layout: "list",
+        custom: { items: ABC() }
+      }),
+      { extraInputs: stringInput("value", "stale") }
+    ),
+    field(
+      "B_Stale",
+      baseConfig({
+        label: "B Stale",
+        layout: "list",
+        required: true,
+        customErrorMessage: "Stale pick is required.",
+        custom: { items: ABC() }
+      }),
+      { extraInputs: stringInput("value", "stale") }
     )
   ].join("");
 
@@ -399,17 +545,31 @@ function buildFlowXml() {
         layout: "list",
         dataSource: "sobject",
         sobject: {
+          ...baseConfig({}).sobject,
           sObjectApiName: "Account",
-          whereClause: "",
           orderByField: "CreatedDate",
           orderByDirection: "DESC",
-          limit: 5,
+          queryLimit: SOQL_LIMIT,
           labelField: "Name",
-          valueField: "Id",
-          sublabelField: "Industry",
-          iconField: "",
-          badgeField: "",
-          helpField: ""
+          sublabelField: "Industry"
+        }
+      })
+    ),
+    // A DATETIME filter written as an ISO 8601 / SOQL datetime literal.
+    field(
+      "S_SoqlDate",
+      baseConfig({
+        label: "S Soql Date",
+        layout: "list",
+        dataSource: "sobject",
+        sobject: {
+          ...baseConfig({}).sobject,
+          sObjectApiName: "Account",
+          whereClause: "CreatedDate < 2999-01-01T00:00:00Z",
+          orderByField: "CreatedDate",
+          orderByDirection: "DESC",
+          queryLimit: SOQL_DATE_LIMIT,
+          labelField: "Name"
         }
       })
     ),
@@ -430,14 +590,55 @@ function buildFlowXml() {
           }
         }
       }),
+      { extraInputs: referenceInput("sourceRecords", "Get_Accounts") }
+    ),
+    // Record collection whose Value field is a Number: 42 is pre-selected
+    // and 0 is picked by the user.
+    field(
+      "S_CollectionNumber",
+      baseConfig({
+        label: "S Collection Number",
+        layout: "picklist",
+        dataSource: "collection",
+        collection: {
+          fieldMap: {
+            label: "Name",
+            sublabel: "",
+            icon: "",
+            value: "NumberOfEmployees",
+            badge: "",
+            helpText: ""
+          }
+        }
+      }),
       {
-        extraInputs: `
-            <inputParameters>
-                <name>sourceRecords</name>
-                <value>
-                    <elementReference>Get_Accounts</elementReference>
-                </value>
-            </inputParameters>`
+        extraInputs:
+          referenceInput("sourceRecords", "NumberRecords") +
+          stringInput("value", "42")
+      }
+    ),
+    // Record collection with a Default selection (the newest Account's Id).
+    field(
+      "S_PresetRecord",
+      baseConfig({
+        label: "S Preset Record",
+        layout: "list",
+        dataSource: "collection",
+        collection: {
+          fieldMap: {
+            label: "Name",
+            sublabel: "",
+            icon: "",
+            value: "Id",
+            badge: "",
+            helpText: ""
+          }
+        }
+      }),
+      {
+        extraInputs:
+          referenceInput("sourceRecords", "Get_Accounts") +
+          referenceInput("value", "Get_Newest_Account.Id")
       }
     )
   ].join("");
@@ -452,11 +653,112 @@ function buildFlowXml() {
     })
   );
 
-  const resultText = RESULT_LINES.map((line) => `<p>${line}</p>`).join("");
+  // Auto-advance with a Default selection: clicking the pre-selected option
+  // must advance too.
+  const repick = field(
+    "A_Repick",
+    baseConfig({
+      label: "A Repick",
+      layout: "grid",
+      autoAdvance: true,
+      custom: { items: items("Go", "Stop") }
+    }),
+    { extraInputs: stringInput("value", "go") }
+  );
+
+  // Auto-advance on the Flow's last screen, whose only forward action is
+  // Finish.
+  const finishAuto = field(
+    "F_Auto",
+    baseConfig({
+      label: "F Auto",
+      layout: "grid",
+      autoAdvance: true,
+      custom: { items: items("Done", "Stay") }
+    })
+  );
+
+  // The label merges a Flow text value that contains double quotes, which
+  // makes the resolved selectorConfigJson unreadable.
+  const badConfig = field(
+    "X_BadConfig",
+    baseConfig({
+      label: "X Bad Config {!QuoteText}",
+      layout: "list",
+      custom: { items: ABC() }
+    })
+  );
+
+  const resultText = `
+        <fields>
+            <name>Result_Text</name>
+            <fieldText>${escapeXml(
+              RESULT_LINES.map((line) => `<p>${line}</p>`).join("")
+            )}</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>`;
+
+  const presetAssignments = [
+    assignment("PresetValues", "Add", "<stringValue>alpha</stringValue>"),
+    assignment("PresetValues", "Add", "<stringValue>gamma</stringValue>"),
+    assignment(
+      "NumRecA.Name",
+      "Assign",
+      "<stringValue>Forty Two Co</stringValue>"
+    ),
+    assignment(
+      "NumRecA.NumberOfEmployees",
+      "Assign",
+      "<numberValue>42.0</numberValue>"
+    ),
+    assignment("NumRecB.Name", "Assign", "<stringValue>Zero Co</stringValue>"),
+    assignment(
+      "NumRecB.NumberOfEmployees",
+      "Assign",
+      "<numberValue>0.0</numberValue>"
+    ),
+    // The 0 record is second, so a fallback to the row index ("1") cannot
+    // look like the right value.
+    assignment(
+      "NumberRecords",
+      "Add",
+      "<elementReference>NumRecA</elementReference>"
+    ),
+    assignment(
+      "NumberRecords",
+      "Add",
+      "<elementReference>NumRecB</elementReference>"
+    )
+  ].join("");
+
+  const variable = (name, dataType, extra = "") => `
+    <variables>
+        <name>${name}</name>
+        <dataType>${dataType}</dataType>${extra}
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>`;
+  const accountVar = (name, isCollection) =>
+    variable(
+      name,
+      "SObject",
+      `
+        <isCollection>${isCollection}</isCollection>
+        <objectType>Account</objectType>`
+    );
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
+    <assignments>
+        <name>Assign_Presets</name>
+        <label>Assign Presets</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>${presetAssignments}
+        <connector>
+            <targetReference>Behavior_Screen</targetReference>
+        </connector>
+    </assignments>
     <environments>Default</environments>
     <interviewLabel>Newton Selector Features {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Newton Selector Features</label>
@@ -474,33 +776,32 @@ function buildFlowXml() {
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Sources_Screen</targetReference>
+            <targetReference>Get_Newest_Account</targetReference>
         </connector>
         <getFirstRecordOnly>false</getFirstRecordOnly>
         <limit>
-            <numberValue>4.0</numberValue>
+            <numberValue>${COLLECTION_LIMIT}.0</numberValue>
         </limit>
         <object>Account</object>
         <sortField>CreatedDate</sortField>
         <sortOrder>Desc</sortOrder>
         <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>${screen("Layouts_Screen", "Layouts", layouts, "Behavior_Screen")}${screen("Behavior_Screen", "Behavior", behavior, "Get_Accounts")}${screen("Sources_Screen", "Sources", sources, "Auto_Screen")}${screen("Auto_Screen", "Auto advance", auto, "Result_Screen")}
-    <screens>
-        <name>Result_Screen</name>
-        <label>Results</label>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Newest_Account</name>
+        <label>Get Newest Account</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <allowBack>true</allowBack>
-        <allowFinish>true</allowFinish>
-        <allowPause>false</allowPause>
-        <fields>
-            <name>Result_Text</name>
-            <fieldText>${escapeXml(resultText)}</fieldText>
-            <fieldType>DisplayText</fieldType>
-        </fields>
-        <showFooter>true</showFooter>
-        <showHeader>true</showHeader>
-    </screens>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Sources_Screen</targetReference>
+        </connector>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>${screen("Layouts_Screen", "Layouts", layouts, "Assign_Presets")}${screen("Behavior_Screen", "Behavior", behavior, "Get_Accounts")}${screen("Sources_Screen", "Sources", sources, "Auto_Screen")}${screen("Auto_Screen", "Auto advance", auto, "Auto_Repick_Screen")}${screen("Auto_Repick_Screen", "Auto advance repick", repick, "Result_Screen")}${screen("Result_Screen", "Results", resultText + badConfig, "Auto_Finish_Screen")}${screen("Auto_Finish_Screen", "Auto finish", finishAuto)}
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
@@ -508,7 +809,20 @@ function buildFlowXml() {
             <targetReference>Layouts_Screen</targetReference>
         </connector>
     </start>
-    <status>Active</status>
+    <status>Active</status>${accountVar("NumberRecords", true)}${accountVar("NumRecA", false)}${accountVar("NumRecB", false)}${variable(
+      "PresetValues",
+      "String",
+      `
+        <isCollection>true</isCollection>`
+    )}${variable(
+      "QuoteText",
+      "String",
+      `
+        <isCollection>false</isCollection>
+        <value>
+            <stringValue>${escapeXml('Plan "Gold"')}</stringValue>
+        </value>`
+    )}
 </Flow>
 `;
 }
@@ -517,20 +831,37 @@ function buildFlowXml() {
 // Salesforce CLI helpers
 // ---------------------------------------------------------------------------
 
+// execFileSync throws on a non-zero exit (sf's JSON status is its exit code),
+// so a returned result always succeeded. A failure is rethrown with the CLI's
+// own JSON error text and the subcommand that failed.
 function runSf(args) {
-  const output = execFileSync(SF_COMMAND, args, {
-    encoding: "utf8",
-    shell: process.platform === "win32",
-    stdio: ["ignore", "pipe", "pipe"],
-    windowsHide: true
-  });
+  // On Windows sf.cmd runs through the shell, which joins the arguments, so
+  // an argument with spaces (a SOQL query) has to be quoted.
+  const shellArgs =
+    process.platform === "win32"
+      ? args.map((arg) => (/\s/.test(arg) ? `"${arg}"` : arg))
+      : args;
+  let output;
+  try {
+    output = execFileSync(SF_COMMAND, shellArgs, {
+      encoding: "utf8",
+      shell: process.platform === "win32",
+      stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true,
+      maxBuffer: 64 * 1024 * 1024
+    });
+  } catch (error) {
+    throw new Error(
+      `sf ${args.slice(0, 3).join(" ")} failed: ${error.stdout || error.stderr || error.message}`
+    );
+  }
   const start = output.indexOf("{");
   if (start < 0) throw new Error(`sf returned no JSON: ${output}`);
   return JSON.parse(output.slice(start));
 }
 
 function deployFlow() {
-  const result = runSf([
+  runSf([
     "project",
     "deploy",
     "start",
@@ -541,9 +872,6 @@ function deployFlow() {
     "--ignore-conflicts",
     "--json"
   ]);
-  if (result.status !== 0) {
-    throw new Error(`Flow deploy failed: ${JSON.stringify(result)}`);
-  }
 }
 
 function runtimeUrl() {
@@ -557,10 +885,42 @@ function runtimeUrl() {
     "--url-only",
     "--json"
   ]);
-  if (result.status !== 0) {
-    throw new Error(`org open failed: ${JSON.stringify(result)}`);
-  }
   return result.result.url;
+}
+
+// The expected data-source contents, read from the org independently of the
+// component.
+function loadOrgExpectations() {
+  const describe = runSf([
+    "sobject",
+    "describe",
+    "--sobject",
+    "Lead",
+    "--target-org",
+    TARGET_ORG,
+    "--json"
+  ]);
+  const rating = describe.result.fields.find((f) => f.name === "Rating");
+  const ratingLabels = rating.picklistValues
+    .filter((entry) => entry.active)
+    .map((entry) => entry.label);
+
+  const query = runSf([
+    "data",
+    "query",
+    "--query",
+    "SELECT Id, Name, Industry, CreatedDate FROM Account ORDER BY CreatedDate DESC LIMIT 200",
+    "--target-org",
+    TARGET_ORG,
+    "--json"
+  ]);
+  const accounts = query.result.records;
+  if (!accounts.length) {
+    throw new Error(
+      `Setup: ${TARGET_ORG} has no Account records; the data-source checks need at least one.`
+    );
+  }
+  return { ratingLabels, accounts };
 }
 
 // ---------------------------------------------------------------------------
@@ -588,17 +948,21 @@ function recordCheck(name, ok, detail) {
   }
 }
 
-// Runs fn as one check; a thrown error is the failure detail.
+// Runs fn as one check; a thrown error is the failure detail. fn receives an
+// object it can fill with what it expected and saw; that goes into the
+// check's detail whether it passes or fails.
 async function check(name, fn) {
   const started = Date.now();
+  const info = {};
   let error = "";
   try {
-    await fn();
+    await fn(info);
   } catch (caught) {
     error = String(caught?.message || caught).split("\n")[0];
   }
   recordCheck(name, !error, {
     ms: Date.now() - started,
+    ...info,
     ...(error ? { error } : {})
   });
 }
@@ -624,6 +988,21 @@ function writeResults(error) {
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+const sameList = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+// Polls fn until it returns a truthy value; throws after timeout.
+async function waitUntil(fn, what, timeout = 10000) {
+  const deadline = Date.now() + timeout;
+  for (;;) {
+    const value = await fn();
+    if (value) return value;
+    if (Date.now() > deadline) {
+      throw new Error(`Timed out after ${timeout} ms waiting for ${what}`);
+    }
+    await new Promise((done) => setTimeout(done, 200));
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -656,6 +1035,30 @@ async function isChecked(scope, label) {
   return tile(scope, label).locator("input").isChecked();
 }
 
+// Visible text of an element as trimmed, non-empty lines.
+const textLines = (text) =>
+  String(text)
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+// Waits until a selector has finished loading: it shows its options or an
+// error. The load runs into the timeout instead of being hidden.
+async function waitForLoaded(selector) {
+  await selector
+    .locator('c-newton-selector-group, [role="alert"]')
+    .first()
+    .waitFor({ state: "attached", timeout: 30000 });
+}
+
+// Fails with the selector's own error text when it shows one.
+async function assertNoLoadError(selector, what) {
+  const alert = selector.getByRole("alert");
+  if (await alert.count()) {
+    throw new Error(`${what} error: ${(await alert.innerText()).trim()}`);
+  }
+}
+
 async function bodyText(page) {
   return page.locator("body").innerText({ timeout: 10000 });
 }
@@ -676,6 +1079,21 @@ async function waitForText(page, pattern, timeout = 60000) {
 async function clickNext(page) {
   const button = page.getByRole("button", { name: /^(Next|Finish)$/ }).last();
   await button.click({ timeout: 15000 });
+}
+
+// Reads every tile of a record-backed selector: its value (the record Id)
+// and its visible text lines.
+async function readRecordTiles(selector) {
+  const tiles = selector.locator("c-newton-selector-choice-tile");
+  const rows = [];
+  for (let index = 0; index < (await tiles.count()); index += 1) {
+    const node = tiles.nth(index);
+    rows.push({
+      id: await node.locator("input").inputValue(),
+      lines: textLines(await node.innerText())
+    });
+  }
+  return rows;
 }
 
 // ---------------------------------------------------------------------------
@@ -699,6 +1117,55 @@ try {
     })
   );
   deployFlow();
+  const { ratingLabels, accounts } = loadOrgExpectations();
+  const accountById = new Map(accounts.map((row) => [row.Id, row]));
+  // The rows an ORDER BY CreatedDate DESC LIMIT n may return: ties on the
+  // n-th CreatedDate can straddle the cut, so the bucket can exceed n.
+  const expectedTop = (n) => {
+    const cut = accounts[Math.min(n, accounts.length) - 1].CreatedDate;
+    return accounts.filter((row) => row.CreatedDate >= cut);
+  };
+
+  // Asserts a record-backed selector shows the newest Accounts, newest
+  // first, labelled by Name (and Industry as sublabel when asked).
+  const assertNewestAccounts = (rows, limit, withIndustry, info) => {
+    const allowed = new Set(expectedTop(limit).map((row) => row.Id));
+    info.expectedCount = Math.min(accounts.length, limit);
+    info.tiles = rows.map((row) => ({
+      id: row.id,
+      lines: row.lines,
+      expectedName: accountById.get(row.id)?.Name ?? null,
+      createdDate: accountById.get(row.id)?.CreatedDate ?? null
+    }));
+    assert(
+      rows.length === info.expectedCount,
+      `expected ${info.expectedCount} tiles, got ${rows.length}`
+    );
+    for (const [index, row] of rows.entries()) {
+      const account = accountById.get(row.id);
+      assert(
+        allowed.has(row.id),
+        `tile ${index + 1} (${row.id}, ${row.lines[0]}) is not among the ${limit} newest Accounts`
+      );
+      assert(
+        row.lines[0] === account.Name,
+        `tile ${index + 1} shows "${row.lines[0]}", expected Name "${account.Name}"`
+      );
+      if (withIndustry && account.Industry) {
+        assert(
+          row.lines.includes(account.Industry),
+          `tile ${index + 1} does not show Industry "${account.Industry}": ${JSON.stringify(row.lines)}`
+        );
+      }
+      if (index > 0) {
+        const previous = accountById.get(rows[index - 1].id);
+        assert(
+          previous.CreatedDate >= account.CreatedDate,
+          `tiles not newest first: ${previous.Name} (${previous.CreatedDate}) before ${account.Name} (${account.CreatedDate})`
+        );
+      }
+    }
+  };
 
   browser = await chromium.launch({
     headless: HEADLESS,
@@ -729,7 +1196,6 @@ try {
     timeout: 120000
   });
   await waitForText(page, /L Grid/, 120000);
-  await page.waitForTimeout(2000);
 
   // ---- Screen 1: layouts --------------------------------------------------
   console.log("\nScreen 1 - layouts");
@@ -740,7 +1206,21 @@ try {
   const radio = selectorFor(page, "L Radio");
   const columns = selectorFor(page, "L Columns");
   const dual = selectorFor(page, "L Dual");
+  const dualSingle = selectorFor(page, "L Dual Single");
+  for (const selector of [
+    grid,
+    list,
+    horizontal,
+    picklist,
+    radio,
+    columns,
+    dual
+  ]) {
+    await waitForLoaded(selector);
+  }
 
+  // Each layout shows at least one option: a choice tile, or for the
+  // Dropdown its closed combobox.
   await check("all seven layouts render", async () => {
     for (const label of [
       "L Grid",
@@ -751,9 +1231,15 @@ try {
       "L Columns",
       "L Dual"
     ]) {
+      const selector = selectorFor(page, label);
+      assert(await selector.isVisible(), `${label} selector not visible`);
+      const option =
+        label === "L Picklist"
+          ? selector.getByRole("combobox")
+          : selector.locator("c-newton-selector-choice-tile");
       assert(
-        await selectorFor(page, label).isVisible(),
-        `${label} selector not visible`
+        await option.first().isVisible(),
+        `${label} rendered no visible ${label === "L Picklist" ? "combobox" : "choice tile"}`
       );
     }
   });
@@ -776,6 +1262,36 @@ try {
     await waitForText(page, /Grid selection is required\./, 15000);
   });
 
+  // The Required message goes away as soon as the user picks an option; it
+  // does not wait for the next Next.
+  await check(
+    "required: picking an option clears the required message",
+    async (info) => {
+      const message = page.getByText("Grid selection is required.");
+      const messageVisible = async () => {
+        for (let index = 0; index < (await message.count()); index += 1) {
+          if (await message.nth(index).isVisible()) return true;
+        }
+        return false;
+      };
+      info.visibleBeforePick = await messageVisible();
+      assert(info.visibleBeforePick, "the required message is not shown");
+      await pickTile(grid, "Alpha");
+      assert(await isChecked(grid, "Alpha"), "Alpha not checked");
+      await waitUntil(
+        async () => !(await messageVisible()),
+        "the required message to clear after Alpha is picked",
+        5000
+      ).catch((error) => {
+        info.visibleAfterPick = true;
+        throw new Error(
+          `"Grid selection is required." is still shown after Alpha was picked (${error.message})`
+        );
+      });
+      info.visibleAfterPick = false;
+    }
+  );
+
   await check("grid: single select", async () => {
     await pickTile(grid, "Bravo");
     assert(await isChecked(grid, "Bravo"), "Bravo not checked");
@@ -791,15 +1307,116 @@ try {
     await pickTile(horizontal, "Bravo");
     assert(await isChecked(horizontal, "Bravo"), "Bravo not checked");
   });
+  const picklistTrigger = picklist.getByRole("combobox");
   await check("picklist: open and select option", async () => {
-    await picklist.getByRole("combobox").click();
-    await picklist
-      .locator('[role="option"][data-value="gamma"]')
-      .first()
-      .click();
-    const label = await picklist.getByRole("combobox").innerText();
+    await picklistTrigger.click();
+    await picklist.getByRole("option").filter({ hasText: "Gamma" }).click();
+    const label = await picklistTrigger.innerText();
     assert(/Gamma/.test(label), `combobox shows "${label}"`);
   });
+
+  // The Dropdown trigger is named by the selector's question label, not only
+  // by its current value.
+  await check(
+    "dropdown: combobox is named by the question label",
+    async (info) => {
+      info.ariaLabel = await picklistTrigger.getAttribute("aria-label");
+      info.ariaLabelledby =
+        await picklistTrigger.getAttribute("aria-labelledby");
+      const named = picklist.getByRole("combobox", { name: /L Picklist/ });
+      assert(
+        (await named.count()) === 1,
+        `combobox accessible name does not include "L Picklist" (aria-label "${info.ariaLabel}")`
+      );
+    }
+  );
+
+  // Dropdown options are the selector's own option tiles: label, sublabel,
+  // badge and icon as configured, never a raw value or an internal id.
+  await check(
+    "dropdown: options show label, sublabel, badge and icon, never a raw value or internal id",
+    async (info) => {
+      await picklistTrigger.click();
+      // The open list is named after the question, like its combobox.
+      const listbox = picklist.getByRole("listbox", { name: /L Picklist/ });
+      await listbox.waitFor({ state: "visible", timeout: 10000 });
+      const options = listbox.getByRole("option");
+      info.options = [];
+      for (let index = 0; index < (await options.count()); index += 1) {
+        const option = options.nth(index);
+        info.options.push({
+          lines: textLines(await option.innerText()),
+          ariaSelected: await option.getAttribute("aria-selected"),
+          // Lucide "circle" is the only icon the fixture items use.
+          circleIconVisible: await option
+            .locator("svg circle")
+            .first()
+            .isVisible()
+        });
+      }
+      await page.screenshot({
+        path: join(ARTIFACT_DIR, "01a-dropdown-open.png")
+      });
+      await page.keyboard.press("Escape");
+      if ((await picklistTrigger.getAttribute("aria-expanded")) === "true") {
+        await picklistTrigger.click();
+      }
+
+      const expectedLabels = [
+        DROPDOWN_NONE_LABEL,
+        ...DROPDOWN_ITEMS.map((item) => item.label)
+      ];
+      assert(
+        sameList(
+          info.options.map((option) => option.lines[0]),
+          expectedLabels
+        ),
+        `option titles ${JSON.stringify(info.options.map((o) => o.lines[0]))}, expected ${JSON.stringify(expectedLabels)}`
+      );
+      for (const [index, item] of DROPDOWN_ITEMS.entries()) {
+        const option = info.options[index + 1];
+        const leaked = option.lines.filter(
+          (line) => line === item.value || line.includes("__")
+        );
+        assert(
+          !leaked.length,
+          `${item.label} option shows raw value or id ${JSON.stringify(leaked)}`
+        );
+        assert(
+          option.circleIconVisible,
+          `${item.label} option shows no icon although Show icons is on`
+        );
+        if (item.sublabel) {
+          assert(
+            option.lines.includes(item.sublabel),
+            `${item.label} option does not show "${item.sublabel}": ${JSON.stringify(option.lines)}`
+          );
+        }
+        // The tile badge is styled text-transform: uppercase, and innerText
+        // reports the rendered case, so the badge is matched ignoring case.
+        if (item.badge) {
+          assert(
+            option.lines.some(
+              (line) => line.toLowerCase() === item.badge.toLowerCase()
+            ),
+            `${item.label} option does not show badge "${item.badge}": ${JSON.stringify(option.lines)}`
+          );
+        }
+      }
+      const noneLeaks = info.options[0].lines.filter((line) =>
+        line.includes("__")
+      );
+      assert(
+        !noneLeaks.length,
+        `None option shows internal id ${JSON.stringify(noneLeaks)}`
+      );
+      assert(
+        info.options[3].ariaSelected === "true",
+        `chosen option Gamma has aria-selected="${info.options[3].ariaSelected}"`
+      );
+    }
+  );
+
   await check("radio: single select", async () => {
     await pickTile(radio, "Alpha");
     assert(await isChecked(radio, "Alpha"), "Alpha not checked");
@@ -808,16 +1425,215 @@ try {
     await pickTile(columns, "Bravo");
     assert(await isChecked(columns, "Bravo"), "Bravo not checked");
   });
-  await check("dual listbox: move selected to chosen", async () => {
-    await pickTile(dual, "Alpha");
-    await dual.getByRole("button", { name: "Move selected to chosen" }).click();
-    const chosen = dual.getByRole("group", { name: "Chosen", exact: true });
-    assert(/Alpha/.test(await chosen.innerText()), "Alpha not in chosen panel");
-  });
 
-  // Icon size "Large" pins the glyph at the icon component's large size
-  // (newtonSelectorIcon renders it with its _size-large class), even on
-  // small tiles whose default would be the small glyph.
+  // Single mode: clicking the card already in the Selected panel keeps it
+  // picked. Only another pick replaces it.
+  await check(
+    "columns (single): clicking the selected card keeps it selected",
+    async (info) => {
+      const selectedCards = columns.getByRole("group", {
+        name: "Selected cards",
+        exact: true
+      });
+      const selectedLines = async () =>
+        textLines(await selectedCards.innerText());
+      info.before = await selectedLines();
+      assert(
+        info.before.includes("Bravo"),
+        `Bravo is not in the Selected cards panel: ${JSON.stringify(info.before)}`
+      );
+      await pickTile(selectedCards, "Bravo");
+      // The card must stay put; give a wrong removal time to show.
+      const removed = await waitUntil(
+        async () => !(await selectedLines()).includes("Bravo"),
+        "Bravo to leave the Selected cards panel",
+        2000
+      ).catch(() => false);
+      info.after = await selectedLines();
+      if (removed) {
+        // Put Bravo back so the columns output check still sees it.
+        await pickTile(columns, "Bravo");
+      }
+      assert(
+        !removed,
+        `clicking the selected Bravo removed it; Selected cards now ${JSON.stringify(info.after)}`
+      );
+      assert(
+        await isChecked(selectedCards, "Bravo"),
+        "Bravo no longer shows as selected"
+      );
+    }
+  );
+
+  // Dual listbox panels follow the SLDS dueling-picklist pattern: listboxes
+  // of options whose aria-selected marks a row highlighted for the next
+  // move, and a polite live region that announces the move.
+  const liveTexts = (scope) =>
+    scope
+      .locator('[aria-live="polite"], [role="status"]')
+      .evaluateAll((nodes) => nodes.map((node) => node.innerText.trim()));
+  await check(
+    "dual listbox: listbox panels, highlight state and an announced move",
+    async (info) => {
+      const available = dual.getByRole("listbox", {
+        name: "Available options",
+        exact: true
+      });
+      const chosen = dual.getByRole("listbox", {
+        name: "Chosen options",
+        exact: true
+      });
+      await available
+        .waitFor({ state: "visible", timeout: 10000 })
+        .catch(() => {
+          throw new Error('no listbox named "Available options" in L Dual');
+        });
+      info.multiselectable = [
+        await available.getAttribute("aria-multiselectable"),
+        await chosen.getAttribute("aria-multiselectable")
+      ];
+      assert(
+        sameList(info.multiselectable, ["true", "true"]),
+        `multi-mode panels have aria-multiselectable ${JSON.stringify(info.multiselectable)}`
+      );
+      const alpha = available.getByRole("option").filter({ hasText: "Alpha" });
+      await alpha.click();
+      await waitUntil(
+        async () => (await alpha.getAttribute("aria-selected")) === "true",
+        'Alpha aria-selected="true" after it is clicked'
+      );
+      await dual.screenshot({
+        path: join(ARTIFACT_DIR, "01b-dual-highlight.png")
+      });
+      const before = await liveTexts(dual);
+      await dual
+        .getByRole("button", { name: "Move selected to chosen" })
+        .click();
+      await waitUntil(
+        async () =>
+          (await chosen
+            .getByRole("option")
+            .filter({ hasText: "Alpha" })
+            .count()) === 1,
+        "Alpha in the Chosen options listbox"
+      );
+      info.chosen = textLines(await chosen.innerText());
+      assert(
+        (await available
+          .getByRole("option")
+          .filter({ hasText: "Alpha" })
+          .count()) === 0,
+        "Alpha is still in Available options"
+      );
+      info.announcement = await waitUntil(async () => {
+        const after = await liveTexts(dual);
+        return after.find((text, index) => text && text !== before[index]);
+      }, "an aria-live announcement of the move").catch((error) => {
+        throw new Error(`move not announced: ${error.message}`);
+      });
+    }
+  );
+
+  await check(
+    "dual listbox (single): only one row can be highlighted",
+    async (info) => {
+      const available = dualSingle.getByRole("listbox", {
+        name: "Available options",
+        exact: true
+      });
+      const chosen = dualSingle.getByRole("listbox", {
+        name: "Chosen options",
+        exact: true
+      });
+      await available
+        .waitFor({ state: "visible", timeout: 10000 })
+        .catch(() => {
+          throw new Error(
+            'no listbox named "Available options" in L Dual Single'
+          );
+        });
+      const option = (label) =>
+        available.getByRole("option").filter({ hasText: label });
+      await option("Alpha").click();
+      await option("Bravo").click();
+      await waitUntil(
+        async () =>
+          (await option("Bravo").getAttribute("aria-selected")) === "true",
+        'Bravo aria-selected="true" after it is clicked'
+      );
+      info.highlighted = textLines(
+        (
+          await available
+            .locator('[role="option"][aria-selected="true"]')
+            .allInnerTexts()
+        ).join("\n")
+      );
+      assert(
+        sameList(info.highlighted, ["Bravo"]),
+        `highlighted rows ${JSON.stringify(info.highlighted)}, expected only Bravo`
+      );
+      await dualSingle
+        .getByRole("button", { name: "Move selected to chosen" })
+        .click();
+      await waitUntil(
+        async () =>
+          (await chosen
+            .getByRole("option")
+            .filter({ hasText: "Bravo" })
+            .count()) === 1,
+        "Bravo in the Chosen options listbox"
+      );
+      info.chosen = textLines(await chosen.innerText());
+    }
+  );
+
+  // With the None row first, a Shift-click before any plain click starts the
+  // range at the clicked row: only that row is highlighted, not None and
+  // every row down to it.
+  await check(
+    "dual listbox: a first Shift-click highlights from the clicked row, not from None",
+    async (info) => {
+      const dualNone = selectorFor(page, "L Dual None");
+      const available = dualNone.getByRole("listbox", {
+        name: "Available options",
+        exact: true
+      });
+      await available
+        .waitFor({ state: "visible", timeout: 10000 })
+        .catch(() => {
+          throw new Error(
+            'no listbox named "Available options" in L Dual None'
+          );
+        });
+      info.rows = textLines(
+        (await available.getByRole("option").allInnerTexts()).join("\n")
+      );
+      assert(
+        info.rows[0] === DUAL_NONE_LABEL,
+        `the None row "${DUAL_NONE_LABEL}" is not first: ${JSON.stringify(info.rows)}`
+      );
+      const bravo = available.getByRole("option").filter({ hasText: "Bravo" });
+      await bravo.click({ modifiers: ["Shift"] });
+      await waitUntil(
+        async () => (await bravo.getAttribute("aria-selected")) === "true",
+        'Bravo aria-selected="true" after it is Shift-clicked'
+      );
+      info.highlighted = textLines(
+        (
+          await available
+            .locator('[role="option"][aria-selected="true"]')
+            .allInnerTexts()
+        ).join("\n")
+      );
+      assert(
+        sameList(info.highlighted, ["Bravo"]),
+        `highlighted rows ${JSON.stringify(info.highlighted)}, expected only Bravo`
+      );
+    }
+  );
+
+  // Icon size "Large" renders the glyph at the large size (3rem / 48px) even
+  // on small tiles, whose default would be the small glyph.
   const largeIcons = await selectorFor(page, "I Large Icons")
     .locator(
       "c-newton-selector-choice-tile c-newton-selector-icon.newton-selector-choice-tile__icon span.newton-selector-icon"
@@ -830,13 +1646,10 @@ try {
     );
   recordCheck(
     'icon size "Large" renders large icons on small tiles',
-    largeIcons.length === 3 &&
-      largeIcons.every((icon) =>
-        /\bnewton-selector-icon_size-large\b/.test(icon.className)
-      ),
+    largeIcons.length === 3 && largeIcons.every((icon) => icon.widthPx >= 48),
     {
       config: { tileSize: "small", iconSize: "large" },
-      expectedClass: "newton-selector-icon_size-large",
+      expectedMinWidthPx: 48,
       icons: largeIcons
     }
   );
@@ -848,22 +1661,33 @@ try {
   const keyboardTrigger = keyboardPicklist.getByRole("combobox");
   await keyboardTrigger.focus();
   const keySteps = [];
-  for (const key of ["Enter", "ArrowDown", "Enter"]) {
+  let previousDescendant = null;
+  for (const [key, settled] of [
+    ["Enter", (state) => state.expanded === "true"],
+    [
+      "ArrowDown",
+      (state) =>
+        state.activeDescendant && state.activeDescendant !== previousDescendant
+    ],
+    ["Enter", (state) => state.expanded !== "true"]
+  ]) {
     await page.keyboard.press(key);
-    await page.waitForTimeout(300);
-    keySteps.push({
-      key,
+    const readState = async () => ({
       expanded: await keyboardTrigger.getAttribute("aria-expanded"),
       activeDescendant: await keyboardTrigger.getAttribute(
         "aria-activedescendant"
-      ),
-      activeOption: await keyboardPicklist
-        .locator(
-          '[role="option"][aria-selected="true"], [role="option"].slds-has-focus'
-        )
-        .allInnerTexts()
-        .catch(() => [])
+      )
     });
+    const state = await waitUntil(
+      async () => {
+        const current = await readState();
+        return settled(current) ? current : null;
+      },
+      `the combobox to react to ${key}`,
+      3000
+    ).catch(async () => ({ ...(await readState()), timedOut: true }));
+    previousDescendant = state.activeDescendant;
+    keySteps.push({ key, ...state });
   }
   const keyboardTriggerText = (await keyboardTrigger.innerText()).trim();
   recordCheck(
@@ -878,14 +1702,27 @@ try {
   // ---- Screen 2: behavior -------------------------------------------------
   console.log("\nScreen 2 - behavior");
   await waitForText(page, /B Multi/);
-  await page.waitForTimeout(1500);
   const multi = selectorFor(page, "B Multi");
   const none = selectorFor(page, "B None");
   const overrides = selectorFor(page, "B Overrides");
   const display = selectorFor(page, "B Display");
-  const disabled = selectorFor(page, "B Disabled");
   const defaults = selectorFor(page, "B Defaults");
   const empty = selectorFor(page, "B Empty");
+  const selectAll = selectorFor(page, "B Select All");
+  const noneColumns = selectorFor(page, "B None Columns");
+  const stale = selectorFor(page, "B Stale");
+  for (const selector of [
+    multi,
+    none,
+    overrides,
+    display,
+    defaults,
+    selectAll,
+    noneColumns,
+    stale
+  ]) {
+    await waitForLoaded(selector);
+  }
 
   await check("multi: min selections enforced", async () => {
     await pickTile(multi, "One");
@@ -894,11 +1731,10 @@ try {
   });
   await check("multi: search filters options", async () => {
     await multi.getByLabel("Filter items").fill("Thr");
-    await page.waitForTimeout(500);
+    await tile(multi, "Five").waitFor({ state: "hidden", timeout: 5000 });
     assert(await tile(multi, "Three").isVisible(), "Three hidden by search");
-    assert(!(await tile(multi, "Five").isVisible()), "Five still visible");
     await multi.getByLabel("Filter items").fill("");
-    await page.waitForTimeout(500);
+    await tile(multi, "Five").waitFor({ state: "visible", timeout: 5000 });
   });
   await check("multi: select all respects max, clear all empties", async () => {
     await multi.getByRole("button", { name: "Select all" }).click();
@@ -920,6 +1756,111 @@ try {
     assert(await fourth.isDisabled(), "Four should be disabled at max");
   });
 
+  // Select all adds the options the search shows to what is already picked:
+  // a pick the search hides and a picked Other both stay.
+  const selectAllStates = async () => {
+    const states = {};
+    for (const label of ["Red", "Blue", "Green", "Something else"]) {
+      states[label] = await isChecked(selectAll, label);
+    }
+    return states;
+  };
+  await check(
+    "multi: Select all adds the filtered options and keeps hidden picks and Other",
+    async (info) => {
+      await pickTile(selectAll, "Red");
+      await pickTile(selectAll, "Something else");
+      await selectAll.getByRole("textbox").fill("Teal");
+      const filter = selectAll.getByLabel("Filter items");
+      await filter.fill("Blu");
+      await tile(selectAll, "Green").waitFor({
+        state: "hidden",
+        timeout: 5000
+      });
+      await selectAll.getByRole("button", { name: "Select all" }).click();
+      await waitUntil(
+        () => isChecked(selectAll, "Blue"),
+        "Blue to be selected by Select all"
+      );
+      await filter.fill("");
+      await tile(selectAll, "Green").waitFor({
+        state: "visible",
+        timeout: 5000
+      });
+      info.states = await selectAllStates();
+      assert(
+        sameList(info.states, {
+          Red: true,
+          Blue: true,
+          Green: false,
+          "Something else": true
+        }),
+        `after Select all with filter "Blu": ${JSON.stringify(info.states)}`
+      );
+    }
+  );
+  await check("multi: Clear all also clears a picked None", async (info) => {
+    await selectAll.getByRole("button", { name: "Clear all" }).click();
+    await pickTile(selectAll, "No colour");
+    await waitUntil(
+      () => isChecked(selectAll, "No colour"),
+      "No colour to be selected"
+    );
+    await selectAll.getByRole("button", { name: "Clear all" }).click();
+    await waitUntil(
+      async () => !(await isChecked(selectAll, "No colour")),
+      "Clear all to clear the picked None option",
+      5000
+    ).catch((error) => {
+      info.noneStillSelected = true;
+      throw error;
+    });
+  });
+
+  // A picked None stays visible in a transfer layout: it moves to the
+  // Selected panel and goes back when a real option replaces it.
+  await check(
+    "columns: a picked None option shows in the Selected panel",
+    async (info) => {
+      const availableCards = noneColumns.getByRole("group", {
+        name: "Available cards",
+        exact: true
+      });
+      const selectedCards = noneColumns.getByRole("group", {
+        name: "Selected cards",
+        exact: true
+      });
+      const panels = async () => ({
+        available: textLines(await availableCards.innerText()),
+        selected: textLines(await selectedCards.innerText())
+      });
+      await pickTile(availableCards, "No fruit");
+      await waitUntil(
+        async () => (await panels()).selected.includes("No fruit"),
+        "No fruit in the Selected cards panel",
+        5000
+      ).catch(async (error) => {
+        info.afterNone = await panels();
+        throw new Error(
+          `${error.message}; panels ${JSON.stringify(info.afterNone)}`
+        );
+      });
+      info.afterNone = await panels();
+      await pickTile(availableCards, "Kiwi");
+      await waitUntil(
+        async () => (await panels()).selected.includes("Kiwi"),
+        "Kiwi in the Selected cards panel",
+        5000
+      );
+      info.afterKiwi = await panels();
+      assert(
+        !info.afterKiwi.selected.includes("No fruit") &&
+          info.afterKiwi.available.includes("No fruit"),
+        `picking Kiwi did not return None to Available: ${JSON.stringify(info.afterKiwi)}`
+      );
+    }
+  );
+
   await check(
     "none option: renders last and clears the picked value",
     async () => {
@@ -934,22 +1875,10 @@ try {
       assert(await isChecked(none, "Red"), "Red not selected");
       await pickTile(none, "None of these");
       assert(!(await isChecked(none, "Red")), "Red still selected after None");
-      await page.waitForTimeout(500);
-      const noneChecked = await isChecked(none, "None of these");
-      const diag = noneChecked
-        ? ""
-        : await none
-            .locator("c-newton-selector-group")
-            .first()
-            .evaluate((g) =>
-              JSON.stringify({
-                selectedValues: g.selectedValues,
-                items: g.items.map((i) => i.value)
-              })
-            );
-      assert(
-        noneChecked,
-        `None tile should show as selected after it is picked ${diag}`
+      await waitUntil(
+        () => isChecked(none, "None of these"),
+        "the None tile to show as selected after it is picked",
+        5000
       );
     }
   );
@@ -979,54 +1908,132 @@ try {
       `empty state shows ${JSON.stringify(emptyText)}`
     );
   });
-  await check("disabled item cannot be chosen", async () => {
-    assert(
-      await tile(disabled, "Locked").locator("input").isDisabled(),
-      "Locked is enabled"
-    );
-    await pickTile(disabled, "Open");
-  });
   await page.screenshot({
     path: join(ARTIFACT_DIR, "02-behavior.png"),
     fullPage: true
   });
   await pickTile(multi, "Three"); // deselect -> 2 selected, within min/max
-  await clickNext(page);
+
+  // B Stale is Required and its Default selection "stale" matches no option:
+  // nothing shows as picked, so Next must be blocked.
+  await check(
+    "required: a pre-set value that matches no option does not satisfy Required",
+    async (info) => {
+      await clickNext(page);
+      const text = await waitForText(
+        page,
+        /Stale pick is required\.|S Picklist/,
+        30000
+      );
+      info.blocked = /Stale pick is required\./.test(text);
+      assert(
+        info.blocked,
+        "Next passed the Behavior screen although B Stale shows no selection"
+      );
+    }
+  );
+  if (!(await page.getByText("S Picklist").count())) {
+    await pickTile(stale, "Alpha");
+    await clickNext(page);
+  }
 
   // ---- Screen 3: data sources --------------------------------------------
   console.log("\nScreen 3 - data sources");
   await waitForText(page, /S Picklist/);
-  await page.waitForTimeout(3000);
   const sPicklist = selectorFor(page, "S Picklist");
   const sSoql = selectorFor(page, "S Soql");
+  const sSoqlDate = selectorFor(page, "S Soql Date");
   const sCollection = selectorFor(page, "S Collection");
+  const sCollectionNumber = selectorFor(page, "S Collection Number");
 
-  await check("picklist source loads Lead.Rating values", async () => {
+  let ratingLabel = "";
+  await check("picklist source loads Lead.Rating values", async (info) => {
+    await waitForLoaded(sPicklist);
+    await assertNoLoadError(sPicklist, "picklist source");
     await sPicklist.getByRole("combobox").click();
-    const options = sPicklist.locator('[role="option"]');
-    assert((await options.count()) >= 2, "expected picklist options");
+    const options = sPicklist.getByRole("option");
+    await options.first().waitFor({ state: "visible", timeout: 10000 });
+    info.expected = ratingLabels;
+    info.actual = (await options.allInnerTexts()).map(
+      (text) => textLines(text)[0]
+    );
+    assert(
+      sameList(info.actual, info.expected),
+      `options ${JSON.stringify(info.actual)}, expected Lead.Rating ${JSON.stringify(info.expected)}`
+    );
+    ratingLabel = info.actual[0];
     await options.first().click();
   });
-  await check("SOQL source loads Account records", async () => {
-    await sSoql
-      .locator(".newton-skeleton")
-      .first()
-      .waitFor({ state: "detached", timeout: 30000 })
-      .catch(() => {});
-    const count = await sSoql.locator("c-newton-selector-choice-tile").count();
-    assert(count >= 1 && count <= 5, `expected 1-5 tiles, got ${count}`);
+
+  let soqlName = "";
+  await check("SOQL source loads Account records", async (info) => {
+    await waitForLoaded(sSoql);
+    await assertNoLoadError(sSoql, "SOQL source");
+    const rows = await readRecordTiles(sSoql);
+    assertNewestAccounts(rows, SOQL_LIMIT, true, info);
     await sSoql.locator("c-newton-selector-choice-tile label").first().click();
+    soqlName = rows[0].lines[0];
   });
-  await check("collection source renders Flow record collection", async () => {
-    const count = await sCollection
-      .locator("c-newton-selector-choice-tile")
-      .count();
-    assert(count >= 1 && count <= 4, `expected 1-4 tiles, got ${count}`);
-    await sCollection
-      .locator("c-newton-selector-choice-tile label")
-      .first()
-      .click();
-  });
+
+  await check(
+    "SOQL source: a DATETIME literal in WHERE loads rows",
+    async (info) => {
+      info.whereClause = "CreatedDate < 2999-01-01T00:00:00Z";
+      await waitForLoaded(sSoqlDate);
+      await assertNoLoadError(sSoqlDate, "SOQL DATETIME filter");
+      assertNewestAccounts(
+        await readRecordTiles(sSoqlDate),
+        SOQL_DATE_LIMIT,
+        false,
+        info
+      );
+    }
+  );
+
+  let collectionName = "";
+  await check(
+    "collection source renders Flow record collection",
+    async (info) => {
+      await waitForLoaded(sCollection);
+      await assertNoLoadError(sCollection, "collection source");
+      const rows = await readRecordTiles(sCollection);
+      assertNewestAccounts(rows, COLLECTION_LIMIT, true, info);
+      await sCollection
+        .locator("c-newton-selector-choice-tile label")
+        .first()
+        .click();
+      collectionName = rows[0].lines[0];
+    }
+  );
+
+  // Number values from a record collection stay what they are: 42 matches
+  // the Default selection "42", and 0 is a pickable value of its own.
+  await check(
+    "collection source: Number values select, including the preset 42 and 0",
+    async (info) => {
+      await waitForLoaded(sCollectionNumber);
+      await assertNoLoadError(sCollectionNumber, "collection Number source");
+      const trigger = sCollectionNumber.getByRole("combobox");
+      info.onLoad = (await trigger.innerText()).trim();
+      // Pick 0 before asserting, so the Flow output check below sees the
+      // value the component writes for it either way.
+      await trigger.click();
+      await sCollectionNumber
+        .getByRole("option")
+        .filter({ hasText: "Zero Co" })
+        .click();
+      info.afterPick = (await trigger.innerText()).trim();
+      assert(
+        info.onLoad === "Forty Two Co",
+        `Default selection "42" shows "${info.onLoad}", expected "Forty Two Co"`
+      );
+      assert(
+        info.afterPick === "Zero Co",
+        `after picking Zero Co the combobox shows "${info.afterPick}"`
+      );
+    }
+  );
+
   await page.screenshot({
     path: join(ARTIFACT_DIR, "03-sources.png"),
     fullPage: true
@@ -1036,26 +2043,78 @@ try {
   // ---- Screen 4: auto advance -------------------------------------------
   console.log("\nScreen 4 - auto advance");
   await waitForText(page, /A Auto/);
-  await page.waitForTimeout(1500);
+  await check(
+    "auto-advance: arrow keys change the selection without advancing",
+    async (info) => {
+      const auto = selectorFor(page, "A Auto");
+      await waitForLoaded(auto);
+      await tile(auto, "Go").locator("input").focus();
+      await page.keyboard.press("ArrowRight");
+      info.stopChecked = await isChecked(auto, "Stop");
+      assert(info.stopChecked, "ArrowRight did not select Stop");
+      // Auto-advance fires 150 ms after a pick; wait well past that.
+      const advanced = await page
+        .getByText("A Repick")
+        .first()
+        .waitFor({ state: "visible", timeout: 2000 })
+        .then(
+          () => true,
+          () => false
+        );
+      info.advanced = advanced;
+      assert(!advanced, "arrow-key navigation advanced the Flow");
+    }
+  );
   await check("auto-advance moves to results on select", async () => {
-    await pickTile(selectorFor(page, "A Auto"), "Go");
-    await waitForText(page, /grid=/, 30000);
+    const auto = selectorFor(page, "A Auto");
+    await waitForLoaded(auto);
+    await pickTile(auto, "Go");
+    await waitForText(page, /A Repick/, 30000);
   });
+
+  await check(
+    "auto-advance: clicking the pre-selected option advances",
+    async (info) => {
+      const repick = selectorFor(page, "A Repick");
+      await waitForLoaded(repick);
+      info.preselected = await isChecked(repick, "Go");
+      assert(info.preselected, "Default selection Go is not shown as selected");
+      await pickTile(repick, "Go");
+      await waitForText(page, /grid=/, 10000).catch(() => {
+        throw new Error(
+          "clicking the pre-selected Go did not advance to the results screen"
+        );
+      });
+    }
+  );
+  if (!(await page.getByText(/grid=/).count())) {
+    await clickNext(page);
+    await waitForText(page, /grid=/, 30000);
+  }
 
   // ---- Screen 5: output assertions ---------------------------------------
   console.log("\nResults - Flow outputs");
   const text = await bodyText(page);
+  const resultLines = text.split("\n").map((line) => line.trim());
+  const lineFor = (key) =>
+    resultLines.find((line) => line.startsWith(`${key}=`)) ?? null;
   await page.screenshot({
     path: join(ARTIFACT_DIR, "04-results.png"),
     fullPage: true
   });
   const expectOutput = (name, pattern) =>
-    check(`output ${name}`, async () => {
-      const key = `${pattern.source.split("=")[0]}=`;
-      const line = text.split("\n").find((entry) => entry.includes(key));
+    check(`output ${name}`, async (info) => {
+      info.line = lineFor(pattern.source.split("=")[0]);
+      assert(pattern.test(text), `${name} did not match ${pattern}`);
+    });
+  // Exact comparison with a value that came from org data.
+  const expectLine = (name, expected) =>
+    check(`output ${name}`, async (info) => {
+      info.expected = expected;
+      info.line = lineFor(expected.split("=")[0]);
       assert(
-        pattern.test(text),
-        `${name} did not match ${pattern}; results screen shows "${line}"`
+        resultLines.includes(expected),
+        `results screen has no line "${expected}"`
       );
     });
   await expectOutput("grid value", /grid=gamma/);
@@ -1077,13 +2136,136 @@ try {
     /overrides=cherry overridesLabel=Cherry/
   );
   await expectOutput("display labels", /displayLabels=.*Elder.*Dill.*Cumin/);
-  await expectOutput("picklist source label", /ratingLabel=\S+/);
-  await expectOutput("SOQL selection count", /soqlCount=1 soqlLabel=\S+/);
-  await expectOutput(
-    "collection selection count",
-    /collectionCount=1 collectionLabel=\S+/
+  await check(
+    "output allValues and allLabels list the options without the Other sentinel",
+    async (info) => {
+      info.values = lineFor("defaultsAllValues");
+      info.labels = lineFor("defaultsAllLabels");
+      assert(
+        /\bred\b/.test(info.values) && /\bblue\b/.test(info.values),
+        `allValues misses red/blue: "${info.values}"`
+      );
+      assert(
+        /Red/.test(info.labels) &&
+          /Blue/.test(info.labels) &&
+          info.labels.includes("--None--"),
+        `allLabels misses Red/Blue/--None--: "${info.labels}"`
+      );
+      assert(
+        !info.values.includes("__newton_manual_input__"),
+        `allValues contains the Other sentinel: "${info.values}"`
+      );
+      assert(
+        !/\bOther\b/.test(info.labels),
+        `allLabels contains the Other entry: "${info.labels}"`
+      );
+    }
   );
+  await expectLine(
+    "default selection writes label and count",
+    "preset=bravo presetLabel=Bravo presetCount=1"
+  );
+  await expectOutput(
+    "default multi selection writes labels and count",
+    /presetMultiCount=2 presetMultiLabels=.*Alpha.*Gamma/
+  );
+  await expectOutput(
+    "default selection matching no option is not output",
+    /staleOpt=\[\]/
+  );
+  await check(
+    "output default record selection writes selectedRecord and count",
+    async (info) => {
+      info.newestAccount = lineFor("newestAccount");
+      info.presetRecord = lineFor("presetRecord");
+      info.presetRecordCount = lineFor("presetRecordCount");
+      const newestName = (info.newestAccount || "").slice(
+        "newestAccount=".length
+      );
+      assert(newestName, "the Flow found no newest Account");
+      assert(
+        info.presetRecord === `presetRecord=${newestName}`,
+        `selectedRecord.Name is "${info.presetRecord}", expected "${newestName}"`
+      );
+      assert(
+        info.presetRecordCount === "presetRecordCount=1",
+        `selectionCount is "${info.presetRecordCount}"`
+      );
+    }
+  );
+  await expectLine("picklist source label", `ratingLabel=${ratingLabel}`);
+  await expectLine("SOQL selection count", `soqlCount=1 soqlLabel=${soqlName}`);
+  await expectLine(
+    "collection selection count",
+    `collectionCount=1 collectionLabel=${collectionName}`
+  );
+  await expectLine("collection numeric value", "collectionNumber=0");
   await expectOutput("auto-advance value", /auto=go/);
+  // Re-picking the pre-selected Go keeps its value.
+  await expectLine("auto-advance re-pick value", "repick=go");
+
+  // X Bad Config merges a Flow value with double quotes into its label, so
+  // the resolved config cannot be read. The error says so instead of the
+  // generic load error.
+  await check(
+    "unreadable selectorConfigJson shows a specific error",
+    async (info) => {
+      const badConfig = page.locator("c-newton-selector-data-selector").first();
+      await waitForLoaded(badConfig);
+      info.selectorText = textLines(await badConfig.innerText());
+      const alert = badConfig.getByRole("alert");
+      assert(
+        await alert.count(),
+        `no error shown; the selector reads ${JSON.stringify(info.selectorText)}`
+      );
+      info.alert = (await alert.innerText()).trim();
+      assert(info.alert, "the error is empty");
+      assert(
+        !info.alert.includes(GENERIC_LOAD_ERROR),
+        `shows the generic "${GENERIC_LOAD_ERROR}"`
+      );
+    }
+  );
+
+  // ---- Screen 6: auto-advance on the last screen ---------------------------
+  console.log("\nScreen 6 - auto-advance finishes the Flow");
+  await clickNext(page);
+  await waitForText(page, /F Auto/);
+  await check(
+    "auto-advance on the last screen finishes the Flow",
+    async (info) => {
+      const finish = selectorFor(page, "F Auto");
+      await waitForLoaded(finish);
+      await pickTile(finish, "Done");
+      // The Flow runtime replaces the screen with an error when the
+      // component sends a navigation the screen does not offer. A finished
+      // Flow restarts at its first screen, so "F Auto" gone and "L Grid" back
+      // is the finished state; a loading spinner in between is neither.
+      const outcome = await waitUntil(
+        async () => {
+          const body = await bodyText(page);
+          const runtimeError = textLines(body).find((line) =>
+            /Something went wrong|isn't supported on this screen/.test(line)
+          );
+          if (runtimeError) return { runtimeError };
+          return /F Auto/.test(body) || !/L Grid/.test(body)
+            ? null
+            : { restartedAtFirstScreen: true };
+        },
+        "the Flow to finish after Done is picked",
+        15000
+      );
+      Object.assign(info, outcome);
+      assert(
+        !outcome.runtimeError,
+        `the Flow did not finish: ${outcome.runtimeError}`
+      );
+    }
+  );
+  await page.screenshot({
+    path: join(ARTIFACT_DIR, "05-auto-finish.png"),
+    fullPage: true
+  });
 
   const componentErrors = [
     ...diagnostics.pageErrors.map((entry) => entry.message),

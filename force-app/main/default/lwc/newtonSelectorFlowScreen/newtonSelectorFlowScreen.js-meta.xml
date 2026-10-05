@@ -71,14 +71,14 @@
         name="allValues"
         type="String[]"
         label="All rendered values"
-        description="Every option value the selector rendered, in display order (post filter/sort/limit, including the None tile if enabled)."
+        description="Every option value the selector rendered, in display order (post filter/sort/limit, including the None tile if enabled). The manual &quot;Other&quot; entry is excluded."
         role="outputOnly"
       />
             <property
         name="allLabels"
         type="String[]"
         label="All rendered labels"
-        description="Every option label the selector rendered, in display order."
+        description="Every option label the selector rendered, in display order. The manual &quot;Other&quot; entry is excluded."
         role="outputOnly"
       />
             <property

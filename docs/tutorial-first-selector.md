@@ -41,7 +41,7 @@ The right panel now shows **Not configured yet** and a **Configure selector** bu
 
 Click **Configure selector**. A large window titled **Configure Newton Selector** opens. The preview is on the left and four chapters are on the right.
 
-1. In **01 Data**, click the **Custom options** tile. The preview comes alive with your (empty) list.
+1. In **Data**, click the **Custom options** tile. The preview shows sample options until you add your own.
 2. Click **Add option**. Fill in the row:
    - **Label:** `Starter`
    - **Value:** `starter`
@@ -52,19 +52,19 @@ Click **Configure selector**. A large window titled **Configure Newton Selector*
 4. Click **Add option** a third time:
    - **Label:** `Enterprise`, **Value:** `enterprise`, **Sublabel:** `Unlimited users`, **Badge:** leave blank
 
-   Always fill in **Value**. A blank value stays empty.
+   Every option needs its own **Value**. Save stays disabled until each one has a unique value.
 
 Look at the preview. You should see three tiles. Use the **Populated / Empty / Error** tabs to see the other states, then return to **Populated**.
 
 ## Step 4: Add a label and make it required
 
-1. In **02 Content**, set **Selector label** to `Choose a plan`.
-2. In **03 Behavior**, turn **Required** on. Leave **Mode** on Single.
+1. In **Content**, set **Selector label** to `Choose a plan`.
+2. In **Behavior**, turn **Required** on. Leave **Mode** on Single.
 3. Optional: turn **Auto-advance** on if you want the Flow to move forward as soon as someone clicks a tile.
 
 ## Step 5: Pick a look
 
-In **04 Appearance**:
+In **Appearance**:
 
 1. Leave **Layout** on Grid. (You can switch later; your styling carries over.)
 2. Set **Tile size** to Medium.
@@ -74,7 +74,7 @@ Watch the preview update after each change.
 
 ## Step 6: Save
 
-Click **Save** at the bottom. If **Save** is grayed out, hover over it. The tooltip says how many errors to fix, and the error list sits at the top of the right column. When it saves, the window closes and the panel shows a **Current configuration** summary with a **Edit configuration** button.
+Click **Save** at the bottom. If **Save** is grayed out, the status line beside it says how many errors to fix and names the first one, and the chapter's error list sits below the chapter tabs at the top of the right column. When it saves, the window closes and the panel shows a **Current configuration** summary with a **Edit configuration** button.
 
 ## Step 7: Show the answer on a second screen
 

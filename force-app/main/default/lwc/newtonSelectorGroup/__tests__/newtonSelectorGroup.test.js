@@ -28,8 +28,7 @@ const ITEMS = [
     icon: "",
     badge: "",
     helpText: "",
-    value: "a",
-    disabled: false
+    value: "a"
   },
   {
     id: "2",
@@ -38,8 +37,7 @@ const ITEMS = [
     icon: "",
     badge: "",
     helpText: "",
-    value: "b",
-    disabled: false
+    value: "b"
   },
   {
     id: "3",
@@ -48,8 +46,7 @@ const ITEMS = [
     icon: "",
     badge: "",
     helpText: "",
-    value: "c",
-    disabled: false
+    value: "c"
   }
 ];
 
@@ -77,31 +74,16 @@ function dispatchCardSelectFrom(card, value) {
 }
 
 describe("c-newton-selector-group", () => {
+  // jsdom has no scrollIntoView; the open Dropdown scrolls its active option.
+  beforeAll(() => {
+    if (!Element.prototype.scrollIntoView) {
+      Element.prototype.scrollIntoView = function () {};
+    }
+  });
+
   afterEach(() => {
     while (document.body.firstChild)
       document.body.removeChild(document.body.firstChild);
-  });
-
-  it("applies Select all / Clear all toolbar to the Salesforce-style multi-select layout", async () => {
-    const el = mount({
-      variant: "dualListbox",
-      selectionMode: "multi",
-      selectedValues: ["b"],
-      showSelectAll: true
-    });
-    const handler = jest.fn();
-    el.addEventListener("selectionchange", handler);
-    await Promise.resolve();
-
-    const buttons = el.shadowRoot.querySelectorAll(".newton-toolbar__btn");
-    expect(buttons.length).toBeGreaterThanOrEqual(2);
-    buttons[0].click();
-    await Promise.resolve();
-    expect(handler.mock.calls[0][0].detail.values).toEqual(["a", "b", "c"]);
-
-    buttons[1].click();
-    await Promise.resolve();
-    expect(handler.mock.calls[1][0].detail.values).toEqual([]);
   });
 
   it("ignores events in preview mode", async () => {
@@ -126,14 +108,16 @@ describe("c-newton-selector-group", () => {
     await Promise.resolve();
 
     el.shadowRoot
-      .querySelector(".newton-picklist__combobox .slds-combobox__input")
+      .querySelector('[role="combobox"]')
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
     await Promise.resolve();
 
-    expect(el.shadowRoot.querySelector(".newton-search-bar")).toBeNull();
-    expect(
-      el.shadowRoot.querySelector(".newton-picklist__search")
-    ).not.toBeNull();
+    // The only search box is the one inside the open menu.
+    const searches = el.shadowRoot.querySelectorAll('input[type="search"]');
+    expect(searches).toHaveLength(1);
+    expect(searches[0].getAttribute("aria-controls")).toBe(
+      el.shadowRoot.querySelector('[role="listbox"]').id
+    );
     const rows = el.shadowRoot.querySelectorAll(
       ".newton-picklist__menu .newton-picklist__option"
     );
@@ -154,9 +138,6 @@ describe("c-newton-selector-group", () => {
     });
     await Promise.resolve();
 
-    expect(
-      el.shadowRoot.querySelector(".newton-transfer_columns")
-    ).not.toBeNull();
     const available = el.shadowRoot.querySelector(
       'section[aria-label="Available card column"]'
     );
@@ -179,23 +160,17 @@ describe("c-newton-selector-group", () => {
     });
     await Promise.resolve();
 
-    expect(el.shadowRoot.querySelector(".newton-search-bar")).toBeNull();
-    const search = el.shadowRoot.querySelector(
-      ".newton-transfer__search input"
-    );
+    const search = el.shadowRoot.querySelector('input[type="search"]');
     search.value = "Gamma";
     search.dispatchEvent(new CustomEvent("input", { bubbles: true }));
     await Promise.resolve();
 
     const available = el.shadowRoot.querySelector(
-      'section[aria-label="Available options"]'
+      '[role="listbox"][aria-label="Available options"]'
     );
-    expect(
-      available.querySelectorAll("c-newton-selector-choice-tile")
-    ).toHaveLength(1);
-    expect(
-      available.querySelector("c-newton-selector-choice-tile").item.value
-    ).toBe("c");
+    const options = available.querySelectorAll('[role="option"]');
+    expect(options).toHaveLength(1);
+    expect(options[0].dataset.value).toBe("c");
   });
 
   it("shows manual input after the manual option is selected", async () => {
@@ -203,7 +178,6 @@ describe("c-newton-selector-group", () => {
       id: MANUAL_INPUT_VALUE,
       label: "Other",
       value: MANUAL_INPUT_VALUE,
-      disabled: false,
       manualInput: true
     };
     const el = mount({

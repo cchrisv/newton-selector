@@ -1,6 +1,6 @@
 /**
  * @description Tests for NewtonSelectorFlowCpeController. Covers the AuraEnabled
- * methods exposed to the Flow CPE LWCs: object search, field search, and object describe.
+ * methods exposed to the Flow CPE LWCs: object search and object field describe.
  */
 @IsTest
 private class NewtonSelectorFlowCpeControllerTest {
@@ -8,6 +8,11 @@ private class NewtonSelectorFlowCpeControllerTest {
   static void testGetObjectFieldsReturnsAccountFields() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
+      Assert.isTrue(
+        Schema.SObjectType.Account.fields.BillingAddress.isAccessible(),
+        'Precondition: test user can read BillingAddress'
+      );
+
       Test.startTest();
       List<NewtonSelectorFlowCpeController.Field> fields = NewtonSelectorFlowCpeController.getObjectFields(
         'Account'
@@ -17,61 +22,88 @@ private class NewtonSelectorFlowCpeControllerTest {
       NewtonSelectorFlowCpeController.Field name = findField(fields, 'Name');
       Assert.areNotEqual(null, name, 'Account.Name should be returned');
       Assert.areEqual('STRING', name.type);
+      Assert.isTrue(name.filterable, 'Name can be used in WHERE');
+      Assert.isTrue(name.sortable, 'Name can be used in ORDER BY');
+      NewtonSelectorFlowCpeController.Field description = findField(
+        fields,
+        'Description'
+      );
+      Assert.isFalse(
+        description.filterable,
+        'Long text areas cannot be filtered'
+      );
+      Assert.isFalse(description.sortable, 'Long text areas cannot be sorted');
       Assert.areEqual(
         null,
         findField(fields, 'Rating'),
         'Fields the user cannot read are omitted'
       );
-    }
-  }
-
-  @IsTest
-  static void testGetObjectFieldsBlankNameReturnsEmpty() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
       Assert.areEqual(
-        0,
-        NewtonSelectorFlowCpeController.getObjectFields(null).size()
+        null,
+        findField(fields, 'BillingAddress'),
+        'Compound address fields cannot be mapped and are omitted'
       );
-      Assert.areEqual(
-        0,
-        NewtonSelectorFlowCpeController.getObjectFields('').size()
-      );
-      Assert.areEqual(
-        0,
-        NewtonSelectorFlowCpeController.getObjectFields('   ').size()
+      Assert.areNotEqual(
+        null,
+        findField(fields, 'BillingCity'),
+        'Address component fields are still offered'
       );
     }
   }
 
   @IsTest
-  static void testGetObjectFieldsInvalidTypeReturnsEmpty() {
+  static void testGetObjectFieldsCarryDisplayType() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
-      Assert.areEqual(
-        0,
-        NewtonSelectorFlowCpeController.getObjectFields('NotARealObjectZZZ999')
-          .size()
-      );
-    }
-  }
-
-  @IsTest
-  static void testGetObjectFieldsIncludesRelationshipName() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      Test.startTest();
       List<NewtonSelectorFlowCpeController.Field> fields = NewtonSelectorFlowCpeController.getObjectFields(
-        'Contact'
+        'Account'
       );
-      Test.stopTest();
 
-      NewtonSelectorFlowCpeController.Field accountLookup = findField(
-        fields,
-        'AccountId'
+      Map<String, String> expectedTypes = new Map<String, String>{
+        'Id' => 'ID',
+        'Name' => 'STRING',
+        'Industry' => 'PICKLIST',
+        'AnnualRevenue' => 'CURRENCY',
+        'NumberOfEmployees' => 'INTEGER',
+        'CreatedDate' => 'DATETIME',
+        'ParentId' => 'REFERENCE'
+      };
+      for (String fieldName : expectedTypes.keySet()) {
+        NewtonSelectorFlowCpeController.Field field = findField(
+          fields,
+          fieldName
+        );
+        Assert.areNotEqual(null, field, fieldName + ' should be returned');
+        Assert.areEqual(expectedTypes.get(fieldName), field.type, fieldName);
+      }
+    }
+  }
+
+  @IsTest
+  static void testGetObjectFieldsRejectsUnusableObjects() {
+    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
+    System.runAs(testUser) {
+      assertGetObjectFieldsFails('', 'Object API name is required.');
+      assertGetObjectFieldsFails(
+        'NotAnObjectZZZ__c',
+        'Unknown object: NotAnObjectZZZ__c'
       );
-      Assert.areNotEqual(null, accountLookup);
-      Assert.areEqual('Account', accountLookup.relationshipName);
+      assertGetObjectFieldsFails(
+        'Opportunity',
+        'Object not accessible: Opportunity'
+      );
+    }
+  }
+
+  @IsTest
+  static void testObjectNamesAreCaseInsensitive() {
+    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
+    System.runAs(testUser) {
+      List<NewtonSelectorFlowCpeController.Field> fields = NewtonSelectorFlowCpeController.getObjectFields(
+        'account'
+      );
+
+      Assert.areNotEqual(null, findField(fields, 'Name'));
     }
   }
 
@@ -114,140 +146,15 @@ private class NewtonSelectorFlowCpeControllerTest {
     }
   }
 
-  @IsTest
-  static void testSearchSObjectTypesNullSafe() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      Assert.isTrue(
-        containsChoice(
-          NewtonSelectorFlowCpeController.searchSObjectTypes(null),
-          'Account'
-        )
-      );
-    }
-  }
-
-  @IsTest
-  static void testSearchLookupDatasetFieldsForAccount() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      List<NewtonSelectorFlowCpeController.ChoiceOption> rows = NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject(
-        'Account',
-        ''
-      );
-
-      Assert.isTrue(
-        containsChoice(rows, 'Name'),
-        'Account.Name should be present in the field lookup'
-      );
-      Assert.isFalse(
-        containsChoice(rows, 'Rating'),
-        'Fields the user cannot read are omitted'
-      );
-    }
-  }
-
-  @IsTest
-  static void testFieldChoicesCarryDisplayType() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      List<NewtonSelectorFlowCpeController.ChoiceOption> rows = NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject(
-        'Account',
-        ''
-      );
-
-      Map<String, String> expectedTypes = new Map<String, String>{
-        'Id' => 'ID',
-        'Name' => 'STRING',
-        'Industry' => 'PICKLIST',
-        'AnnualRevenue' => 'CURRENCY',
-        'NumberOfEmployees' => 'INTEGER',
-        'CreatedDate' => 'DATETIME',
-        'ParentId' => 'REFERENCE'
-      };
-      for (String fieldName : expectedTypes.keySet()) {
-        NewtonSelectorFlowCpeController.ChoiceOption row = findChoice(
-          rows,
-          fieldName
-        );
-        Assert.areNotEqual(null, row, fieldName + ' should be returned');
-        Assert.areEqual(expectedTypes.get(fieldName), row.type, fieldName);
-      }
-    }
-  }
-
-  @IsTest
-  static void testObjectNamesAreCaseInsensitive() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      List<NewtonSelectorFlowCpeController.ChoiceOption> rows = NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject(
-        'ACCOUNT',
-        'name'
-      );
-      List<NewtonSelectorFlowCpeController.Field> fields = NewtonSelectorFlowCpeController.getObjectFields(
-        'account'
-      );
-
-      Assert.isTrue(containsChoice(rows, 'Name'));
-      Assert.areEqual('Account', rows[0].sObjectType);
-      Assert.areNotEqual(null, findField(fields, 'Name'));
-    }
-  }
-
-  @IsTest
-  static void testSearchLookupDatasetFieldsBlankObjectReturnsEmpty() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      Assert.areEqual(
-        0,
-        NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject(
-            '',
-            'x'
-          )
-          .size()
-      );
-      Assert.areEqual(
-        0,
-        NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject(
-            null,
-            'x'
-          )
-          .size()
-      );
-    }
-  }
-
-  @IsTest
-  static void testSearchLookupDatasetFieldsBogusObjectReturnsEmpty() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      Assert.areEqual(
-        0,
-        NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject(
-            'NotAnObjectZZZ__c',
-            ''
-          )
-          .size()
-      );
-    }
-  }
-
-  @IsTest
-  static void testSearchLookupDatasetFieldsFiltersByKey() {
-    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
-    System.runAs(testUser) {
-      List<NewtonSelectorFlowCpeController.ChoiceOption> rows = NewtonSelectorFlowCpeController.searchLookupDatasetFieldsForObject(
-        'Account',
-        'name'
-      );
-
-      Assert.isTrue(containsChoice(rows, 'Name'));
-      for (NewtonSelectorFlowCpeController.ChoiceOption row : rows) {
-        Assert.isTrue(
-          row.value.toLowerCase().contains('name') ||
-          row.label.toLowerCase().contains('name')
-        );
-      }
+  private static void assertGetObjectFieldsFails(
+    String objectName,
+    String expectedMessage
+  ) {
+    try {
+      NewtonSelectorFlowCpeController.getObjectFields(objectName);
+      Assert.fail('Expected failure: ' + expectedMessage);
+    } catch (AuraHandledException e) {
+      Assert.areEqual(expectedMessage, e.getMessage());
     }
   }
 
@@ -267,18 +174,11 @@ private class NewtonSelectorFlowCpeControllerTest {
     List<NewtonSelectorFlowCpeController.ChoiceOption> rows,
     String value
   ) {
-    return findChoice(rows, value) != null;
-  }
-
-  private static NewtonSelectorFlowCpeController.ChoiceOption findChoice(
-    List<NewtonSelectorFlowCpeController.ChoiceOption> rows,
-    String value
-  ) {
     for (NewtonSelectorFlowCpeController.ChoiceOption row : rows) {
       if (row.value == value) {
-        return row;
+        return true;
       }
     }
-    return null;
+    return false;
   }
 }

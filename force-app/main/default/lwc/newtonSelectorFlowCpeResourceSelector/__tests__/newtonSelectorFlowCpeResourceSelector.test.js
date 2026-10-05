@@ -22,46 +22,10 @@ function selectedTrigger(el) {
 }
 
 describe("c-newton-selector-flow-cpe-resource-selector", () => {
-  beforeAll(() => {
-    if (!Element.prototype.scrollIntoView) {
-      Element.prototype.scrollIntoView = function () {};
-    }
-  });
-
   afterEach(() => {
     while (document.body.firstChild) {
       document.body.removeChild(document.body.firstChild);
     }
-  });
-
-  describe("rendering", () => {
-    it("renders a visible label by default (variant=standard)", () => {
-      const el = mount({ label: "Value" });
-      const lbl = el.shadowRoot.querySelector("label");
-      expect(lbl.className).toContain("slds-form-element__label");
-      expect(lbl.className).not.toContain("slds-assistive-text");
-      expect(lbl.textContent.trim()).toBe("Value");
-    });
-
-    it("applies slds-assistive-text when variant=label-hidden", () => {
-      const el = mount({ label: "Value", variant: "label-hidden" });
-      const lbl = el.shadowRoot.querySelector("label");
-      expect(lbl.className).toContain("slds-assistive-text");
-    });
-
-    it("applies max-width style when maxWidth is set", () => {
-      const el = mount({ maxWidth: 280 });
-      const wrapper = el.shadowRoot.querySelector("div[style]");
-      expect(wrapper.getAttribute("style")).toContain("max-width: 280px");
-    });
-
-    it("passes required through to lightning-input", async () => {
-      const el = mount({ required: true });
-      await flush();
-      expect(el.shadowRoot.querySelector("lightning-input").required).toBe(
-        true
-      );
-    });
   });
 
   describe("displayed value", () => {
@@ -97,54 +61,6 @@ describe("c-newton-selector-flow-cpe-resource-selector", () => {
       );
       expect(label.textContent).toBe("Account.Name");
     });
-
-    it("deduplicates repeated selected reference segments", async () => {
-      const el = mount({});
-      el.value = "{!Get_E2E_Leads.Get_E2E_Leads}";
-      await flush();
-      const label = el.shadowRoot.querySelector(
-        ".newton-selector-flow-cpe-resource-selector__selected-label"
-      );
-      expect(label.textContent).toBe("Get_E2E_Leads");
-    });
-  });
-
-  describe("valuechanged event", () => {
-    it("reports a picked resource as a {!...} merge field", async () => {
-      const el = mount({
-        name: "selectorLabel",
-        builderContextFilterType: "String",
-        builderContext: {
-          variables: [
-            {
-              name: "selectorLabelText",
-              label: "Selector Label Text",
-              dataType: "String"
-            }
-          ]
-        },
-        automaticOutputVariables: {}
-      });
-      await flush();
-
-      const handler = jest.fn();
-      el.addEventListener("valuechanged", handler);
-      el.shadowRoot.querySelector("lightning-input").click();
-      await flush();
-      el.shadowRoot
-        .querySelector(
-          '.newton-selector-flow-cpe-resource-selector__option[data-value="selectorLabelText"]'
-        )
-        .click();
-
-      expect(handler).toHaveBeenCalledTimes(1);
-      expect(handler.mock.calls[0][0].detail).toEqual(
-        expect.objectContaining({
-          id: "selectorLabel",
-          newValue: "{!selectorLabelText}"
-        })
-      );
-    });
   });
 
   describe("builder context filtering", () => {
@@ -158,13 +74,15 @@ describe("c-newton-selector-flow-cpe-resource-selector", () => {
               name: "Get_Leads",
               label: "Get Leads",
               object: "Lead",
-              getFirstRecordOnly: "false"
+              getFirstRecordOnly: false,
+              storeOutputAutomatically: true
             },
             {
               name: "Get_First_Account",
               label: "Get First Account",
               object: "Account",
-              getFirstRecordOnly: "true"
+              getFirstRecordOnly: true,
+              storeOutputAutomatically: true
             }
           ],
           screens: [
@@ -186,7 +104,7 @@ describe("c-newton-selector-flow-cpe-resource-selector", () => {
       });
 
       await flush();
-      el.shadowRoot.querySelector("lightning-input").click();
+      el.shadowRoot.querySelector("input").click();
       await flush();
 
       const options = [

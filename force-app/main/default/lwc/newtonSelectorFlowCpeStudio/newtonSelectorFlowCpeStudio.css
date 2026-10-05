@@ -6,8 +6,6 @@
 @import "c/newtonSelectorFlowCpeUtilityTokens";
 
 :host {
-  --newton-studio-left-fr: 50fr;
-  --newton-studio-right-fr: 50fr;
   --newton-studio-splitter-w: 0.375rem;
 }
 
@@ -43,7 +41,6 @@
 .newton-studio__left {
   display: flex;
   flex-direction: column;
-  min-width: 0;
   overflow: hidden;
 }
 
@@ -113,7 +110,7 @@
 
 .newton-studio__tab:hover {
   background: var(--newton-studio-panel-soft);
-  color: var(--slds-g-color-neutral-base-10, #181818);
+  color: var(--newton-studio-ink);
 }
 
 .newton-studio__tab:focus-visible {
@@ -123,12 +120,8 @@
 
 .newton-studio__tab_active {
   border-block-end-color: var(--newton-studio-brand);
-  color: var(--slds-g-color-neutral-base-10, #181818);
+  color: var(--newton-studio-ink);
   font-weight: var(--slds-g-font-weight-7, 700);
-}
-
-.newton-studio__tab c-newton-selector-icon {
-  color: currentColor;
 }
 
 .newton-studio__tab_active c-newton-selector-icon {
@@ -138,8 +131,8 @@
 /* Status pip — only rendered when a chapter has a warning or error. */
 .newton-studio__nav-status {
   flex: 0 0 auto;
-  inline-size: 0.4375rem;
-  block-size: 0.4375rem;
+  inline-size: var(--slds-g-sizing-3, 0.5rem);
+  block-size: var(--slds-g-sizing-3, 0.5rem);
   border-radius: var(--slds-g-radius-border-circle, 50%);
   background: currentColor;
 }
@@ -162,15 +155,12 @@
 .newton-studio__splitter {
   position: relative;
   cursor: col-resize;
-  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  border: 0;
-  padding: 0;
 }
 
 .newton-studio__splitter-grip {
@@ -212,11 +202,13 @@
 }
 
 .newton-studio__splitter::before {
-  top: calc(50% - 8px);
+  top: calc(50% - var(--slds-g-sizing-3, 0.5rem));
 }
 
 .newton-studio__splitter::after {
-  top: calc(50% + 5px);
+  top: calc(
+    50% + var(--slds-g-sizing-3, 0.5rem) - var(--slds-g-sizing-border-3, 3px)
+  );
 }
 
 .newton-studio__splitter:hover::before,
@@ -229,6 +221,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .newton-studio__tab,
   .newton-studio__splitter-grip,
   .newton-studio__splitter::before,
   .newton-studio__splitter::after {
@@ -246,8 +239,7 @@
     display: none;
   }
 
-  .newton-studio__left,
-  .newton-studio__scroll {
+  .newton-studio__left {
     padding: var(--slds-g-spacing-3, 0.75rem);
   }
 }

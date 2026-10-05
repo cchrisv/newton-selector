@@ -8,15 +8,16 @@ public with sharing class NewtonSelectorRuntimeController {
   /**
    * @description Queries runtime selector items from a serialized NewtonSelectorQueryDTO.
    * Failures surface as AuraHandledException carrying the validation or database message.
+   * Not cacheable: a revisited Flow screen must show records changed earlier in the Flow.
    * @param configJson Serialized NewtonSelectorQueryDTO.
    * @return Runtime selector item DTOs.
    */
-  @AuraEnabled(cacheable=true)
+  @AuraEnabled(cacheable=false)
   public static List<NewtonSelectorItemDTO> queryItems(String configJson) {
     try {
       return NewtonSelectorService.fetchItems(parseConfig(configJson));
     } catch (Exception e) {
-      throw auraException(e.getMessage());
+      throw NewtonSelectorException.toAuraException(e.getMessage());
     }
   }
 
@@ -54,17 +55,13 @@ public with sharing class NewtonSelectorRuntimeController {
         NewtonSelectorQueryDTO.class
       );
     } catch (JSONException e) {
-      throw new NewtonSelectorException('Invalid selector configuration.');
+      throw new NewtonSelectorException(
+        'Invalid selector configuration: ' + e.getMessage()
+      );
     }
     if (config == null) {
       throw new NewtonSelectorException('Selector configuration is required.');
     }
     return config;
-  }
-
-  private static AuraHandledException auraException(String message) {
-    AuraHandledException e = new AuraHandledException(message);
-    e.setMessage(message);
-    return e;
   }
 }

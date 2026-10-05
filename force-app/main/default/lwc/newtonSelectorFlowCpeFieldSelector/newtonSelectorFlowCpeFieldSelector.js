@@ -1,6 +1,6 @@
 import { LightningElement, api, track } from "lwc";
+import getObjectFields from "@salesforce/apex/NewtonSelectorFlowCpeController.getObjectFields";
 import {
-  fetchFields,
   loadErrorMessage,
   fieldsToOptions,
   filterFieldOptions
@@ -10,10 +10,9 @@ import {
  * Newton Selector Flow CPE | Field Selector.
  *
  * A searchable list of an SObject's fields with type icons. Field metadata
- * comes through the shared cache in `c/newtonSelectorFlowCpeUtilityHelpers`,
- * so selectors for the same object share one Apex describe call.
+ * comes from the cacheable `getObjectFields` Apex method.
  *
- * @fires fieldchange — `{ detail: { fieldApiName, fieldLabel, fieldType } }`.
+ * @fires fieldchange — `{ detail: { fieldApiName } }`.
  */
 export default class NewtonSelectorFlowCpeFieldSelector extends LightningElement {
   @track _allOptions = [];
@@ -25,6 +24,8 @@ export default class NewtonSelectorFlowCpeFieldSelector extends LightningElement
   /** @type {boolean} */ @api required = false;
   /** Comma-separated Schema.DisplayType names to include (e.g. 'PICKLIST,MULTIPICKLIST'). Empty string = all types. */
   @api fieldTypeFilter = "";
+  /** Only offer fields that can be used in ORDER BY. */
+  @api sortableOnly = false;
   /** @type {string} */ @api value = "";
 
   _objectApiName = "";
@@ -36,6 +37,7 @@ export default class NewtonSelectorFlowCpeFieldSelector extends LightningElement
   set objectApiName(v) {
     const next = v == null ? "" : String(v).trim();
     if (next === this._objectApiName) return;
+    this.loadError = "";
     this._objectApiName = next;
     this._allOptions = [];
     this._loadedObject = "";
@@ -67,14 +69,14 @@ export default class NewtonSelectorFlowCpeFieldSelector extends LightningElement
   _loadFields() {
     const obj = this._objectApiName;
     this.loadError = "";
-    fetchFields(obj)
+    getObjectFields({ objectName: obj })
       .then((fields) => {
         if (!this._connected || this._objectApiName !== obj) return;
-        this._allOptions = this._applyTypeFilter(fieldsToOptions(fields));
+        const usable = this.sortableOnly
+          ? fields.filter((field) => field.sortable)
+          : fields;
+        this._allOptions = this._applyTypeFilter(fieldsToOptions(usable));
         this._loadedObject = obj;
-        this.template
-          .querySelector("c-newton-selector-combobox")
-          ?.setDefaultResults(this._allOptions);
       })
       .catch((error) => {
         if (this._objectApiName === obj) {
@@ -106,14 +108,9 @@ export default class NewtonSelectorFlowCpeFieldSelector extends LightningElement
 
   handleSelectionChange(event) {
     const row = event.currentTarget.getSelection()[0];
-    const fieldApiName = row?.id ? String(row.id) : "";
     this.dispatchEvent(
       new CustomEvent("fieldchange", {
-        detail: {
-          fieldApiName,
-          fieldLabel: row?.title ? String(row.title) : "",
-          fieldType: row?.type ? String(row.type) : ""
-        }
+        detail: { fieldApiName: row?.id ? String(row.id) : "" }
       })
     );
   }

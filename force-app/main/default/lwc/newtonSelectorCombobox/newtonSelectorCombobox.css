@@ -4,11 +4,7 @@
   z-index: 1;
   width: 100%;
   --newton-selector-combobox-dropdown-max-height: 22rem;
-  --newton-selector-combobox-dropdown-z-index: 1;
-  --newton-selector-combobox-dropdown-padding: 0;
   --newton-selector-combobox-dropdown-width: 100%;
-  --newton-selector-combobox-dropdown-min-width: auto;
-  --newton-selector-combobox-option-gap: var(--slds-g-spacing-1, 0.25rem);
 }
 
 :host(:focus-within) {
@@ -16,13 +12,24 @@
 }
 
 .newton-selector-combobox__dropdown {
-  z-index: var(--newton-selector-combobox-dropdown-z-index);
+  z-index: 1;
   width: var(--newton-selector-combobox-dropdown-width);
-  min-width: var(--newton-selector-combobox-dropdown-min-width);
+  min-width: auto;
   max-height: var(--newton-selector-combobox-dropdown-max-height);
-  padding: var(--newton-selector-combobox-dropdown-padding);
+  padding: 0;
   overflow: auto;
   box-sizing: border-box;
+  border-color: var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-3, 0.75rem);
+  box-shadow: var(
+    --slds-g-shadow-2,
+    0 2px 8px
+      color-mix(
+        in oklab,
+        var(--slds-g-color-neutral-base-10, #181818) 12%,
+        transparent
+      )
+  );
 }
 
 .newton-selector-combobox__lookup {
@@ -32,7 +39,6 @@
     --slds-g-sizing-15,
     20rem
   );
-  --newton-selector-combobox-dropdown-padding: 0;
 }
 
 .newton-selector-combobox__select {
@@ -63,8 +69,9 @@
 .newton-selector-combobox__listbox {
   display: flex;
   flex-direction: column;
-  gap: var(--newton-selector-combobox-option-gap);
-  padding: var(--newton-selector-combobox-option-gap);
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  padding: var(--slds-g-spacing-1, 0.25rem);
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
 }
 
 .newton-selector-combobox__option {
@@ -89,8 +96,16 @@
   --_leading-rule: calc(var(--slds-g-sizing-border-2, 2px) * -1);
 }
 
-.newton-selector-combobox__option:hover {
+.newton-selector-combobox__option:hover,
+.newton-selector-combobox__option_active {
   background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+/* The keyboard-active row in select mode; aria-selected marks the chosen one. */
+.newton-selector-combobox__option_active {
+  outline: var(--slds-g-sizing-border-2, 2px) solid
+    var(--slds-g-color-border-accent-1, #0176d3);
+  outline-offset: calc(var(--slds-g-sizing-border-2, 2px) * -1);
 }
 
 .newton-selector-combobox__state {
@@ -115,14 +130,4 @@
 
 .newton-selector-combobox__clear-button {
   color: var(--slds-g-color-neutral-base-40, #5c5c5c);
-}
-
-.newton-selector-combobox__dropdown {
-  border-color: var(--slds-g-color-border-1, #c9c9c9);
-  border-radius: var(--slds-g-radius-border-3, 0.75rem);
-  box-shadow: var(--slds-g-shadow-2, 0 2px 8px rgba(0, 0, 0, 0.12));
-}
-
-.newton-selector-combobox__listbox {
-  background: var(--slds-g-color-surface-container-1, #f3f3f3);
 }

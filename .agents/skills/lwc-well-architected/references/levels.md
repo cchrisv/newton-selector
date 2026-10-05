@@ -2,13 +2,13 @@
 
 ## Atom
 
-**Format:** `{app}Atom{Name}` | **Data:** Never | **Logic:** Never
+**Format:** `{app}{Name}` | **Data:** Never | **Logic:** Never
 
 Pure presentational. Receives all state via `@api`, communicates out via `CustomEvent`.
 
 **Responsibilities:**
 - Render a single UI element or tightly coupled visual group
-- Emit semantic events (`checkboxchanged`, `cardselect`)
+- Emit semantic events (`toggle`, `iconselect`)
 - Accept style configuration via `@api` properties
 
 **Constraints:**
@@ -17,24 +17,33 @@ Pure presentational. Receives all state via `@api`, communicates out via `Custom
 - No child component imports beyond base Lightning components
 - No business logic — not even simple conditionals about data shape
 
-**Example — newtonCheckbox:**
+**Example — newtonSelectorFlowCpeToggle** (condensed):
 ```javascript
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api } from "lwc";
 
-export default class NewtonCheckbox extends LightningElement {
-    /** @type {string} Label displayed next to the checkbox */
-    @api label = '';
-    /** @type {boolean} Current checked state */
-    @api value = false;
-    /** @type {boolean} Disable interaction */
-    @api disabled = false;
+/**
+ * Two-state setting control: a radio group of an "off" and an "on" option.
+ *
+ * @fires toggle — detail `{ checked }`.
+ */
+export default class NewtonSelectorFlowCpeToggle extends LightningElement {
+  /** @type {string} Accessible name; shown above the control unless label-hidden. */
+  @api label;
+  /** @type {boolean} Current value. */
+  @api checked = false;
+  /** @type {string} Text of the "on" option. */
+  @api activeLabel = "On";
+  /** @type {string} Text of the "off" option. */
+  @api inactiveLabel = "Off";
 
-    handleChange(event) {
-        const isOn = event.detail.checked;
-        this.dispatchEvent(new CustomEvent('checkboxchanged', {
-            detail: { newValue: isOn }
-        }));
-    }
+  handleChoiceClick(event) {
+    this.select(event.currentTarget.dataset.checked === "true");
+  }
+
+  select(isOn) {
+    if (isOn === (this.checked === true)) return;
+    this.dispatchEvent(new CustomEvent("toggle", { detail: { checked: isOn } }));
+  }
 }
 ```
 
@@ -42,7 +51,7 @@ export default class NewtonCheckbox extends LightningElement {
 
 ## Molecule
 
-**Format:** `{app}Molecule{Name}` | **Data:** Never | **Logic:** Coordination
+**Format:** `{app}{Name}` | **Data:** Never | **Logic:** Coordination
 
 Composes 2-5 atoms/molecules. Adds **local coordination** — search filtering, tab selection, drag reordering — but never fetches data.
 
@@ -57,31 +66,42 @@ Composes 2-5 atoms/molecules. Adds **local coordination** — search filtering, 
 - Does not contain business rules (validation logic belongs in organisms)
 - Maximum 5 direct child components
 
-**Example — newtonSelectorFlowCpeFieldSelector:**
+**Example — newtonSelectorFlowCpeIconSelector** (condensed): filters the
+generated icon catalog by a local search term and reports the pick upward.
 ```javascript
-import { LightningElement, api, track } from 'lwc';
+import { LightningElement, api } from "lwc";
+import { filterIcons } from "./iconCatalog";
 
-export default class NewtonSelectorFlowCpeFieldSelector extends LightningElement {
-    /** @type {Array} Available fields to pick from */
-    @api items = [];
+export default class NewtonSelectorFlowCpeIconSelector extends LightningElement {
+  @api label = "Icon";
 
-    @track _searchTerm = '';
+  _value = "";
+  _searchTerm = "";
 
-    get filteredItems() {
-        if (!this._searchTerm) return this.items;
-        const term = this._searchTerm.toLowerCase();
-        return this.items.filter(i => i.label.toLowerCase().includes(term));
-    }
+  @api
+  get value() {
+    return this._value;
+  }
+  set value(v) {
+    this._value = v || "";
+  }
 
-    handleSearch(event) {
-        this._searchTerm = event.detail.value;
-    }
+  get filteredIcons() {
+    return filterIcons(this._searchTerm);
+  }
 
-    handleSelect(event) {
-        this.dispatchEvent(new CustomEvent('fieldselect', {
-            detail: { fieldApiName: event.detail.value }
-        }));
-    }
+  handleSearchInput(event) {
+    this._searchTerm = event.target.value || "";
+  }
+
+  handleIconClick(event) {
+    this.selectIcon(event.currentTarget.dataset.icon);
+  }
+
+  selectIcon(iconName) {
+    this._value = iconName;
+    this.dispatchEvent(new CustomEvent("iconselect", { detail: { iconName } }));
+  }
 }
 ```
 
@@ -89,7 +109,7 @@ export default class NewtonSelectorFlowCpeFieldSelector extends LightningElement
 
 ## Organism
 
-**Format:** `{app}Organism{Name}` | **Data:** wire/Apex | **Logic:** Business rules
+**Format:** `{app}{Name}` | **Data:** wire/Apex | **Logic:** Business rules
 
 Owns a **data domain**. Fetches, transforms, validates, and presents data with full state management.
 
@@ -100,70 +120,63 @@ Owns a **data domain**. Fetches, transforms, validates, and presents data with f
 - Enforce FLS/sharing (at Apex layer)
 - Support cross-context rendering (desktop, mobile, Experience Cloud)
 
-**Required patterns:**
+**Example — newtonSelectorDataSelector** (condensed): guards async work with a
+connected flag and shows the real Apex error message.
 ```javascript
-import { LightningElement, api, track, wire } from 'lwc';
-import queryItems from '@salesforce/apex/NewtonSelectorRuntimeController.queryItems';
+import { LightningElement } from "lwc";
+import queryItems from "@salesforce/apex/NewtonSelectorRuntimeController.queryItems";
+import { errorMessageOf } from "c/newtonSelectorUtilityDataSources";
 
 export default class NewtonSelectorDataSelector extends LightningElement {
-    @track _items = [];
-    @track _loading = true;
-    @track _error = null;
-    _connected = false;
+  _connectedFlag = false;
+  _isLoading = false;
+  _errorMessage = "";
 
-    connectedCallback() {
-        this._connected = true;
-        this.loadData();
+  connectedCallback() {
+    this._connectedFlag = true;
+    this.loadData();
+  }
+
+  disconnectedCallback() {
+    this._connectedFlag = false;
+  }
+
+  async loadSObject() {
+    this._isLoading = true;
+    this._errorMessage = "";
+    try {
+      this._rawData = await queryItems({ configJson: JSON.stringify(this._sobjectConfig) });
+      this.reapplyNormalization();
+    } finally {
+      this._isLoading = false;
     }
+  }
 
-    disconnectedCallback() {
-        this._connected = false;
-        if (this._debounceTimer) clearTimeout(this._debounceTimer);
-    }
-
-    async loadData() {
-        this._loading = true;
-        this._error = null;
-        try {
-            const result = await queryItems({ /* params */ });
-            if (this._connected) {
-                this._items = this.normalizeResults(result);
-            }
-        } catch (error) {
-            if (this._connected) {
-                this._error = error.body?.message || 'An error occurred';
-            }
-        } finally {
-            if (this._connected) {
-                this._loading = false;
-            }
-        }
-    }
-
-    get hasItems() { return this._items.length > 0; }
-    get showEmptyState() { return !this._loading && !this._error && !this.hasItems; }
+  handleError(error) {
+    this._errorMessage = errorMessageOf(error, this.errorStateMessage);
+    this._isLoading = false;
+  }
 }
 ```
 
-**Template with all states:**
+**Template with all states** (condensed): a loading status, an error alert
+with the message and a standard SLDS neutral **Try again** button (SOQL failures only),
+an empty state, and the options.
 ```html
-<template>
-    <template if:true={_loading}>
-        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+<template lwc:if={isLoading}>
+  <div class="newton-state newton-state_loading" role="status" aria-live="polite">
+    <span class="slds-assistive-text">{labels.loadingOptions}</span>
+  </div>
+</template>
+<template lwc:if={hasError}>
+  <div class="newton-state newton-state_error" role="alert">
+    <p class="newton-state__message">{resolvedErrorMessage}</p>
+    <template lwc:if={canRetry}>
+      <button type="button" class="slds-button slds-button_neutral" onclick={handleRetry}>
+        {labels.tryAgain}
+      </button>
     </template>
-    <template if:true={_error}>
-        <c-newton-error-message message={_error}></c-newton-error-message>
-    </template>
-    <template if:true={showEmptyState}>
-        <c-newton-empty-state message="No items found"></c-newton-empty-state>
-    </template>
-    <template if:true={hasItems}>
-        <template for:each={_items} for:item="item">
-            <c-newton-picker-card key={item.id} item={item}
-                onselect={handleItemSelect}>
-            </c-newton-picker-card>
-        </template>
-    </template>
+  </div>
 </template>
 ```
 
@@ -171,7 +184,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
 
 ## Template
 
-**Format:** `{app}Template{Name}` | **Data:** Never | **Logic:** Never
+**Format:** `{app}{Name}` | **Data:** Never | **Logic:** Never
 
 Layout-only via `<slot>`. Provides responsive structure. Contains zero content and zero logic.
 
@@ -211,32 +224,14 @@ Composes templates and organisms into complete user journeys. Owns navigation an
 
 **Not an LWC component** — pure JS module. Imported by any level.
 
-**Patterns:**
-```javascript
-// Stateless transforms
-export function normalizePicklist(picklistValues) {
-    return picklistValues.values.map(v => ({
-        id: v.value, label: v.label, value: v.value
-    }));
-}
-
-// Module-level cache with invalidation
-const _cache = new Map();
-export function fetchCached(key, fetcher) {
-    if (_cache.has(key)) return Promise.resolve(_cache.get(key));
-    return fetcher().then(result => { _cache.set(key, result); return result; });
-}
-export function clearCache() { _cache.clear(); }
-
-// In-flight deduplication
-const _inflight = new Map();
-export function deduplicatedFetch(key, fetcher) {
-    if (_inflight.has(key)) return _inflight.get(key);
-    const p = fetcher().finally(() => _inflight.delete(key));
-    _inflight.set(key, p);
-    return p;
-}
-```
+**Patterns in this repo:**
+- Stateless transforms: `normalizePicklist(picklistValues, valueSource)`,
+  `normalizeCollection`, `filterItems` and `formatLabel` in
+  `c/newtonSelectorUtilityDataSources`.
+- Option shaping: `fieldsToOptions(fields)`, `filterFieldOptions(options, term)`
+  and `loadErrorMessage(what, error)` in `c/newtonSelectorFlowCpeUtilityHelpers`.
+  The field picker calls the cacheable Apex `getObjectFields` itself; the
+  utility only shapes the result and the error text.
 
 ---
 
@@ -246,35 +241,35 @@ export function deduplicatedFetch(key, fetcher) {
 
 Thin wrapper that bridges Flow runtime ↔ LWC organisms.
 
-**Required patterns:**
+**Example — newtonSelectorFlowScreen** (condensed): publishes outputs to Flow
+and delegates validation to the composed organism.
 ```javascript
-import { LightningElement, api } from 'lwc';
-import { FlowAttributeChangeEvent, FlowNavigationNextEvent } from 'lightning/flowSupport';
+import { LightningElement, api } from "lwc";
+import { FlowAttributeChangeEvent } from "lightning/flowSupport";
 
 export default class NewtonSelectorFlowScreen extends LightningElement {
-    /** @type {string} Flow input — selected value */
-    @api value;
-    /** @type {Array} Flow input — available actions */
-    @api availableActions = [];
+  @api availableActions = [];
 
-    handleSelection(event) {
-        this._value = event.detail.value;
-        this.dispatchEvent(new FlowAttributeChangeEvent('value', this._value));
-    }
+  handleValueChange(event) {
+    this._value = event.detail.value || "";
+    this.dispatchEvent(new FlowAttributeChangeEvent("value", this._value));
+  }
 
-    @api
-    validate() {
-        if (!this._value) {
-            return { isValid: false, errorMessage: 'Please select an item.' };
-        }
-        return { isValid: true };
+  @api
+  validate() {
+    const result = this.template
+      .querySelector("c-newton-selector-data-selector")
+      .validate();
+    // The Error message applies only while Required is on.
+    if (
+      !result.isValid &&
+      this._config.required &&
+      this._config.customErrorMessage
+    ) {
+      return { isValid: false, errorMessage: this._config.customErrorMessage };
     }
-
-    handleNext() {
-        if (this.availableActions.includes('NEXT')) {
-            this.dispatchEvent(new FlowNavigationNextEvent());
-        }
-    }
+    return result;
+  }
 }
 ```
 

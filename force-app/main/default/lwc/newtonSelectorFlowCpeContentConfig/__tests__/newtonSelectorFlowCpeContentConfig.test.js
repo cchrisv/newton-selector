@@ -1,17 +1,19 @@
 import { createElement } from "lwc";
 import NewtonSelectorFlowCpeContentConfig from "c/newtonSelectorFlowCpeContentConfig";
 
+const CONFIG = {
+  label: "Current label",
+  helpText: "",
+  fieldLevelHelp: "",
+  emptyStateMessage: "",
+  errorStateMessage: ""
+};
+
 function mount() {
   const element = createElement("c-newton-selector-flow-cpe-content-config", {
     is: NewtonSelectorFlowCpeContentConfig
   });
-  element.config = {
-    label: "Current label",
-    helpText: "",
-    fieldLevelHelp: "",
-    emptyStateMessage: "",
-    errorStateMessage: ""
-  };
+  element.config = CONFIG;
   document.body.appendChild(element);
   return element;
 }
@@ -56,11 +58,11 @@ describe("c-newton-selector-flow-cpe-content-config events", () => {
     valueChanged(controls[4], "Load failed");
 
     expect(patches).toEqual([
-      { path: ["label"], value: "New label" },
-      { path: ["helpText"], value: "New help" },
-      { path: ["fieldLevelHelp"], value: "Tooltip" },
-      { path: ["emptyStateMessage"], value: "Nothing here" },
-      { path: ["errorStateMessage"], value: "Load failed" }
+      { value: { ...CONFIG, label: "New label" } },
+      { value: { ...CONFIG, helpText: "New help" } },
+      { value: { ...CONFIG, fieldLevelHelp: "Tooltip" } },
+      { value: { ...CONFIG, emptyStateMessage: "Nothing here" } },
+      { value: { ...CONFIG, errorStateMessage: "Load failed" } }
     ]);
   });
 });

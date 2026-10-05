@@ -180,31 +180,31 @@ export const SPACING_TILES = [
   {
     value: "5",
     label: "L",
-    sublabel: "20px",
+    sublabel: "24px",
     shape: { width: "1.25rem", height: "1.25rem" }
   },
   {
     value: "6",
     label: "XL",
-    sublabel: "24px",
+    sublabel: "32px",
     shape: { width: "1.5rem", height: "1.5rem" }
   },
   {
     value: "7",
     label: "2XL",
-    sublabel: "32px",
+    sublabel: "40px",
     shape: { width: "2rem", height: "2rem" }
   },
   {
     value: "8",
     label: "3XL",
-    sublabel: "40px",
+    sublabel: "48px",
     shape: { width: "2.25rem", height: "2.25rem" }
   },
   {
     value: "9",
     label: "4XL",
-    sublabel: "48px",
+    sublabel: "56px",
     shape: { width: "2.5rem", height: "2.5rem" }
   }
 ];
@@ -218,18 +218,6 @@ export const PADDING_TILES = [
   },
   ...SPACING_TILES
 ];
-
-export const AUTO_SPACING_TILES = [
-  {
-    value: "",
-    label: "Auto",
-    sublabel: "Standard spacing",
-    icon: "wand-sparkles"
-  },
-  ...SPACING_TILES
-];
-
-export const SPACING_SIDES = ["top", "right", "bottom", "left"];
 
 export const SIDE_META = [
   { side: "top", label: "Top", icon: "panel-top" },
@@ -382,48 +370,28 @@ export const ELEVATION_TILES = [
   }
 ];
 
-export function spacingTileList(source, activeValue) {
+// Tiles for a picker, each with a unique id and `_selected` on the active one.
+export function tileList(source, activeValue) {
   return source.map((t, i) => ({
+    ...t,
     id: `${t.value || "auto"}-${i}`,
-    value: t.value,
-    label: t.label,
-    sublabel: t.sublabel,
-    icon: t.icon,
-    shape: t.shape,
     _selected: t.value === activeValue
   }));
 }
 
 export const SECTIONS = [
-  { key: "data", label: "Data", icon: "database", numeral: "01" },
-  { key: "content", label: "Content", icon: "type", numeral: "02" },
-  {
-    key: "behavior",
-    label: "Behavior",
-    icon: "panels-top-left",
-    numeral: "03"
-  },
-  {
-    key: "appearance",
-    label: "Appearance",
-    icon: "palette",
-    numeral: "04"
-  }
+  { key: "data", label: "Data", icon: "database" },
+  { key: "content", label: "Content", icon: "type" },
+  { key: "behavior", label: "Behavior", icon: "panels-top-left" },
+  { key: "appearance", label: "Appearance", icon: "palette" }
 ];
 
-// Keys of a per-value override that count as a customization in the editor.
-// The runtime (newtonSelectorUtilityDataSources) copies only the text fields
-// onto the option; "hidden" is not copied, it removes the option instead.
-export const OVERRIDE_FIELDS = [
-  "label",
-  "sublabel",
-  "icon",
-  "badge",
-  "helpText",
-  "hidden"
-];
-
-export const GRID_MIN_WIDTH_RANGE = { min: 6, max: 32, step: 1, fallback: 7.5 };
+export const GRID_MIN_WIDTH_RANGE = {
+  min: 6,
+  max: 32,
+  step: 0.5,
+  fallback: 7.5
+};
 
 export const PATTERN_TILES = [
   {
@@ -625,6 +593,12 @@ export const ICON_SHADING_TILES = [
 
 export const ICON_SIZE_TILES = [
   {
+    value: "auto",
+    label: "Auto",
+    sublabel: "Match tile",
+    icon: "refresh-cw"
+  },
+  {
     value: "xx-small",
     label: "XX-small",
     sublabel: "0.75rem",
@@ -639,16 +613,16 @@ export const ICON_SIZE_TILES = [
   {
     value: "small",
     label: "Small",
-    sublabel: "1.25rem",
+    sublabel: "1.5rem",
     icon: "rectangle-horizontal"
   },
   {
     value: "medium",
     label: "Medium",
-    sublabel: "1.5rem",
+    sublabel: "2rem",
     icon: "expand"
   },
-  { value: "large", label: "Large", sublabel: "2rem", icon: "expand" }
+  { value: "large", label: "Large", sublabel: "3rem", icon: "expand" }
 ];
 
 export const GLYPH_TONE_SWATCHES = [
@@ -674,5 +648,18 @@ export const TONE_SWATCHES = [
   { value: "violet", label: "Violet" },
   { value: "pink", label: "Pink" },
   { value: "teal", label: "Teal" },
+  { value: "custom", label: "Custom" }
+];
+
+export const BADGE_TONE_SWATCHES = [
+  { value: "neutral", label: "Neutral" },
+  { value: "brand", label: "Brand" },
+  { value: "success", label: "Success" },
+  { value: "warning", label: "Warning" },
+  { value: "error", label: "Error" },
+  { value: "violet", label: "Violet" },
+  { value: "pink", label: "Pink" },
+  { value: "teal", label: "Teal" },
+  { value: "inverse", label: "Inverse" },
   { value: "custom", label: "Custom" }
 ];

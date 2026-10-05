@@ -1,0 +1,5 @@
+@import "c/newtonSelectorFlowCpeUtilityConfigStyles";
+
+:host {
+  display: block;
+}

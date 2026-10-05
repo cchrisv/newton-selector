@@ -15,14 +15,31 @@ export function formatLabel(label, ...values) {
   });
 }
 
+/**
+ * Reads the message of an Apex or UI API error. UI API read errors carry an
+ * array of { errorCode, message } in `body`; Apex errors carry `body.message`.
+ */
+export function errorMessageOf(error, fallback) {
+  const body = error?.body;
+  const message = Array.isArray(body)
+    ? body
+        .map((entry) => entry?.message)
+        .filter(Boolean)
+        .join(", ")
+    : body?.message;
+  return message || error?.message || fallback;
+}
+
+// Every mapped field becomes text, like the SOQL source's Apex mapping, so a
+// Number 0 or Checkbox false is a value of its own and matches the string
+// values the layouts compare against.
 function safeGet(record, fieldPath) {
   if (!record || !fieldPath) return EMPTY;
   const value = record[fieldPath];
-  return value === undefined || value === null ? EMPTY : value;
+  return value === undefined || value === null ? EMPTY : String(value);
 }
 
 export function normalizePicklist(picklistValues, valueSource) {
-  if (!picklistValues || !Array.isArray(picklistValues.values)) return [];
   const useLabel = valueSource === "label";
   return picklistValues.values.map((entry, index) => {
     const resolvedValue = useLabel ? entry.label : entry.value;
@@ -33,41 +50,24 @@ export function normalizePicklist(picklistValues, valueSource) {
       icon: EMPTY,
       badge: EMPTY,
       helpText: EMPTY,
-      value: resolvedValue,
-      disabled: false
+      value: resolvedValue
     };
   });
 }
 
 export function normalizeCollection(records, fieldMap) {
-  if (!Array.isArray(records)) return [];
-  const map = fieldMap || {};
   return records.map((record, index) => ({
     id: safeGet(record, "Id") || `col-${index}`,
     label:
-      safeGet(record, map.label) || formatLabel(rowFallbackLabel, index + 1),
-    sublabel: safeGet(record, map.sublabel),
-    icon: safeGet(record, map.icon),
-    badge: safeGet(record, map.badge),
-    helpText: safeGet(record, map.helpText),
-    value: safeGet(record, map.value) || safeGet(record, "Id") || String(index),
-    disabled: false,
+      safeGet(record, fieldMap.label) ||
+      formatLabel(rowFallbackLabel, index + 1),
+    sublabel: safeGet(record, fieldMap.sublabel),
+    icon: safeGet(record, fieldMap.icon),
+    badge: safeGet(record, fieldMap.badge),
+    helpText: safeGet(record, fieldMap.helpText),
+    value:
+      safeGet(record, fieldMap.value) || safeGet(record, "Id") || String(index),
     record
-  }));
-}
-
-export function normalizeSObjectDTO(dtos) {
-  if (!Array.isArray(dtos)) return [];
-  return dtos.map((dto, index) => ({
-    id: dto.id || `so-${index}`,
-    label: dto.label || EMPTY,
-    sublabel: dto.sublabel || EMPTY,
-    icon: dto.icon || EMPTY,
-    badge: dto.badge || EMPTY,
-    helpText: dto.helpText || EMPTY,
-    value: dto.value || dto.id || String(index),
-    disabled: false,
-    record: dto.record
   }));
 }
 
@@ -76,8 +76,7 @@ export function normalizeCustom(customItems) {
   return customItems
     .filter((item) => item?.hidden !== true)
     .map((item, index) => ({
-      ...item,
-      id: item.id || `cu-${index}`,
+      id: `cu-${index}`,
       label: item.label || EMPTY,
       sublabel: item.sublabel || EMPTY,
       icon: item.icon || EMPTY,
@@ -86,14 +85,12 @@ export function normalizeCustom(customItems) {
       value:
         item.value !== undefined && item.value !== null
           ? String(item.value)
-          : String(index),
-      disabled: Boolean(item.disabled)
+          : String(index)
     }));
 }
 
 export function filterItems(items, searchTerm) {
-  if (!Array.isArray(items)) return [];
-  const term = (searchTerm || EMPTY).trim().toLowerCase();
+  const term = searchTerm.trim().toLowerCase();
   if (!term) return items;
   return items.filter((item) => {
     const haystack =
@@ -102,18 +99,22 @@ export function filterItems(items, searchTerm) {
   });
 }
 
-const OVERRIDE_FIELDS = ["label", "sublabel", "icon", "badge", "helpText"];
+export const OVERRIDE_TEXT_FIELDS = [
+  "label",
+  "sublabel",
+  "icon",
+  "badge",
+  "helpText"
+];
 
 export function applyOverrides(items, overrides) {
-  if (!Array.isArray(items)) return [];
-  if (!overrides || typeof overrides !== "object") return items;
   return items
     .map((item) => {
       const ov = overrides[item.value];
       if (!ov) return item;
       if (ov.hidden === true) return null;
       const next = { ...item };
-      for (const field of OVERRIDE_FIELDS) {
+      for (const field of OVERRIDE_TEXT_FIELDS) {
         const val = ov[field];
         if (val !== undefined && val !== null && val !== EMPTY) {
           next[field] = val;
@@ -140,8 +141,6 @@ export function tokenToCss(token) {
  * - limit: positive integer (optional — no cap if falsy)
  */
 export function applyDisplay(items, display) {
-  if (!Array.isArray(items)) return [];
-  if (!display || typeof display !== "object") return items;
   const { sortBy, sortDirection, limit } = display;
   let out = items;
   if (sortBy === "label" || sortBy === "value") {

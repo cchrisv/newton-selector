@@ -9,9 +9,9 @@ import {
 } from "c/newtonSelectorUtilityConfigDefaults";
 import {
   ASPECT_TILES,
-  AUTO_SPACING_TILES,
   BADGE_POSITIONS,
   BADGE_SHAPES,
+  BADGE_TONE_SWATCHES,
   COLUMN_CHIPS,
   CORNER_TILES,
   ELEVATION_TILES,
@@ -28,25 +28,11 @@ import {
   SIDE_META,
   SIZE_COLUMN_WIDTHS,
   SIZE_TILES,
-  SPACING_SIDES,
+  SPACING_TILES,
   SURFACE_TILES,
   TONE_SWATCHES,
-  spacingTileList
+  tileList
 } from "c/newtonSelectorFlowCpeUtilityConfigOptions";
-
-// The runtime accepts #RGB, #RRGGBB and #RRGGBBAA and drops anything else.
-const HEX_COLOR = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
-
-const ICON_SIZE_OPTIONS = [
-  { value: "auto", label: "Auto", sublabel: "Match tile", icon: "refresh-cw" },
-  ...ICON_SIZE_TILES
-];
-
-const BADGE_TONES = [
-  ...TONE_SWATCHES.slice(0, -1),
-  { value: "inverse", label: "Inverse" },
-  TONE_SWATCHES[TONE_SWATCHES.length - 1]
-];
 
 const STATE_TONES = [
   { key: "normal", label: "Normal", suffix: "Tone" },
@@ -55,16 +41,22 @@ const STATE_TONES = [
   { key: "disabled", label: "Disabled", suffix: "DisabledTone" }
 ];
 
+// Everything Reset replaces plus the layout it was applied to; Undo is
+// offered only while this is unchanged.
+function appearanceSignature(config) {
+  return JSON.stringify({
+    layout: config.layout,
+    gridConfig: config.gridConfig,
+    layoutGeometry: config.layoutGeometry || {}
+  });
+}
+
 /**
  * Appearance chapter of the config modal. Reads the merged selector config
  * (every key present) and emits `configpatch` with the whole next config.
  */
 export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElement {
   @api config;
-
-  // Hex fields whose typed value was rejected, keyed by config key; the value
-  // is "true" so it can drive aria-invalid directly.
-  _hexErrors = {};
 
   // "Reset appearance" with Undo: keep what Reset replaced until the
   // appearance changes again, then withdraw the offer so Undo can never
@@ -76,9 +68,6 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
   }
   get layout() {
     return this.config.layout;
-  }
-  get hexErrors() {
-    return this._hexErrors;
   }
 
   get showAspectRatio() {
@@ -105,18 +94,15 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
       "dualListbox"
     ].includes(this.layout);
   }
-  get showGapCard() {
-    return this.showGapHorizontal || this.showGapVertical;
-  }
 
   get layoutTiles() {
-    return this.selectedTiles(LAYOUT_TILES, this.layout);
+    return tileList(LAYOUT_TILES, this.layout);
   }
   get sizeTiles() {
-    return this.selectedTiles(SIZE_TILES, this.gridConfig.size);
+    return tileList(SIZE_TILES, this.gridConfig.size);
   }
   get aspectTiles() {
-    return this.selectedTiles(ASPECT_TILES, this.gridConfig.aspectRatio);
+    return tileList(ASPECT_TILES, this.gridConfig.aspectRatio);
   }
   get columnChips() {
     const active =
@@ -131,45 +117,38 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
     }));
   }
   get selectionIndicatorTiles() {
-    return this.selectedTiles(
+    return tileList(
       SELECTION_INDICATOR_TILES,
       this.gridConfig.selectionIndicator
     );
   }
   get elevationTiles() {
-    return this.selectedTiles(ELEVATION_TILES, this.gridConfig.elevation);
+    return tileList(ELEVATION_TILES, this.gridConfig.elevation);
   }
 
   get patternTiles() {
-    return this.selectedTiles(PATTERN_TILES, this.gridConfig.pattern);
+    return tileList(PATTERN_TILES, this.gridConfig.pattern);
   }
   get patternToneRows() {
     return this.stateToneRows(
       "pattern",
       "Pattern",
-      this.gridConfig.pattern !== "none"
+      this.gridConfig.pattern === "none"
     );
   }
 
   get cornerTiles() {
-    return this.selectedTiles(CORNER_TILES, this.gridConfig.cornerStyle);
+    return tileList(CORNER_TILES, this.gridConfig.cornerStyle);
   }
-  get cornerToneChips() {
-    return this.toneChips(
-      TONE_SWATCHES,
-      this.gridConfig.cornerTone,
-      this.gridConfig.cornerStyle !== "none"
-    );
-  }
-  get cornerToneIsCustom() {
-    return this.gridConfig.cornerTone === "custom";
+  get cornerToneDisabled() {
+    return this.gridConfig.cornerStyle === "none";
   }
 
   get surfaceTiles() {
-    return this.selectedTiles(SURFACE_TILES, this.gridConfig.surfaceStyle);
+    return tileList(SURFACE_TILES, this.gridConfig.surfaceStyle);
   }
   get surfaceToneRows() {
-    return this.stateToneRows("surface", "Surface", true);
+    return this.stateToneRows("surface", "Surface", false);
   }
 
   get showIconsValue() {
@@ -190,58 +169,45 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
   }
 
   get iconSizeTiles() {
-    return this.selectedTiles(ICON_SIZE_OPTIONS, this.gridConfig.iconSize);
+    return tileList(ICON_SIZE_TILES, this.gridConfig.iconSize);
   }
   get iconDecorTiles() {
-    return this.selectedTiles(ICON_DECOR_TILES, this.gridConfig.iconDecor);
+    return tileList(ICON_DECOR_TILES, this.gridConfig.iconDecor);
   }
   get showIconTreatment() {
     return this.gridConfig.iconDecor !== "none";
   }
   get iconStyleTiles() {
-    return this.selectedTiles(ICON_STYLE_TILES, this.gridConfig.iconStyle);
+    return tileList(ICON_STYLE_TILES, this.gridConfig.iconStyle);
   }
   get showIconShading() {
     return this.gridConfig.iconStyle === "filled";
   }
   get iconShadingTiles() {
-    return this.selectedTiles(ICON_SHADING_TILES, this.gridConfig.iconShading);
+    return tileList(ICON_SHADING_TILES, this.gridConfig.iconShading);
   }
-  get iconToneChips() {
-    return this.toneChips(TONE_SWATCHES, this.gridConfig.iconTone, true);
+  get toneSwatches() {
+    return TONE_SWATCHES;
   }
-  get iconToneIsCustom() {
-    return this.gridConfig.iconTone === "custom";
+  get glyphToneSwatches() {
+    return GLYPH_TONE_SWATCHES;
   }
-  get iconGlyphToneChips() {
-    return this.toneChips(
-      GLYPH_TONE_SWATCHES,
-      this.gridConfig.iconGlyphTone,
-      true
-    );
-  }
-  get iconGlyphToneIsCustom() {
-    return this.gridConfig.iconGlyphTone === "custom";
+  get badgeToneSwatches() {
+    return BADGE_TONE_SWATCHES;
   }
 
   get badgePositionTiles() {
-    return this.selectedTiles(BADGE_POSITIONS, this.gridConfig.badge.position);
-  }
-  get badgeVariantChips() {
-    return this.toneChips(BADGE_TONES, this.gridConfig.badge.variant, true);
-  }
-  get badgeVariantIsCustom() {
-    return this.gridConfig.badge.variant === "custom";
+    return tileList(BADGE_POSITIONS, this.gridConfig.badge.position);
   }
   get badgeShapeTiles() {
-    return this.selectedTiles(BADGE_SHAPES, this.gridConfig.badge.shape);
+    return tileList(BADGE_SHAPES, this.gridConfig.badge.shape);
   }
 
   get gapHTiles() {
-    return spacingTileList(AUTO_SPACING_TILES, this.gridConfig.gapH);
+    return tileList(SPACING_TILES, this.gridConfig.gapH);
   }
   get gapVTiles() {
-    return spacingTileList(AUTO_SPACING_TILES, this.gridConfig.gapV);
+    return tileList(SPACING_TILES, this.gridConfig.gapV);
   }
   get marginLinked() {
     return this.gridConfig.margin.linked;
@@ -250,13 +216,13 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
     return this.gridConfig.padding.linked;
   }
   get marginAllTiles() {
-    return spacingTileList(AUTO_SPACING_TILES, this.gridConfig.margin.top);
+    return tileList(SPACING_TILES, this.gridConfig.margin.top);
   }
   get paddingAllTiles() {
-    return spacingTileList(PADDING_TILES, this.gridConfig.padding.top);
+    return tileList(PADDING_TILES, this.gridConfig.padding.top);
   }
   get marginSideSections() {
-    return this.sideSections(AUTO_SPACING_TILES, "margin", "Margin");
+    return this.sideSections(SPACING_TILES, "margin", "Margin");
   }
   get paddingSideSections() {
     return this.sideSections(PADDING_TILES, "padding", "Padding");
@@ -284,7 +250,7 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
   get showResetUndo() {
     return Boolean(
       this._undoReset &&
-      JSON.stringify(this.gridConfig) === this._undoReset.resetSignature
+      appearanceSignature(this.config) === this._undoReset.resetSignature
     );
   }
 
@@ -304,7 +270,7 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
           layoutGeometry: this.config.layoutGeometry || {}
         })
       ),
-      resetSignature: JSON.stringify(next.gridConfig)
+      resetSignature: appearanceSignature(next)
     };
     this.emit(next);
   }
@@ -327,36 +293,24 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
     this.patchGrid({ minWidth: formatRem(Number(event.target.value)) });
   }
 
-  // Tile groups and tone chips name the gridConfig key they set in
-  // data-key; tiles report the value in the cardselect detail, chips in
-  // data-value.
+  // Tile groups name the gridConfig key they set in data-key and report the
+  // value in the cardselect detail.
   handleTileChange(event) {
     this.patchGrid({ [event.currentTarget.dataset.key]: event.detail.value });
-  }
-  handleToneChange(event) {
-    const { key, value } = event.currentTarget.dataset;
-    this.patchGrid({ [key]: value });
   }
   handleBadgeTileChange(event) {
     this.patchBadge({ [event.currentTarget.dataset.key]: event.detail.value });
   }
-  handleBadgeVariantChange(event) {
-    this.patchBadge({ variant: event.currentTarget.dataset.value });
-  }
 
-  // Color swatches always produce a valid hex; typed values are checked and
-  // only stored when valid (or cleared), otherwise an inline error shows.
-  handleHexChange(event) {
-    const key = event.target.dataset.hexKey;
-    const value = event.target.value.trim();
-    const valid = value === "" || HEX_COLOR.test(value);
-    const errors = { ...this._hexErrors };
-    if (valid) delete errors[key];
-    else errors[key] = "true";
-    this._hexErrors = errors;
-    if (!valid) return;
-    if (key === "variantHex") this.patchBadge({ variantHex: value });
-    else this.patchGrid({ [key]: value });
+  // Tone rows report { key, value } for both tonechange and hexchange; the
+  // badge's keys live under gridConfig.badge.
+  handleToneRowChange(event) {
+    const { key, value } = event.detail;
+    if (key === "variant" || key === "variantHex") {
+      this.patchBadge({ [key]: value });
+    } else {
+      this.patchGrid({ [key]: value });
+    }
   }
 
   handleShowIconsToggle(event) {
@@ -393,47 +347,20 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
     );
   }
 
-  selectedTiles(source, active) {
-    return source.map((tile) => ({
-      ...tile,
-      id: tile.value,
-      _selected: tile.value === active
-    }));
-  }
-  toneChips(tones, active, enabled) {
-    return tones.map((tone) => ({
-      ...tone,
-      className: [
-        "newton-tone-chip",
-        `newton-tone-chip_${tone.value}`,
-        tone.value === active ? "newton-tone-chip_active" : "",
-        enabled ? "" : "newton-tone-chip_disabled"
-      ]
-        .filter(Boolean)
-        .join(" "),
-      ariaPressed: String(tone.value === active),
-      dotClassName: `newton-tone-chip__dot newton-tone-chip__dot_${tone.value}`,
-      disabled: !enabled
-    }));
-  }
-  stateToneRows(axis, axisLabel, enabled) {
+  stateToneRows(axis, axisLabel, disabled) {
     return STATE_TONES.map((state) => {
       const toneKey = `${axis}${state.suffix}`;
       const hexKey = `${toneKey}Hex`;
-      const active = this.gridConfig[toneKey];
       const stateLabel = state.label.toLowerCase();
       return {
+        rowKey: `${axis}-${state.key}`,
         label: state.label,
+        groupLabel: `${axisLabel} ${stateLabel} color`,
         toneKey,
         hexKey,
-        rowKey: `${axis}-${state.key}`,
-        ariaLabel: `${axisLabel} ${stateLabel} color`,
-        chips: this.toneChips(TONE_SWATCHES, active, enabled),
-        isCustom: enabled && active === "custom",
+        value: this.gridConfig[toneKey],
         hexValue: this.gridConfig[hexKey],
-        hexId: `${axis}-${state.key}-tone-hex`,
-        hexErrorId: `${axis}-${state.key}-tone-hex-error`,
-        hexInvalid: this._hexErrors[hexKey],
+        disabled,
         colorAriaLabel: `Pick ${axisLabel.toLowerCase()} ${stateLabel} color`,
         hexAriaLabel: `${axisLabel} ${stateLabel} hex color value`
       };
@@ -443,13 +370,13 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
     return SIDE_META.map((meta) => ({
       ...meta,
       groupLabel: `${property} ${meta.label.toLowerCase()}`,
-      tiles: spacingTileList(source, this.gridConfig[name][meta.side])
+      tiles: tileList(source, this.gridConfig[name][meta.side])
     }));
   }
 
   emit(config) {
     this.dispatchEvent(
-      new CustomEvent("configpatch", { detail: { path: [], value: config } })
+      new CustomEvent("configpatch", { detail: { value: config } })
     );
   }
   patchGrid(values) {
@@ -480,7 +407,6 @@ export default class NewtonSelectorFlowCpeAppearanceConfig extends LightningElem
     });
   }
   patchBoxSide(name, side, value) {
-    if (!SPACING_SIDES.includes(side)) return;
     this.patchGrid({
       [name]: { ...this.gridConfig[name], [side]: value, linked: false }
     });

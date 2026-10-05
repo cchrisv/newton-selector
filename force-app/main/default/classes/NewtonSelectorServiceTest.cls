@@ -32,8 +32,10 @@ private class NewtonSelectorServiceTest {
   static void fetchItemsDefaultsLabelToNameAndValueToId() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
-      Account account = new Account(Name = 'Only Account');
-      insert account;
+      Account account = NewtonSelectorTestDataFactory.createAccounts(
+        1,
+        'Technology'
+      )[0];
       NewtonSelectorQueryDTO config = new NewtonSelectorQueryDTO();
       config.sObjectApiName = 'Account';
 
@@ -44,7 +46,7 @@ private class NewtonSelectorServiceTest {
       Test.stopTest();
 
       Assert.areEqual(1, dtos.size());
-      Assert.areEqual('Only Account', dtos[0].label);
+      Assert.areEqual('Test Account 0', dtos[0].label);
       Assert.areEqual(String.valueOf(account.Id), dtos[0].value);
     }
   }

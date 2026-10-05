@@ -67,4 +67,4 @@ Deploy the `force-app` folder to your org with the Salesforce CLI, assign the `N
 
 ## Known rough edges
 
-A few behaviors need workarounds today (for example SOQL date literals). They are listed with fixes in [Known limitations](known-limitations.md).
+A few behaviors need workarounds today. They are listed with fixes in [Known limitations](known-limitations.md).

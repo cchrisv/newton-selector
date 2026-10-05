@@ -5,7 +5,6 @@
 # Salesforce cache
 .sf/
 .sfdx/
-.localdevserver/
 deploy-options.json
 
 # LWC VSCode autocomplete
@@ -47,18 +46,10 @@ $RECYCLE.BIN/
 # Local environment variables
 .env
 
-# Python Salesforce Functions
+# Python caches from .agents skill scripts
 **/__pycache__/
 **/.venv/
 **/venv/
-
-# Build output
-dist/
-build/
-out/
-.next/
-.nuxt/
-.output/
 
 # Claude AI
 .claude/
@@ -67,7 +58,6 @@ CLAUDE.md
 # GitHub / VS Code Copilot
 .github/
 .copilot/
-.github/copilot-instructions.md
 
 # Playwright / e2e artifacts
 output/

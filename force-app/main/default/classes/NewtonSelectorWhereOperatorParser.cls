@@ -3,21 +3,26 @@ public with sharing class NewtonSelectorWhereOperatorParser {
   /**
    * @description Parses a SOQL comparison operator.
    * @param scanner WHERE clause scanner.
+   * @param fieldName Canonical name of the field the operator follows, for error messages.
    * @return Normalized operator.
    */
-  public static String parse(NewtonSelectorWhereScanner scanner) {
-    String keywordOperator = parseKeywordOperator(scanner);
+  public static String parse(
+    NewtonSelectorWhereScanner scanner,
+    String fieldName
+  ) {
+    String keywordOperator = parseKeywordOperator(scanner, fieldName);
     if (keywordOperator != null) {
       return keywordOperator;
     }
-    return parseSymbolOperator(scanner);
+    return parseSymbolOperator(scanner, fieldName);
   }
 
   private static String parseKeywordOperator(
-    NewtonSelectorWhereScanner scanner
+    NewtonSelectorWhereScanner scanner,
+    String fieldName
   ) {
     if (scanner.matchKeyword('NOT')) {
-      return parseNotOperator(scanner);
+      return parseNotOperator(scanner, fieldName);
     }
     if (scanner.matchKeyword('LIKE')) {
       return 'LIKE';
@@ -34,15 +39,24 @@ public with sharing class NewtonSelectorWhereOperatorParser {
     return null;
   }
 
-  private static String parseNotOperator(NewtonSelectorWhereScanner scanner) {
+  private static String parseNotOperator(
+    NewtonSelectorWhereScanner scanner,
+    String fieldName
+  ) {
     if (scanner.matchKeyword('IN')) {
       return 'NOT IN';
     }
-    throw new NewtonSelectorException('Unsupported WHERE operator.');
+    throw new NewtonSelectorException(
+      'Unsupported WHERE operator after ' +
+        fieldName +
+        ': NOT ' +
+        scanner.near()
+    );
   }
 
   private static String parseSymbolOperator(
-    NewtonSelectorWhereScanner scanner
+    NewtonSelectorWhereScanner scanner,
+    String fieldName
   ) {
     if (scanner.consume('!')) {
       scanner.expect('=');
@@ -57,6 +71,8 @@ public with sharing class NewtonSelectorWhereOperatorParser {
     if (scanner.consume('=')) {
       return '=';
     }
-    throw new NewtonSelectorException('Expected WHERE operator.');
+    throw new NewtonSelectorException(
+      'Expected WHERE operator after ' + fieldName + ' near: ' + scanner.near()
+    );
   }
 }

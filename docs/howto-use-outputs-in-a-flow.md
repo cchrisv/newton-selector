@@ -20,20 +20,20 @@ Read what the user chose and use it in a Decision, an assignment, a Get Records,
 
 6. **Fetch the full record (SOQL or Collection sources).** `selectedRecord` and `selectedRecords` are filled only for these sources; for Custom and Picklist they stay empty. Set the SOQL **Value** field, or the collection **Value** map, to `Id`. After the screen, add **Get Records** where `Id` equals `{!Plan_Selector.value}`. This is more reliable than reading fields from `selectedRecord`.
 
-7. **Pre-select a value.** In the editor's **03 Behavior** chapter, set **Default selection** to a Flow resource: a text variable in single mode, a text collection variable in multi mode. In multi mode the field refuses typed text with "Pick a text collection variable for multiple default selections." The editor stores it in the component's `value` (or `values`) input, and the screen opens with those options selected. Outputs are not rewritten until the user acts.
+7. **Pre-select a value.** In the editor's **Behavior** chapter, set **Default selection** to a Flow resource: a text variable in single mode, a text collection variable in multi mode. In multi mode the field refuses typed text with "Pick a text collection variable for multiple default selections." The editor stores it in the component's `value` (or `values`) input, and the screen opens with those options selected. Pre-selected options fill the label, record and count outputs as soon as the options load, and never trigger auto-advance. When manual input is off, a pre-set value that matches no option is cleared; when it is on, that value is shown as the "Other" text.
 
 ## Handling the special entries
 
-| User action                 | `value` / `values` | `selectedLabel`         | `selectionCount` |
-| --------------------------- | ------------------ | ----------------------- | ---------------- |
-| Chooses an option           | The option's value | The option's label      | 1                |
-| Chooses **None** (single)   | `""`               | `""`                    | 0                |
-| Chooses **Other** and types | The typed text     | The manual option label | 1                |
-| Nothing yet                 | `""` or `[]`       | `""`                    | 0                |
+| User action                 | `value` / `values` | `selectedLabel`    | `selectionCount` |
+| --------------------------- | ------------------ | ------------------ | ---------------- |
+| Chooses an option           | The option's value | The option's label | 1                |
+| Chooses **None** (single)   | `""`               | `""`               | 0                |
+| Chooses **Other** and types | The typed text     | The typed text     | 1                |
+| Nothing yet                 | `""` or `[]`       | `""`               | 0                |
 
-`allValues` and `allLabels` include the None entry (value `""`) and the Other entry (value `__newton_manual_input__`) when those are enabled. Filter them out if you use these lists for something other than display.
+`allValues` and `allLabels` include the None entry (value `""`) when it is enabled. They never include the Other entry.
 
-In a Decision, test for the Other value with the label rather than the sentinel, or check `selectedLabel` against your **Manual option label**.
+A manual pick puts the typed text in `value` and `selectedLabel` (or adds it to `values` and `selectedLabels`). To tell an Other answer from a listed option in a Decision, check whether `value` is missing from `allValues`. This can't tell them apart when the typed text exactly matches an option's value.
 
 ## Verification
 

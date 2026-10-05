@@ -1,5 +1,5 @@
 <template>
-  <div class={selectorClass}>
+  <div>
     <label class="slds-form-element__label" for="combobox-trigger"
       >{label}</label
     >
@@ -9,7 +9,6 @@
         open={_isOpen}
         dropdown-role="dialog"
         dropdown-label="Icon selector"
-        dropdown-class="newton-combobox__panel"
         onfocusout={handleFocusOut}
       >
         <div slot="trigger" class="newton-combobox__field">
@@ -94,14 +93,13 @@
             </div>
 
             <template lwc:if={hasVisibleIcons}>
-              <div class="newton-grid" role="listbox" aria-label="Icons">
+              <div class="newton-grid" role="group" aria-label="Icons">
                 <template for:each={visibleIcons} for:item="entry">
                   <button
-                    key={entry.id}
+                    key={entry.iconName}
                     type="button"
                     class={entry.buttonClass}
-                    role="option"
-                    aria-selected={entry.selected}
+                    aria-pressed={entry.selected}
                     aria-label={entry.assistiveLabel}
                     title={entry.iconName}
                     data-icon={entry.iconName}

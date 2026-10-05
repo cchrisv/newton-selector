@@ -13,8 +13,10 @@ import { chromium } from "playwright";
 // Deploys the draft flow Newton_Selector_CPE_Lab from the fixtures package
 // directory (fixtures/main/default/flows) before opening it. Options (env):
 //   CPE_VIEWPORT=1500x1050   viewport size
+//   CPE_FIELD=<api name>     screen field whose editor to open (default
+//                            Plan_Selector; the lab flow also has
+//                            Addons_Selector and Account_Selector)
 //   CPE_OUT=<dir>            output directory (default output/cpe-capture)
-//   CPE_PANEL_WAIT=<ms>      wait for the inline panel to load (default 3000)
 //   CPE_APPEARANCE_STEPS=<n> extra screenshots walking the Appearance chapter
 //   CPE_STYLE_SNAPSHOT=<file> write the computed style of every element in
 //                            the panel and the editor (per data source) to a
@@ -40,27 +42,91 @@ const SF_COMMAND = process.platform === "win32" ? "sf.cmd" : "sf";
 
 mkdirSync(OUT, { recursive: true });
 
+// execFileSync throws on a non-zero exit (sf's JSON status is its exit code),
+// so a returned result always succeeded. A failure is rethrown with the CLI's
+// own JSON error text and the subcommand that failed.
 const runSf = (args) => {
-  const raw = execFileSync(SF_COMMAND, [...args, "--json"], {
-    encoding: "utf8",
-    shell: process.platform === "win32"
-  });
-  const result = JSON.parse(raw.slice(raw.indexOf("{")));
-  if (result.status !== 0) {
-    throw new Error(`sf ${args.join(" ")} failed: ${raw}`);
+  let raw;
+  try {
+    raw = execFileSync(SF_COMMAND, [...args, "--json"], {
+      encoding: "utf8",
+      shell: process.platform === "win32",
+      stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true
+    });
+  } catch (error) {
+    throw new Error(
+      `sf ${args.slice(0, 3).join(" ")} failed: ${error.stdout || error.stderr || error.message}`
+    );
   }
-  return result.result;
+  return JSON.parse(raw.slice(raw.indexOf("{"))).result;
 };
+
+const pause = (ms) => new Promise((done) => setTimeout(done, ms));
+
+// Reads until two consecutive reads are equal, so a capture is taken after
+// rendering, transitions and smooth scrolling have finished. Throws if it
+// never settles.
+async function readSettled(read, label, timeout = 30000) {
+  const deadline = Date.now() + timeout;
+  let previous = await read();
+  while (Date.now() < deadline) {
+    await pause(250);
+    const current = await read();
+    if (JSON.stringify(current) === JSON.stringify(previous)) return current;
+    previous = current;
+  }
+  throw new Error(`${label} kept changing for ${timeout} ms`);
+}
+
+// The position and size of every element on the page (shadow roots
+// included) and every scroll offset, folded into one value.
+const layoutSignature = (page) =>
+  page.evaluate(() => {
+    let count = 0;
+    let hash = 0;
+    const visit = (root) => {
+      for (const el of root.querySelectorAll("*")) {
+        const r = el.getBoundingClientRect();
+        for (const n of [r.x, r.y, r.width, r.height, el.scrollTop]) {
+          hash = (Math.imul(hash, 31) + Math.round(n)) | 0;
+        }
+        count += 1;
+        if (el.shadowRoot) visit(el.shadowRoot);
+      }
+    };
+    visit(document);
+    return `${count}:${hash}`;
+  });
+
+const layoutSettled = (page, label) =>
+  readSettled(() => layoutSignature(page), `${label}: page layout`);
+
+// Clicks a studio chapter tab, waits until it is the current one, then
+// until the smooth scroll to its chapter has finished.
+async function openTab(page, key) {
+  const tab = `button.newton-studio__tab[data-key="${key}"]`;
+  await page.locator(tab).first().click();
+  await page
+    .locator(`${tab}[aria-current="page"]`)
+    .first()
+    .waitFor({ state: "attached", timeout: 10000 });
+  await layoutSettled(page, `${key} tab`);
+}
 
 // Computed style of every element under the given hosts (shadow roots
 // included), keyed by a stable DOM path. Regular properties are stored as a
 // hash of all of them (exact equality) plus a readable visual subset;
 // custom properties (design tokens, inherited by every element) are stored
 // as whole sets in their own table, since only a few distinct sets exist.
-// Each distinct style or token set is stored once.
+// Each distinct style or token set is stored once. Taken once two
+// consecutive snapshots agree, so hover transitions have finished.
 async function snapshotStyles(page, hostSelectors) {
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(300);
+  return readSettled(() => readStyles(page, hostSelectors), "Style snapshot");
+}
+
+function readStyles(page, hostSelectors) {
   return page.evaluate((selectors) => {
     const READABLE =
       /^(display|position|inset|top|right|bottom|left|width|height|min-|max-|margin|padding|border|outline|box-shadow|background|color|opacity|visibility|font|line-height|letter-spacing|text-|gap|row-gap|column-gap|grid|flex|align|justify|place|order|overflow|transform|z-index|aspect-ratio|content|clip-path|filter|cursor)/;
@@ -147,7 +213,10 @@ async function snapshotStyles(page, hostSelectors) {
         return null;
       };
       const host = find(document);
-      if (host) visit(host, `${selector}#${index}`);
+      if (!host) {
+        throw new Error(`Style snapshot: no element matches ${selector}`);
+      }
+      visit(host, `${selector}#${index}`);
     });
     return { ...tables, elements };
   }, hostSelectors);
@@ -211,7 +280,7 @@ for (const name of ["Skip", "Got It", "Got it", "Close"]) {
   const b = page.getByRole("button", { name }).first();
   if (await b.isVisible().catch(() => false)) await b.click().catch(() => {});
 }
-await page.waitForTimeout(4000);
+await layoutSettled(page, "Flow Builder");
 await stage("builder-loaded");
 
 // Free-form canvas: the first Screen node sits under the Start element. The
@@ -230,7 +299,11 @@ await page.getByText(FIELD_NAME, { exact: true }).last().click({
   force: true,
   timeout: 60000
 });
-await page.waitForTimeout(Number(process.env.CPE_PANEL_WAIT || 3000));
+await page
+  .getByRole("button", { name: /Edit configuration|Configure selector/i })
+  .first()
+  .waitFor({ state: "visible", timeout: 60000 });
+await layoutSettled(page, "Inline panel");
 await stage("field-selected-inline-panel");
 await page.screenshot({ path: join(OUT, "00-inline-panel.png") });
 if (process.env.CPE_STYLE_SNAPSHOT) {
@@ -261,7 +334,7 @@ await page.waitForFunction(
   null,
   { timeout: 60000, polling: 50 }
 );
-await page.waitForTimeout(2500);
+await layoutSettled(page, "Configuration modal");
 await stage("modal-open");
 
 for (const [i, key] of [
@@ -270,11 +343,7 @@ for (const [i, key] of [
   "behavior",
   "appearance"
 ].entries()) {
-  await page
-    .locator(`button.newton-studio__tab[data-key="${key}"]`)
-    .first()
-    .click();
-  await page.waitForTimeout(1500);
+  await openTab(page, key);
   await page.screenshot({ path: join(OUT, `${i + 1}-${key}.png`) });
 }
 
@@ -328,16 +397,12 @@ for (let i = 0; i < steps; i += 1) {
       scroller.scrollTop;
     scroller.scrollTop = top + index * (scroller.clientHeight - 60);
   }, i);
-  await page.waitForTimeout(700);
+  await layoutSettled(page, `Appearance step ${i + 1}`);
   await page.screenshot({ path: join(OUT, `5-appearance-${i + 1}.png`) });
 }
 
 if (process.env.CPE_STYLE_SNAPSHOT) {
-  await page
-    .locator('button.newton-studio__tab[data-key="data"]')
-    .first()
-    .click();
-  await page.waitForTimeout(800);
+  await openTab(page, "data");
   const sources = page
     .locator('.newton-studio__selectorgroup[aria-label="Data source"]')
     .first();
@@ -347,11 +412,22 @@ if (process.env.CPE_STYLE_SNAPSHOT) {
     "SOQL query",
     "Custom options"
   ]) {
-    await sources
-      .locator(".newton-selector-choice-tile__title", { hasText: name })
-      .first()
-      .click();
-    await page.waitForTimeout(1500);
+    const sourceTile = sources
+      .locator("c-newton-selector-choice-tile")
+      .filter({
+        has: page.locator(".newton-selector-choice-tile__title", {
+          hasText: name
+        })
+      })
+      .first();
+    await sourceTile.locator(".newton-selector-choice-tile__title").click();
+    const deadline = Date.now() + 10000;
+    while (!(await sourceTile.getByRole("radio").isChecked())) {
+      if (Date.now() > deadline) {
+        throw new Error(`Data source tile "${name}" did not become checked`);
+      }
+      await pause(100);
+    }
     styleSnapshot[name] = await snapshotStyles(page, [
       "c-newton-selector-flow-cpe-studio",
       "lightning-modal-footer"

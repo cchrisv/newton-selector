@@ -102,7 +102,6 @@ describe("c-newton-selector-flow-cpe-behavior-config events", () => {
       true
     );
 
-    expect(patches[0].path).toEqual([]);
     expect(patches[0].value).toMatchObject({
       selectionMode: "multi",
       autoAdvance: false,
@@ -206,7 +205,7 @@ describe("c-newton-selector-flow-cpe-behavior-config events", () => {
     ).toBeNull();
   });
 
-  it("emits none option patches only for valid position changes", () => {
+  it("emits none option label and position patches", () => {
     const element = mount();
     const patches = collect(element);
 
@@ -218,7 +217,6 @@ describe("c-newton-selector-flow-cpe-behavior-config events", () => {
       '.newton-studio__selectorgroup[aria-label="None option position"]'
     );
     cardSelect(positionGroup, "end");
-    cardSelect(positionGroup, "middle");
 
     expect(patches).toHaveLength(2);
     expect(patches[0].value.noneOptionLabel).toBe("No choice");

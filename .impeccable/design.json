@@ -37,16 +37,16 @@
       "brand-weak": {
         "role": "primary",
         "displayName": "Brand Wash",
-        "canonical": "#eaf3ff",
+        "canonical": "#eef4ff",
         "tonalRamp": [
-          "oklch(15% 0.013 256)",
-          "oklch(26% 0.019 256)",
-          "oklch(37% 0.019 256)",
-          "oklch(48% 0.019 256)",
-          "oklch(60% 0.019 256)",
-          "oklch(72% 0.019 256)",
-          "oklch(84% 0.019 256)",
-          "oklch(95% 0.008 256)"
+          "oklch(15% 0.011 263)",
+          "oklch(26% 0.016 263)",
+          "oklch(37% 0.016 263)",
+          "oklch(48% 0.016 263)",
+          "oklch(60% 0.016 263)",
+          "oklch(72% 0.016 263)",
+          "oklch(84% 0.016 263)",
+          "oklch(95% 0.007 263)"
         ]
       },
       "brand-deep": {
@@ -67,91 +67,91 @@
       "success": {
         "role": "tertiary",
         "displayName": "Success Green",
-        "canonical": "#3baa6f",
+        "canonical": "#2e844a",
         "tonalRamp": [
-          "oklch(15% 0.094 156)",
-          "oklch(26% 0.134 156)",
-          "oklch(37% 0.134 156)",
-          "oklch(48% 0.134 156)",
-          "oklch(60% 0.134 156)",
-          "oklch(72% 0.134 156)",
-          "oklch(84% 0.134 156)",
-          "oklch(95% 0.060 156)"
+          "oklch(15% 0.085 151)",
+          "oklch(26% 0.121 151)",
+          "oklch(37% 0.121 151)",
+          "oklch(48% 0.121 151)",
+          "oklch(60% 0.121 151)",
+          "oklch(72% 0.121 151)",
+          "oklch(84% 0.121 151)",
+          "oklch(95% 0.055 151)"
         ]
       },
       "warning": {
         "role": "tertiary",
         "displayName": "Warning Amber",
-        "canonical": "#b25900",
+        "canonical": "#a96404",
         "tonalRamp": [
-          "oklch(15% 0.099 54)",
-          "oklch(26% 0.141 54)",
-          "oklch(37% 0.141 54)",
-          "oklch(48% 0.141 54)",
-          "oklch(60% 0.141 54)",
-          "oklch(72% 0.141 54)",
-          "oklch(84% 0.141 54)",
-          "oklch(95% 0.063 54)"
+          "oklch(15% 0.089 64)",
+          "oklch(26% 0.127 64)",
+          "oklch(37% 0.127 64)",
+          "oklch(48% 0.127 64)",
+          "oklch(60% 0.127 64)",
+          "oklch(72% 0.127 64)",
+          "oklch(84% 0.127 64)",
+          "oklch(95% 0.057 64)"
         ]
       },
       "error": {
         "role": "tertiary",
         "displayName": "Error Red",
-        "canonical": "#ba0517",
+        "canonical": "#ea001e",
         "tonalRamp": [
-          "oklch(15% 0.140 26)",
-          "oklch(26% 0.201 26)",
-          "oklch(37% 0.201 26)",
-          "oklch(48% 0.201 26)",
-          "oklch(60% 0.201 26)",
-          "oklch(72% 0.201 26)",
-          "oklch(84% 0.201 26)",
-          "oklch(95% 0.090 26)"
+          "oklch(15% 0.168 26)",
+          "oklch(26% 0.240 26)",
+          "oklch(37% 0.240 26)",
+          "oklch(48% 0.240 26)",
+          "oklch(60% 0.240 26)",
+          "oklch(72% 0.240 26)",
+          "oklch(84% 0.240 26)",
+          "oklch(95% 0.108 26)"
         ]
       },
       "violet": {
         "role": "tertiary",
         "displayName": "Violet",
-        "canonical": "#6d42c1",
+        "canonical": "#9050e9",
         "tonalRamp": [
-          "oklch(15% 0.132 294)",
-          "oklch(26% 0.188 294)",
-          "oklch(37% 0.188 294)",
-          "oklch(48% 0.188 294)",
-          "oklch(60% 0.188 294)",
-          "oklch(72% 0.188 294)",
-          "oklch(84% 0.188 294)",
-          "oklch(95% 0.085 294)"
+          "oklch(15% 0.154 299)",
+          "oklch(26% 0.220 299)",
+          "oklch(37% 0.220 299)",
+          "oklch(48% 0.220 299)",
+          "oklch(60% 0.220 299)",
+          "oklch(72% 0.220 299)",
+          "oklch(84% 0.220 299)",
+          "oklch(95% 0.099 299)"
         ]
       },
       "pink": {
         "role": "tertiary",
         "displayName": "Pink",
-        "canonical": "#c9257b",
+        "canonical": "#e3066a",
         "tonalRamp": [
-          "oklch(15% 0.146 355)",
-          "oklch(26% 0.208 355)",
-          "oklch(37% 0.208 355)",
-          "oklch(48% 0.208 355)",
-          "oklch(60% 0.208 355)",
-          "oklch(72% 0.208 355)",
-          "oklch(84% 0.208 355)",
-          "oklch(95% 0.094 355)"
+          "oklch(15% 0.165 5)",
+          "oklch(26% 0.235 5)",
+          "oklch(37% 0.235 5)",
+          "oklch(48% 0.235 5)",
+          "oklch(60% 0.235 5)",
+          "oklch(72% 0.235 5)",
+          "oklch(84% 0.235 5)",
+          "oklch(95% 0.106 5)"
         ]
       },
       "teal": {
         "role": "tertiary",
         "displayName": "Teal",
-        "canonical": "#0f7b82",
+        "canonical": "#0b827c",
         "tonalRamp": [
-          "oklch(15% 0.061 202)",
-          "oklch(26% 0.087 202)",
-          "oklch(37% 0.087 202)",
-          "oklch(48% 0.087 202)",
-          "oklch(60% 0.087 202)",
-          "oklch(72% 0.087 202)",
-          "oklch(84% 0.087 202)",
-          "oklch(95% 0.039 202)"
+          "oklch(15% 0.065 189)",
+          "oklch(26% 0.093 189)",
+          "oklch(37% 0.093 189)",
+          "oklch(48% 0.093 189)",
+          "oklch(60% 0.093 189)",
+          "oklch(72% 0.093 189)",
+          "oklch(84% 0.093 189)",
+          "oklch(95% 0.042 189)"
         ]
       },
       "ink": {
@@ -298,7 +298,7 @@
       {
         "name": "hook-1",
         "value": "var(--slds-g-shadow-1, 0 1px 2px color-mix(in oklab, #181818 6%, transparent))",
-        "purpose": "Preview head, expanded override row, active column chip, sidebar button hover."
+        "purpose": "Preview head, expanded override row, active column chip, sidebar button hover. The WHERE builder's selected segment and hovered condition row use the same hook with an 8% fallback."
       },
       {
         "name": "hook-2",
@@ -312,12 +312,12 @@
       },
       {
         "name": "elev-raised-hover",
-        "value": "0 8px 20px color-mix(in oklab, #181818 13%, transparent)",
+        "value": "0 8px 24px color-mix(in oklab, #181818 13%, transparent)",
         "purpose": "Raised tile on hover."
       },
       {
         "name": "elev-floating-rest",
-        "value": "0 12px 24px color-mix(in oklab, #181818 14%, transparent)",
+        "value": "0 12px 32px color-mix(in oklab, #181818 14%, transparent)",
         "purpose": "Floating tile at rest."
       },
       {
@@ -327,7 +327,7 @@
       },
       {
         "name": "elev-inset-rest",
-        "value": "inset 0 0 0 1px color-mix(in oklab, #747474 18%, transparent)",
+        "value": "inset 0 0 0 1px color-mix(in oklab, #757575 18%, transparent)",
         "purpose": "Inset tile ring at rest."
       },
       {
@@ -345,7 +345,7 @@
       {
         "name": "ease-spring",
         "value": "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-        "purpose": "Selection check scale-in."
+        "purpose": "Selection check scale-in (280ms), the one exception to the single ease."
       },
       {
         "name": "duration-border",
@@ -396,7 +396,7 @@
       "refersTo": "choice-tile",
       "description": "Default flat tile, with a selected sibling.",
       "html": "<div class=\"ds-tiles\"><label class=\"ds-tile\"><span class=\"ds-ic\"><svg class=\"ds-svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/></svg></span><span class=\"ds-title\">Hot</span><span class=\"ds-sub\">Ready to buy</span></label><label class=\"ds-tile ds-tile-sel\"><span class=\"ds-check\"><svg class=\"ds-svg-sm\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"20 6 9 17 4 12\"/></svg></span><span class=\"ds-ic\"><svg class=\"ds-svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/></svg></span><span class=\"ds-title\">Warm</span><span class=\"ds-sub\">Interested</span></label></div>",
-      "css": ".ds-tiles{display:flex;gap:8px}.ds-tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;width:120px;padding:16px;background:#fff;border:1px solid #c9c9c9;border-radius:8px;color:#181818;text-align:center;box-sizing:border-box;cursor:pointer;transition:border-color 160ms cubic-bezier(.2,.8,.2,1),background-color 160ms cubic-bezier(.2,.8,.2,1)}.ds-tile:hover{border-color:#747474}.ds-tile-sel,.ds-tile-sel:hover{border-color:#0176d3;background:#eaf3ff}.ds-ic{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid #c9c9c9;border-radius:50%;color:#5c5c5c}.ds-tile-sel .ds-ic{color:#0176d3;border-color:#0176d3}.ds-title{font-size:14px;font-weight:600;line-height:1.25}.ds-sub{font-size:12px;color:#5c5c5c;line-height:1.25}.ds-check{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:#0176d3;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff}.ds-tile:focus-within{outline:2px solid #0b5cab;outline-offset:2px}.ds-svg{width:20px;height:20px}.ds-svg-sm{width:14px;height:14px}"
+      "css": ".ds-tiles{display:flex;gap:8px}.ds-tile{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;width:120px;padding:8px;background:#fff;border:1px solid #c9c9c9;border-radius:8px;color:#181818;text-align:center;box-sizing:border-box;cursor:pointer;transition:border-color 160ms cubic-bezier(.2,.8,.2,1),background-color 160ms cubic-bezier(.2,.8,.2,1)}.ds-tile:hover{border-color:#757575}.ds-tile-sel,.ds-tile-sel:hover{border-color:#0176d3;background:#eef4ff}.ds-ic{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid #c9c9c9;border-radius:50%;color:#5c5c5c}.ds-tile-sel .ds-ic{color:#0176d3;border-color:#0176d3}.ds-title{font-size:14px;font-weight:600;line-height:1.25}.ds-sub{font-size:12px;color:#5c5c5c;line-height:1.25}.ds-check{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:#0176d3;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #fff}.ds-tile:focus-within{outline:2px solid #1b96ff;outline-offset:2px}.ds-svg{width:20px;height:20px}.ds-svg-sm{width:14px;height:14px}"
     },
     {
       "name": "Raised Tile",
@@ -404,7 +404,7 @@
       "refersTo": "choice-tile",
       "description": "Tile with Raised elevation; lifts on hover.",
       "html": "<label class=\"ds-raised\"><span class=\"ds-title\">Raised</span><span class=\"ds-sub\">Hover to lift</span></label>",
-      "css": ".ds-raised{display:flex;flex-direction:column;align-items:center;gap:4px;width:140px;padding:16px;background:#fff;border:1px solid #c9c9c9;border-radius:8px;box-shadow:0 2px 12px rgba(24,24,24,.10);color:#181818;cursor:pointer;transition:box-shadow 200ms cubic-bezier(.2,.8,.2,1),transform 180ms cubic-bezier(.2,.8,.2,1),border-color 160ms cubic-bezier(.2,.8,.2,1)}.ds-raised:hover{border-color:#747474;box-shadow:0 8px 20px rgba(24,24,24,.13);transform:translateY(-1px)}.ds-title{font-size:14px;font-weight:600}.ds-sub{font-size:12px;color:#5c5c5c}"
+      "css": ".ds-raised{display:flex;flex-direction:column;align-items:center;gap:4px;width:140px;padding:16px;background:#fff;border:1px solid #c9c9c9;border-radius:8px;box-shadow:0 2px 12px rgba(24,24,24,.10);color:#181818;cursor:pointer;transition:box-shadow 200ms cubic-bezier(.2,.8,.2,1),transform 180ms cubic-bezier(.2,.8,.2,1),border-color 160ms cubic-bezier(.2,.8,.2,1)}.ds-raised:hover{border-color:#757575;box-shadow:0 8px 24px rgba(24,24,24,.13);transform:translateY(-1px)}.ds-title{font-size:14px;font-weight:600}.ds-sub{font-size:12px;color:#5c5c5c}"
     },
     {
       "name": "Tile Badge",
@@ -412,7 +412,7 @@
       "refersTo": "tile-badge",
       "description": "Uppercase status badge shown on tiles.",
       "html": "<span class=\"ds-badge\">New</span> <span class=\"ds-badge ds-badge-brand\">Popular</span>",
-      "css": ".ds-badge{display:inline-flex;align-items:center;padding:4px 8px;background:#f3f3f3;color:#444;border-radius:999px;box-shadow:inset 0 0 0 1px #e5e5e5;font-size:11px;font-weight:700;line-height:1;letter-spacing:.06em;text-transform:uppercase}.ds-badge-brand{background:#eaf3ff;color:#014486;box-shadow:inset 0 0 0 1px #0b5cab}"
+      "css": ".ds-badge{display:inline-flex;align-items:center;padding:4px 8px;background:#f3f3f3;color:#444;border-radius:999px;box-shadow:inset 0 0 0 1px #e5e5e5;font-size:11px;font-weight:700;line-height:1;letter-spacing:.06em;text-transform:uppercase}.ds-badge-brand{background:#eef4ff;color:#014486;box-shadow:inset 0 0 0 1px #1b96ff}"
     },
     {
       "name": "Search Bar",
@@ -420,7 +420,7 @@
       "refersTo": "search-bar",
       "description": "Inline filter above a tile group.",
       "html": "<div class=\"ds-search\"><input class=\"ds-search-input\" placeholder=\"Search options\" /></div>",
-      "css": ".ds-search{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #c9c9c9;border-radius:8px;background:#fff;width:240px;box-sizing:border-box}.ds-search-input{flex:1;border:0;outline:none;background:transparent;font-size:14px;color:#181818}.ds-search:focus-within{border-color:#0176d3;box-shadow:0 0 0 2px #eaf3ff}"
+      "css": ".ds-search{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #c9c9c9;border-radius:8px;background:#fff;width:240px;box-sizing:border-box}.ds-search-input{flex:1;border:0;outline:none;background:transparent;font-size:14px;color:#181818}.ds-search:focus-within{border-color:#0176d3;box-shadow:0 0 0 1px #0176d3}"
     },
     {
       "name": "On/Off Toggle",
@@ -436,15 +436,15 @@
       "refersTo": "tone-chip",
       "description": "Color-tone picker chip; active inverts to ink with a brand ring.",
       "html": "<span class=\"ds-tone\"><i class=\"ds-dot\"></i>Brand</span> <span class=\"ds-tone ds-tone-on\"><i class=\"ds-dot ds-dot-violet\"></i>Violet</span>",
-      "css": ".ds-tone{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;background:#fff;border:1px solid #e5e5e5;border-radius:8px;font-size:11px;font-weight:600;color:#2e2e2e;line-height:1.25;cursor:pointer;transition:background-color 140ms,border-color 140ms}.ds-dot{width:8px;height:8px;border-radius:50%;background:#0176d3;display:inline-block}.ds-dot-violet{background:#6d42c1}.ds-tone:hover{background:#f3f3f3;border-color:#c9c9c9}.ds-tone-on,.ds-tone-on:hover{background:#181818;color:#fff;border-color:#181818;box-shadow:0 0 0 2px rgba(1,118,211,.45)}.ds-tone:focus-visible{outline:2px solid #0176d3;outline-offset:2px}"
+      "css": ".ds-tone{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;background:#fff;border:1px solid #e5e5e5;border-radius:8px;font-size:11px;font-weight:600;color:#2e2e2e;line-height:1.25;cursor:pointer;transition:background-color 140ms,border-color 140ms}.ds-dot{width:8px;height:8px;border-radius:50%;background:#0176d3;display:inline-block}.ds-dot-violet{background:#9050e9}.ds-tone:hover{background:#f3f3f3;border-color:#c9c9c9}.ds-tone-on,.ds-tone-on:hover{background:#181818;color:#fff;border-color:#181818;box-shadow:0 0 0 2px rgba(1,118,211,.45)}.ds-tone:focus-visible{outline:2px solid #0176d3;outline-offset:2px}"
     },
     {
       "name": "Studio Card",
       "kind": "card",
       "refersTo": "studio-card",
-      "description": "Editor section card: flat hairline, 12px radius, soft header band.",
+      "description": "Editor section card: flat hairline, 12px radius, white header band over a hairline divider.",
       "html": "<section class=\"ds-card\"><header class=\"ds-card-head\"><h3 class=\"ds-card-title\">Card surface</h3><p class=\"ds-card-sub\">Elevation, surface style and tones per state.</p></header><div class=\"ds-card-body\">Controls</div></section>",
-      "css": ".ds-card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;width:300px;box-sizing:border-box}.ds-card-head{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;padding:8px 12px;background:#f9f9f9;border-bottom:1px solid #e5e5e5;border-radius:12px 12px 0 0}.ds-card-title{margin:0;font-size:14px;font-weight:700;color:#181818;line-height:1.25}.ds-card-sub{margin:0;font-size:12px;color:#5c5c5c;line-height:1.375}.ds-card-body{padding:12px;font-size:13px;color:#5c5c5c}"
+      "css": ".ds-card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;width:300px;box-sizing:border-box}.ds-card-head{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;padding:8px 12px;background:#fff;border-bottom:1px solid #e5e5e5;border-radius:12px 12px 0 0}.ds-card-title{margin:0;font-size:14px;font-weight:700;color:#181818;line-height:1.25}.ds-card-sub{margin:0;font-size:12px;color:#5c5c5c;line-height:1.375}.ds-card-body{padding:12px;font-size:13px;color:#5c5c5c}"
     },
     {
       "name": "Bulk Edit Card",
@@ -460,12 +460,12 @@
       "refersTo": "studio-card",
       "description": "Per-value override row; selected state tints head 12% and body 3% brand.",
       "html": "<div class=\"ds-row\"><div class=\"ds-row-head\">Hot</div></div><div class=\"ds-row ds-row-sel\"><div class=\"ds-row-head\">Warm</div><div class=\"ds-row-body\">Overrides</div></div>",
-      "css": ".ds-row{width:300px;margin-bottom:8px;box-sizing:border-box;border:1px solid #e5e5e5;border-radius:12px;background:#fff;transition:border-color 180ms cubic-bezier(.2,.8,.2,1)}.ds-row:hover{border-color:#c9c9c9}.ds-row-head{padding:8px 12px;background:#f9f9f9;border-radius:12px 12px 0 0;font-size:14px;font-weight:700;color:#181818}.ds-row-body{padding:12px;border-top:1px dashed #e5e5e5;font-size:13px;color:#5c5c5c}.ds-row-sel,.ds-row-sel:hover{border-color:#0176d3;background:color-mix(in oklab,#0176d3 3%,#fff)}.ds-row-sel .ds-row-head{background:color-mix(in oklab,#0176d3 12%,#fff)}"
+      "css": ".ds-row{width:300px;margin-bottom:8px;box-sizing:border-box;border:1px solid #e5e5e5;border-radius:12px;background:#fff;transition:border-color 180ms cubic-bezier(.2,.8,.2,1)}.ds-row:hover{border-color:#c9c9c9}.ds-row-head{padding:8px 12px;background:#f3f3f3;border-radius:12px 12px 0 0;font-size:14px;font-weight:700;color:#181818}.ds-row-body{padding:12px;border-top:1px dashed #e5e5e5;font-size:13px;color:#5c5c5c}.ds-row-sel,.ds-row-sel:hover{border-color:#0176d3;background:color-mix(in oklab,#0176d3 3%,#fff)}.ds-row-sel .ds-row-head{background:color-mix(in oklab,#0176d3 12%,#fff)}"
     }
   ],
   "narrative": {
     "northStar": "The Native Upgrade",
-    "overview": "Newton Selector is what SLDS 2 choice controls would be if they had been designed as visual objects: a tile you can read at a glance, not a radio button with a label. It must disappear into whatever org theme it lands in. Every color, radius, space and size is an `--slds-g-*` styling hook with a literal fallback, so dark mode, branding themes and density settings reach it without a single override. The system takes no identity of its own. Its craft shows in the details: crisp hairlines, a decisive selected state, disciplined eases.\n\nThere are two surfaces and one voice. The **runtime selector** (a grid, list, ribbon, picklist, radio-card, column or transfer layout of `ChoiceTile`s) is the product. The **Custom Property Editor studio** (a live preview beside four chapters of controls) is the tool an admin uses to dial it in, and it is built from the same hooks and the same tiles, so what the admin sees is what the user gets. Both are quiet and flat at rest: white surface, neutral ink, one brand-blue accent. Color is a *setting the admin chooses* (nine tones, four states), never decoration the system imposes.\n\nThe feel is crisp and confident. Borders are one pixel, corners are 8px on tiles and inputs and 12px on studio cards, transitions run 120-240ms on a single ease, and a selected tile announces itself unmistakably (brand border, brand-tinted surface, a check badge) without moving the layout.",
+    "overview": "Newton Selector is what SLDS 2 choice controls would be if they had been designed as visual objects: a tile you can read at a glance, not a radio button with a label. It must disappear into whatever org theme it lands in. Every color, radius, space and size is an `--slds-g-*` styling hook with a literal fallback, so dark mode, branding themes and density settings reach it without a single override. The system takes no identity of its own. Its craft shows in the details: crisp hairlines, a decisive selected state, disciplined eases.\n\nThere are two surfaces and one voice. The **runtime selector** (a grid, list, ribbon, picklist, radio-card, column or transfer layout of `ChoiceTile`s) is the product. The **Custom Property Editor studio** (a live preview beside four chapters of controls) is the tool an admin uses to dial it in, and it is built from the same hooks and the same tiles, so what the admin sees is what the user gets. Both are quiet and flat at rest: white surface, neutral ink, one brand-blue accent. Color is a *setting the admin chooses* (nine tones, four states), never decoration the system imposes.\n\nThe feel is crisp and confident. Borders are one pixel, corners are 8px on tiles and inputs and 12px on studio cards, transitions run 120-240ms on a single ease, and a selected tile announces itself unmistakably (brand border, brand-tinted surface and, by default, an inset frame) without moving the layout.",
     "keyCharacteristics": [
       "SLDS 2 hooks end to end; hex values in this file are the fallbacks, the hooks are the truth.",
       "Flat at rest. Elevation is an admin option (six levels), not a default.",
@@ -535,7 +535,7 @@
       "**Do** read every color, radius, space and size from an `--slds-g-*` hook with a literal fallback; keep literals only for admin-chosen Custom tones.",
       "**Do** express appearance as BEM modifier classes plus CSS variables; keep new options on the same state model (normal, hover, selected, disabled).",
       "**Do** keep selected state dimension-stable and visible without color alone (a check, bar, frame, ribbon or fill shape accompanies the tint).",
-      "**Do** use 1px hairlines, 8px tile and input radius and 12px card radius, and the single ease `cubic-bezier(0.2, 0.8, 0.2, 1)` at 120-240ms.",
+      "**Do** use 1px hairlines, 8px tile and input radius and 12px card radius, and the single ease `cubic-bezier(0.2, 0.8, 0.2, 1)` at 120-240ms. The one exception is the selection checkmark, which scales in on a 280ms spring (`cubic-bezier(0.175, 0.885, 0.32, 1.275)`).",
       "**Do** wrap every animation in `prefers-reduced-motion` and give interactive tiles a `:focus-visible` outline.",
       "**Do** use monospace only for machine values: API names, merge fields, SOQL, hex codes and numeric readouts."
     ],

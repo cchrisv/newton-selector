@@ -1,5 +1,5 @@
 import { LightningElement, api } from "lwc";
-import { ICONS, filterIcons, findIconByName } from "./iconCatalog";
+import { filterIcons, findIconByName } from "./iconCatalog";
 
 const ICON_PAGE_SIZE = 80;
 
@@ -24,19 +24,24 @@ export default class NewtonSelectorFlowCpeIconSelector extends LightningElement 
   }
 
   get filteredIcons() {
-    return filterIcons(ICONS, this._searchTerm);
+    return filterIcons(this._searchTerm);
+  }
+
+  // The selected icon leads the list when it matches the search.
+  get orderedIcons() {
+    const filtered = this.filteredIcons;
+    const selected = this.selectedEntry;
+    if (!selected || !filtered.includes(selected)) {
+      return filtered;
+    }
+    return [selected, ...filtered.filter((entry) => entry !== selected)];
   }
 
   get visibleIcons() {
-    const selected = this.selectedEntry;
-    let visible = this.filteredIcons.slice(0, this._visibleLimit);
-    if (selected && !visible.includes(selected)) {
-      visible = [selected, ...visible.slice(0, ICON_PAGE_SIZE - 1)];
-    }
-    return visible.map((entry) => ({
+    return this.orderedIcons.slice(0, this._visibleLimit).map((entry) => ({
       ...entry,
-      displayLabel: entry.humanLabel || entry.name,
-      assistiveLabel: `Select ${entry.humanLabel || entry.iconName} icon`,
+      displayLabel: entry.humanLabel,
+      assistiveLabel: `Select ${entry.humanLabel} icon`,
       selected: entry.iconName === this._value,
       buttonClass:
         entry.iconName === this._value
@@ -60,17 +65,11 @@ export default class NewtonSelectorFlowCpeIconSelector extends LightningElement 
   }
 
   get placeholderLabel() {
-    return this.selectedEntry?.iconName || this._value || "Select an icon...";
+    return this._value || "Select an icon...";
   }
 
   get hasSelection() {
     return Boolean(this._value);
-  }
-
-  get selectorClass() {
-    return this._isOpen
-      ? "newton-selector-icon-selector newton-selector-icon-selector_open"
-      : "newton-selector-icon-selector";
   }
 
   handleSearchInput(event) {
@@ -107,12 +106,6 @@ export default class NewtonSelectorFlowCpeIconSelector extends LightningElement 
   selectIcon(iconName) {
     this._value = iconName;
     this._isOpen = false;
-    this.dispatchEvent(
-      new CustomEvent("iconselect", {
-        detail: { iconName },
-        bubbles: true,
-        composed: true
-      })
-    );
+    this.dispatchEvent(new CustomEvent("iconselect", { detail: { iconName } }));
   }
 }

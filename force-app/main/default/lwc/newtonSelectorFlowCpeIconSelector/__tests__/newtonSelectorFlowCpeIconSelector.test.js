@@ -26,14 +26,19 @@ describe("c-newton-selector-flow-cpe-icon-selector", () => {
     const el = await mountOpen();
     const handler = jest.fn();
     el.addEventListener("iconselect", handler);
+    const searchInput = el.shadowRoot.querySelector(".newton-search__input");
+    searchInput.value = "settings";
+    searchInput.dispatchEvent(new CustomEvent("input"));
+    await Promise.resolve();
 
-    const firstIcon = cells(el)[0];
-    firstIcon.click();
+    el.shadowRoot
+      .querySelector(
+        '.newton-selector-icon-cell[aria-label="Select settings icon"]'
+      )
+      .click();
 
     expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler.mock.calls[0][0].detail.iconName).toBe(
-      firstIcon.dataset.icon
-    );
+    expect(handler.mock.calls[0][0].detail.iconName).toBe("settings");
   });
 
   it("filters icons by search term", async () => {
@@ -51,9 +56,7 @@ describe("c-newton-selector-flow-cpe-icon-selector", () => {
 
   it("pre-selects the matching entry when value is set", async () => {
     const el = await mountOpen("settings");
-    const selected = el.shadowRoot.querySelector(
-      ".newton-selector-icon-cell_selected"
-    );
+    const selected = el.shadowRoot.querySelector('[aria-pressed="true"]');
     expect(selected).not.toBeNull();
     expect(selected.getAttribute("aria-label")).toBe("Select settings icon");
   });

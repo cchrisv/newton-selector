@@ -1,5 +1,6 @@
 /** @description Token scanner for Newton Selector WHERE clause parsing. */
 public with sharing class NewtonSelectorWhereScanner {
+  private static final String IDENTIFIER_CHAR = '[A-Za-z0-9_]';
   private final String input;
   private Integer pos = 0;
 
@@ -8,7 +9,7 @@ public with sharing class NewtonSelectorWhereScanner {
    * @param input WHERE clause without the WHERE keyword.
    */
   public NewtonSelectorWhereScanner(String input) {
-    this.input = input == null ? '' : input;
+    this.input = input;
   }
 
   /**
@@ -29,19 +30,29 @@ public with sharing class NewtonSelectorWhereScanner {
   }
 
   /**
+   * @description Describes the next unparsed text for error messages.
+   * @return Remaining input after whitespace, or "end of WHERE clause" when none is left.
+   */
+  public String near() {
+    skipWhitespace();
+    String rest = remaining();
+    return rest.length() == 0 ? 'end of WHERE clause' : rest;
+  }
+
+  /**
    * @description Parses a field identifier.
    * @return Field identifier.
    */
   public String parseIdentifier() {
     skipWhitespace();
     Integer start = pos;
-    while (
-      pos < input.length() && isIdentifierChar(input.substring(pos, pos + 1))
-    ) {
+    while (nextMatches(IDENTIFIER_CHAR)) {
       pos++;
     }
     if (start == pos) {
-      throw new NewtonSelectorException('Expected field name in WHERE clause.');
+      throw new NewtonSelectorException(
+        'Expected field name in WHERE clause near: ' + near()
+      );
     }
     return input.substring(start, pos);
   }
@@ -51,12 +62,10 @@ public with sharing class NewtonSelectorWhereScanner {
    * @return Parsed literal values.
    */
   public List<String> parseListLiterals() {
-    skipWhitespace();
     expect('(');
     List<String> values = new List<String>();
     do {
-      values.add(parseLiteral());
-      skipWhitespace();
+      values.add(parseLiteral(false));
     } while (consume(','));
     expect(')');
     return values;
@@ -64,22 +73,34 @@ public with sharing class NewtonSelectorWhereScanner {
 
   /**
    * @description Parses a single quoted or bare literal.
+   * @param likePattern True for a LIKE value, which keeps the SOQL escapes \%, \_ and \\ for the LIKE bind.
    * @return Parsed literal value; null for the bare NULL keyword (a quoted 'null' stays text).
    */
-  public String parseLiteral() {
-    skipWhitespace();
+  public String parseLiteral(Boolean likePattern) {
     if (peek('\'')) {
-      return parseQuotedString();
+      NewtonSelectorWhereQuotedString quoted = NewtonSelectorWhereQuotedString.read(
+        input,
+        pos,
+        likePattern
+      );
+      pos = quoted.endPos;
+      return quoted.value;
+    }
+    if (nextMatches('[=<>!(]')) {
+      throw new NewtonSelectorException(
+        'Unexpected "' +
+          input.substring(pos, pos + 1) +
+          '" in WHERE value near: ' +
+          remaining()
+      );
     }
 
     Integer start = pos;
-    while (
-      pos < input.length() && !isLiteralBoundary(input.substring(pos, pos + 1))
-    ) {
+    while (nextMatches('[^\\s,)]')) {
       pos++;
     }
     if (start == pos) {
-      throw new NewtonSelectorException('Expected WHERE value.');
+      throw new NewtonSelectorException('Expected WHERE value near: ' + near());
     }
     String literal = input.substring(start, pos);
     return literal.equalsIgnoreCase('NULL') ? null : literal;
@@ -116,7 +137,6 @@ public with sharing class NewtonSelectorWhereScanner {
    * @return True when consumed.
    */
   public Boolean consume(String expected) {
-    skipWhitespace();
     if (!peek(expected)) {
       return false;
     }
@@ -129,31 +149,12 @@ public with sharing class NewtonSelectorWhereScanner {
    * @param expected Expected single-character token.
    */
   public void expect(String expected) {
-    skipWhitespace();
     if (!peek(expected)) {
       throw new NewtonSelectorException(
-        'Expected "' + expected + '" in WHERE clause.'
+        'Expected "' + expected + '" in WHERE clause near: ' + near()
       );
     }
     pos++;
-  }
-
-  private String parseQuotedString() {
-    expect('\'');
-    String value = '';
-    while (pos < input.length()) {
-      String ch = input.substring(pos, pos + 1);
-      pos++;
-      if (ch == '\\' && pos < input.length()) {
-        value += input.substring(pos, pos + 1);
-        pos++;
-      } else if (ch == '\'') {
-        return value;
-      } else {
-        value += ch;
-      }
-    }
-    throw new NewtonSelectorException('Unterminated string in WHERE clause.');
   }
 
   private Boolean matchesKeywordAt(String keyword, Integer endPos) {
@@ -164,23 +165,17 @@ public with sharing class NewtonSelectorWhereScanner {
       return false;
     }
     return endPos >= input.length() ||
-      !isIdentifierChar(input.substring(endPos, endPos + 1));
+      !Pattern.matches(IDENTIFIER_CHAR, input.substring(endPos, endPos + 1));
   }
 
   private void skipWhitespace() {
-    while (
-      pos < input.length() &&
-      Pattern.matches('\\s', input.substring(pos, pos + 1))
-    ) {
+    while (nextMatches('\\s')) {
       pos++;
     }
   }
 
-  private Boolean isIdentifierChar(String ch) {
-    return Pattern.matches('[A-Za-z0-9_]', ch);
-  }
-
-  private Boolean isLiteralBoundary(String ch) {
-    return Pattern.matches('[\\s,)]', ch);
+  private Boolean nextMatches(String charClass) {
+    return pos < input.length() &&
+      Pattern.matches(charClass, input.substring(pos, pos + 1));
   }
 }

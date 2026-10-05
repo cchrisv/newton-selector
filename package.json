@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Newton Selector for Salesforce Flow Screens",
   "scripts": {
-    "lint": "eslint \"**/lwc/**/*.js\"",
+    "lint": "eslint \"**/lwc/**/*.js\" \"force-app/test/jest-mocks/**/*.js\"",
     "lint:slds": "slds-linter lint force-app/main/default/lwc",
     "test": "npm run test:unit",
     "test:unit": "sfdx-lwc-jest",

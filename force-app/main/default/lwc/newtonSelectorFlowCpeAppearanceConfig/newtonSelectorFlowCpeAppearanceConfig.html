@@ -22,9 +22,9 @@
         ></c-newton-selector-icon>
       </span>
       <div class="newton-card__headings">
-        <h3 class="slds-card__header-title slds-text-heading_small">
+        <h4 class="slds-card__header-title slds-text-heading_small">
           Layout style
-        </h3>
+        </h4>
         <p
           class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
@@ -96,9 +96,9 @@
         ></c-newton-selector-icon>
       </span>
       <div class="newton-card__headings">
-        <h3 class="slds-card__header-title slds-text-heading_small">
+        <h4 class="slds-card__header-title slds-text-heading_small">
           Tile size
-        </h3>
+        </h4>
         <p
           class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
@@ -143,9 +143,9 @@
           ></c-newton-selector-icon>
         </span>
         <div class="newton-card__headings">
-          <h3 class="slds-card__header-title slds-text-heading_small">
+          <h4 class="slds-card__header-title slds-text-heading_small">
             Aspect ratio
-          </h3>
+          </h4>
           <p
             class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
@@ -192,9 +192,9 @@
           ></c-newton-selector-icon>
         </span>
         <div class="newton-card__headings">
-          <h3 class="slds-card__header-title slds-text-heading_small">
+          <h4 class="slds-card__header-title slds-text-heading_small">
             Column count
-          </h3>
+          </h4>
           <p
             class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
@@ -242,9 +242,9 @@
         ></c-newton-selector-icon>
       </span>
       <div class="newton-card__headings">
-        <h3 class="slds-card__header-title slds-text-heading_small">
+        <h4 class="slds-card__header-title slds-text-heading_small">
           Tile elevation
-        </h3>
+        </h4>
         <p
           class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
@@ -289,9 +289,9 @@
         ></c-newton-selector-icon>
       </span>
       <div class="newton-card__headings">
-        <h3 class="slds-card__header-title slds-text-heading_small">
+        <h4 class="slds-card__header-title slds-text-heading_small">
           Surface style
-        </h3>
+        </h4>
         <p
           class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
@@ -323,60 +323,21 @@
         </template>
       </div>
       <template for:each={surfaceToneRows} for:item="row">
-        <div key={row.rowKey} class="newton-tone-state">
-          <div class="newton-tone-row" role="group" aria-label={row.ariaLabel}>
-            <span class="newton-tone-row__eyebrow">{row.label}</span>
-            <template for:each={row.chips} for:item="chip">
-              <button
-                key={chip.value}
-                type="button"
-                class={chip.className}
-                data-key={row.toneKey}
-                data-value={chip.value}
-                aria-pressed={chip.ariaPressed}
-                title={chip.label}
-                disabled={chip.disabled}
-                onclick={handleToneChange}
-              >
-                <span class={chip.dotClassName} aria-hidden="true"></span>
-                <span class="newton-tone-chip__label">{chip.label}</span>
-              </button>
-            </template>
-          </div>
-          <template lwc:if={row.isCustom}>
-            <div class="newton-hex-row">
-              <label class="newton-hex-row__label" for={row.hexId}
-                >Custom color</label
-              >
-              <input
-                id={row.hexId}
-                type="color"
-                class="newton-hex-row__selector"
-                data-hex-key={row.hexKey}
-                value={row.hexValue}
-                oninput={handleHexChange}
-                onchange={handleHexChange}
-                aria-label={row.colorAriaLabel}
-              />
-              <input
-                type="text"
-                class="newton-hex-row__input"
-                data-hex-key={row.hexKey}
-                value={row.hexValue}
-                placeholder="#3baa6f"
-                onchange={handleHexChange}
-                aria-label={row.hexAriaLabel}
-                aria-invalid={row.hexInvalid}
-                aria-describedby={row.hexErrorId}
-              />
-              <template lwc:if={row.hexInvalid}>
-                <p id={row.hexErrorId} class="newton-hex-row__error">
-                  Use a hex color like #1B96FF.
-                </p>
-              </template>
-            </div>
-          </template>
-        </div>
+        <c-newton-selector-flow-cpe-tone-row
+          key={row.rowKey}
+          label={row.label}
+          group-label={row.groupLabel}
+          tone-key={row.toneKey}
+          hex-key={row.hexKey}
+          tones={toneSwatches}
+          value={row.value}
+          hex-value={row.hexValue}
+          disabled={row.disabled}
+          color-aria-label={row.colorAriaLabel}
+          hex-aria-label={row.hexAriaLabel}
+          ontonechange={handleToneRowChange}
+          onhexchange={handleToneRowChange}
+        ></c-newton-selector-flow-cpe-tone-row>
       </template>
     </div>
   </article>
@@ -390,9 +351,9 @@
         ></c-newton-selector-icon>
       </span>
       <div class="newton-card__headings">
-        <h3 class="slds-card__header-title slds-text-heading_small">
+        <h4 class="slds-card__header-title slds-text-heading_small">
           Selection indicator
-        </h3>
+        </h4>
         <p
           class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
@@ -433,9 +394,9 @@
         ></c-newton-selector-icon>
       </span>
       <div class="newton-card__headings">
-        <h3 class="slds-card__header-title slds-text-heading_small">
+        <h4 class="slds-card__header-title slds-text-heading_small">
           Pattern overlay
-        </h3>
+        </h4>
         <p
           class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
@@ -468,60 +429,21 @@
         </template>
       </div>
       <template for:each={patternToneRows} for:item="row">
-        <div key={row.rowKey} class="newton-tone-state">
-          <div class="newton-tone-row" role="group" aria-label={row.ariaLabel}>
-            <span class="newton-tone-row__eyebrow">{row.label}</span>
-            <template for:each={row.chips} for:item="chip">
-              <button
-                key={chip.value}
-                type="button"
-                class={chip.className}
-                data-key={row.toneKey}
-                data-value={chip.value}
-                aria-pressed={chip.ariaPressed}
-                title={chip.label}
-                disabled={chip.disabled}
-                onclick={handleToneChange}
-              >
-                <span class={chip.dotClassName} aria-hidden="true"></span>
-                <span class="newton-tone-chip__label">{chip.label}</span>
-              </button>
-            </template>
-          </div>
-          <template lwc:if={row.isCustom}>
-            <div class="newton-hex-row">
-              <label class="newton-hex-row__label" for={row.hexId}
-                >Custom color</label
-              >
-              <input
-                id={row.hexId}
-                type="color"
-                class="newton-hex-row__selector"
-                data-hex-key={row.hexKey}
-                value={row.hexValue}
-                oninput={handleHexChange}
-                onchange={handleHexChange}
-                aria-label={row.colorAriaLabel}
-              />
-              <input
-                type="text"
-                class="newton-hex-row__input"
-                data-hex-key={row.hexKey}
-                value={row.hexValue}
-                placeholder="#3baa6f"
-                onchange={handleHexChange}
-                aria-label={row.hexAriaLabel}
-                aria-invalid={row.hexInvalid}
-                aria-describedby={row.hexErrorId}
-              />
-              <template lwc:if={row.hexInvalid}>
-                <p id={row.hexErrorId} class="newton-hex-row__error">
-                  Use a hex color like #1B96FF.
-                </p>
-              </template>
-            </div>
-          </template>
-        </div>
+        <c-newton-selector-flow-cpe-tone-row
+          key={row.rowKey}
+          label={row.label}
+          group-label={row.groupLabel}
+          tone-key={row.toneKey}
+          hex-key={row.hexKey}
+          tones={toneSwatches}
+          value={row.value}
+          hex-value={row.hexValue}
+          disabled={row.disabled}
+          color-aria-label={row.colorAriaLabel}
+          hex-aria-label={row.hexAriaLabel}
+          ontonechange={handleToneRowChange}
+          onhexchange={handleToneRowChange}
+        ></c-newton-selector-flow-cpe-tone-row>
       </template>
     </div>
   </article>
@@ -535,9 +457,9 @@
         ></c-newton-selector-icon>
       </span>
       <div class="newton-card__headings">
-        <h3 class="slds-card__header-title slds-text-heading_small">
+        <h4 class="slds-card__header-title slds-text-heading_small">
           Corner flourish
-        </h3>
+        </h4>
         <p
           class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
@@ -568,58 +490,20 @@
           ></c-newton-selector-choice-tile>
         </template>
       </div>
-      <div class="newton-tone-row" role="group" aria-label="Corner color">
-        <span class="newton-tone-row__eyebrow">Color</span>
-        <template for:each={cornerToneChips} for:item="chip">
-          <button
-            key={chip.value}
-            type="button"
-            class={chip.className}
-            data-key="cornerTone"
-            data-value={chip.value}
-            aria-pressed={chip.ariaPressed}
-            title={chip.label}
-            disabled={chip.disabled}
-            onclick={handleToneChange}
-          >
-            <span class={chip.dotClassName} aria-hidden="true"></span>
-            <span class="newton-tone-chip__label">{chip.label}</span>
-          </button>
-        </template>
-      </div>
-      <template lwc:if={cornerToneIsCustom}>
-        <div class="newton-hex-row">
-          <label class="newton-hex-row__label" for="corner-tone-hex"
-            >Custom color</label
-          >
-          <input
-            id="corner-tone-hex"
-            type="color"
-            class="newton-hex-row__selector"
-            data-hex-key="cornerToneHex"
-            value={gridConfig.cornerToneHex}
-            oninput={handleHexChange}
-            onchange={handleHexChange}
-            aria-label="Pick corner color"
-          />
-          <input
-            type="text"
-            class="newton-hex-row__input"
-            data-hex-key="cornerToneHex"
-            value={gridConfig.cornerToneHex}
-            placeholder="#3baa6f"
-            onchange={handleHexChange}
-            aria-label="Corner hex color value"
-            aria-invalid={hexErrors.cornerToneHex}
-            aria-describedby="corner-tone-hex-error"
-          />
-          <template lwc:if={hexErrors.cornerToneHex}>
-            <p id="corner-tone-hex-error" class="newton-hex-row__error">
-              Use a hex color like #1B96FF.
-            </p>
-          </template>
-        </div>
-      </template>
+      <c-newton-selector-flow-cpe-tone-row
+        label="Color"
+        group-label="Corner color"
+        tone-key="cornerTone"
+        hex-key="cornerToneHex"
+        tones={toneSwatches}
+        value={gridConfig.cornerTone}
+        hex-value={gridConfig.cornerToneHex}
+        disabled={cornerToneDisabled}
+        color-aria-label="Pick corner color"
+        hex-aria-label="Corner hex color value"
+        ontonechange={handleToneRowChange}
+        onhexchange={handleToneRowChange}
+      ></c-newton-selector-flow-cpe-tone-row>
     </div>
   </article>
   <div class={iconSubchapterClass}>
@@ -648,9 +532,9 @@
           ></c-newton-selector-icon>
         </span>
         <div class="newton-card__headings">
-          <h3 class="slds-card__header-title slds-text-heading_small">
+          <h4 class="slds-card__header-title slds-text-heading_small">
             Icon size
-          </h3>
+          </h4>
           <p
             class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
@@ -695,9 +579,9 @@
           ></c-newton-selector-icon>
         </span>
         <div class="newton-card__headings">
-          <h3 class="slds-card__header-title slds-text-heading_small">
+          <h4 class="slds-card__header-title slds-text-heading_small">
             Icon decoration
-          </h3>
+          </h4>
           <p
             class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
@@ -741,9 +625,9 @@
             ></c-newton-selector-icon>
           </span>
           <div class="newton-card__headings">
-            <h3 class="slds-card__header-title slds-text-heading_small">
+            <h4 class="slds-card__header-title slds-text-heading_small">
               Icon treatment
-            </h3>
+            </h4>
             <p
               class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
             >
@@ -778,7 +662,9 @@
                 icon-style={tile.value}
                 icon-shading={gridConfig.iconShading}
                 icon-tone={gridConfig.iconTone}
+                icon-tone-hex={gridConfig.iconToneHex}
                 icon-glyph-tone={gridConfig.iconGlyphTone}
+                icon-glyph-tone-hex={gridConfig.iconGlyphToneHex}
               ></c-newton-selector-choice-tile>
             </template>
           </div>
@@ -803,119 +689,40 @@
                   icon-style="filled"
                   icon-shading={tile.value}
                   icon-tone={gridConfig.iconTone}
+                  icon-tone-hex={gridConfig.iconToneHex}
                   icon-glyph-tone={gridConfig.iconGlyphTone}
+                  icon-glyph-tone-hex={gridConfig.iconGlyphToneHex}
                 ></c-newton-selector-choice-tile>
               </template>
             </div>
           </template>
-          <div class="newton-tone-row" role="group" aria-label="Icon color">
-            <span class="newton-tone-row__eyebrow">Decoration</span>
-            <template for:each={iconToneChips} for:item="chip">
-              <button
-                key={chip.value}
-                type="button"
-                class={chip.className}
-                data-key="iconTone"
-                data-value={chip.value}
-                aria-pressed={chip.ariaPressed}
-                title={chip.label}
-                disabled={chip.disabled}
-                onclick={handleToneChange}
-              >
-                <span class={chip.dotClassName} aria-hidden="true"></span>
-                <span class="newton-tone-chip__label">{chip.label}</span>
-              </button>
-            </template>
-          </div>
-          <template lwc:if={iconToneIsCustom}>
-            <div class="newton-hex-row">
-              <label class="newton-hex-row__label" for="icon-tone-hex"
-                >Custom color</label
-              >
-              <input
-                id="icon-tone-hex"
-                type="color"
-                class="newton-hex-row__selector"
-                data-hex-key="iconToneHex"
-                value={gridConfig.iconToneHex}
-                oninput={handleHexChange}
-                onchange={handleHexChange}
-                aria-label="Pick icon decoration color"
-              />
-              <input
-                type="text"
-                class="newton-hex-row__input"
-                data-hex-key="iconToneHex"
-                value={gridConfig.iconToneHex}
-                placeholder="#3baa6f"
-                onchange={handleHexChange}
-                aria-label="Icon decoration hex color value"
-                aria-invalid={hexErrors.iconToneHex}
-                aria-describedby="icon-tone-hex-error"
-              />
-              <template lwc:if={hexErrors.iconToneHex}>
-                <p id="icon-tone-hex-error" class="newton-hex-row__error">
-                  Use a hex color like #1B96FF.
-                </p>
-              </template>
-            </div>
-          </template>
-          <div
-            class="newton-tone-row"
-            role="group"
-            aria-label="Icon glyph color"
-          >
-            <span class="newton-tone-row__eyebrow">Glyph</span>
-            <template for:each={iconGlyphToneChips} for:item="chip">
-              <button
-                key={chip.value}
-                type="button"
-                class={chip.className}
-                data-key="iconGlyphTone"
-                data-value={chip.value}
-                aria-pressed={chip.ariaPressed}
-                title={chip.label}
-                disabled={chip.disabled}
-                onclick={handleToneChange}
-              >
-                <span class={chip.dotClassName} aria-hidden="true"></span>
-                <span class="newton-tone-chip__label">{chip.label}</span>
-              </button>
-            </template>
-          </div>
-          <template lwc:if={iconGlyphToneIsCustom}>
-            <div class="newton-hex-row">
-              <label class="newton-hex-row__label" for="icon-glyph-tone-hex"
-                >Custom glyph</label
-              >
-              <input
-                id="icon-glyph-tone-hex"
-                type="color"
-                class="newton-hex-row__selector"
-                data-hex-key="iconGlyphToneHex"
-                value={gridConfig.iconGlyphToneHex}
-                oninput={handleHexChange}
-                onchange={handleHexChange}
-                aria-label="Pick icon glyph color"
-              />
-              <input
-                type="text"
-                class="newton-hex-row__input"
-                data-hex-key="iconGlyphToneHex"
-                value={gridConfig.iconGlyphToneHex}
-                placeholder="#ffffff"
-                onchange={handleHexChange}
-                aria-label="Icon glyph hex color value"
-                aria-invalid={hexErrors.iconGlyphToneHex}
-                aria-describedby="icon-glyph-tone-hex-error"
-              />
-              <template lwc:if={hexErrors.iconGlyphToneHex}>
-                <p id="icon-glyph-tone-hex-error" class="newton-hex-row__error">
-                  Use a hex color like #1B96FF.
-                </p>
-              </template>
-            </div>
-          </template>
+          <c-newton-selector-flow-cpe-tone-row
+            label="Decoration"
+            group-label="Icon color"
+            tone-key="iconTone"
+            hex-key="iconToneHex"
+            tones={toneSwatches}
+            value={gridConfig.iconTone}
+            hex-value={gridConfig.iconToneHex}
+            color-aria-label="Pick icon decoration color"
+            hex-aria-label="Icon decoration hex color value"
+            ontonechange={handleToneRowChange}
+            onhexchange={handleToneRowChange}
+          ></c-newton-selector-flow-cpe-tone-row>
+          <c-newton-selector-flow-cpe-tone-row
+            label="Glyph"
+            group-label="Icon glyph color"
+            tone-key="iconGlyphTone"
+            hex-key="iconGlyphToneHex"
+            tones={glyphToneSwatches}
+            value={gridConfig.iconGlyphTone}
+            hex-value={gridConfig.iconGlyphToneHex}
+            hex-placeholder="#ffffff"
+            color-aria-label="Pick icon glyph color"
+            hex-aria-label="Icon glyph hex color value"
+            ontonechange={handleToneRowChange}
+            onhexchange={handleToneRowChange}
+          ></c-newton-selector-flow-cpe-tone-row>
         </div>
       </article>
     </template>
@@ -952,7 +759,7 @@
           ></c-newton-selector-icon>
         </span>
         <div class="newton-card__headings">
-          <h3 class="slds-card__header-title slds-text-heading_small">Badge</h3>
+          <h4 class="slds-card__header-title slds-text-heading_small">Badge</h4>
           <p
             class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
@@ -992,56 +799,18 @@
         </div>
         <div class="newton-badge-card__control">
           <span class="newton-badge-card__eyebrow">Color</span>
-          <div class="newton-tone-row" role="group" aria-label="Badge color">
-            <template for:each={badgeVariantChips} for:item="chip">
-              <button
-                key={chip.value}
-                type="button"
-                class={chip.className}
-                data-value={chip.value}
-                aria-pressed={chip.ariaPressed}
-                title={chip.label}
-                disabled={chip.disabled}
-                onclick={handleBadgeVariantChange}
-              >
-                <span class={chip.dotClassName} aria-hidden="true"></span>
-                <span class="newton-tone-chip__label">{chip.label}</span>
-              </button>
-            </template>
-          </div>
-          <template lwc:if={badgeVariantIsCustom}>
-            <div class="newton-hex-row">
-              <label class="newton-hex-row__label" for="badge-variant-hex"
-                >Custom color</label
-              >
-              <input
-                id="badge-variant-hex"
-                type="color"
-                class="newton-hex-row__selector"
-                data-hex-key="variantHex"
-                value={gridConfig.badge.variantHex}
-                oninput={handleHexChange}
-                onchange={handleHexChange}
-                aria-label="Pick badge color"
-              />
-              <input
-                type="text"
-                class="newton-hex-row__input"
-                data-hex-key="variantHex"
-                value={gridConfig.badge.variantHex}
-                placeholder="#3baa6f"
-                onchange={handleHexChange}
-                aria-label="Badge hex color value"
-                aria-invalid={hexErrors.variantHex}
-                aria-describedby="badge-variant-hex-error"
-              />
-              <template lwc:if={hexErrors.variantHex}>
-                <p id="badge-variant-hex-error" class="newton-hex-row__error">
-                  Use a hex color like #1B96FF.
-                </p>
-              </template>
-            </div>
-          </template>
+          <c-newton-selector-flow-cpe-tone-row
+            group-label="Badge color"
+            tone-key="variant"
+            hex-key="variantHex"
+            tones={badgeToneSwatches}
+            value={gridConfig.badge.variant}
+            hex-value={gridConfig.badge.variantHex}
+            color-aria-label="Pick badge color"
+            hex-aria-label="Badge hex color value"
+            ontonechange={handleToneRowChange}
+            onhexchange={handleToneRowChange}
+          ></c-newton-selector-flow-cpe-tone-row>
         </div>
         <div class="newton-badge-card__control">
           <span class="newton-badge-card__eyebrow">Shape</span>
@@ -1091,9 +860,9 @@
           ></c-newton-selector-icon>
         </span>
         <div class="newton-card__headings">
-          <h3 class="slds-card__header-title slds-text-heading_small">
+          <h4 class="slds-card__header-title slds-text-heading_small">
             Grid density
-          </h3>
+          </h4>
           <p
             class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
           >
@@ -1136,107 +905,105 @@
       </div>
     </article>
   </template>
-  <template lwc:if={showGapCard}>
-    <article class="slds-card newton-studio__card newton-studio__section-card">
-      <header class="slds-card__header newton-card__head">
-        <span class="newton-card__glyph" aria-hidden="true">
-          <c-newton-selector-icon
-            name="rows-3"
-            size="small"
-            alternative-text=""
-          ></c-newton-selector-icon>
-        </span>
-        <div class="newton-card__headings">
-          <h3 class="slds-card__header-title slds-text-heading_small">
-            Tile gaps
-          </h3>
-          <p
-            class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
-          >
-            Space between tiles.
-          </p>
-        </div>
-        <lightning-helptext
-          class="newton-card__help"
-          content="Horizontal is the space between side-by-side tiles. Vertical is the space between rows."
-        ></lightning-helptext>
-      </header>
-      <div
-        class="slds-card__body slds-card__body_inner newton-studio__field-block"
-      >
-        <template lwc:if={showGapHorizontal}>
-          <div class="newton-studio__axis">
-            <div class="newton-studio__axis-head">
-              <c-newton-selector-icon
-                name="move-horizontal"
-                size="x-small"
-                alternative-text=""
-              ></c-newton-selector-icon>
-              <div class="newton-studio__axis-text">
-                <h4 class="newton-studio__axis-title">Horizontal</h4>
-                <p class="newton-studio__axis-sub">Column gap between tiles.</p>
-              </div>
-            </div>
-            <div
-              class="newton-studio__selectorgroup"
-              role="radiogroup"
-              aria-label="Horizontal gap"
-              data-key="gapH"
-              oncardselect={handleTileChange}
-            >
-              <template for:each={gapHTiles} for:item="tile">
-                <c-newton-selector-choice-tile
-                  key={tile.id}
-                  item={tile}
-                  selected={tile._selected}
-                  selection-mode="single"
-                  group-name="newton-gap-h"
-                  size="small"
-                  framed-visual
-                  aspect-ratio="3:2"
-                ></c-newton-selector-choice-tile>
-              </template>
-            </div>
-          </div>
-        </template>
-        <template lwc:if={showGapVertical}>
-          <div class="newton-studio__axis">
-            <div class="newton-studio__axis-head">
-              <c-newton-selector-icon
-                name="move-vertical"
-                size="x-small"
-                alternative-text=""
-              ></c-newton-selector-icon>
-              <div class="newton-studio__axis-text">
-                <h4 class="newton-studio__axis-title">Vertical</h4>
-                <p class="newton-studio__axis-sub">Row gap between tiles.</p>
-              </div>
-            </div>
-            <div
-              class="newton-studio__selectorgroup"
-              role="radiogroup"
-              aria-label="Vertical gap"
-              data-key="gapV"
-              oncardselect={handleTileChange}
-            >
-              <template for:each={gapVTiles} for:item="tile">
-                <c-newton-selector-choice-tile
-                  key={tile.id}
-                  item={tile}
-                  selected={tile._selected}
-                  selection-mode="single"
-                  group-name="newton-gap-v"
-                  size="small"
-                  framed-visual
-                  aspect-ratio="3:2"
-                ></c-newton-selector-choice-tile>
-              </template>
-            </div>
-          </div>
-        </template>
+  <article class="slds-card newton-studio__card newton-studio__section-card">
+    <header class="slds-card__header newton-card__head">
+      <span class="newton-card__glyph" aria-hidden="true">
+        <c-newton-selector-icon
+          name="rows-3"
+          size="small"
+          alternative-text=""
+        ></c-newton-selector-icon>
+      </span>
+      <div class="newton-card__headings">
+        <h4 class="slds-card__header-title slds-text-heading_small">
+          Tile gaps
+        </h4>
+        <p
+          class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
+        >
+          Space between tiles.
+        </p>
       </div>
-    </article>
-  </template>
+      <lightning-helptext
+        class="newton-card__help"
+        content="Horizontal is the space between side-by-side tiles. Vertical is the space between rows."
+      ></lightning-helptext>
+    </header>
+    <div
+      class="slds-card__body slds-card__body_inner newton-studio__field-block"
+    >
+      <template lwc:if={showGapHorizontal}>
+        <div class="newton-studio__axis">
+          <div class="newton-studio__axis-head">
+            <c-newton-selector-icon
+              name="move-horizontal"
+              size="x-small"
+              alternative-text=""
+            ></c-newton-selector-icon>
+            <div class="newton-studio__axis-text">
+              <h5 class="newton-studio__axis-title">Horizontal</h5>
+              <p class="newton-studio__axis-sub">Column gap between tiles.</p>
+            </div>
+          </div>
+          <div
+            class="newton-studio__selectorgroup"
+            role="radiogroup"
+            aria-label="Horizontal gap"
+            data-key="gapH"
+            oncardselect={handleTileChange}
+          >
+            <template for:each={gapHTiles} for:item="tile">
+              <c-newton-selector-choice-tile
+                key={tile.id}
+                item={tile}
+                selected={tile._selected}
+                selection-mode="single"
+                group-name="newton-gap-h"
+                size="small"
+                framed-visual
+                aspect-ratio="3:2"
+              ></c-newton-selector-choice-tile>
+            </template>
+          </div>
+        </div>
+      </template>
+      <template lwc:if={showGapVertical}>
+        <div class="newton-studio__axis">
+          <div class="newton-studio__axis-head">
+            <c-newton-selector-icon
+              name="move-vertical"
+              size="x-small"
+              alternative-text=""
+            ></c-newton-selector-icon>
+            <div class="newton-studio__axis-text">
+              <h5 class="newton-studio__axis-title">Vertical</h5>
+              <p class="newton-studio__axis-sub">Row gap between tiles.</p>
+            </div>
+          </div>
+          <div
+            class="newton-studio__selectorgroup"
+            role="radiogroup"
+            aria-label="Vertical gap"
+            data-key="gapV"
+            oncardselect={handleTileChange}
+          >
+            <template for:each={gapVTiles} for:item="tile">
+              <c-newton-selector-choice-tile
+                key={tile.id}
+                item={tile}
+                selected={tile._selected}
+                selection-mode="single"
+                group-name="newton-gap-v"
+                size="small"
+                framed-visual
+                aspect-ratio="3:2"
+              ></c-newton-selector-choice-tile>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+  </article>
   <article class="slds-card newton-studio__card newton-studio__section-card">
     <header
       class="slds-card__header newton-card__head newton-card__head_with-action"
@@ -1249,9 +1016,9 @@
         ></c-newton-selector-icon>
       </span>
       <div class="newton-card__headings">
-        <h3 class="slds-card__header-title slds-text-heading_small">
+        <h4 class="slds-card__header-title slds-text-heading_small">
           Outer margin
-        </h3>
+        </h4>
         <p
           class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
@@ -1260,7 +1027,7 @@
       </div>
       <span class="newton-card__action"
         ><c-newton-selector-flow-cpe-toggle
-          label="Link all sides"
+          label="Link all margin sides"
           variant="label-hidden"
           active-label="Linked"
           inactive-label="Per side"
@@ -1307,7 +1074,7 @@
                 alternative-text=""
               ></c-newton-selector-icon>
               <div class="newton-studio__axis-text">
-                <h4 class="newton-studio__axis-title">{section.label}</h4>
+                <h5 class="newton-studio__axis-title">{section.label}</h5>
               </div>
             </div>
             <div
@@ -1347,9 +1114,9 @@
         ></c-newton-selector-icon>
       </span>
       <div class="newton-card__headings">
-        <h3 class="slds-card__header-title slds-text-heading_small">
+        <h4 class="slds-card__header-title slds-text-heading_small">
           Inner tile padding
-        </h3>
+        </h4>
         <p
           class="slds-card__header-subtitle slds-text-body_small slds-text-color_weak"
         >
@@ -1358,7 +1125,7 @@
       </div>
       <span class="newton-card__action"
         ><c-newton-selector-flow-cpe-toggle
-          label="Link all sides"
+          label="Link all padding sides"
           variant="label-hidden"
           active-label="Linked"
           inactive-label="Per side"
@@ -1409,7 +1176,7 @@
                 alternative-text=""
               ></c-newton-selector-icon>
               <div class="newton-studio__axis-text">
-                <h4 class="newton-studio__axis-title">{section.label}</h4>
+                <h5 class="newton-studio__axis-title">{section.label}</h5>
               </div>
             </div>
             <div
