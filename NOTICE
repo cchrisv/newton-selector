@@ -1,0 +1,32 @@
+Newton Selector
+Copyright (c) 2026 Christiaan Van Der Merwe
+
+Newton Selector is licensed under the MIT License (see LICENSE), except for
+the third-party portions listed below, which remain under their own license.
+
+-------------------------------------------------------------------------------
+UnofficialSF LightningFlowComponents
+https://github.com/UnofficialSF/LightningFlowComponents
+Licensed under the Apache License, Version 2.0
+https://www.apache.org/licenses/LICENSE-2.0
+-------------------------------------------------------------------------------
+
+The following files are adapted from components in the FlowScreenComponentsBasePack
+of UnofficialSF LightningFlowComponents. They were modified for Newton Selector:
+renamed into the newtonSelector namespace, restyled for SLDS 2 and the Newton
+Selector configuration editor, and changed in behavior as described in each
+file's header and in this repository's history.
+
+  force-app/main/default/lwc/newtonSelectorFlowCpeResourceSelector/
+      adapted from fsc_flowCombobox
+  force-app/main/default/lwc/newtonSelectorFlowCpeToggle/
+      adapted from fsc_flowCheckbox
+  force-app/main/default/lwc/newtonSelectorFlowCpeUtilityHelpers/
+      merge-field helpers adapted from fsc_flowComboboxUtils
+
+These adapted files are distributed under the Apache License, Version 2.0. You
+may not use them except in compliance with that License. Unless required by
+applicable law or agreed to in writing, software distributed under the License
+is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the specific language
+governing permissions and limitations under the License.

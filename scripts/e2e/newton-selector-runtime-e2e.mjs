@@ -335,6 +335,32 @@ function buildFlowXml() {
         display: { sortBy: "label", sortDirection: "desc", limit: 3 }
       })
     ),
+    // Blank text is saved blank and shows the Custom Label default.
+    field(
+      "B_Defaults",
+      baseConfig({
+        label: "B Defaults",
+        layout: "list",
+        includeNoneOption: true,
+        noneOptionLabel: "",
+        manualInput: {
+          enabled: true,
+          label: "",
+          minLength: 0,
+          maxLength: null
+        },
+        custom: { items: items("Red", "Blue") }
+      })
+    ),
+    field(
+      "B_Empty",
+      baseConfig({
+        label: "B Empty",
+        layout: "list",
+        emptyStateMessage: "",
+        custom: { items: [] }
+      })
+    ),
     field(
       "B_Disabled",
       baseConfig({
@@ -858,6 +884,8 @@ try {
   const overrides = selectorFor(page, "B Overrides");
   const display = selectorFor(page, "B Display");
   const disabled = selectorFor(page, "B Disabled");
+  const defaults = selectorFor(page, "B Defaults");
+  const empty = selectorFor(page, "B Empty");
 
   await check("multi: min selections enforced", async () => {
     await pickTile(multi, "One");
@@ -937,6 +965,18 @@ try {
     assert(
       JSON.stringify(texts) === JSON.stringify(["Elder", "Dill", "Cumin"]),
       `got ${JSON.stringify(texts)}`
+    );
+  });
+  await check("blank text shows the default labels", async () => {
+    const labels = (
+      await defaults.locator("c-newton-selector-choice-tile").allInnerTexts()
+    ).map((t) => t.split("\n")[0].trim());
+    assert(labels.includes("--None--"), `no --None-- in ${labels}`);
+    assert(labels.includes("Other"), `no Other in ${labels}`);
+    const emptyText = await empty.innerText();
+    assert(
+      emptyText.includes("No options available."),
+      `empty state shows ${JSON.stringify(emptyText)}`
     );
   });
   await check("disabled item cannot be chosen", async () => {

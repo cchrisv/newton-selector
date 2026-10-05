@@ -28,7 +28,6 @@ Option overrides apply to Picklist and SOQL sources, not to Collection or Custom
 - **Missing object or field.** For the Picklist source, a missing object or field leaves the loading skeleton in place with no error text.
 - **Apex error logging.** Apex failures are mapped to messages and not logged anywhere.
 - **No image support.** Tiles show icons or geometric shapes. There is no image field.
-- **License file.** The README says MIT, but the repo has no `LICENSE` file.
 - **E2E leaves Flows in the org.** `npm run test:e2e:builder` removes its Leads and local file but leaves a Draft Flow named `Newton_Selector_E2E`. `npm run test:e2e:runtime` leaves the active Flow `Newton_Selector_Features`.
 - **Apex test gaps.** No tests for WHERE scanner errors (an unterminated string, a missing `)`) or for DESC ordering.
 

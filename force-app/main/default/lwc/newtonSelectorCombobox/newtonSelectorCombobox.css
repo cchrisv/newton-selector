@@ -70,18 +70,23 @@
 .newton-selector-combobox__option {
   padding: 0;
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
 }
 
 .newton-selector-combobox__option[aria-selected="true"] {
+  /* The accent rule sits on the leading edge, so its offset flips in RTL. */
+  --_leading-rule: var(--slds-g-sizing-border-2, 2px);
   background: var(--slds-g-color-brand-base-95, #eef4ff);
   box-shadow:
-    inset var(--slds-g-sizing-border-2, 2px) 0 0
-      var(--slds-g-color-brand-base-50, #0176d3),
+    inset var(--_leading-rule) 0 0 var(--slds-g-color-brand-base-50, #0176d3),
     inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
       var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.newton-selector-combobox__option[aria-selected="true"]:dir(rtl) {
+  --_leading-rule: calc(var(--slds-g-sizing-border-2, 2px) * -1);
 }
 
 .newton-selector-combobox__option:hover {
@@ -89,11 +94,11 @@
 }
 
 .newton-selector-combobox__state {
-  min-height: var(--slds-g-sizing-10, 2.5rem);
+  min-height: var(--slds-g-sizing-10, 3rem);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
 }
 
 .newton-selector-combobox__input-entity-icon,
@@ -113,8 +118,8 @@
 }
 
 .newton-selector-combobox__dropdown {
-  border-color: var(--slds-g-color-border-base-1, #c9c9c9);
-  border-radius: var(--slds-g-radius-border-3, 0.5rem);
+  border-color: var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-3, 0.75rem);
   box-shadow: var(--slds-g-shadow-2, 0 2px 8px rgba(0, 0, 0, 0.12));
 }
 

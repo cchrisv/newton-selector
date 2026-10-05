@@ -14,10 +14,7 @@
             data-id="resultBox"
             aria-expanded={dropdownExpanded}
           >
-            <div
-              class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right"
-              role="none"
-            >
+            <div class="slds-form-element__control" role="none">
               <template if:false={displayPill}>
                 <div
                   class="newton-selector-flow-cpe-resource-selector__input-anchor"
@@ -27,7 +24,7 @@
                   <lightning-input
                     class="value-input newton-selector-flow-cpe-resource-selector__value-input"
                     name="searchText"
-                    type="search"
+                    type="text"
                     label={label}
                     required={required}
                     data-input-name={name}
@@ -50,7 +47,7 @@
                 <button
                   type="button"
                   data-input-name={name}
-                  class="slds-input_faux slds-combobox__input slds-combobox__input-value newton-selector-flow-cpe-resource-selector__selected-trigger"
+                  class="slds-input slds-input_faux slds-combobox__input slds-combobox__input-value newton-selector-flow-cpe-resource-selector__selected-trigger"
                   title={selectedDisplayLabel}
                   onclick={handleOpenOptions}
                 >

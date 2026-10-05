@@ -82,6 +82,14 @@ Typing in the manual "Other" box never auto-advances. The user types and then cl
 
 The error state also appears when `selectorConfigJson` does not parse, and when a SOQL query fails after the configuration changes.
 
+## Translating built-in text
+
+Every piece of text the screen component shows on its own (the messages in [Validation](#validation), the loading, empty and error text above, the **Try again** button, the None and "Other" option defaults, search placeholders, the **Select all** button, the dual listbox and column headings and buttons, selected and available counts, and the accessible names screen readers announce) is a Custom Label. The labels are named `Newton_Selector_*` and grouped in the category `NewtonSelector`.
+
+To translate them, open **Setup > Custom Labels**, pick a `Newton_Selector_*` label, and add a translation for each language, or use **Setup > Translation Workbench**. Each label's description says where it appears, and `{0}` and `{1}` mark the numbers or text filled in at run time; keep them in the translation. Users see the translation for their own language.
+
+Text you type in the editor (the selector label, help text, option labels, **No options message**, **Load error message**, **Error message**, None and manual option labels) is shown exactly as typed and is not a Custom Label. To translate it, bind the field to a Flow resource that holds the translated text. The editor itself (the Custom Property Editor) is in English only.
+
 ## Related
 
 - [Configuration reference](reference-configuration.md)

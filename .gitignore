@@ -71,3 +71,6 @@ CLAUDE.md
 
 # Playwright / e2e artifacts
 output/
+
+# Impeccable design-tool cache (design.json and critique/ are committed)
+.impeccable/hook.cache.json

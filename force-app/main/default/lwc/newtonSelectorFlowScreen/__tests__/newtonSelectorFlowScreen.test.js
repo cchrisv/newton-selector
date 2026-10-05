@@ -1,6 +1,19 @@
 import { createElement } from "lwc";
 import NewtonSelectorFlowScreen from "c/newtonSelectorFlowScreen";
 
+// Jest resolves Custom Labels to their names; give the default labels these
+// tests check their English text.
+jest.mock(
+  "@salesforce/label/c.Newton_Selector_ErrorStateDefault",
+  () => ({ default: "Could not load options." }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/label/c.Newton_Selector_ManualOptionDefault",
+  () => ({ default: "Other" }),
+  { virtual: true }
+);
+
 function mount(configOverrides = {}) {
   const config = {
     dataSource: "custom",

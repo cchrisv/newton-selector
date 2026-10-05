@@ -1,7 +1,19 @@
 import { LightningElement, api, wire, track } from "lwc";
 import { getPicklistValues } from "lightning/uiObjectInfoApi";
 import queryItems from "@salesforce/apex/NewtonSelectorRuntimeController.queryItems";
+import requiredLabel from "@salesforce/label/c.Newton_Selector_Required";
+import loadingOptions from "@salesforce/label/c.Newton_Selector_LoadingOptions";
+import errorIconAlt from "@salesforce/label/c.Newton_Selector_ErrorIconAlt";
+import tryAgain from "@salesforce/label/c.Newton_Selector_TryAgain";
+import manualOptionSublabel from "@salesforce/label/c.Newton_Selector_ManualOptionSublabel";
+import makeSelection from "@salesforce/label/c.Newton_Selector_MakeSelection";
+import selectAtLeast from "@salesforce/label/c.Newton_Selector_SelectAtLeast";
+import selectNoMoreThan from "@salesforce/label/c.Newton_Selector_SelectNoMoreThan";
+import manualValueRequired from "@salesforce/label/c.Newton_Selector_ManualValueRequired";
+import manualMinLength from "@salesforce/label/c.Newton_Selector_ManualMinLength";
+import manualMaxLength from "@salesforce/label/c.Newton_Selector_ManualMaxLength";
 import {
+  formatLabel,
   normalizePicklist,
   normalizeCollection,
   normalizeSObjectDTO,
@@ -17,7 +29,16 @@ const SOURCE_COLLECTION = "collection";
 const SOURCE_SOBJECT = "sobject";
 const SOURCE_CUSTOM = "custom";
 
+const LABELS = {
+  required: requiredLabel,
+  loadingOptions,
+  errorIconAlt,
+  tryAgain
+};
+
 export default class NewtonSelectorDataSelector extends LightningElement {
+  labels = LABELS;
+
   @api label;
   @api helpText;
   @api fieldLevelHelp;
@@ -378,7 +399,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
         {
           id: MANUAL_INPUT_VALUE,
           label: this._manualInputLabel,
-          sublabel: "Enter a custom value",
+          sublabel: manualOptionSublabel,
           icon: "square-pen",
           badge: "",
           helpText: "",
@@ -581,10 +602,10 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     if (this.previewMode) return { isValid: true };
     if (this.required) {
       if (this.selectionMode === "single" && !this._value) {
-        return { isValid: false, errorMessage: "Please make a selection." };
+        return { isValid: false, errorMessage: makeSelection };
       }
       if (this.selectionMode === "multi" && this._values.length === 0) {
-        return { isValid: false, errorMessage: "Please make a selection." };
+        return { isValid: false, errorMessage: makeSelection };
       }
     }
     const manualValidation = this.validateManualInput();
@@ -594,7 +615,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
       if (this._values.length < min) {
         return {
           isValid: false,
-          errorMessage: `Please select at least ${min} option(s).`
+          errorMessage: formatLabel(selectAtLeast, min)
         };
       }
       if (
@@ -606,7 +627,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
         if (this._values.length > max) {
           return {
             isValid: false,
-            errorMessage: `Please select no more than ${max} option(s).`
+            errorMessage: formatLabel(selectNoMoreThan, max)
           };
         }
       }
@@ -620,16 +641,13 @@ export default class NewtonSelectorDataSelector extends LightningElement {
     }
     const value = (this.manualValueForGroup || "").trim();
     if (!value) {
-      return {
-        isValid: false,
-        errorMessage: "Enter a value for the manual option."
-      };
+      return { isValid: false, errorMessage: manualValueRequired };
     }
     const min = Number(this.manualInputMinLength || 0);
     if (Number.isFinite(min) && min > 0 && value.length < min) {
       return {
         isValid: false,
-        errorMessage: `Enter at least ${min} character(s).`
+        errorMessage: formatLabel(manualMinLength, min)
       };
     }
     if (
@@ -641,7 +659,7 @@ export default class NewtonSelectorDataSelector extends LightningElement {
       if (Number.isFinite(max) && max > 0 && value.length > max) {
         return {
           isValid: false,
-          errorMessage: `Enter no more than ${max} character(s).`
+          errorMessage: formatLabel(manualMaxLength, max)
         };
       }
     }

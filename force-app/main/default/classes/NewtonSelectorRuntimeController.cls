@@ -1,5 +1,10 @@
 /** @description AuraEnabled runtime and query-validation controller for the Flow screen LWC. */
 public with sharing class NewtonSelectorRuntimeController {
+  // Both entry points catch Exception: the database also fails with types other
+  // than QueryException, e.g. ExternalObjectException for FlexQueueItem without
+  // a JobType filter. System.UnexpectedException ("field ... can not be sorted")
+  // is uncatchable; the NewtonSelectorQueryFieldAccess checks prevent it.
+
   /**
    * @description Queries runtime selector items from a serialized NewtonSelectorQueryDTO.
    * Failures surface as AuraHandledException carrying the validation or database message.
@@ -10,9 +15,7 @@ public with sharing class NewtonSelectorRuntimeController {
   public static List<NewtonSelectorItemDTO> queryItems(String configJson) {
     try {
       return NewtonSelectorService.fetchItems(parseConfig(configJson));
-    } catch (NewtonSelectorException e) {
-      throw auraException(e.getMessage());
-    } catch (QueryException e) {
+    } catch (Exception e) {
       throw auraException(e.getMessage());
     }
   }
@@ -34,9 +37,7 @@ public with sharing class NewtonSelectorRuntimeController {
         true,
         'Query validated successfully.'
       );
-    } catch (NewtonSelectorException e) {
-      return new NewtonSelectorQueryValidationResultDTO(false, e.getMessage());
-    } catch (QueryException e) {
+    } catch (Exception e) {
       return new NewtonSelectorQueryValidationResultDTO(false, e.getMessage());
     }
   }

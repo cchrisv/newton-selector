@@ -66,9 +66,6 @@ export function sectionIssues(key, config, refs = {}) {
       );
     }
     if (manual.enabled) {
-      if (!manual.label || !String(manual.label).trim()) {
-        errors.push("Give the manual input option a label.");
-      }
       if (!Number.isFinite(manualMin) || manualMin < 0) {
         errors.push("Minimum characters can't be negative.");
       }

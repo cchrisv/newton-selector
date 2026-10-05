@@ -20,7 +20,7 @@ Read what the user chose and use it in a Decision, an assignment, a Get Records,
 
 6. **Fetch the full record (SOQL or Collection sources).** `selectedRecord` and `selectedRecords` are filled only for these sources; for Custom and Picklist they stay empty. Set the SOQL **Value** field, or the collection **Value** map, to `Id`. After the screen, add **Get Records** where `Id` equals `{!Plan_Selector.value}`. This is more reliable than reading fields from `selectedRecord`.
 
-7. **Pre-select a value.** In the editor's **03 Behavior** chapter, set **Default selection** to a Flow resource: a text variable in single mode, a text collection in multi mode. The editor stores it in the component's `value` (or `values`) input, and the screen opens with those options selected. Outputs are not rewritten until the user acts.
+7. **Pre-select a value.** In the editor's **03 Behavior** chapter, set **Default selection** to a Flow resource: a text variable in single mode, a text collection variable in multi mode. In multi mode the field refuses typed text with "Pick a text collection variable for multiple default selections." The editor stores it in the component's `value` (or `values`) input, and the screen opens with those options selected. Outputs are not rewritten until the user acts.
 
 ## Handling the special entries
 

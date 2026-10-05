@@ -88,6 +88,20 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
   /** 'standard' (default) | 'label-hidden' — hides the label visually but keeps it for screen readers. */
   @api variant = "standard";
 
+  // An owner-supplied error (for example a value this field can't take). The
+  // inner input reports it, so the text box itself is marked invalid and
+  // linked to the message.
+  @api
+  get errorMessage() {
+    return this._errorMessage;
+  }
+  set errorMessage(value) {
+    this._errorMessage = value || "";
+    this._errorPending = true;
+  }
+  _errorMessage = "";
+  _errorPending = false;
+
   @api
   get allowHardCodeReference() {
     return this._allowHardCodeReference;
@@ -902,6 +916,15 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
     document.addEventListener("click", this.handleWindowClick);
   }
 
+  renderedCallback() {
+    if (!this._errorPending) return;
+    const input = this.template.querySelector('[data-id="userinput"]');
+    if (!input) return;
+    this._errorPending = false;
+    input.setCustomValidity(this._errorMessage);
+    input.reportValidity();
+  }
+
   disconnectedCallback() {
     document.removeEventListener("click", this.handleWindowClick);
   }
@@ -1095,10 +1118,6 @@ export default class NewtonSelectorFlowCpeResourceSelector extends LightningElem
         this._dataType = flowComboboxDefaults.referenceDataType;
       } else {
         this._dataType = flowComboboxDefaults.stringDataType;
-      }
-
-      if (!valueInput.checkValidity()) {
-        this.hasError = true;
       }
     }
   }

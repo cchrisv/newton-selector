@@ -1,3 +1,8 @@
+import DEFAULT_NONE_OPTION_LABEL from "@salesforce/label/c.Newton_Selector_NoneOptionDefault";
+import DEFAULT_MANUAL_INPUT_LABEL from "@salesforce/label/c.Newton_Selector_ManualOptionDefault";
+import DEFAULT_EMPTY_STATE_MESSAGE from "@salesforce/label/c.Newton_Selector_EmptyStateDefault";
+import DEFAULT_ERROR_STATE_MESSAGE from "@salesforce/label/c.Newton_Selector_ErrorStateDefault";
+
 export function parseRemValue(value, fallback) {
   if (value == null || value === "") return fallback;
   const match = String(value)
@@ -12,9 +17,6 @@ export function formatRem(n) {
   const rounded = Math.round(n * 100) / 100;
   return `${rounded}rem`;
 }
-
-const DEFAULT_NONE_OPTION_LABEL = "--None--";
-const DEFAULT_MANUAL_INPUT_LABEL = "Other";
 
 const AUTO_BOX = {
   top: "",
@@ -167,8 +169,8 @@ export function defaultSelectorConfig() {
     label: "",
     helpText: "",
     fieldLevelHelp: "",
-    emptyStateMessage: "No options available.",
-    errorStateMessage: "Could not load options.",
+    emptyStateMessage: "",
+    errorStateMessage: "",
     picklist: {
       objectApiName: "",
       fieldApiName: "",
@@ -201,11 +203,11 @@ export function defaultSelectorConfig() {
     },
     custom: { items: [] },
     includeNoneOption: false,
-    noneOptionLabel: DEFAULT_NONE_OPTION_LABEL,
+    noneOptionLabel: "",
     noneOptionPosition: "start",
     manualInput: {
       enabled: false,
-      label: DEFAULT_MANUAL_INPUT_LABEL,
+      label: "",
       minLength: 0,
       maxLength: null
     },
@@ -249,9 +251,19 @@ export function mergeSelectorConfig(initialConfig) {
   };
 }
 
-// A blank label would render an empty tile, so it falls back to the default.
+// Blank text means "use the standard wording". It is stored blank and resolved
+// here, at render time, so each user sees the Custom Label in their language
+// instead of the language the admin saved the flow in.
 function labelOrDefault(label, fallback) {
   return label?.trim() ? label : fallback;
+}
+
+export function noneOptionLabelOf(config) {
+  return labelOrDefault(config.noneOptionLabel, DEFAULT_NONE_OPTION_LABEL);
+}
+
+export function manualInputLabelOf(config) {
+  return labelOrDefault(config.manualInput.label, DEFAULT_MANUAL_INPUT_LABEL);
 }
 
 /**
@@ -277,8 +289,14 @@ export function selectorPropsFromConfig(config, records = []) {
     maxSelections: config.maxSelections,
     enableSearch: config.enableSearch,
     showSelectAll: config.showSelectAll,
-    emptyStateMessage: config.emptyStateMessage,
-    errorStateMessage: config.errorStateMessage,
+    emptyStateMessage: labelOrDefault(
+      config.emptyStateMessage,
+      DEFAULT_EMPTY_STATE_MESSAGE
+    ),
+    errorStateMessage: labelOrDefault(
+      config.errorStateMessage,
+      DEFAULT_ERROR_STATE_MESSAGE
+    ),
     picklistConfig: config.picklist,
     collectionConfig: { records, fieldMap: config.collection.fieldMap },
     sobjectConfig: config.sobject,
@@ -286,16 +304,10 @@ export function selectorPropsFromConfig(config, records = []) {
     overrides: config.overrides,
     displayConfig: config.display,
     includeNoneOption: config.includeNoneOption,
-    noneOptionLabel: labelOrDefault(
-      config.noneOptionLabel,
-      DEFAULT_NONE_OPTION_LABEL
-    ),
+    noneOptionLabel: noneOptionLabelOf(config),
     noneOptionPosition: config.noneOptionPosition,
     allowManualInput: config.manualInput.enabled,
-    manualInputLabel: labelOrDefault(
-      config.manualInput.label,
-      DEFAULT_MANUAL_INPUT_LABEL
-    ),
+    manualInputLabel: manualInputLabelOf(config),
     manualInputMinLength: config.manualInput.minLength,
     manualInputMaxLength: config.manualInput.maxLength,
     appearance: {

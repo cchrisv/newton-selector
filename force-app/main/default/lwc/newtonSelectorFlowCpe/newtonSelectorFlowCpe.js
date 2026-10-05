@@ -18,7 +18,11 @@ import {
   SURFACE_TILES,
   TONE_SWATCHES
 } from "c/newtonSelectorFlowCpeUtilityConfigOptions";
-import { mergeSelectorConfig } from "c/newtonSelectorUtilityConfigDefaults";
+import {
+  manualInputLabelOf,
+  mergeSelectorConfig,
+  noneOptionLabelOf
+} from "c/newtonSelectorUtilityConfigDefaults";
 import {
   DEFAULT_QUERY_LIMIT,
   resolveRecordCollectionMetadataFromBuilderContext
@@ -286,7 +290,7 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
     }
     if (c.includeNoneOption && c.selectionMode === "single") {
       const pos = c.noneOptionPosition === "end" ? "end" : "start";
-      const lbl = (c.noneOptionLabel || "--None--").trim() || "--None--";
+      const lbl = noneOptionLabelOf(c);
       lines.push({
         key: "none",
         text: `Includes "${lbl}" at the ${pos}`,
@@ -294,7 +298,7 @@ export default class NewtonSelectorFlowCpe extends LightningElement {
       });
     }
     if (c.manualInput?.enabled) {
-      const label = (c.manualInput.label || "Other").trim() || "Other";
+      const label = manualInputLabelOf(c);
       const min = Number(c.manualInput.minLength || 0);
       const max = c.manualInput.maxLength;
       let limits = "";

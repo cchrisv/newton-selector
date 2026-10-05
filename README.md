@@ -73,6 +73,7 @@ Drop the `Professor Flow | Newton Selector` component onto any Flow Screen and t
 | **Option overrides**    | Per-option label, sublabel, icon, badge, help text, and hide overrides for Picklist and SOQL sources                        |
 | **Sort and limit**      | Sort by label, value, or source order; optional result cap                                                                  |
 | **Required validation** | Block flow navigation with a configurable error message                                                                     |
+| **Translatable text**   | Built-in end-user text is `Newton_Selector_*` Custom Labels, translatable in Setup                                          |
 | **SLDS 2-oriented UI**  | Uses SLDS utilities, design tokens and accessibility patterns. `npm run lint:slds` runs the SLDS linter over the components |
 
 ---
@@ -133,7 +134,7 @@ Manual input is a behavior-level option that can add an "Other" choice to any se
 | **Single** | One option selected at a time. Outputs `value`, `selectedRecord`, `selectedLabel`, and `selectionCount`. Auto-advance applies only to this mode.                                                |
 | **Multi**  | Any number of options, optionally bounded by **Minimum selections** and **Maximum selections** (Behavior chapter). Outputs `values`, `selectedRecords`, `selectedLabels`, and `selectionCount`. |
 
-Both modes support the `required` flag, which blocks the Flow's Next button until a valid selection is made and shows a configurable error message. **Default selection** (Behavior chapter) pre-selects options from a Flow resource by setting the component's `value` (single) or `values` (multi) input.
+Both modes support the `required` flag, which blocks the Flow's Next button until a valid selection is made and shows a configurable error message. **Default selection** (Behavior chapter) pre-selects options from a Flow resource by setting the component's `value` (single) or `values` (multi) input. In multi mode it accepts only a text collection variable.
 
 ---
 
@@ -357,4 +358,6 @@ Key test classes: `NewtonSelectorRuntimeControllerTest`, `NewtonSelectorServiceT
 
 ## License
 
-MIT (c) cchrisv
+MIT. Copyright (c) 2026 Christiaan Van Der Merwe. See [LICENSE](LICENSE).
+
+The resource picker (`newtonSelectorFlowCpeResourceSelector`), the toggle (`newtonSelectorFlowCpeToggle`) and the merge-field helpers in `newtonSelectorFlowCpeUtilityHelpers` are adapted from [UnofficialSF LightningFlowComponents](https://github.com/UnofficialSF/LightningFlowComponents) (`fsc_flowCombobox`, `fsc_flowCheckbox`, `fsc_flowComboboxUtils`) and remain under the Apache License 2.0. See [NOTICE](NOTICE).

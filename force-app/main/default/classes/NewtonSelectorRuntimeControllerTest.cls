@@ -1,6 +1,7 @@
 @IsTest
 private class NewtonSelectorRuntimeControllerTest {
   private static final Integer BULK_RECORD_COUNT = 251;
+  private static final String FLEX_QUEUE_FILTER_ERROR = 'data.api.DataSourceUnsupportedQueryException: The WHERE clause must contain a JobType field expression.';
 
   @IsTest
   static void queryItemsSuccess() {
@@ -165,6 +166,34 @@ private class NewtonSelectorRuntimeControllerTest {
   }
 
   @IsTest
+  static void validateQueryReportsExternalDataSourceError() {
+    User testUser = createViewSetupUser();
+    System.runAs(testUser) {
+      Test.startTest();
+      NewtonSelectorQueryValidationResultDTO result = NewtonSelectorRuntimeController.validateQuery(
+        JSON.serialize(buildUnfilteredFlexQueueConfig())
+      );
+      Test.stopTest();
+
+      Assert.areEqual(false, result.valid);
+      Assert.areEqual(FLEX_QUEUE_FILTER_ERROR, result.message);
+    }
+  }
+
+  @IsTest
+  static void queryItemsReportsExternalDataSourceError() {
+    User testUser = createViewSetupUser();
+    System.runAs(testUser) {
+      Test.startTest();
+      assertQueryItemsFails(
+        JSON.serialize(buildUnfilteredFlexQueueConfig()),
+        FLEX_QUEUE_FILTER_ERROR
+      );
+      Test.stopTest();
+    }
+  }
+
+  @IsTest
   static void validateQueryRejectsBlankConfig() {
     User testUser = NewtonSelectorTestDataFactory.createStandardUser();
     System.runAs(testUser) {
@@ -207,6 +236,34 @@ private class NewtonSelectorRuntimeControllerTest {
       Assert.areEqual(false, result.valid);
       Assert.areEqual('Selector configuration is required.', result.message);
     }
+  }
+
+  // FlexQueueItem is served by a platform data source that rejects a query
+  // without a JobType filter with System.ExternalObjectException, not QueryException.
+  private static NewtonSelectorQueryDTO buildUnfilteredFlexQueueConfig() {
+    NewtonSelectorQueryDTO config = new NewtonSelectorQueryDTO();
+    config.sObjectApiName = 'FlexQueueItem';
+    config.labelField = 'JobType';
+    return config;
+  }
+
+  // FlexQueueItem is readable only with View Setup and Configuration.
+  private static User createViewSetupUser() {
+    User testUser = NewtonSelectorTestDataFactory.createStandardUser();
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      PermissionSet viewSetup = new PermissionSet(
+        Name = 'Newton_Selector_Test_View_Setup',
+        Label = 'Newton Selector Test View Setup',
+        PermissionsViewSetup = true,
+        PermissionsViewRoles = true
+      );
+      insert viewSetup;
+      insert new PermissionSetAssignment(
+        AssigneeId = testUser.Id,
+        PermissionSetId = viewSetup.Id
+      );
+    }
+    return testUser;
   }
 
   private static void assertQueryItemsFails(

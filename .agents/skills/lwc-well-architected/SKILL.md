@@ -181,5 +181,4 @@ Apply level-specific rules strictly:
 
 ## Related Standards
 
-- Apex architecture: `apex-well-architected.md`
-- Naming conventions: `metadata-naming-conventions.md`
+- Apex and LWC code standards: `AGENTS.md` ("Code standards")

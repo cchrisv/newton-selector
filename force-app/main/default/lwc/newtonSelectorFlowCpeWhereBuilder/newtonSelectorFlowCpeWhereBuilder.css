@@ -5,7 +5,7 @@
 .cc-where {
   display: block;
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
+    var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-1, 0.25rem);
   background: var(--slds-g-color-surface-1, #ffffff);
   overflow: hidden;
@@ -20,7 +20,7 @@
   min-height: 3.25rem;
   padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
   border-bottom: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #e5e5e5);
+    var(--slds-g-color-neutral-base-90, #e5e5e5);
   background: var(--slds-g-color-surface-1, #ffffff);
 }
 
@@ -55,7 +55,7 @@
   align-items: center;
   padding: var(--slds-g-sizing-1, 0.125rem);
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
+    var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-1, 0.25rem);
   background: var(--slds-g-color-surface-container-1, #f3f3f3);
 }
@@ -80,9 +80,9 @@
 }
 
 .cc-where-segment_selected {
-  border-color: var(--slds-g-color-border-base-1, #c9c9c9);
+  border-color: var(--slds-g-color-border-1, #c9c9c9);
   background: var(--slds-g-color-surface-1, #ffffff);
-  color: var(--slds-g-color-brand-base-30, #032d60);
+  color: var(--slds-g-color-brand-base-30, #014486);
   box-shadow: var(
     --slds-g-shadow-1,
     0 1px 2px
@@ -113,7 +113,7 @@
   gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem);
   border-bottom: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #e5e5e5);
+    var(--slds-g-color-neutral-base-90, #e5e5e5);
   background: var(--slds-g-color-surface-container-2, #fafafa);
 }
 
@@ -132,7 +132,7 @@
   height: var(--slds-g-sizing-6, 1.25rem);
   border-radius: var(--slds-g-radius-border-circle, 999rem);
   background: var(--slds-g-color-brand-base-90, #d8e6fe);
-  color: var(--slds-g-color-brand-base-30, #032d60);
+  color: var(--slds-g-color-brand-base-30, #014486);
   font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
   font-weight: var(--slds-g-font-weight-7, 700);
 }
@@ -141,7 +141,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--slds-g-spacing-3, 0.75rem);
-  max-height: 30rem;
+  max-height: var(--slds-g-sizing-16, 30rem);
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
@@ -157,7 +157,7 @@
   margin-inline-start: var(--cc-depth-offset);
   padding: var(--slds-g-spacing-3, 0.75rem);
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #e5e5e5);
+    var(--slds-g-color-neutral-base-90, #e5e5e5);
   border-inline-start: var(--slds-g-sizing-border-2, 2px) solid
     var(--slds-g-color-brand-base-50, #0176d3);
   border-radius: var(--slds-g-radius-border-1, 0.25rem);
@@ -226,7 +226,7 @@
 }
 
 .cc-where-icon-button:hover {
-  border-color: var(--slds-g-color-border-base-1, #c9c9c9);
+  border-color: var(--slds-g-color-border-1, #c9c9c9);
   background: var(--slds-g-color-surface-container-2, #fafafa);
   color: var(--slds-g-color-on-surface-1, #181818);
 }
@@ -254,7 +254,7 @@
   max-width: none;
   padding-top: var(--slds-g-spacing-1, 0.25rem);
   border-top: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #e5e5e5);
+    var(--slds-g-color-neutral-base-90, #e5e5e5);
 }
 
 .cc-where-group {
@@ -305,7 +305,7 @@
   height: var(--slds-g-sizing-7, 1.5rem);
   border-radius: var(--slds-g-radius-border-1, 0.25rem);
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
+    var(--slds-g-color-border-1, #c9c9c9);
   background: var(--slds-g-color-surface-container-1, #f3f3f3);
   color: var(--slds-g-color-on-surface-2, #444444);
   font-family: var(--slds-g-font-family-monospace, Consolas, monospace);
@@ -359,7 +359,7 @@
     var(--slds-g-color-brand-base-50, #0176d3);
   border-radius: var(--slds-g-radius-border-1, 0.25rem);
   background: var(--slds-g-color-surface-1, #ffffff);
-  color: var(--slds-g-color-brand-base-40, #014486);
+  color: var(--slds-g-color-brand-base-40, #0b5cab);
   cursor: pointer;
   font-family: inherit;
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
@@ -379,13 +379,13 @@
   min-height: 7rem;
   padding: var(--slds-g-spacing-2, 0.5rem);
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
+    var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-1, 0.25rem);
   background: var(--slds-g-color-surface-1, #ffffff);
   color: var(--slds-g-color-on-surface-1, #181818);
   font-family: var(--slds-g-font-family-monospace, Consolas, monospace);
   font-size: var(--slds-g-font-scale-base, 0.8125rem);
-  line-height: var(--slds-g-font-line-height-3, 1.5);
+  line-height: var(--slds-g-font-line-height-3, 1.375);
   resize: vertical;
 }
 

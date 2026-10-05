@@ -12,18 +12,18 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--slds-g-spacing-3, 0.75rem);
 }
 
 /* Search bar */
 .newton-search-bar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
 }
 
@@ -39,7 +39,7 @@
 .newton-toolbar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-1, 0.25rem) 0;
 }
 
@@ -180,7 +180,7 @@
   width: var(--slds-g-sizing-5, 1rem);
   height: var(--slds-g-sizing-5, 1rem);
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
+    var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-circle, 50%);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
 }
@@ -193,7 +193,7 @@
 }
 
 .newton-radio-card_multi .newton-radio-card__marker {
-  border-radius: var(--slds-g-radius-border-1, 0.125rem);
+  border-radius: var(--slds-g-radius-border-1, 0.25rem);
 }
 
 .newton-radio-card_multi.newton-radio-card_selected .newton-radio-card__marker {
@@ -207,8 +207,8 @@
   position: absolute;
   top: 2px;
   inset-inline-start: var(--slds-g-spacing-1, 0.25rem);
-  width: 4px;
-  height: 7px;
+  width: var(--slds-g-sizing-2, 0.25rem);
+  height: var(--slds-g-sizing-3, 0.5rem);
   /* Physical on purpose: a checkmark glyph must not mirror in RTL. */
   border-style: solid;
   border-color: var(--slds-g-color-on-accent-1, #ffffff);
@@ -259,7 +259,7 @@
   padding: 0;
   overflow-y: auto;
   border-color: var(--slds-g-color-border-1, #c9c9c9);
-  border-radius: var(--slds-g-radius-border-3, 0.5rem);
+  border-radius: var(--slds-g-radius-border-3, 0.75rem);
   box-shadow: var(--slds-g-shadow-2, 0 2px 8px #0000001f);
 }
 
@@ -279,8 +279,8 @@
   display: block;
   padding: 0;
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
   cursor: pointer;
 }
@@ -290,19 +290,24 @@
 }
 
 /* The keyboard-active option (aria-activedescendant). */
-.newton-picklist__option.slds-has-focus {
+.newton-picklist__option_active {
   outline: var(--slds-g-sizing-border-2, 2px) solid
     var(--slds-g-color-brand-base-50, #0176d3);
   outline-offset: calc(-1 * var(--slds-g-sizing-border-2, 2px));
 }
 
 .newton-picklist__item_selected .newton-picklist__option {
+  /* The accent rule sits on the leading edge, so its offset flips in RTL. */
+  --_leading-rule: var(--slds-g-sizing-border-2, 2px);
   background: var(--slds-g-color-brand-base-95, #eef4ff);
   box-shadow:
-    inset var(--slds-g-sizing-border-2, 2px) 0 0
-      var(--slds-g-color-brand-base-50, #0176d3),
+    inset var(--_leading-rule) 0 0 var(--slds-g-color-brand-base-50, #0176d3),
     inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
       var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.newton-picklist__item_selected .newton-picklist__option:dir(rtl) {
+  --_leading-rule: calc(var(--slds-g-sizing-border-2, 2px) * -1);
 }
 
 .newton-picklist__item c-newton-selector-choice-tile {
@@ -323,8 +328,8 @@
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
   margin: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-3, 0.75rem) 0;
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
 }
 
@@ -353,12 +358,14 @@
   min-width: 0;
   min-height: 12rem;
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
   transition:
-    border-color var(--newton-transfer-transition-duration) ease,
-    box-shadow var(--newton-transfer-transition-duration) ease;
+    border-color var(--newton-transfer-transition-duration)
+      cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow var(--newton-transfer-transition-duration)
+      cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .newton-transfer_columns .newton-transfer__panel {
@@ -381,16 +388,16 @@
   align-items: center;
   justify-content: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
-  inline-size: var(--slds-g-sizing-10, 2rem);
+  inline-size: var(--slds-g-sizing-9, 2rem);
 }
 
 .newton-transfer__control {
   display: inline-flex;
-  flex: 0 0 var(--slds-g-sizing-10, 2rem);
+  flex: 0 0 var(--slds-g-sizing-9, 2rem);
   align-items: center;
   justify-content: center;
-  inline-size: var(--slds-g-sizing-10, 2rem);
-  block-size: var(--slds-g-sizing-10, 2rem);
+  inline-size: var(--slds-g-sizing-9, 2rem);
+  block-size: var(--slds-g-sizing-9, 2rem);
   margin: 0;
 }
 
@@ -400,8 +407,13 @@
   justify-content: center;
 }
 
+/* The chevrons point from one panel to the other, so they mirror in RTL. */
+.newton-transfer__control c-newton-selector-icon:dir(rtl) {
+  transform: scaleX(-1);
+}
+
 .newton-transfer__panel_drop {
-  border-color: var(--slds-g-color-brand-base-60, #0b5cab);
+  border-color: var(--slds-g-color-brand-base-60, #1b96ff);
   box-shadow: inset 0 0 0 var(--slds-g-sizing-border-2, 2px)
     var(--slds-g-color-brand-base-80, #aacbff);
 }
@@ -413,7 +425,7 @@
   gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
   border-bottom: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #c9c9c9);
+    var(--slds-g-color-border-1, #c9c9c9);
 }
 
 .newton-transfer__label {
@@ -438,7 +450,7 @@
 }
 
 .newton-transfer__item {
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
 }
 
 .newton-transfer__item_draggable {
@@ -451,7 +463,7 @@
 
 .newton-transfer__item_active {
   box-shadow: 0 0 0 var(--slds-g-sizing-border-2, 2px)
-    var(--slds-g-color-brand-base-60, #0b5cab);
+    var(--slds-g-color-brand-base-60, #1b96ff);
 }
 
 .newton-transfer__item c-newton-selector-choice-tile {
@@ -484,7 +496,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--slds-g-spacing-2, 0.5rem);
   padding: var(--slds-g-spacing-6, 2rem) var(--slds-g-spacing-4, 1rem);
   color: var(--slds-g-color-neutral-base-50, #747474);
   text-align: center;

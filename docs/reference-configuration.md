@@ -92,6 +92,7 @@ Adjust how individual options render without changing the data. Stored in `overr
 - Toggle **Option overrides**: Default or Advanced. Switching back to Default clears every override and offers **Undo** until your next change to the overrides.
 - Per-row fields: Hide option, Icon, Label override, Subtitle, Badge, Help text.
 - Filter box, **Select all shown**, and **Bulk apply · N selected** (Icon, Sublabel, Badge, Help text; Clear and Apply to selected). Bulk apply never changes label or hide.
+- A row checked for bulk apply shows as selected, and a row opened for editing shows as expanded, so you can see which rows a bulk apply will change. The **Bulk apply** card is drawn apart from the rows it edits.
 - SOQL rows need **Load sample rows** first so the editor has values to key on.
 
 ### Display options (all sources)
@@ -106,35 +107,37 @@ Adjust how individual options render without changing the data. Stored in `overr
 
 All five fields accept merge fields and are always visible.
 
-| UI label                            | Key                 | Default                   |
-| ----------------------------------- | ------------------- | ------------------------- |
-| Selector label                      | `label`             | empty                     |
-| Help text (description under label) | `helpText`          | empty                     |
-| Label tooltip (info icon)           | `fieldLevelHelp`    | empty                     |
-| No options message                  | `emptyStateMessage` | `No options available.`   |
-| Load error message                  | `errorStateMessage` | `Could not load options.` |
+A blank message, None label or manual option label is saved blank, and the selector shows its Custom Label at run time, so each user sees the translation for their own language. Type your own text to override it for every user.
+
+| UI label                            | Key                 | Default                                                                      |
+| ----------------------------------- | ------------------- | ---------------------------------------------------------------------------- |
+| Selector label                      | `label`             | empty                                                                        |
+| Help text (description under label) | `helpText`          | empty                                                                        |
+| Label tooltip (info icon)           | `fieldLevelHelp`    | empty                                                                        |
+| No options message                  | `emptyStateMessage` | empty: shows `No options available.` (`Newton_Selector_EmptyStateDefault`)   |
+| Load error message                  | `errorStateMessage` | empty: shows `Could not load options.` (`Newton_Selector_ErrorStateDefault`) |
 
 ## 03 Behavior
 
-| UI label              | Key                                             | Values / default                                                                                             |
-| --------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Mode (Single / Multi) | `selectionMode`                                 | `single` (default), `multi`. Choosing Multi switches `autoAdvance` off.                                      |
-| Required              | `required`                                      | Off by default.                                                                                              |
-| Error message         | `customErrorMessage`                            | Shown only when Required is on. Optional. Replaces every validation message.                                 |
-| Auto-advance          | `autoAdvance`                                   | Off by default. Single mode only.                                                                            |
-| None option           | `includeNoneOption`                             | Off by default. Works in single and multi.                                                                   |
-| None option label     | `noneOptionLabel`                               | `--None--`. Shown when None option is on.                                                                    |
-| Position              | `noneOptionPosition`                            | `start` (default) or `end`.                                                                                  |
-| Manual input          | `manualInput.enabled`                           | Off by default. Adds an "Other" choice with a text box.                                                      |
-| Manual option label   | `manualInput.label`                             | `Other`                                                                                                      |
-| Minimum characters    | `manualInput.minLength`                         | `0`                                                                                                          |
-| Maximum characters    | `manualInput.maxLength`                         | Unlimited                                                                                                    |
-| Search                | `enableSearch`                                  | Off by default. Adds a filter box above the options.                                                         |
-| Default selection     | Flow input `value` (single) or `values` (multi) | Optional. A Flow resource whose value (or text collection, in multi mode) is selected when the screen opens. |
+| UI label              | Key                                             | Values / default                                                                                                                        |
+| --------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Mode (Single / Multi) | `selectionMode`                                 | `single` (default), `multi`. Choosing Multi switches `autoAdvance` off.                                                                 |
+| Required              | `required`                                      | Off by default.                                                                                                                         |
+| Error message         | `customErrorMessage`                            | Shown only when Required is on. Optional. Replaces every validation message.                                                            |
+| Auto-advance          | `autoAdvance`                                   | Off by default. Single mode only.                                                                                                       |
+| None option           | `includeNoneOption`                             | Off by default. Works in single and multi.                                                                                              |
+| None option label     | `noneOptionLabel`                               | empty: shows `--None--` (`Newton_Selector_NoneOptionDefault`). Shown when None option is on.                                            |
+| Position              | `noneOptionPosition`                            | `start` (default) or `end`.                                                                                                             |
+| Manual input          | `manualInput.enabled`                           | Off by default. Adds an "Other" choice with a text box.                                                                                 |
+| Manual option label   | `manualInput.label`                             | empty: shows `Other` (`Newton_Selector_ManualOptionDefault`)                                                                            |
+| Minimum characters    | `manualInput.minLength`                         | `0`                                                                                                                                     |
+| Maximum characters    | `manualInput.maxLength`                         | Unlimited                                                                                                                               |
+| Search                | `enableSearch`                                  | Off by default. Adds a filter box above the options.                                                                                    |
+| Default selection     | Flow input `value` (single) or `values` (multi) | Optional. Single mode: a Flow text resource whose value is selected when the screen opens. Multi mode: a text collection variable only. |
 
 In multi mode, **Minimum selections** (`minSelections`, blank or 0 means none) and **Maximum selections** (`maxSelections`, blank means no maximum) sit on the Selection mode card.
 
-**Default selection** is the one Behavior setting that is not stored in `selectorConfigJson`: the editor writes the chosen resource, as a `{!Resource}` reference, to the component's `value` input in single mode or `values` input in multi mode. `showSelectAll` exists in the config and the runtime honors it, but the editor has no control for it; set it by editing `selectorConfigJson`. See [Known limitations](known-limitations.md#no-editor-control-for-select-all).
+**Default selection** is the one Behavior setting that is not stored in `selectorConfigJson`: the editor writes the chosen resource, as a `{!Resource}` reference, to the component's `value` input in single mode or `values` input in multi mode. In multi mode a typed value is refused: the field shows "Pick a text collection variable for multiple default selections." and nothing is written to `values`. `showSelectAll` exists in the config and the runtime honors it, but the editor has no control for it; set it by editing `selectorConfigJson`. See [Known limitations](known-limitations.md#no-editor-control-for-select-all).
 
 ## 04 Appearance
 
@@ -232,7 +235,6 @@ Only the Data and Behavior chapters produce issues. Errors block Save. Warnings 
 - Choose the field to show as each option's label. (Collection)
 - Choose the object to query. (SOQL)
 - Add at least one option. (Custom, only when manual input is off.)
-- Give the manual input option a label.
 - Minimum characters can't be negative.
 - Maximum characters must be at least the minimum, and at least 1.
 - Maximum selections must be at least the minimum, and at least 1. (Multi mode)

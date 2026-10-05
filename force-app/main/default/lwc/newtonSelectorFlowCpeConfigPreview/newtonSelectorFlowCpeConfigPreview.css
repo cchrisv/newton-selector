@@ -1,45 +1,11 @@
+@import "c/newtonSelectorFlowCpeUtilityTokens";
+
 :host {
   display: block;
-  --newton-studio-surface: var(--slds-g-color-neutral-base-100, #ffffff);
-  --newton-studio-surface-alt: var(--slds-g-color-neutral-base-95, #f3f3f3);
-  --newton-studio-surface-raised: var(
-    --slds-g-color-surface-1,
-    var(--newton-studio-surface)
-  );
-  --newton-studio-surface-soft: var(
-    --slds-g-color-surface-container-2,
-    var(--newton-studio-surface-alt)
-  );
-  --newton-studio-ink: var(--slds-g-color-neutral-base-10, #181818);
-  --newton-studio-ink-weak: var(--slds-g-color-neutral-base-40, #5c5c5c);
-  --newton-studio-hairline: var(--slds-g-color-border-base-1, #e5e5e5);
-  --newton-studio-brand: var(--slds-g-color-brand-base-50, #0176d3);
-  --newton-studio-brand-weak: var(--slds-g-color-brand-base-95, #eaf3ff);
-  --newton-studio-radius: var(--slds-g-radius-border-2, 0.25rem);
-  --newton-studio-radius-lg: var(--slds-g-radius-border-3, 0.5rem);
-  --newton-studio-shadow: var(
-    --slds-g-shadow-1,
-    0 1px 2px
-      color-mix(
-        in oklab,
-        var(--slds-g-color-neutral-base-10, #181818) 6%,
-        transparent
-      )
-  );
-  --newton-studio-shadow-lift: var(
-    --slds-g-shadow-2,
-    0 2px 8px
-      color-mix(
-        in oklab,
-        var(--slds-g-color-neutral-base-10, #181818) 12%,
-        transparent
-      )
-  );
-  --newton-studio-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .newton-studio__eyebrow {
-  color: var(--newton-studio-ink-weak, #5c5c5c);
+  color: var(--newton-studio-ink-weak);
   letter-spacing: 0;
   margin: 0;
 }
@@ -64,7 +30,7 @@
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
   border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--newton-studio-radius-lg);
-  background: var(--newton-studio-surface-raised);
+  background: var(--newton-studio-panel);
   box-shadow: var(--newton-studio-shadow);
 }
 
@@ -93,14 +59,14 @@
   background: color-mix(
     in oklab,
     var(--newton-studio-brand-weak) 76%,
-    var(--newton-studio-surface-raised)
+    var(--newton-studio-panel)
   );
   color: var(--newton-studio-brand);
   box-shadow: inset 0 0 0 var(--slds-g-sizing-border-1, 1px)
     color-mix(
       in oklab,
       var(--newton-studio-brand) 8%,
-      var(--newton-studio-surface-raised)
+      var(--newton-studio-panel)
     );
 }
 
@@ -129,16 +95,15 @@
   align-items: stretch;
   padding: var(--slds-g-spacing-1, 0.25rem);
   border-radius: var(--newton-studio-radius);
-  background: var(--newton-studio-surface-soft);
-  border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--newton-studio-hairline, #e5e5e5);
+  background: var(--newton-studio-panel-soft);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   gap: var(--slds-g-spacing-1, 0.25rem);
   flex: 0 0 auto;
 }
 
 .newton-studio__preview-frame {
   flex: 1 1 auto;
-  background: var(--newton-studio-surface-raised);
+  background: var(--newton-studio-panel);
   border: var(--slds-g-sizing-border-1, 1px) solid var(--newton-studio-hairline);
   border-radius: var(--newton-studio-radius-lg);
   padding: var(--slds-g-spacing-4, 1rem);
@@ -178,7 +143,7 @@
 
 .newton-studio__state-btn:focus-visible {
   outline: var(--slds-g-sizing-border-2, 2px) solid var(--newton-studio-brand);
-  outline-offset: -2px;
+  outline-offset: calc(-1 * var(--slds-g-sizing-border-2, 2px));
 }
 
 .newton-studio__state-btn_active {

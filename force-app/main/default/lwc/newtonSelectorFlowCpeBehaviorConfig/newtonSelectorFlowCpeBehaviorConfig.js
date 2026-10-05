@@ -1,6 +1,12 @@
 import { api, LightningElement } from "lwc";
 import { defaultSelectorConfig } from "c/newtonSelectorUtilityConfigDefaults";
-import { readResourceValue } from "c/newtonSelectorFlowCpeUtilityHelpers";
+import {
+  isReference,
+  readResourceValue
+} from "c/newtonSelectorFlowCpeUtilityHelpers";
+
+const MULTI_DEFAULT_LITERAL_ERROR =
+  "Pick a text collection variable for multiple default selections.";
 
 export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElement {
   @api config;
@@ -30,6 +36,8 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
     return this._config.selectionMode === "multi";
   }
 
+  defaultSelectionError = "";
+
   // Single select pre-selects from a text value, multi select from a text
   // collection; each mode has its own Flow input.
   get defaultSelectionRefName() {
@@ -39,14 +47,19 @@ export default class NewtonSelectorFlowCpeBehaviorConfig extends LightningElemen
     return this.isMultiSelect ? this.valuesRef : this.valueRef;
   }
   handleDefaultSelectionChange(event) {
-    this.dispatchRefChange(
-      this.defaultSelectionRefName,
-      readResourceValue(event)
-    );
+    const value = readResourceValue(event);
+    // A typed literal can't fill the `values` text collection; keep it unsaved.
+    if (this.isMultiSelect && value && !isReference(value)) {
+      this.defaultSelectionError = MULTI_DEFAULT_LITERAL_ERROR;
+      return;
+    }
+    this.defaultSelectionError = "";
+    this.dispatchRefChange(this.defaultSelectionRefName, value);
   }
 
   handleSelectionModeToggle(event) {
     const leaving = this.defaultSelectionRefName;
+    this.defaultSelectionError = "";
     const value = event.detail.checked ? "multi" : "single";
     const next = { ...this._config, selectionMode: value };
     if (value === "multi") {

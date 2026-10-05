@@ -39,7 +39,7 @@ Task-focused steps for admins and developers.
 Complete, factual descriptions.
 
 - [Configuration reference](reference-configuration.md): every editor setting, key, value and default.
-- [Flow component reference](reference-flow-component.md): inputs, outputs, validation messages, auto-advance.
+- [Flow component reference](reference-flow-component.md): inputs, outputs, validation messages, auto-advance, translating built-in text.
 - [Apex API reference](reference-apex-api.md): classes, methods, DTOs, limits, messages.
 - [WHERE clause reference](reference-where-clause.md): builder operators and the Apex grammar.
 

@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Newton_Selector_Available</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox available panel heading</shortDescription>
+        <value>Available</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_AvailableCardColumn</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Columns layout available panel accessible name</shortDescription>
+        <value>Available card column</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_AvailableCards</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Columns layout available panel heading</shortDescription>
+        <value>Available cards</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_AvailableCount</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Available panel count; {0} is the number of options</shortDescription>
+        <value>{0} available</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_AvailableOptions</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox available panel accessible name</shortDescription>
+        <value>Available options</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_CharacterRange</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Manual input hint; {0} is the minimum, {1} the maximum length</shortDescription>
+        <value>{0}-{1} characters</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ChooseAnOption</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dropdown layout placeholder when nothing is selected</shortDescription>
+        <value>Choose an option</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_Chosen</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Dual listbox chosen panel heading</shortDescription>
+        <value>Chosen</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ChosenOptions</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox chosen panel accessible name</shortDescription>
+        <value>Chosen options</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ClearAll</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Multi-select toolbar button that clears the selection</shortDescription>
+        <value>Clear all</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_DropSelectedCardsHere</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Columns layout empty selected panel message</shortDescription>
+        <value>Drop selected cards here.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_EmptyStateDefault</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Default empty-state message when the admin sets none</shortDescription>
+        <value>No options available.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ErrorIconAlt</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Accessible name of the error-state icon</shortDescription>
+        <value>Error</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ErrorStateDefault</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Default error-state message when the admin sets none</shortDescription>
+        <value>Could not load options.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_FilterAvailable</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Placeholder of the available panel search field</shortDescription>
+        <value>Filter available</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_FilterAvailableOptions</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Accessible name of the available panel search field</shortDescription>
+        <value>Filter available options</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_FilterItems</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Accessible name of the option search field</shortDescription>
+        <value>Filter items</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_FilterPicklistOptions</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Accessible name of the Dropdown layout search field</shortDescription>
+        <value>Filter picklist options</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_LoadingOptions</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Screen reader text while options load</shortDescription>
+        <value>Loading options</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_MakeSelection</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Validation message when a required selector is empty</shortDescription>
+        <value>Please make a selection.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ManualInputMax</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Manual input hint; {0} is the maximum length</shortDescription>
+        <value>Up to {0} characters</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ManualInputMin</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Manual input hint; {0} is the minimum length</shortDescription>
+        <value>At least {0} characters</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ManualMaxLength</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Validation message; {0} is the maximum manual input length</shortDescription>
+        <value>Enter no more than {0} character(s).</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ManualMinLength</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Validation message; {0} is the minimum manual input length</shortDescription>
+        <value>Enter at least {0} character(s).</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ManualOptionDefault</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Default label of the manual-input option</shortDescription>
+        <value>Other</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ManualOptionSublabel</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Subtitle of the manual-input option</shortDescription>
+        <value>Enter a custom value</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_ManualValueRequired</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Validation message when the manual option is picked but empty</shortDescription>
+        <value>Enter a value for the manual option.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_MoreSelected</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dropdown summary; {0} is the first labels, {1} the hidden count</shortDescription>
+        <value>{0} +{1} more</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_MoveAllToChosen</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox button that moves every option</shortDescription>
+        <value>Move all to chosen</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_MoveChoicesHere</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox empty chosen panel message</shortDescription>
+        <value>Move choices here.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_MoveOptions</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Accessible name of the dual listbox button group</shortDescription>
+        <value>Move options</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_MoveSelectedToChosen</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox button that moves the highlighted options</shortDescription>
+        <value>Move selected to chosen</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_NoAvailableCards</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Columns layout empty available panel message</shortDescription>
+        <value>No available cards.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_NoAvailableOptions</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox empty available panel message</shortDescription>
+        <value>No available options.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_NoItems</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Message when a search matches no tiles</shortDescription>
+        <value>No items to display.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_NoneOptionDefault</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Default label of the None option</shortDescription>
+        <value>--None--</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_NoOptionsToDisplay</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dropdown layout message when a search matches nothing</shortDescription>
+        <value>No options to display.</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_PicklistOptions</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Accessible name of the Dropdown layout option list</shortDescription>
+        <value>Picklist options</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_RemoveAll</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox button that removes every chosen option</shortDescription>
+        <value>Remove all</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_RemoveSelected</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Dual listbox button that removes the highlighted options</shortDescription>
+        <value>Remove selected</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_Required</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Tooltip of the required-field asterisk</shortDescription>
+        <value>required</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_RowFallback</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Option label when a record has no label value; {0} is the row number</shortDescription>
+        <value>(row {0})</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_Search</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Placeholder of the option search field</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_SearchOptions</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Placeholder of the Dropdown layout search field</shortDescription>
+        <value>Search options</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_SelectAll</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Multi-select toolbar button that selects every option</shortDescription>
+        <value>Select all</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_SelectAtLeast</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Validation message; {0} is the minimum number of selections</shortDescription>
+        <value>Please select at least {0} option(s).</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_SelectedCardColumn</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Columns layout selected panel accessible name</shortDescription>
+        <value>Selected card column</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_SelectedCards</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Columns layout selected panel heading</shortDescription>
+        <value>Selected cards</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_SelectedCount</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Selected panel count; {0} is the number of options</shortDescription>
+        <value>{0} selected</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_SelectNoMoreThan</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Validation message; {0} is the maximum number of selections</shortDescription>
+        <value>Please select no more than {0} option(s).</value>
+    </labels>
+    <labels>
+        <fullName>Newton_Selector_TryAgain</fullName>
+        <categories>NewtonSelector</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription
+    >Error-state button that reloads the options</shortDescription>
+        <value>Try again</value>
+    </labels>
+</CustomLabels>

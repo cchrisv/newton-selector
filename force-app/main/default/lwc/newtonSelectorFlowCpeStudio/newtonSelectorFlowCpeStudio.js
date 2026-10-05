@@ -7,6 +7,11 @@ const DEFAULT_LEFT_PERCENT = 50;
 // above a jumped-to chapter so it sits where it would at the top of the list.
 const SCROLL_PADDING_TOP_PX = 12;
 
+// +1 when the inline-start pane is on the left, -1 in right-to-left layouts.
+function inlineSign(element) {
+  return getComputedStyle(element).direction === "rtl" ? -1 : 1;
+}
+
 export default class NewtonSelectorFlowCpeStudio extends LightningElement {
   @api sections = [];
   @track _leftWidth = DEFAULT_LEFT_PERCENT;
@@ -104,6 +109,7 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
     this._dragState = {
       startX: event.clientX,
       startLeft: this._leftWidth,
+      sign: inlineSign(event.currentTarget),
       pointerId: event.pointerId,
       bodyWidth: this._bodyWidth()
     };
@@ -115,7 +121,7 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
     if (!state) return;
     if (!state.bodyWidth) return;
     const deltaPercent =
-      ((event.clientX - state.startX) / state.bodyWidth) * 100;
+      ((event.clientX - state.startX) / state.bodyWidth) * 100 * state.sign;
     this._setLeftWidth(state.startLeft + deltaPercent);
   }
 
@@ -126,7 +132,9 @@ export default class NewtonSelectorFlowCpeStudio extends LightningElement {
   }
 
   handleSplitterKeyDown(event) {
-    const step = event.shiftKey ? 10 : 5;
+    // Arrows move the splitter on screen; the start pane is on the right in
+    // right-to-left languages.
+    const step = (event.shiftKey ? 10 : 5) * inlineSign(event.currentTarget);
     let next;
     if (event.key === "ArrowLeft") next = this._leftWidth - step;
     else if (event.key === "ArrowRight") next = this._leftWidth + step;

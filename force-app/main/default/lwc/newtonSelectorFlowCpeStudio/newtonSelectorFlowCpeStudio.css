@@ -3,18 +3,12 @@
    Preview panel | splitter | configuration controls
    ============================================================================= */
 
+@import "c/newtonSelectorFlowCpeUtilityTokens";
+
 :host {
   --newton-studio-left-fr: 50fr;
   --newton-studio-right-fr: 50fr;
   --newton-studio-splitter-w: 0.375rem;
-  --newton-studio-canvas: var(--slds-g-color-surface-container-1, #f3f3f3);
-  --newton-studio-panel: var(--slds-g-color-surface-1, #ffffff);
-  --newton-studio-panel-soft: var(--slds-g-color-surface-container-2, #f9f9f9);
-  --newton-studio-ink-weak: var(--slds-g-color-neutral-base-40, #5c5c5c);
-  --newton-studio-hairline: var(--slds-g-color-border-base-1, #e5e5e5);
-  --newton-studio-brand: var(--slds-g-color-brand-base-50, #0176d3);
-  --newton-studio-radius: var(--slds-g-radius-border-2, 0.25rem);
-  --newton-studio-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .newton-studio {
@@ -151,11 +145,11 @@
 }
 
 .newton-studio__nav-status_warn {
-  color: var(--slds-g-color-warning-base-60, #9a5b02);
+  color: var(--newton-studio-warn);
 }
 
 .newton-studio__nav-status_error {
-  color: var(--slds-g-color-error-base-50, #ba0517);
+  color: var(--newton-studio-error);
 }
 
 /* Narrow controls column: icons drop out, labels stay. */
@@ -185,8 +179,8 @@
   height: 100%;
   background: var(--newton-studio-hairline);
   transition:
-    background-color 120ms ease,
-    width 120ms ease;
+    background-color 120ms var(--newton-studio-ease),
+    width 120ms var(--newton-studio-ease);
   pointer-events: none;
 }
 

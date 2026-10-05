@@ -4,10 +4,19 @@ import {
   normalizeSObjectDTO,
   normalizeCustom,
   filterItems,
-  applyOverrides
+  applyOverrides,
+  formatLabel
 } from "c/newtonSelectorUtilityDataSources";
 
 describe("newtonSelectorUtilityDataSources", () => {
+  describe("formatLabel", () => {
+    it("fills placeholders by index so a translation can reorder them", () => {
+      expect(formatLabel("{1} de {0}", 3, "Alpha, Beta")).toBe(
+        "Alpha, Beta de 3"
+      );
+    });
+  });
+
   describe("normalizePicklist", () => {
     it("returns [] for bad input", () => {
       expect(normalizePicklist(null)).toEqual([]);

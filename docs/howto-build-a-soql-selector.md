@@ -59,7 +59,7 @@ Show a live, filtered list of records from your org (for example open Cases or a
 | `Unsupported WHERE operator.`          | A hand-written operator Apex doesn't allow, such as `NOT LIKE`. Use `LIKE`, `!=` or `NOT IN`. |
 | `Invalid value for F (TYPE): v`        | The value does not fit the field's type (for example `TODAY` on a Date). Fix the value.       |
 | `Field not sortable on X: F`           | The **Order by** field cannot be sorted. Choose another field.                                |
-| `Unable to load selector options.`     | An unexpected failure. Click **Validate query** in the editor to see the real error.          |
+| Any other message                      | A database error, reported as the database gave it. Click **Validate query** to reproduce it. |
 
 ## Related
 

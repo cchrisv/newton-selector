@@ -1,19 +1,8 @@
+@import "c/newtonSelectorFlowCpeUtilityTokens";
+
 :host {
-  --newton-selector-icon-cell-size: var(--slds-g-sizing-11, 3.5rem);
+  --newton-selector-icon-cell-size: var(--slds-g-sizing-11, 4rem);
   --newton-selector-icon-cell-gap: var(--slds-g-spacing-2, 0.5rem);
-  --newton-cpe-dropdown-surface: var(--slds-g-color-neutral-base-100, #ffffff);
-  --newton-cpe-dropdown-border: var(--slds-g-color-border-base-1, #c9c9c9);
-  --newton-cpe-dropdown-shadow: var(
-    --slds-g-shadow-3,
-    0 8px 24px
-      color-mix(
-        in oklab,
-        var(--slds-g-color-neutral-base-10, #181818) 14%,
-        transparent
-      )
-  );
-  --newton-cpe-dropdown-radius: var(--slds-g-radius-border-3, 0.5rem);
-  --newton-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   display: block;
 }
 
@@ -36,14 +25,18 @@
   position: relative;
 }
 
+/* The closed trigger is the SLDS standard input (.slds-input owns its edge,
+   fill, radius and height); this only lays out its preview, label and chevron.
+   The inline padding is pinned so the clear button's offset below is exact. */
 .newton-combobox__trigger {
   display: inline-flex;
   align-items: center;
   gap: var(--slds-g-spacing-2, 0.5rem);
-  width: 100%;
   justify-content: space-between;
-  padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-3, 0.75rem);
-  min-height: var(--slds-g-sizing-8, 2rem);
+  padding-inline: var(--slds-g-spacing-3, 0.75rem);
+  font-family: inherit;
+  text-align: start;
+  cursor: pointer;
 }
 
 .newton-combobox__preview {
@@ -53,7 +46,7 @@
   flex: 0 0 auto;
   width: var(--slds-g-sizing-8, 1.75rem);
   height: var(--slds-g-sizing-8, 1.75rem);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
   color: var(--slds-g-color-brand-base-50, #0176d3);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
   border: var(--slds-g-sizing-border-2, 2px) solid
@@ -92,7 +85,7 @@
   margin-block: auto;
   padding: 0;
   border: 0;
-  border-radius: var(--slds-g-radius-border-pill, 999px);
+  border-radius: var(--slds-g-radius-border-pill, 15rem);
   background: transparent;
   color: inherit;
   cursor: pointer;
@@ -102,7 +95,7 @@
 }
 .newton-combobox__clear:focus-visible {
   outline: var(--slds-g-sizing-border-2, 2px) solid
-    var(--slds-g-color-brand-base-60, #0b5cab);
+    var(--slds-g-color-brand-base-50, #0176d3);
   outline-offset: 1px;
 }
 
@@ -117,7 +110,7 @@
 .newton-search {
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
   border-bottom: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #e5e5e5);
+    var(--slds-g-color-neutral-base-90, #e5e5e5);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
   position: sticky;
   top: 0;
@@ -147,15 +140,15 @@
   width: var(--newton-selector-icon-cell-size);
   min-height: 4.75rem;
   border: var(--slds-g-sizing-border-1, 1px) solid
-    var(--slds-g-color-border-base-1, #e5e5e5);
-  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    var(--slds-g-color-neutral-base-90, #e5e5e5);
+  border-radius: var(--slds-g-radius-border-2, 0.5rem);
   background: var(--slds-g-color-neutral-base-100, #ffffff);
   color: var(--slds-g-color-neutral-base-20, #2e2e2e);
   cursor: pointer;
   transition:
-    background-color 140ms var(--newton-ease),
-    border-color 140ms var(--newton-ease),
-    transform 140ms var(--newton-ease);
+    background-color 140ms var(--newton-studio-ease),
+    border-color 140ms var(--newton-studio-ease),
+    transform 140ms var(--newton-studio-ease);
   padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-1, 0.25rem);
 }
 .newton-selector-icon-cell:hover {
@@ -163,13 +156,13 @@
   border-color: color-mix(
     in oklab,
     var(--slds-g-color-brand-base-50, #0176d3) 36%,
-    var(--slds-g-color-border-base-1, #e5e5e5)
+    var(--slds-g-color-neutral-base-90, #e5e5e5)
   );
   transform: translateY(calc(var(--slds-g-sizing-border-1, 1px) * -1));
 }
 .newton-selector-icon-cell:focus-visible {
   outline: var(--slds-g-sizing-border-2, 2px) solid
-    var(--slds-g-color-brand-base-60, #0b5cab);
+    var(--slds-g-color-brand-base-50, #0176d3);
   outline-offset: 1px;
 }
 .newton-selector-icon-cell_selected {
